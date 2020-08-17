@@ -5,19 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
 <meta name="generator" content="Hexo 4.2.0">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/avatar.jpg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/avatar.jpg">
   <link rel="mask-icon" href="/images/logo.svg" color="#222">
 
 <link rel="stylesheet" href="/css/main.css">
 
-
-<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/themes/blue/pace-theme-minimal.min.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.min.js"></script>
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"raymond-zhao.top","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"raymond-zhao.top","root":"/","scheme":"Gemini","version":"7.8.0","exturl":true,"sidebar":{"position":"left","Pisces | Gemini":240,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":true,"comments":{"style":"tabs","active":"valine","storage":true,"lazyload":true,"nav":null,"activeClass":"valine"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="梳理一下计算机网络中的基础知识">
@@ -59,8 +62,26 @@
 
   <title>计算机网络基础知识 | Raymond's Blog</title>
   
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-153445863-1"></script>
+    <script data-pjax>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-153445863-1');
+      }
+    </script>
 
 
+  <script data-pjax>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?889b45174b1bfd8b974e0944a5c47850";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
 
 
 
@@ -97,7 +118,7 @@
     <header class="header" itemscope itemtype="http://schema.org/WPHeader">
       <div class="header-inner"><div class="site-brand-container">
   <div class="site-nav-toggle">
-    <div class="toggle" aria-label="Toggle navigation bar">
+    <div class="toggle" aria-label="切换导航栏">
       <span class="toggle-line toggle-line-first"></span>
       <span class="toggle-line toggle-line-middle"></span>
       <span class="toggle-line toggle-line-last"></span>
@@ -116,6 +137,7 @@
 
   <div class="site-nav-right">
     <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
     </div>
   </div>
 </div>
@@ -127,19 +149,61 @@
   <ul id="menu" class="main-menu menu">
         <li class="menu-item menu-item-home">
 
-    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">26</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">16</span></a>
 
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">29</span></a>
 
   </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
   </ul>
 </nav>
 
 
 
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
 
 </div>
     </header>
@@ -149,6 +213,9 @@
     <i class="fa fa-arrow-up"></i>
     <span>0%</span>
   </div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <span class="exturl github-corner" data-url="aHR0cHM6Ly9naXRodWIuY29tL3JheW1vbmQtemhhbw==" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></span>
 
 
     <main class="main">
@@ -166,7 +233,7 @@
     <link itemprop="mainEntityOfPage" href="http://raymond-zhao.top/2020/03/18/2020-03-18-Network-Basic/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar.jpg">
       <meta itemprop="name" content="忘川三途">
       <meta itemprop="description" content="">
     </span>
@@ -180,45 +247,68 @@
         </h1>
 
         <div class="post-meta">
+
+          
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-calendar"></i>
               </span>
-              <span class="post-meta-item-text">Posted on</span>
+              <span class="post-meta-item-text">发表于</span>
 
-              <time title="Created: 2020-03-18 05:20:20" itemprop="dateCreated datePublished" datetime="2020-03-18T05:20:20+08:00">2020-03-18</time>
+              <time title="创建时间：2020-03-18 05:20:20" itemprop="dateCreated datePublished" datetime="2020-03-18T05:20:20+08:00">2020-03-18</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-08-17 12:34:19" itemprop="dateModified" datetime="2020-08-17T12:34:19+08:00">2020-08-17</time>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-08-17 12:34:19" itemprop="dateModified" datetime="2020-08-17T12:34:19+08:00">2020-08-17</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
-              <span class="post-meta-item-text">In</span>
+              <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
                   <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">计算机网络</span></a>
                 </span>
             </span>
 
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/03/18/2020-03-18-Network-Basic/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/03/18/2020-03-18-Network-Basic/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
+                <span class="post-meta-item-text">本文字数：</span>
               <span>8.1k</span>
             </span>
-            <span class="post-meta-item" title="Reading time">
+            <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>7 mins.</span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>7 分钟</span>
             </span>
             <div class="post-description">梳理一下计算机网络中的基础知识</div>
 
@@ -233,7 +323,7 @@
       
         <h1 id="1-基础知识"><a href="#1-基础知识" class="headerlink" title="1 基础知识"></a>1 基础知识</h1><p>OSI的七层协议体系结构的概念清楚，理论也较完整，但它既复杂又不实用。TCP/IP体系结构则不同，但它现在却得到了非常广泛的应用。</p>
 <p>TCP/IP是一个四层的体系结构，它包含应用层、运输层、网际层和网络接口层(用网际层这个名字是强调这一层是为了解决不同网络的互连问题)。不过从实质上讲，TCP/IP只有最上面的三层，因为最下面的网络接口层并没有什么具体内容。</p>
-<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gd9qb100evj31f40ocdvs.jpg" alt="计算机网络体系结构"></p>
+<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9qb100evj31f40ocdvs.jpg" alt="计算机网络体系结构"></p>
 <ul>
 <li><p>应用层(applicationlayer)：应用层的任务是通过应用进程间的交互来完成特定网络应用。应用层协议定义的是应用进程间通信和交互的规则。这里的进程就是指主机中正在运行的程序。对于不同的网络应用需要有不同的应用层协议。在互联网中的应用层协议很多，如域名系统DNS，支持万维网应用的HTTP协议，支持电子邮件的SMTP协议等等。我们把应用层交互的数据单元称为报文(message)。</p>
 </li>
@@ -258,10 +348,10 @@
 <li><p>物理层(physicallayer)：考虑的是怎样在传输媒体上透明地传输数据比特流，而不是指具体的传输媒体。物理层的作用是尽可能屏蔽传输媒体和通信手段的差异，使数据链路层感觉不到这些差异。</p>
 </li>
 </ul>
-<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gczcfmgbzjg30u016i0yk.gif" alt="计算机网络分层体系图"></p>
-<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gd9rqohwupj31ea0jgk38.jpg" alt="数据在各层之间的传递过程"></p>
+<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gczcfmgbzjg30u016i0yk.gif" alt="计算机网络分层体系图"></p>
+<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9rqohwupj31ea0jgk38.jpg" alt="数据在各层之间的传递过程"></p>
 <h1 id="2-TCP-的三次牵手四次分手"><a href="#2-TCP-的三次牵手四次分手" class="headerlink" title="2 TCP 的三次牵手四次分手"></a>2 TCP 的三次牵手四次分手</h1><h2 id="2-1-三次握手：建立连接"><a href="#2-1-三次握手：建立连接" class="headerlink" title="2.1 三次握手：建立连接"></a>2.1 三次握手：建立连接</h2><p>TCP建立连接的过程叫做握手，握手需要在客户和服务器之间交换三个TCP报文段。</p>
-<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gd9tsfxtkyj31ce0okdrn.jpg" alt="三报文握手建立连接"></p>
+<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9tsfxtkyj31ce0okdrn.jpg" alt="三报文握手建立连接"></p>
 <p>假定主机A运行的是TCP客户程序，而B运行TCP服务器程序。最初两端的TCP进程都处CLOSED(关闭)状态。图中在主机下面的方框分别是TCP进程所处的状态。在本例中，A主动打开连接，而B被动打开连接。</p>
 <p>一开始，B的TCP服务器进程先创建传输控制块TCB，准备接受客户进程的连接请求。然后服务器进程就处于LISTEN(收听)状态，等待客户的连接请求。如有，即作出响应。</p>
 <p>A的TCP客户进程也是首先创建传输控制模块TCB。然后，在打算建立TCP连接时，向B发出连接请求报文段，这时首部中的同步位SYN=1，同时选择一个初始序号seq=x。TCP规定，SYN报文段(即SYN=1的报文段)不能携带数据，但要消耗掉一个序号。这时，TCP客户进程进入SYN-SENT(同步已发送)状态。</p>
@@ -275,7 +365,7 @@
 <p>由于现在A并没有发出建立连接的请求，因此不会理睬B的确认，也不会向B发送数据。但B却以为新的运输连接已经建立了，并一直等待A发来数据。B的许多资源就这样白白浪费了。</p>
 <p>采用三报文握手的办法，可以防止上述现象的发生。例如在刚才的异常情况下，A不会向B的确认发出确认。B由于收不到确认，就知道A并没有要求建立连接。</p>
 <h2 id="2-2-四次分手：断了联系"><a href="#2-2-四次分手：断了联系" class="headerlink" title="2.2 四次分手：断了联系"></a>2.2 四次分手：断了联系</h2><p>数据传输结束后，通信的双方都可释放连接。现在A和B都处于ESTABLISHED状态。A的应用进程先向其TCP发出连接释放报文段，并停止再发送数据，主动关闭TCP连接。A把连接释放报文段首部的终止控制位FIN置1，其序号seq=u，它等于前面已传送过的数据的最后一个字节的序号加1。这时A进入FIN-WAIT-1(终止等待1)状态，等待B的确认。注意，TCP规定，FIN报文段即使不携带数据，它也消耗掉一个序号。</p>
-<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gd9uuv1g7cj31ew0r2qje.jpg" alt="TCP连接的释放过程"></p>
+<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9uuv1g7cj31ew0r2qje.jpg" alt="TCP连接的释放过程"></p>
 <p>B收到连接释放报文段后即发出确认，确认号是ack=u+1，而这个报文段自己的序号是v，等于B前面已传送过的数据的最后一个字节的序号加1。然后B就进入CLOSE-WAIT(关闭等待)状态。TCP服务器进程这时应通知高层应用进程，因而从A到B这个方向的连接就释放了，这时的TCP连接处于半关闭(half-close)状态，即A已经没有数据要发送了，但B若发送数据，A仍要接收。也就是说，从B到A这个方向的连接并未关闭，这个状态可能会持续一段时间。</p>
 <p>A收到来自B的确认后，就进入FIN-WAIT-2(终止等待2)状态，等待B发出的连接释放报文段。</p>
 <p>若B已经没有要向A发送的数据，其应用进程就通知TCP释放连接。这时B发出的连接释放报文段必须使FIN=1。现假定B的序号为w(在半关闭状态B可能又发送了一些数据)。B还必须重复上次已发送过的确认号ack=u+1。这时B就进入LAST-ACK(最后确认)状态，等待A的确认。</p>
@@ -325,17 +415,17 @@
 <td align="center">提供全双工通信</td>
 </tr>
 </tbody></table>
-<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gd9wbh2rblj315a0rqn73.jpg" alt="UDP报文段的首部"></p>
-<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gd9wcefwrej315w0li46o.jpg" alt="TCP报文段的首部格式"></p>
+<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9wbh2rblj315a0rqn73.jpg" alt="UDP报文段的首部"></p>
+<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9wcefwrej315w0li46o.jpg" alt="TCP报文段的首部格式"></p>
 <h1 id="4-TCP-的滑动窗口机制"><a href="#4-TCP-的滑动窗口机制" class="headerlink" title="4 TCP 的滑动窗口机制"></a>4 TCP 的滑动窗口机制</h1><p>滑动窗口机制可以很方便地在TCP连接上实现对发送方的流量控制，与超时重传，选择确认一起保证可靠传输。</p>
-<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gd9xtsj9nvj316c0ay444.jpg" alt="滑动窗口"></p>
+<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9xtsj9nvj316c0ay444.jpg" alt="滑动窗口"></p>
 <p>发送窗口里面的序号表示允许发送的序号。显然，窗口越大，发送方就可以在收到对方确认之前连续发送更多的数据，因而可能获得更高的传输效率。</p>
 <p>发送窗口后沿的后面部分表示已发送且已收到了确认。</p>
 <p>发送窗口的位置由窗口前沿和后沿的位置共同确定。发送窗口后沿的变化情况有两种可能，即不动(没有收到新的确认)和前移(收到了新的确认)。发送窗口后沿不可能向后移动，因为不能撤销掉已收到的确认。发送窗口前沿通常是不断向前移动，但也有可能不动。这对应于两种情况:一是没有收到新的确认，对方通知的窗口大小也不变;二是收到了新的确认但对方通知的窗口缩小了，使得发送窗口前沿正好不动。</p>
 <p>发送窗口前沿也有可能向后收缩。这发生在对方通知的窗口缩小了。</p>
 <h1 id="5-TCP的拥塞控制"><a href="#5-TCP的拥塞控制" class="headerlink" title="5 TCP的拥塞控制"></a>5 TCP的拥塞控制</h1><p>拥塞控制与流量控制的关系密切，它们之间也存在着一些差别。所谓拥塞控制就是防止过多的数据注入到网络中，这样可以使网络中的路由器或链路不致过载。拥塞控制所要做的都有一个前提，就是网络能够承受现有的网络负荷。拥塞控制是一个全局性的过程，涉及到所有的主机、所有的路由器，以及与降低网络传输性能有关的所有因素。但TCP连接的端点只要迟迟不能收到对方的确认信息，就猜想在当前网络中的某处很可能发生了拥塞，但这时却无法知道拥塞到底发生在网络的何处，也无法知道发生拥塞的具体原因。(是访问某个服务器的通信量过大?还是在某个地区出现自然灾害?)</p>
 <p>相反，流量控制往往是指点对点通信量的控制，是个端到端的问题(接收端控制发送端)。流量控制所要做的就是抑制发送端发送数据的速率，以便使接收端来得及接收。</p>
-<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gd9y0c49wrj315a0fywlq.jpg" alt="拥塞控制所起的作用"></p>
+<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9y0c49wrj315a0fywlq.jpg" alt="拥塞控制所起的作用"></p>
 <p>拥塞控制的算法种类</p>
 <ul>
 <li>慢开始(slow-start)</li>
@@ -344,10 +434,10 @@
 <li>快恢复(fast recovery)</li>
 </ul>
 <h1 id="6-HTTP与HTTPS"><a href="#6-HTTP与HTTPS" class="headerlink" title="6 HTTP与HTTPS"></a>6 HTTP与HTTPS</h1><p>主要来源于<strong>维基百科</strong></p>
-<p><strong>超文本传输协议</strong>（英语：<strong>H</strong>yper<strong>T</strong>ext <strong>T</strong>ransfer <strong>P</strong>rotocol，缩写：<strong>HTTP</strong>）是一种用于分布式、协作式和<a href="https://zh.wikipedia.org/wiki/超媒體" target="_blank" rel="noopener">超媒体</a>信息系统的<a href="https://zh.wikipedia.org/wiki/应用层" target="_blank" rel="noopener">应用层</a><a href="https://zh.wikipedia.org/wiki/网络传输协议" target="_blank" rel="noopener">协议</a><a href="https://zh.wikipedia.org/wiki/超文本传输协议#cite_note-ietf2616-1" target="_blank" rel="noopener">[1]</a>。HTTP是<a href="https://zh.wikipedia.org/wiki/全球資訊網" target="_blank" rel="noopener">万维网</a>的数据通信的基础，无状态，明文传输。</p>
-<p><strong>超文本传输安全协议</strong>（英语：<strong>H</strong>yper<strong>T</strong>ext <strong>T</strong>ransfer <strong>P</strong>rotocol <strong>S</strong>ecure，缩写：<strong>HTTPS</strong>；常称为HTTP over TLS、HTTP over SSL或HTTP Secure）是一种通过<a href="https://zh.wikipedia.org/wiki/計算機網絡" target="_blank" rel="noopener">计算机网络</a>进行安全通信的<a href="https://zh.wikipedia.org/wiki/網路傳輸協定" target="_blank" rel="noopener">传输协议</a>。HTTPS经由<a href="https://zh.wikipedia.org/wiki/HTTP" target="_blank" rel="noopener">HTTP</a>进行通信，但利用<a href="https://zh.wikipedia.org/wiki/传输层安全" target="_blank" rel="noopener">SSL/TLS</a>来<a href="https://zh.wikipedia.org/wiki/加密" target="_blank" rel="noopener">加密</a>数据包。HTTPS开发的主要目的，是提供对<a href="https://zh.wikipedia.org/wiki/網站" target="_blank" rel="noopener">网站</a>服务器的<a href="https://zh.wikipedia.org/wiki/身份验证" target="_blank" rel="noopener">身份认证</a>，保护交换数据的隐私与<a href="https://zh.wikipedia.org/wiki/完整性" target="_blank" rel="noopener">完整性</a>。</p>
-<p>HTTP是一个客户端（用户）和服务端（网站）之间请求和应答的标准，通常使用<a href="https://zh.wikipedia.org/wiki/传输控制协议" target="_blank" rel="noopener">TCP协议</a>。默认端口 80, HTTPS默认端口 443.</p>
-<p>HTTP协议和安全协议同属于应用层（<a href="https://zh.wikipedia.org/wiki/OSI模型" target="_blank" rel="noopener">OSI模型</a>的最高层），具体来讲，安全协议工作在HTTP之下，传输层之上：安全协议向运行HTTP的进程提供一个类似于TCP的套接字，供进程向其中注入报文，安全协议将报文加密并注入运输层套接字；或是从运输层获取加密报文，解密后交给对应的进程。严格地讲，HTTPS并不是一个单独的协议，而是对工作在一加密连接（<a href="https://zh.wikipedia.org/wiki/传输层安全" target="_blank" rel="noopener">TLS</a>或SSL）上的常规HTTP协议的称呼。</p>
+<p><strong>超文本传输协议</strong>（英语：<strong>H</strong>yper<strong>T</strong>ext <strong>T</strong>ransfer <strong>P</strong>rotocol，缩写：<strong>HTTP</strong>）是一种用于分布式、协作式和<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv6LaF5aqS6auU">超媒体<i class="fa fa-external-link-alt"></i></span>信息系统的<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5bqU55So5bGC">应用层<i class="fa fa-external-link-alt"></i></span><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv572R57uc5Lyg6L6T5Y2P6K6u">协议<i class="fa fa-external-link-alt"></i></span><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv6LaF5paH5pys5Lyg6L6T5Y2P6K6uI2NpdGVfbm90ZS1pZXRmMjYxNi0x">[1]<i class="fa fa-external-link-alt"></i></span>。HTTP是<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5YWo55CD6LOH6KiK57ay">万维网<i class="fa fa-external-link-alt"></i></span>的数据通信的基础，无状态，明文传输。</p>
+<p><strong>超文本传输安全协议</strong>（英语：<strong>H</strong>yper<strong>T</strong>ext <strong>T</strong>ransfer <strong>P</strong>rotocol <strong>S</strong>ecure，缩写：<strong>HTTPS</strong>；常称为HTTP over TLS、HTTP over SSL或HTTP Secure）是一种通过<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv6KiI566X5qmf57ay57Wh">计算机网络<i class="fa fa-external-link-alt"></i></span>进行安全通信的<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv57ay6Lev5YKz6Ly45Y2U5a6a">传输协议<i class="fa fa-external-link-alt"></i></span>。HTTPS经由<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUA==">HTTP<i class="fa fa-external-link-alt"></i></span>进行通信，但利用<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5Lyg6L6T5bGC5a6J5YWo">SSL/TLS<i class="fa fa-external-link-alt"></i></span>来<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5Yqg5a+G">加密<i class="fa fa-external-link-alt"></i></span>数据包。HTTPS开发的主要目的，是提供对<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv57ay56uZ">网站<i class="fa fa-external-link-alt"></i></span>服务器的<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv6Lqr5Lu96aqM6K+B">身份认证<i class="fa fa-external-link-alt"></i></span>，保护交换数据的隐私与<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5a6M5pW05oCn">完整性<i class="fa fa-external-link-alt"></i></span>。</p>
+<p>HTTP是一个客户端（用户）和服务端（网站）之间请求和应答的标准，通常使用<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5Lyg6L6T5o6n5Yi25Y2P6K6u">TCP协议<i class="fa fa-external-link-alt"></i></span>。默认端口 80, HTTPS默认端口 443.</p>
+<p>HTTP协议和安全协议同属于应用层（<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvT1NJ5qih5Z6L">OSI模型<i class="fa fa-external-link-alt"></i></span>的最高层），具体来讲，安全协议工作在HTTP之下，传输层之上：安全协议向运行HTTP的进程提供一个类似于TCP的套接字，供进程向其中注入报文，安全协议将报文加密并注入运输层套接字；或是从运输层获取加密报文，解密后交给对应的进程。严格地讲，HTTPS并不是一个单独的协议，而是对工作在一加密连接（<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5Lyg6L6T5bGC5a6J5YWo">TLS<i class="fa fa-external-link-alt"></i></span>或SSL）上的常规HTTP协议的称呼。</p>
 <p>HTTP使用TCP三次握手建立连接，客户端和服务器需要交换3个包；HTTPS除了TCP的三个包，还要加上ssl握手需要的9个包，所以一共是12个包。</p>
 <h2 id="6-1-请求方法"><a href="#6-1-请求方法" class="headerlink" title="6.1 请求方法"></a>6.1 请求方法</h2><table>
 <thead>
@@ -393,22 +483,22 @@
 <td align="center">通常用于SSL加密服务器的链接</td>
 </tr>
 </tbody></table>
-<h2 id="6-2-状态码"><a href="#6-2-状态码" class="headerlink" title="6.2 状态码"></a>6.2 状态码</h2><p>所有HTTP响应的第一行都是<strong>状态行</strong>，依次是当前HTTP版本号，3位数字组成的<a href="https://zh.wikipedia.org/wiki/HTTP状态码" target="_blank" rel="noopener">状态代码</a>，以及描述状态的短语，彼此由空格分隔。</p>
+<h2 id="6-2-状态码"><a href="#6-2-状态码" class="headerlink" title="6.2 状态码"></a>6.2 状态码</h2><p>所有HTTP响应的第一行都是<strong>状态行</strong>，依次是当前HTTP版本号，3位数字组成的<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggQ==">状态代码<i class="fa fa-external-link-alt"></i></span>，以及描述状态的短语，彼此由空格分隔。</p>
 <p>状态代码的第一个数字代表当前响应的类型：</p>
 <ul>
-<li><a href="https://zh.wikipedia.org/wiki/HTTP状态码#1xx消息" target="_blank" rel="noopener">1xx消息</a>——请求已被服务器接收，继续处理</li>
-<li><a href="https://zh.wikipedia.org/wiki/HTTP状态码#2xx成功" target="_blank" rel="noopener">2xx成功</a>——请求已成功被服务器接收、理解、并接受<ul>
+<li><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSMxeHjmtojmga8=">1xx消息<i class="fa fa-external-link-alt"></i></span>——请求已被服务器接收，继续处理</li>
+<li><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSMyeHjmiJDlip8=">2xx成功<i class="fa fa-external-link-alt"></i></span>——请求已成功被服务器接收、理解、并接受<ul>
 <li>200: 正常返回信息</li>
 </ul>
 </li>
-<li><a href="https://zh.wikipedia.org/wiki/HTTP状态码#3xx重定向" target="_blank" rel="noopener">3xx重定向</a>——需要后续操作才能完成这一请求</li>
-<li><a href="https://zh.wikipedia.org/wiki/HTTP状态码#4xx请求错误" target="_blank" rel="noopener">4xx请求错误</a>——请求含有词法错误或者无法被执行<ul>
+<li><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSMzeHjph43lrprlkJE=">3xx重定向<i class="fa fa-external-link-alt"></i></span>——需要后续操作才能完成这一请求</li>
+<li><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSM0eHjor7fmsYLplJnor68=">4xx请求错误<i class="fa fa-external-link-alt"></i></span>——请求含有词法错误或者无法被执行<ul>
 <li>401 Unauthorized：请求未经授权，这个状态码必须要和 <code>WWW-Authenticate</code> 一起使用</li>
 <li>403 Forbidden：服务器收到请求，但是拒绝提供服务</li>
 <li>404 Not Found：请求资源部存在。最常见的就是URL错误</li>
 </ul>
 </li>
-<li><a href="https://zh.wikipedia.org/wiki/HTTP状态码#5xx服务器错误" target="_blank" rel="noopener">5xx服务器错误</a>——服务器在处理某个正确请求时发生错误<ul>
+<li><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSM1eHjmnI3liqHlmajplJnor68=">5xx服务器错误<i class="fa fa-external-link-alt"></i></span>——服务器在处理某个正确请求时发生错误<ul>
 <li>500 Internal Server Error：服务器发生不可预期的错误</li>
 <li>505 Server Unavailable：服务器当前不能处理客户端的请求，一段时间后可能恢复正常</li>
 </ul>
@@ -441,7 +531,7 @@
 </li>
 </ol>
 <h2 id="6-4-SSL-与-TLS"><a href="#6-4-SSL-与-TLS" class="headerlink" title="6.4 SSL 与 TLS"></a>6.4 SSL 与 TLS</h2><ul>
-<li><a href="https://baike.baidu.com/item/安全套接层" target="_blank" rel="noopener">SSL(Secure Sockets Layer安全套接层)</a></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9iYWlrZS5iYWlkdS5jb20vaXRlbS/lronlhajlpZfmjqXlsYI=">SSL(Secure Sockets Layer安全套接层)<i class="fa fa-external-link-alt"></i></span></li>
 <li><a href="https://zh.wikipedia.org/wiki/%E5%82%B3%E8%BC%B8%E5%B1%A4%E5%AE%89%E5%85%A8%E6%80%A7%E5%8D%94%E5%AE%9A" target="_blank" rel="noopener">TLS (<strong>T</strong>ransport <strong>L</strong>ayer <strong>S</strong>ecurity 传输层安全性协议)</a></li>
 </ul>
 <p>加密方式</p>
@@ -457,7 +547,7 @@
 <li>客户端再次请求的时候，会把 <code>Cookie</code> 回发</li>
 <li>服务器收到后，会解析 <code>Cookie</code> 生成与客户端相对应的内容</li>
 </ul>
-<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gda16yd3y9j30qi0d6gnh.jpg" alt="Cookie的设置与工作过程"></p>
+<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gda16yd3y9j30qi0d6gnh.jpg" alt="Cookie的设置与工作过程"></p>
 <p>Session简介</p>
 <ul>
 <li>服务器端的机制，在服务器上保存的信息</li>
@@ -468,7 +558,7 @@
 </ul>
 </li>
 </ul>
-<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gda1a9ou70j30sq0bcjwe.jpg" alt="Session的工作方式"></p>
+<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gda1a9ou70j30sq0bcjwe.jpg" alt="Session的工作方式"></p>
 <p> <code>Cookie</code> 和 <code>Session</code> 的区别</p>
 <ul>
 <li><code>Cookie</code> 数据存放在客户的浏览器上， <code>Session</code> 数据存放在服务器上</li>
@@ -496,10 +586,13 @@
     
     
     
+      
+
 
       <footer class="post-footer">
+          
           <div class="post-tags">
-              <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag"># 计算机网络</a>
+              <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag"><i class="fa fa-tag"></i> 计算机网络</a>
           </div>
 
         
@@ -527,6 +620,7 @@
 
           </div>
           
+    <div class="comments" id="valine-comments"></div>
 
 <script>
   window.addEventListener('tabs:register', () => {
@@ -564,21 +658,23 @@
 
       <ul class="sidebar-nav motion-element">
         <li class="sidebar-nav-toc">
-          Table of Contents
+          文章目录
         </li>
         <li class="sidebar-nav-overview">
-          Overview
+          站点概览
         </li>
       </ul>
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-基础知识"><span class="nav-number">1.</span> <span class="nav-text">1 基础知识</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-TCP-的三次牵手四次分手"><span class="nav-number">2.</span> <span class="nav-text">2 TCP 的三次牵手四次分手</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-三次握手：建立连接"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 三次握手：建立连接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-四次分手：断了联系"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 四次分手：断了联系</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-TCP-与-UDP-的区别"><span class="nav-number">3.</span> <span class="nav-text">3 TCP 与 UDP 的区别</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-TCP-的滑动窗口机制"><span class="nav-number">4.</span> <span class="nav-text">4 TCP 的滑动窗口机制</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-TCP的拥塞控制"><span class="nav-number">5.</span> <span class="nav-text">5 TCP的拥塞控制</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-HTTP与HTTPS"><span class="nav-number">6.</span> <span class="nav-text">6 HTTP与HTTPS</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#6-1-请求方法"><span class="nav-number">6.1.</span> <span class="nav-text">6.1 请求方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-2-状态码"><span class="nav-number">6.2.</span> <span class="nav-text">6.2 状态码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-3-HTTPS-工作流程"><span class="nav-number">6.3.</span> <span class="nav-text">6.3 HTTPS 工作流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-4-SSL-与-TLS"><span class="nav-number">6.4.</span> <span class="nav-text">6.4 SSL 与 TLS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-5-Cookie与Session"><span class="nav-number">6.5.</span> <span class="nav-text">6.5 Cookie与Session</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-6-GET-与-POST"><span class="nav-number">6.6.</span> <span class="nav-text">6.6 GET 与 POST</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">6.7.</span> <span class="nav-text">参考</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-基础知识"><span class="nav-text">1 基础知识</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-TCP-的三次牵手四次分手"><span class="nav-text">2 TCP 的三次牵手四次分手</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-三次握手：建立连接"><span class="nav-text">2.1 三次握手：建立连接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-四次分手：断了联系"><span class="nav-text">2.2 四次分手：断了联系</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-TCP-与-UDP-的区别"><span class="nav-text">3 TCP 与 UDP 的区别</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-TCP-的滑动窗口机制"><span class="nav-text">4 TCP 的滑动窗口机制</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-TCP的拥塞控制"><span class="nav-text">5 TCP的拥塞控制</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-HTTP与HTTPS"><span class="nav-text">6 HTTP与HTTPS</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#6-1-请求方法"><span class="nav-text">6.1 请求方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-2-状态码"><span class="nav-text">6.2 状态码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-3-HTTPS-工作流程"><span class="nav-text">6.3 HTTPS 工作流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-4-SSL-与-TLS"><span class="nav-text">6.4 SSL 与 TLS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-5-Cookie与Session"><span class="nav-text">6.5 Cookie与Session</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-6-GET-与-POST"><span class="nav-text">6.6 GET 与 POST</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-text">参考</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
       <div class="site-overview-wrap sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="忘川三途"
+      src="/images/avatar.jpg">
   <p class="site-author-name" itemprop="name">忘川三途</p>
   <div class="site-description" itemprop="description"></div>
 </div>
@@ -588,23 +684,66 @@
           <a href="/archives/">
         
           <span class="site-state-item-count">29</span>
-          <span class="site-state-item-name">posts</span>
+          <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
+          
         <span class="site-state-item-count">16</span>
-        <span class="site-state-item-name">categories</span></a>
+        <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
+          
         <span class="site-state-item-count">26</span>
-        <span class="site-state-item-name">tags</span></a>
+        <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
 </div>
+  <div class="sidebar-button motion-element">
+    <a onclick="Chatra('openChat', true);">
+    
+  </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL3JheW1vbmQtemhhbw==" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;raymond-zhao"><i class="github fa-fw"></i>GitHub</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="bWFpbHRvOnFxNzQwNTY3Mzk2QGdtYWlsLmNvbQ==" title="E-Mail → mailto:qq740567396@gmail.com"><i class="envelope fa-fw"></i>E-Mail</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly93ZWliby5jb20vNTcwOTY3MTA3OA==" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;5709671078"><i class="weibo fa-fw"></i>Weibo</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly90d2l0dGVyLmNvbS9SYXltb25kZ2FsYXh5" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;Raymondgalaxy"><i class="twitter fa-fw"></i>Twitter</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly93d3cuZmFjZWJvb2suY29tL3JheS56aGFvLjU2OA==" title="Facebook → https:&#x2F;&#x2F;www.facebook.com&#x2F;ray.zhao.568"><i class="facebook fa-fw"></i>Facebook</span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9pbnN0YWdyYW0uY29tL3JheW1vbmRfX3poYW8=" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;raymond__zhao"><i class="instagram fa-fw"></i>Instagram</span>
+      </span>
+  </div>
 
 
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <span class="exturl" data-url="aHR0cHM6Ly9yYW1vbmEtY2hlbi50b3Av" title="https:&#x2F;&#x2F;ramona-chen.top&#x2F;">陈某人</span>
+        </li>
+        <li class="links-of-blogroll-item">
+          <span class="exturl" data-url="aHR0cHM6Ly9pbmtzcy5jbi8=" title="https:&#x2F;&#x2F;inkss.cn&#x2F;">SZYINK</span>
+        </li>
+        <li class="links-of-blogroll-item">
+          <span class="exturl" data-url="aHR0cHM6Ly9saXNpamlhbi5jbi8=" title="https:&#x2F;&#x2F;lisijian.cn&#x2F;">思建的NLP之旅</span>
+        </li>
+    </ul>
+  </div>
 
       </div>
 
@@ -634,17 +773,37 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="Symbols count total">325k</span>
+    <span title="站点总字数">325k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">4:55</span>
+    <span title="站点阅读时长">4:55</span>
 </div>
-  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  <div class="powered-by">由 <span class="exturl theme-link" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl theme-link" data-url="aHR0cHM6Ly90aGVtZS1uZXh0Lm9yZw==">NexT.Gemini</span> 强力驱动
   </div>
 
         
+<div class="busuanzi-count">
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
 
 
 
@@ -658,42 +817,219 @@
   </div>
 
   
-  <script src="/lib/anime.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.1.0/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/theme-next/theme-next-pjax@0/pjax.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/lozad.js/1.14.0/lozad.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/pangu/4.0.7/pangu.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/velocity/1.2.1/velocity.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/velocity/1.2.1/velocity.ui.min.js"></script>
 
 <script src="/js/utils.js"></script>
 
 <script src="/js/motion.js"></script>
 
 
-<script src="/js/schemes/muse.js"></script>
+<script src="/js/schemes/pisces.js"></script>
 
 
 <script src="/js/next-boot.js"></script>
 
+<script src="/js/bookmark.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
 
 
 
   
-
-
-
-
-
-
-
-
-
-
-
+  <script data-pjax>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
 
 
 
 
   
+<script src="/js/local-search.js"></script>
+
+
+
+
+  <script>
+    (function(d, w, c) {
+      w.ChatraID = 'WW9yp8QpPcAKpJMYy';
+      var s = d.createElement('script');
+      w[c] = w[c] || function() {
+        (w[c].q = w[c].q || []).push(arguments);
+      };
+      s.async = true;
+      s.src = 'https://call.chatra.io/chatra.js';
+      if (d.head) d.head.appendChild(s);
+    })(document, window, 'Chatra');
+  </script>
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
 
   
 
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//cdnjs.cloudflare.com/ajax/libs/valine/1.3.10/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'v6cb35sRa1lfGq6EOtTQHHyf-gzGzoHsz',
+      appKey     : '2ulfq63r4brxg2l9QfXp0cTM',
+      placeholder: "快来评论吧",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : true,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+    </div>
 </body>
 </html>
