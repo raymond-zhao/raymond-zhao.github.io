@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"raymond-zhao.top","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="LeetCode多线程题目">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LeetCode多线程题目">
+<meta property="og:url" content="http://raymond-zhao.top/2020/07/13/2020-07-13-LeetCode-Concurrency/index.html">
+<meta property="og:site_name" content="Raymond&#39;s Blog">
+<meta property="og:description" content="LeetCode多线程题目">
+<meta property="article:published_time" content="2020-07-13T06:00:09.000Z">
+<meta property="article:modified_time" content="2020-08-16T13:05:36.507Z">
+<meta property="article:author" content="忘川三途">
+<meta property="article:tag" content="LeetCode多线程">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://raymond-zhao.top/2020/07/13/2020-07-13-LeetCode-Concurrency/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>LeetCode多线程题目 | Raymond's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Raymond's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Get busy Living, or get busy Dying.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://raymond-zhao.top/2020/07/13/2020-07-13-LeetCode-Concurrency/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川三途">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Raymond's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          LeetCode多线程题目
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-07-13 14:00:09" itemprop="dateCreated datePublished" datetime="2020-07-13T14:00:09+08:00">2020-07-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-08-16 21:05:36" itemprop="dateModified" datetime="2020-08-16T21:05:36+08:00">2020-08-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/LeetCode/" itemprop="url" rel="index"><span itemprop="name">LeetCode</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>6.2k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+            <div class="post-description">LeetCode多线程题目</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="LeetCode多线程题目"><a href="#LeetCode多线程题目" class="headerlink" title="LeetCode多线程题目"></a>LeetCode多线程题目</h1><h2 id="1114-按序打印"><a href="#1114-按序打印" class="headerlink" title="1114. 按序打印"></a><a href="https://leetcode-cn.com/problems/print-in-order/" target="_blank" rel="noopener">1114. 按序打印</a></h2><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">我们提供了一个类：</span><br><span class="line">public class Foo &#123;</span><br><span class="line">  public void one() &#123; print("one"); &#125;</span><br><span class="line">  public void two() &#123; print("two"); &#125;</span><br><span class="line">  public void three() &#123; print("three"); &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">三个不同的线程将会共用一个 Foo 实例。</span><br><span class="line"></span><br><span class="line">线程 A 将会调用 one() 方法</span><br><span class="line">线程 B 将会调用 two() 方法</span><br><span class="line">线程 C 将会调用 three() 方法</span><br><span class="line">请设计修改程序，以确保 two() 方法在 one() 方法之后被执行，three() 方法在 two() 方法之后被执行。</span><br><span class="line"></span><br><span class="line"><span class="bullet">- </span>示例1</span><br><span class="line">输入: [1,2,3]</span><br><span class="line">输出: "onetwothree"</span><br><span class="line">解释: </span><br><span class="line">有三个线程会被异步启动。</span><br><span class="line">输入 [1,2,3] 表示线程 A 将会调用 one() 方法，线程 B 将会调用 two() 方法，线程 C 将会调用 three() 方法。</span><br><span class="line">正确的输出是 "onetwothree"。</span><br><span class="line"></span><br><span class="line"><span class="bullet">- </span>示例2</span><br><span class="line">输入: [1,3,2]</span><br><span class="line">输出: "onetwothree"</span><br><span class="line">解释: </span><br><span class="line">输入 [1,3,2] 表示线程 A 将会调用 one() 方法，线程 B 将会调用 three() 方法，线程 C 将会调用 two() 方法。</span><br><span class="line">正确的输出是 "onetwothree"。</span><br></pre></td></tr></table></figure>
+
+<h3 id="Solution-1-原子类"><a href="#Solution-1-原子类" class="headerlink" title="Solution 1 - 原子类"></a>Solution 1 - 原子类</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> AtomicInteger firstJobDone = <span class="keyword">new</span> AtomicInteger(<span class="number">0</span>);</span><br><span class="line">  <span class="keyword">private</span> AtomicInteger secondJobDone = <span class="keyword">new</span> AtomicInteger(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">Foo</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">first</span><span class="params">(Runnable printFirst)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    printFirst.run(); <span class="comment">// "first"</span></span><br><span class="line">    <span class="comment">// 确保打印 first 的任务完成后进行原子增加</span></span><br><span class="line">    firstJobDone.incrementAndGet();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">second</span><span class="params">(Runnable printSecond)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    <span class="keyword">while</span> (firstJobDone.get() != <span class="number">1</span>) &#123;</span><br><span class="line">      <span class="comment">// 如果 first 任务还未完成则进行等待</span></span><br><span class="line">    &#125;</span><br><span class="line">    printSecond.run(); <span class="comment">// "second"</span></span><br><span class="line">    <span class="comment">// 确保打印 second 的任务完成后进行原子增加</span></span><br><span class="line">    secondJobDone.incrementAndGet();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">third</span><span class="params">(Runnable printThird)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    <span class="keyword">while</span> (secondJobDone.get() != <span class="number">1</span>) &#123;</span><br><span class="line">      <span class="comment">// 如果 second 任务还未完成则进行等待</span></span><br><span class="line">    &#125;</span><br><span class="line">    printThird.run(); <span class="comment">// "third"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Solution-2-synchronized"><a href="#Solution-2-synchronized" class="headerlink" title="Solution 2 - synchronized"></a>Solution 2 - synchronized</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> firstDone;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> secondDone;</span><br><span class="line">    <span class="keyword">private</span> Object lock = <span class="keyword">new</span> Object();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Foo</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">first</span><span class="params">(Runnable printFirst)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        <span class="keyword">synchronized</span>(lock) &#123;</span><br><span class="line">            <span class="comment">// printFirst.run() outputs "first". Do not change or remove this line.</span></span><br><span class="line">            printFirst.run();</span><br><span class="line">            firstDone = <span class="keyword">true</span>;</span><br><span class="line">            lock.notifyAll();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">second</span><span class="params">(Runnable printSecond)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        <span class="keyword">synchronized</span>(lock) &#123;</span><br><span class="line">            <span class="keyword">while</span> (!firstDone)</span><br><span class="line">                lock.wait();</span><br><span class="line">            <span class="comment">// printSecond.run() outputs "second". Do not change or remove this line.</span></span><br><span class="line">            printSecond.run();</span><br><span class="line">            secondDone = <span class="keyword">true</span>;</span><br><span class="line">            lock.notifyAll();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">third</span><span class="params">(Runnable printThird)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        <span class="keyword">synchronized</span>(lock) &#123;</span><br><span class="line">            <span class="keyword">while</span> (!secondDone)</span><br><span class="line">                lock.wait();</span><br><span class="line">            <span class="comment">// printThird.run() outputs "third". Do not change or remove this line.</span></span><br><span class="line">            printThird.run();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Solution-3-volatile"><a href="#Solution-3-volatile" class="headerlink" title="Solution 3 - volatile"></a>Solution 3 - volatile</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">boolean</span> firstJobDone = <span class="keyword">false</span>;</span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">boolean</span> secondJobDone = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Foo</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">first</span><span class="params">(Runnable printFirst)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        <span class="comment">// printFirst.run() outputs "first". Do not change or remove this line.</span></span><br><span class="line">        printFirst.run();</span><br><span class="line">        firstJobDone=<span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">second</span><span class="params">(Runnable printSecond)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">         <span class="keyword">while</span> (!firstJobDone)&#123;</span><br><span class="line">            <span class="comment">// 等待printFirst完成</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// printSecond.run() outputs "second". Do not change or remove this line.</span></span><br><span class="line">        printSecond.run();</span><br><span class="line">        secondJobDone=<span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">third</span><span class="params">(Runnable printThird)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        <span class="keyword">while</span> (!secondJobDone)&#123;</span><br><span class="line">            <span class="comment">// 等待printSecond完成</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// printThird.run() outputs "third". Do not change or remove this line.</span></span><br><span class="line">        printThird.run();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Solution-4-可重入锁"><a href="#Solution-4-可重入锁" class="headerlink" title="Solution 4 - 可重入锁"></a>Solution 4 - 可重入锁</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> Lock lock = <span class="keyword">new</span> ReentrantLock();</span><br><span class="line">    <span class="keyword">private</span> Condition condition = lock.newCondition();</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> count = <span class="number">1</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Foo</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">first</span><span class="params">(Runnable printFirst)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        lock.lock();</span><br><span class="line">        printFirst.run();</span><br><span class="line">        count = <span class="number">2</span>;</span><br><span class="line">        condition.signalAll();</span><br><span class="line">        lock.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">second</span><span class="params">(Runnable printSecond)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        lock.lock();</span><br><span class="line">        <span class="keyword">if</span> (count != <span class="number">2</span>)</span><br><span class="line">            condition.await();</span><br><span class="line">        printSecond.run();</span><br><span class="line">        count = <span class="number">3</span>;</span><br><span class="line">        condition.signal();</span><br><span class="line">        lock.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">third</span><span class="params">(Runnable printThird)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        lock.lock();</span><br><span class="line">        <span class="keyword">while</span> (count != <span class="number">3</span>)</span><br><span class="line">            condition.await();</span><br><span class="line">        printThird.run();</span><br><span class="line">        lock.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Solution-4-CountDownLatch"><a href="#Solution-4-CountDownLatch" class="headerlink" title="Solution 4 - CountDownLatch"></a>Solution 4 - CountDownLatch</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Foo</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 声明两个 CountDownLatch变量</span></span><br><span class="line">    <span class="keyword">private</span> CountDownLatch countDownLatch1;</span><br><span class="line">    <span class="keyword">private</span> CountDownLatch countDownLatch2;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Foo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 初始化每个CountDownLatch 的值为1，表示有一个线程执行完后，执行等待的线程</span></span><br><span class="line">        countDownLatch01 = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</span><br><span class="line">        countDownLatch02 = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">first</span><span class="params">(Runnable printFirst)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">            <span class="comment">// 当前只有 first 线程没有任何的阻碍，其余两个线程都处于等待阶段</span></span><br><span class="line">            <span class="comment">// printFirst.run() outputs "first". Do not change or remove this line.</span></span><br><span class="line">            printFirst.run();</span><br><span class="line">            <span class="comment">// 直到 CountDownLatch1 里面计数为 0 才执行因调用该 countDownCatch1.await() 而等待的线程</span></span><br><span class="line">            countDownLatch1.countDown();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">second</span><span class="params">(Runnable printSecond)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">            <span class="comment">// 只有 countDownLatch1 为 0 才能通过，否则会一直阻塞</span></span><br><span class="line">            countDownLatch1.await();</span><br><span class="line">            <span class="comment">// printSecond.run() outputs "second". Do not change or remove this line.</span></span><br><span class="line">            printSecond.run();</span><br><span class="line">            <span class="comment">// 直到 CountDownLatch2 里面计数为 0 才执行因调用该 countDownCatch2.await() 而等待的线程</span></span><br><span class="line">            countDownLatch2.countDown();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">third</span><span class="params">(Runnable printThird)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">            <span class="comment">// 只有 countDownLatch2 为 0 才能通过，否则会一直阻塞</span></span><br><span class="line">            countDownLatch2.await();</span><br><span class="line">            <span class="comment">// printThird.run() outputs "third". Do not change or remove this line.</span></span><br><span class="line">            printThird.run();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Solution-5-Semaphore"><a href="#Solution-5-Semaphore" class="headerlink" title="Solution 5 - Semaphore"></a>Solution 5 - Semaphore</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Foo03</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 声明两个Semaphore 变量</span></span><br><span class="line">    <span class="keyword">private</span> Semaphore spa,spb;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Foo03</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 初始化 Semaphore 为 0 的原因</span></span><br><span class="line">        <span class="comment">// 如果这个Semaphore 为零，如果另一线程调用(acquire)这个Semaphore就会产生阻塞</span></span><br><span class="line">        <span class="comment">// 便可以控制 second 和 third 线程的执行</span></span><br><span class="line">        spa = <span class="keyword">new</span> Semaphore(<span class="number">0</span>);</span><br><span class="line">        spb = <span class="keyword">new</span> Semaphore(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">first</span><span class="params">(Runnable printFirst)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">            <span class="comment">// printFirst.run() outputs "first". Do not change or remove this line.</span></span><br><span class="line">            printFirst.run();</span><br><span class="line">            <span class="comment">// 只有等first线程释放Semaphore后使Semaphore值为1,另外一个线程才可以调用（acquire）</span></span><br><span class="line">            spa.release();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">second</span><span class="params">(Runnable printSecond)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">            <span class="comment">//只有spa为1才能执行acquire，如果为0就会产生阻塞</span></span><br><span class="line">            spa.acquire();</span><br><span class="line">            <span class="comment">// printSecond.run() outputs "second". Do not change or remove this line.</span></span><br><span class="line">            printSecond.run();</span><br><span class="line">            spb.release();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">third</span><span class="params">(Runnable printThird)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">            <span class="comment">//只有spb为1才能通过，如果为0就会阻塞</span></span><br><span class="line">            spb.acquire();</span><br><span class="line">            <span class="comment">// printThird.run() outputs "third". Do not change or remove this line.</span></span><br><span class="line">            printThird.run();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="1115-交替打印FooBar"><a href="#1115-交替打印FooBar" class="headerlink" title="1115. 交替打印FooBar"></a><a href="https://leetcode-cn.com/problems/print-foobar-alternately/" target="_blank" rel="noopener">1115. 交替打印FooBar</a></h2><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">我们提供一个类：</span><br><span class="line"></span><br><span class="line">class FooBar &#123;</span><br><span class="line">  public void foo() &#123;</span><br><span class="line">    for (int i = 0; i <span class="xml"><span class="tag">&lt; <span class="attr">n</span>; <span class="attr">i</span>++) &#123;</span></span></span><br><span class="line"><span class="xml">      print("foo");</span></span><br><span class="line"><span class="xml">    &#125;</span></span><br><span class="line"><span class="xml">  &#125;</span></span><br><span class="line"></span><br><span class="line"><span class="xml">  public void bar() &#123;</span></span><br><span class="line"><span class="xml">    for (int i = 0; i <span class="tag">&lt; <span class="attr">n</span>; <span class="attr">i</span>++) &#123;</span></span></span><br><span class="line"><span class="xml">      print("bar");</span></span><br><span class="line"><span class="xml">    &#125;</span></span><br><span class="line"><span class="xml">  &#125;</span></span><br><span class="line"><span class="xml">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="xml">两个不同的线程将会共用一个 FooBar 实例。其中一个线程将会调用 foo() 方法，另一个线程将会调用 bar() 方法。</span></span><br><span class="line"><span class="xml">请设计修改程序，以确保 "foobar" 被输出 n 次。</span></span><br><span class="line"></span><br><span class="line"><span class="xml">示例 1:</span></span><br><span class="line"><span class="xml">输入: n = 1</span></span><br><span class="line"><span class="xml">输出: "foobar"</span></span><br><span class="line"><span class="xml">解释: 这里有两个线程被异步启动。其中一个调用 foo() 方法, 另一个调用 bar() 方法，"foobar" 将被输出一次。</span></span><br><span class="line"></span><br><span class="line"><span class="xml">示例 2:</span></span><br><span class="line"><span class="xml">输入: n = 2</span></span><br><span class="line"><span class="xml">输出: "foobarfoobar"</span></span><br><span class="line"><span class="xml">解释: "foobar" 将被输出两次。</span></span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LeetCode%E5%A4%9A%E7%BA%BF%E7%A8%8B/" rel="tag"># LeetCode多线程</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/07/10/2020-07-10-Java-AQS/" rel="prev" title="AQS源码笔记">
+      <i class="fa fa-chevron-left"></i> AQS源码笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/07/16/2020-07-16-JUC-CASAndUnsafe/" rel="next" title="CAS与Unsafe源码笔记">
+      CAS与Unsafe源码笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#LeetCode多线程题目"><span class="nav-number">1.</span> <span class="nav-text">LeetCode多线程题目</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1114-按序打印"><span class="nav-number">1.1.</span> <span class="nav-text">1114. 按序打印</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Solution-1-原子类"><span class="nav-number">1.1.1.</span> <span class="nav-text">Solution 1 - 原子类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Solution-2-synchronized"><span class="nav-number">1.1.2.</span> <span class="nav-text">Solution 2 - synchronized</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Solution-3-volatile"><span class="nav-number">1.1.3.</span> <span class="nav-text">Solution 3 - volatile</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Solution-4-可重入锁"><span class="nav-number">1.1.4.</span> <span class="nav-text">Solution 4 - 可重入锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Solution-4-CountDownLatch"><span class="nav-number">1.1.5.</span> <span class="nav-text">Solution 4 - CountDownLatch</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Solution-5-Semaphore"><span class="nav-number">1.1.6.</span> <span class="nav-text">Solution 5 - Semaphore</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1115-交替打印FooBar"><span class="nav-number">1.2.</span> <span class="nav-text">1115. 交替打印FooBar</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">忘川三途</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">忘川三途</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">325k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">4:55</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

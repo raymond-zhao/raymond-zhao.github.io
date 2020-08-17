@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"raymond-zhao.top","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="梳理一下计算机网络中的基础知识">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机网络基础知识">
+<meta property="og:url" content="http://raymond-zhao.top/2020/03/18/2020-03-18-Network-Basic/index.html">
+<meta property="og:site_name" content="Raymond&#39;s Blog">
+<meta property="og:description" content="梳理一下计算机网络中的基础知识">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/00831rSTly1gd9qb100evj31f40ocdvs.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/00831rSTly1gczcfmgbzjg30u016i0yk.gif">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/00831rSTly1gd9rqohwupj31ea0jgk38.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/00831rSTly1gd9tsfxtkyj31ce0okdrn.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/00831rSTly1gd9uuv1g7cj31ew0r2qje.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/00831rSTly1gd9wbh2rblj315a0rqn73.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/00831rSTly1gd9wcefwrej315w0li46o.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/00831rSTly1gd9xtsj9nvj316c0ay444.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/00831rSTly1gd9y0c49wrj315a0fywlq.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/00831rSTly1gda16yd3y9j30qi0d6gnh.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/00831rSTly1gda1a9ou70j30sq0bcjwe.jpg">
+<meta property="article:published_time" content="2020-03-17T21:20:20.000Z">
+<meta property="article:modified_time" content="2020-08-17T04:34:19.591Z">
+<meta property="article:author" content="忘川三途">
+<meta property="article:tag" content="计算机网络">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/00831rSTly1gd9qb100evj31f40ocdvs.jpg">
+
+<link rel="canonical" href="http://raymond-zhao.top/2020/03/18/2020-03-18-Network-Basic/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>计算机网络基础知识 | Raymond's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Raymond's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Get busy Living, or get busy Dying.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://raymond-zhao.top/2020/03/18/2020-03-18-Network-Basic/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川三途">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Raymond's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          计算机网络基础知识
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-03-18 05:20:20" itemprop="dateCreated datePublished" datetime="2020-03-18T05:20:20+08:00">2020-03-18</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-08-17 12:34:19" itemprop="dateModified" datetime="2020-08-17T12:34:19+08:00">2020-08-17</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">计算机网络</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>8.1k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>7 mins.</span>
+            </span>
+            <div class="post-description">梳理一下计算机网络中的基础知识</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="1-基础知识"><a href="#1-基础知识" class="headerlink" title="1 基础知识"></a>1 基础知识</h1><p>OSI的七层协议体系结构的概念清楚，理论也较完整，但它既复杂又不实用。TCP/IP体系结构则不同，但它现在却得到了非常广泛的应用。</p>
+<p>TCP/IP是一个四层的体系结构，它包含应用层、运输层、网际层和网络接口层(用网际层这个名字是强调这一层是为了解决不同网络的互连问题)。不过从实质上讲，TCP/IP只有最上面的三层，因为最下面的网络接口层并没有什么具体内容。</p>
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gd9qb100evj31f40ocdvs.jpg" alt="计算机网络体系结构"></p>
+<ul>
+<li><p>应用层(applicationlayer)：应用层的任务是通过应用进程间的交互来完成特定网络应用。应用层协议定义的是应用进程间通信和交互的规则。这里的进程就是指主机中正在运行的程序。对于不同的网络应用需要有不同的应用层协议。在互联网中的应用层协议很多，如域名系统DNS，支持万维网应用的HTTP协议，支持电子邮件的SMTP协议等等。我们把应用层交互的数据单元称为报文(message)。</p>
+</li>
+<li><p>运输层(transportlayer)：运输层的任务就是负责向两台主机中进程之间的通信提供通用的数据传输服务。应用进程利用该服务传送应用层报文。所谓“通用的”，是指并不针对某个特定网络应用，而是多种应用可以使用同一个运输层服务。由于一台主机可同时运行多个进程，因此运输层有复用和分用的功能。复用就是多个应用层进程可同时使用下面运输层的服务，分用和复用相反，是运输层把收到的信息分别交付上面应用层中的相应进程。运输层主要使用以下两种协议:</p>
+<ul>
+<li>传输控制协议TCP(TransmissionControlProtocol)—提供面向连接的、可靠的数据传输服务，其数据传输的单位是<strong>报文段(segment)</strong>。</li>
+<li>用户数据报协议UDP(UserDatagramProtocol)—提供无连接的、尽最大努力(best-effort)的数据传输服务(不保证数据传输的可靠性)，其数据传输的单位是<strong>用户数据报</strong>。</li>
+</ul>
+</li>
+<li><p>网络层：网络层负责为分组交换网上的不同主机提供通信服务。在发送数据时，网络层把运输层产生的<strong>报文段或用户数据报封装成分组或包进行传送</strong>。在TCP/IP体系中，由于网络层使用IP协议，因此分组也叫做IP数据报，或简称为数据报。</p>
+<ul>
+<li>网络层的另一个任务就是要选择合适的路由，使源主机运输层所传下来的分组，能够通过网络中的路由器找到目的主机。</li>
+<li>不要将运输层的“用户数据报UDP”和网络层的“IP数据报”弄混。此外，无论在哪一层传送的数据单元，都可笼统地用“分组”来表示。</li>
+</ul>
+</li>
+<li><p>数据链路层(datalinklayer)：两台主机之间的数据传输，总是在一段一段的链路上传送的，这就需要使用专门的链路层的协议。在两个相邻结点之间传送数据时，数据链路层将网络层交下来的<strong>IP数据报组装成帧(framing)</strong>，在两个相邻结点间的链路上传送<strong>帧(frame)</strong>。每一帧包括数据和必要的控制信息(如同步信息、地址信息、差错控制等)。</p>
+<ul>
+<li>在接收数据时，控制信息使接收端能够知道一个帧从哪个比特开始和到哪个比特结束。</li>
+<li>控制信息还使接收端能够检测到所收到的帧中有无差错。</li>
+</ul>
+</li>
+<li><p>物理层(physicallayer)：考虑的是怎样在传输媒体上透明地传输数据比特流，而不是指具体的传输媒体。物理层的作用是尽可能屏蔽传输媒体和通信手段的差异，使数据链路层感觉不到这些差异。</p>
+</li>
+</ul>
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gczcfmgbzjg30u016i0yk.gif" alt="计算机网络分层体系图"></p>
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gd9rqohwupj31ea0jgk38.jpg" alt="数据在各层之间的传递过程"></p>
+<h1 id="2-TCP-的三次牵手四次分手"><a href="#2-TCP-的三次牵手四次分手" class="headerlink" title="2 TCP 的三次牵手四次分手"></a>2 TCP 的三次牵手四次分手</h1><h2 id="2-1-三次握手：建立连接"><a href="#2-1-三次握手：建立连接" class="headerlink" title="2.1 三次握手：建立连接"></a>2.1 三次握手：建立连接</h2><p>TCP建立连接的过程叫做握手，握手需要在客户和服务器之间交换三个TCP报文段。</p>
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gd9tsfxtkyj31ce0okdrn.jpg" alt="三报文握手建立连接"></p>
+<p>假定主机A运行的是TCP客户程序，而B运行TCP服务器程序。最初两端的TCP进程都处CLOSED(关闭)状态。图中在主机下面的方框分别是TCP进程所处的状态。在本例中，A主动打开连接，而B被动打开连接。</p>
+<p>一开始，B的TCP服务器进程先创建传输控制块TCB，准备接受客户进程的连接请求。然后服务器进程就处于LISTEN(收听)状态，等待客户的连接请求。如有，即作出响应。</p>
+<p>A的TCP客户进程也是首先创建传输控制模块TCB。然后，在打算建立TCP连接时，向B发出连接请求报文段，这时首部中的同步位SYN=1，同时选择一个初始序号seq=x。TCP规定，SYN报文段(即SYN=1的报文段)不能携带数据，但要消耗掉一个序号。这时，TCP客户进程进入SYN-SENT(同步已发送)状态。</p>
+<p>B收到连接请求报文段后，如同意建立连接，则向A发送确认。在确认报文段中应把SYN位和ACK位都置1，确认号是ack=x+1，同时也为自己选择一个初始序号seq=y。注意，这个报文段也不能携带数据，但同样要消耗掉一个序号。这时TCP服务器进程进入SYN-RCVD(同步收到)状态。</p>
+<p>TCP客户进程收到B的确认后，还要向B给出确认。确认报文段的ACK置1，确认号ack=y+1，而自己的序号seq=x+1。TCP的标准规定，ACK报文段可以携带数据。但如果不携带数据则不消耗序号，在这种情况下，下一个数据报文段的序号仍是seq=x+1。这时，TCP连接已经建立，A进入ESTABLISHED(已建立连接)状态。</p>
+<p>当B收到A的确认后，也进入ESTABLISHED状态。</p>
+<p>上面给出的连接建立过程叫做<strong>三报文握手</strong>。注意，在图中B发送给A的报文段，也可拆成两个报文段。可以先发送一个确认报文段(ACK=1，ack=x+1)，然后再发送一个同步报文段(SYN=1，seq=y)。这样的过程就变成了四报文握手，但效果是一样的。</p>
+<p>为什么A最后还要发送一次确认呢?这主要是为了防止已失效的连接请求报文段突然又传送到了B，因而产生错误。</p>
+<p>所谓“已失效的连接请求报文段”是这样产生的。考虑一种正常情况，A发出连接请求，但因连接请求报文丢失而未收到确认。于是A再重传一次连接请求。后来收到了确认，建立了连接。数据传输完毕后，就释放了连接。A共发送了两个连接请求报文段，其中第一个丢失，第二个到达了B，没有“已失效的连接请求报文段”。</p>
+<p>现假定出现一种异常情况，即A发出的第一个连接请求报文段并没有丢失，而是在某些网络结点长时间滞留了，以致延误到连接释放以后的某个时间才到达B。本来这是一个早已失效的报文段。但B收到此失效的连接请求报文段后，就误认为是A又发出一次新的连接请求。于是就向A发出确认报文段，同意建立连接。假定不采用报文握手，那么只要B发出确认，新的连接就建立了。</p>
+<p>由于现在A并没有发出建立连接的请求，因此不会理睬B的确认，也不会向B发送数据。但B却以为新的运输连接已经建立了，并一直等待A发来数据。B的许多资源就这样白白浪费了。</p>
+<p>采用三报文握手的办法，可以防止上述现象的发生。例如在刚才的异常情况下，A不会向B的确认发出确认。B由于收不到确认，就知道A并没有要求建立连接。</p>
+<h2 id="2-2-四次分手：断了联系"><a href="#2-2-四次分手：断了联系" class="headerlink" title="2.2 四次分手：断了联系"></a>2.2 四次分手：断了联系</h2><p>数据传输结束后，通信的双方都可释放连接。现在A和B都处于ESTABLISHED状态。A的应用进程先向其TCP发出连接释放报文段，并停止再发送数据，主动关闭TCP连接。A把连接释放报文段首部的终止控制位FIN置1，其序号seq=u，它等于前面已传送过的数据的最后一个字节的序号加1。这时A进入FIN-WAIT-1(终止等待1)状态，等待B的确认。注意，TCP规定，FIN报文段即使不携带数据，它也消耗掉一个序号。</p>
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gd9uuv1g7cj31ew0r2qje.jpg" alt="TCP连接的释放过程"></p>
+<p>B收到连接释放报文段后即发出确认，确认号是ack=u+1，而这个报文段自己的序号是v，等于B前面已传送过的数据的最后一个字节的序号加1。然后B就进入CLOSE-WAIT(关闭等待)状态。TCP服务器进程这时应通知高层应用进程，因而从A到B这个方向的连接就释放了，这时的TCP连接处于半关闭(half-close)状态，即A已经没有数据要发送了，但B若发送数据，A仍要接收。也就是说，从B到A这个方向的连接并未关闭，这个状态可能会持续一段时间。</p>
+<p>A收到来自B的确认后，就进入FIN-WAIT-2(终止等待2)状态，等待B发出的连接释放报文段。</p>
+<p>若B已经没有要向A发送的数据，其应用进程就通知TCP释放连接。这时B发出的连接释放报文段必须使FIN=1。现假定B的序号为w(在半关闭状态B可能又发送了一些数据)。B还必须重复上次已发送过的确认号ack=u+1。这时B就进入LAST-ACK(最后确认)状态，等待A的确认。</p>
+<p>A在收到B的连接释放报文段后，必须对此发出确认。在确认报文段中把ACK置1，确认号ack=w+1，而自己的序号是seq=u+1(根据TCP标准，前面发送过的FIN报文段要消耗一个序号)。然后进入到TIME-WAIT(时间等待)状态。请注意，现在TCP连接还没有释放掉。必须经过时间等待计时器(TIME-WAITtimer)设置的时间2MSL后，A才进入到CLOSED状态。时间MSL叫做最长报文段寿命(MaximumSegmentLifetime)，RFC793建议设为2分钟。但这完全是从工程上来考虑的，对于现在的网络，MSL=2分钟可能太长了一些。因此TCP允许不同的实现可根据具体情况使用更小的MSL值。因此，从A进入到TIME-WAIT状态后，要经过4分钟才能进入到CLOSED状态，才能开始建立下一个新的连接。当A撤销相应的传输控制块TCB后，就结束了这次的TCP连接。</p>
+<p>为什么A在TIME-WAIT状态必须等待2MSL的时间呢?这有两个理由。</p>
+<p>第一，为了保证A发送的最后一个ACK报文段能够到达B。这个ACK报文段有可能丢失，因而使处在LAST-ACK状态的B收不到对已发送的FIN+ACK报文段的确认。B会超时重传这个FIN+ACK报文段，而A就能在2MSL时间内收到这个重传的FIN+ACK报文段。接着A重传一次确认，重新启动2MSL计时器。最后，A和B都正常进入到CLOSED状态。如果A在TIME-WAIT状态不等待一段时间，而是在发送完ACK报文段后立即释放连接，那么就无法收到B重传的FIN+ACK报文段，因而也不会再发送一次确认报文段。这样，B就无法按照正常步骤进入CLOSED状态。</p>
+<p>第二，防止上一节提到的“已失效的连接请求报文段”出现在本连接中。A在发送完最后一个ACK报文段后，再经过时间2MSL，就可以使本连接持续的时间内所产生的所有报文段都从网络中消失。这样就可以使下一个新的连接中不会出现这种旧的连接请求报文段。</p>
+<p>B只要收到了A发出的确认，就进入CLOSED状态。同样，B在撤销相应的传输控制块TCB后，就结束了这次的TCP连接。我们注意到，B结束TCP连接的时间要比A早一些。</p>
+<p>上述的TCP连接释放过程是四报文握手。</p>
+<h1 id="3-TCP-与-UDP-的区别"><a href="#3-TCP-与-UDP-的区别" class="headerlink" title="3 TCP 与 UDP 的区别"></a>3 TCP 与 UDP 的区别</h1><table>
+<thead>
+<tr>
+<th align="center">TCP</th>
+<th align="center">UDP</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"></td>
+<td align="center">用户数据报协议UDP只在IP的数据报服务之上增加了很少一点的功能，这就是复用和分用的功能以及差错检测的功能</td>
+</tr>
+<tr>
+<td align="center">面向连接，应用程序在使用TCP协议之前，必须先建立TCP连接。在传送数据完毕后，必须释放已经建立的TCP连接。</td>
+<td align="center">无连接的，即发送数据之前不需要建立连接，发送数据之后也不需要断开连接，因此减少了开销和发送数据之前的时延。</td>
+</tr>
+<tr>
+<td align="center">提供可靠交付，通过TCP连接传送的数据，无差错、不丢失、不重复，并且按序到达。</td>
+<td align="center">尽最大努力交付，即不保证可靠交付，因此主机不需要维持复杂的连接状态表</td>
+</tr>
+<tr>
+<td align="center">面向字节流。TCP中的“流”(stream)指的是流入到进程或从进程流出的字节序列。</td>
+<td align="center">UDP是面向报文的</td>
+</tr>
+<tr>
+<td align="center">滑动窗口，流量控制，拥塞控制，停止等待协议，连续ARQ协议</td>
+<td align="center">没有拥塞控制，因此网络出现的拥塞不会使源主机的发送速率降低。这对实时应用是很重要的。吞吐量只受限于数据生成速率，传输速率以及机器性能</td>
+</tr>
+<tr>
+<td align="center">每一条TCP连接只能有两个端点(endpoint)，每一条TCP连接只能是点对点的(一对一)</td>
+<td align="center">支持一对一、一对多、多对一和多对多的交互通信。</td>
+</tr>
+<tr>
+<td align="center">首部至少20个字节</td>
+<td align="center">首部开销小，只有8个字节</td>
+</tr>
+<tr>
+<td align="center">TCP提供全双工通信。TCP允许通信双方的应用进程在任何时候都能发送数据。TCP连接的两端都设有发送缓存和接收缓存，用来临时存放双向通信的数据。</td>
+<td align="center">提供全双工通信</td>
+</tr>
+</tbody></table>
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gd9wbh2rblj315a0rqn73.jpg" alt="UDP报文段的首部"></p>
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gd9wcefwrej315w0li46o.jpg" alt="TCP报文段的首部格式"></p>
+<h1 id="4-TCP-的滑动窗口机制"><a href="#4-TCP-的滑动窗口机制" class="headerlink" title="4 TCP 的滑动窗口机制"></a>4 TCP 的滑动窗口机制</h1><p>滑动窗口机制可以很方便地在TCP连接上实现对发送方的流量控制，与超时重传，选择确认一起保证可靠传输。</p>
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gd9xtsj9nvj316c0ay444.jpg" alt="滑动窗口"></p>
+<p>发送窗口里面的序号表示允许发送的序号。显然，窗口越大，发送方就可以在收到对方确认之前连续发送更多的数据，因而可能获得更高的传输效率。</p>
+<p>发送窗口后沿的后面部分表示已发送且已收到了确认。</p>
+<p>发送窗口的位置由窗口前沿和后沿的位置共同确定。发送窗口后沿的变化情况有两种可能，即不动(没有收到新的确认)和前移(收到了新的确认)。发送窗口后沿不可能向后移动，因为不能撤销掉已收到的确认。发送窗口前沿通常是不断向前移动，但也有可能不动。这对应于两种情况:一是没有收到新的确认，对方通知的窗口大小也不变;二是收到了新的确认但对方通知的窗口缩小了，使得发送窗口前沿正好不动。</p>
+<p>发送窗口前沿也有可能向后收缩。这发生在对方通知的窗口缩小了。</p>
+<h1 id="5-TCP的拥塞控制"><a href="#5-TCP的拥塞控制" class="headerlink" title="5 TCP的拥塞控制"></a>5 TCP的拥塞控制</h1><p>拥塞控制与流量控制的关系密切，它们之间也存在着一些差别。所谓拥塞控制就是防止过多的数据注入到网络中，这样可以使网络中的路由器或链路不致过载。拥塞控制所要做的都有一个前提，就是网络能够承受现有的网络负荷。拥塞控制是一个全局性的过程，涉及到所有的主机、所有的路由器，以及与降低网络传输性能有关的所有因素。但TCP连接的端点只要迟迟不能收到对方的确认信息，就猜想在当前网络中的某处很可能发生了拥塞，但这时却无法知道拥塞到底发生在网络的何处，也无法知道发生拥塞的具体原因。(是访问某个服务器的通信量过大?还是在某个地区出现自然灾害?)</p>
+<p>相反，流量控制往往是指点对点通信量的控制，是个端到端的问题(接收端控制发送端)。流量控制所要做的就是抑制发送端发送数据的速率，以便使接收端来得及接收。</p>
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gd9y0c49wrj315a0fywlq.jpg" alt="拥塞控制所起的作用"></p>
+<p>拥塞控制的算法种类</p>
+<ul>
+<li>慢开始(slow-start)</li>
+<li>拥塞避免 (congestion avoidance)</li>
+<li>快重传(fast retransmit)</li>
+<li>快恢复(fast recovery)</li>
+</ul>
+<h1 id="6-HTTP与HTTPS"><a href="#6-HTTP与HTTPS" class="headerlink" title="6 HTTP与HTTPS"></a>6 HTTP与HTTPS</h1><p>主要来源于<strong>维基百科</strong></p>
+<p><strong>超文本传输协议</strong>（英语：<strong>H</strong>yper<strong>T</strong>ext <strong>T</strong>ransfer <strong>P</strong>rotocol，缩写：<strong>HTTP</strong>）是一种用于分布式、协作式和<a href="https://zh.wikipedia.org/wiki/超媒體" target="_blank" rel="noopener">超媒体</a>信息系统的<a href="https://zh.wikipedia.org/wiki/应用层" target="_blank" rel="noopener">应用层</a><a href="https://zh.wikipedia.org/wiki/网络传输协议" target="_blank" rel="noopener">协议</a><a href="https://zh.wikipedia.org/wiki/超文本传输协议#cite_note-ietf2616-1" target="_blank" rel="noopener">[1]</a>。HTTP是<a href="https://zh.wikipedia.org/wiki/全球資訊網" target="_blank" rel="noopener">万维网</a>的数据通信的基础，无状态，明文传输。</p>
+<p><strong>超文本传输安全协议</strong>（英语：<strong>H</strong>yper<strong>T</strong>ext <strong>T</strong>ransfer <strong>P</strong>rotocol <strong>S</strong>ecure，缩写：<strong>HTTPS</strong>；常称为HTTP over TLS、HTTP over SSL或HTTP Secure）是一种通过<a href="https://zh.wikipedia.org/wiki/計算機網絡" target="_blank" rel="noopener">计算机网络</a>进行安全通信的<a href="https://zh.wikipedia.org/wiki/網路傳輸協定" target="_blank" rel="noopener">传输协议</a>。HTTPS经由<a href="https://zh.wikipedia.org/wiki/HTTP" target="_blank" rel="noopener">HTTP</a>进行通信，但利用<a href="https://zh.wikipedia.org/wiki/传输层安全" target="_blank" rel="noopener">SSL/TLS</a>来<a href="https://zh.wikipedia.org/wiki/加密" target="_blank" rel="noopener">加密</a>数据包。HTTPS开发的主要目的，是提供对<a href="https://zh.wikipedia.org/wiki/網站" target="_blank" rel="noopener">网站</a>服务器的<a href="https://zh.wikipedia.org/wiki/身份验证" target="_blank" rel="noopener">身份认证</a>，保护交换数据的隐私与<a href="https://zh.wikipedia.org/wiki/完整性" target="_blank" rel="noopener">完整性</a>。</p>
+<p>HTTP是一个客户端（用户）和服务端（网站）之间请求和应答的标准，通常使用<a href="https://zh.wikipedia.org/wiki/传输控制协议" target="_blank" rel="noopener">TCP协议</a>。默认端口 80, HTTPS默认端口 443.</p>
+<p>HTTP协议和安全协议同属于应用层（<a href="https://zh.wikipedia.org/wiki/OSI模型" target="_blank" rel="noopener">OSI模型</a>的最高层），具体来讲，安全协议工作在HTTP之下，传输层之上：安全协议向运行HTTP的进程提供一个类似于TCP的套接字，供进程向其中注入报文，安全协议将报文加密并注入运输层套接字；或是从运输层获取加密报文，解密后交给对应的进程。严格地讲，HTTPS并不是一个单独的协议，而是对工作在一加密连接（<a href="https://zh.wikipedia.org/wiki/传输层安全" target="_blank" rel="noopener">TLS</a>或SSL）上的常规HTTP协议的称呼。</p>
+<p>HTTP使用TCP三次握手建立连接，客户端和服务器需要交换3个包；HTTPS除了TCP的三个包，还要加上ssl握手需要的9个包，所以一共是12个包。</p>
+<h2 id="6-1-请求方法"><a href="#6-1-请求方法" class="headerlink" title="6.1 请求方法"></a>6.1 请求方法</h2><table>
+<thead>
+<tr>
+<th align="center">方法名</th>
+<th align="center">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>GET</code></td>
+<td align="center">向指定的资源发出“显示”请求。</td>
+</tr>
+<tr>
+<td align="center"><code>PATCH</code></td>
+<td align="center">用于将局部修改应用到资源。</td>
+</tr>
+<tr>
+<td align="center"><code>POST</code></td>
+<td align="center">向指定资源提交数据，请求服务器进行处理。</td>
+</tr>
+<tr>
+<td align="center"><code>PUT</code></td>
+<td align="center">向指定资源位置上传其最新内容。</td>
+</tr>
+<tr>
+<td align="center"><code>DELETE</code></td>
+<td align="center">请求服务器删除Request-URI所标识的资源。</td>
+</tr>
+<tr>
+<td align="center"><code>HEAD</code></td>
+<td align="center">与GET方法一样，都是向服务器发出指定资源的请求。只不过服务器将不传回资源的本文部分。</td>
+</tr>
+<tr>
+<td align="center"><code>TRACE</code></td>
+<td align="center">回显服务器收到的请求，主要用于测试或诊断。</td>
+</tr>
+<tr>
+<td align="center"><code>OPTIONS</code></td>
+<td align="center">可使服务器传回该资源所支持的所有HTTP请求方法。</td>
+</tr>
+<tr>
+<td align="center"><code>CONNECT</code></td>
+<td align="center">通常用于SSL加密服务器的链接</td>
+</tr>
+</tbody></table>
+<h2 id="6-2-状态码"><a href="#6-2-状态码" class="headerlink" title="6.2 状态码"></a>6.2 状态码</h2><p>所有HTTP响应的第一行都是<strong>状态行</strong>，依次是当前HTTP版本号，3位数字组成的<a href="https://zh.wikipedia.org/wiki/HTTP状态码" target="_blank" rel="noopener">状态代码</a>，以及描述状态的短语，彼此由空格分隔。</p>
+<p>状态代码的第一个数字代表当前响应的类型：</p>
+<ul>
+<li><a href="https://zh.wikipedia.org/wiki/HTTP状态码#1xx消息" target="_blank" rel="noopener">1xx消息</a>——请求已被服务器接收，继续处理</li>
+<li><a href="https://zh.wikipedia.org/wiki/HTTP状态码#2xx成功" target="_blank" rel="noopener">2xx成功</a>——请求已成功被服务器接收、理解、并接受<ul>
+<li>200: 正常返回信息</li>
+</ul>
+</li>
+<li><a href="https://zh.wikipedia.org/wiki/HTTP状态码#3xx重定向" target="_blank" rel="noopener">3xx重定向</a>——需要后续操作才能完成这一请求</li>
+<li><a href="https://zh.wikipedia.org/wiki/HTTP状态码#4xx请求错误" target="_blank" rel="noopener">4xx请求错误</a>——请求含有词法错误或者无法被执行<ul>
+<li>401 Unauthorized：请求未经授权，这个状态码必须要和 <code>WWW-Authenticate</code> 一起使用</li>
+<li>403 Forbidden：服务器收到请求，但是拒绝提供服务</li>
+<li>404 Not Found：请求资源部存在。最常见的就是URL错误</li>
+</ul>
+</li>
+<li><a href="https://zh.wikipedia.org/wiki/HTTP状态码#5xx服务器错误" target="_blank" rel="noopener">5xx服务器错误</a>——服务器在处理某个正确请求时发生错误<ul>
+<li>500 Internal Server Error：服务器发生不可预期的错误</li>
+<li>505 Server Unavailable：服务器当前不能处理客户端的请求，一段时间后可能恢复正常</li>
+</ul>
+</li>
+</ul>
+<h2 id="6-3-HTTPS-工作流程"><a href="#6-3-HTTPS-工作流程" class="headerlink" title="6.3 HTTPS 工作流程"></a>6.3 HTTPS 工作流程</h2><ol>
+<li><p><strong>客户端发起HTTPS请求</strong></p>
+<p>用户在浏览器里输入一个https网址，然后连接到server的443端口。</p>
+</li>
+<li><p><strong>服务端的配置</strong></p>
+<p>采用HTTPS协议的服务器必须要有一套数字证书，可以自己制作，也可以向组织申请，区别就是自己颁发的证书需要客户端验证通过，才可以继续访问，而使用受信任的公司申请的证书则不会弹出提示页面。证书其实就是一对公钥和私钥。</p>
+</li>
+<li><p><strong>传送证书</strong></p>
+<p>其实就是公钥，只是包含了很多信息，如证书的颁发机构，过期时间等等。</p>
+</li>
+<li><p><strong>客户端解析证书</strong></p>
+<p>是由客户端的TLS来完成的，首先会验证公钥是否有效，如颁发机构，过期时间等等，如果发现异常，则会弹出一个警告框，提示证书存在问题。如果证书没有问题，那么就生成一个随机值，然后用证书对该随机值进行加密。</p>
+</li>
+<li><p><strong>传送加密信息</strong></p>
+<p>传送的是用证书加密后的随机值，目的就是让服务端得到这个随机值，以后客户端和服务端的通信就可以通过这个随机值来进行加密解密了。</p>
+</li>
+<li><p><strong>服务段解密信息</strong></p>
+<p>服务端用私钥解密后，得到了客户端传过来的随机值(私钥)，然后把内容通过该值进行对称加密，所谓对称加密就是，将信息和私钥通过某种算法混合在一起，这样除非知道私钥，不然无法获取内容，而正好客户端和服务端都知道这个私钥，所以只要加密算法够彪悍，私钥够复杂，数据就够安全。</p>
+</li>
+<li><p><strong>传输加密后的信息</strong></p>
+<p>这部分信息是服务端用私钥加密后的信息，可以在客户端被还原。</p>
+</li>
+<li><p><strong>客户端解密信息</strong></p>
+<p>客户端用之前生成的私钥解密服务段传过来的信息，于是获取了解密后的内容，整个过程第三方即使监听到了数据，也束手无策。</p>
+</li>
+</ol>
+<h2 id="6-4-SSL-与-TLS"><a href="#6-4-SSL-与-TLS" class="headerlink" title="6.4 SSL 与 TLS"></a>6.4 SSL 与 TLS</h2><ul>
+<li><a href="https://baike.baidu.com/item/安全套接层" target="_blank" rel="noopener">SSL(Secure Sockets Layer安全套接层)</a></li>
+<li><a href="https://zh.wikipedia.org/wiki/%E5%82%B3%E8%BC%B8%E5%B1%A4%E5%AE%89%E5%85%A8%E6%80%A7%E5%8D%94%E5%AE%9A" target="_blank" rel="noopener">TLS (<strong>T</strong>ransport <strong>L</strong>ayer <strong>S</strong>ecurity 传输层安全性协议)</a></li>
+</ul>
+<p>加密方式</p>
+<ul>
+<li>对称加密：加密和解密都是用同一个秘钥</li>
+<li>非对称加密：加密和解密使用的秘钥是不同的</li>
+<li>哈希算法：将任意长度的信息转换为固定长度的值，不可逆</li>
+<li>数字签名：证明某个信息或者文件是某人发出/认同的</li>
+</ul>
+<h2 id="6-5-Cookie与Session"><a href="#6-5-Cookie与Session" class="headerlink" title="6.5 Cookie与Session"></a>6.5 Cookie与Session</h2><p>Cookie简介</p>
+<ul>
+<li>由服务器发给客户端的特殊信息，以文本的形式存放在客户端</li>
+<li>客户端再次请求的时候，会把 <code>Cookie</code> 回发</li>
+<li>服务器收到后，会解析 <code>Cookie</code> 生成与客户端相对应的内容</li>
+</ul>
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gda16yd3y9j30qi0d6gnh.jpg" alt="Cookie的设置与工作过程"></p>
+<p>Session简介</p>
+<ul>
+<li>服务器端的机制，在服务器上保存的信息</li>
+<li>解析客户端请求并操作 <code>Session Id</code> ，按需保存状态信息</li>
+<li>实现方式<ul>
+<li>使用 <code>Cookie</code> 来实现</li>
+<li>使用 <code>URL</code> 回写来实现</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gda1a9ou70j30sq0bcjwe.jpg" alt="Session的工作方式"></p>
+<p> <code>Cookie</code> 和 <code>Session</code> 的区别</p>
+<ul>
+<li><code>Cookie</code> 数据存放在客户的浏览器上， <code>Session</code> 数据存放在服务器上</li>
+<li><code>Session</code> 相对于 <code>Cookie</code> 更安全</li>
+<li>若考虑减轻服务器负担，应当使用 <code>Cookie</code> </li>
+</ul>
+<h2 id="6-6-GET-与-POST"><a href="#6-6-GET-与-POST" class="headerlink" title="6.6 GET 与 POST"></a>6.6 GET 与 POST</h2><ul>
+<li>HTTP 报文层面：<code>GET</code> 将请求信息放在 <code>URL</code> 中，而 <code>POST</code> 放在报文体中</li>
+<li>数据库层面： <code>GET</code> 符合 <strong>幂等性</strong> 和 <strong>安全性</strong>， 而  <code>POST</code> 不符合</li>
+<li>其他层面： <code>GET</code> 可以被缓存，被存储，而 <code>POST</code> 不行</li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><p>参考书籍：《计算机网络》第七版，谢希仁。</p>
+</li>
+<li><p>提到网络总忍不住想起伦敦奥运会开幕式上的 万维网发明者 <strong>Tim Berners-Lee</strong> </p>
+</li>
+<li><p><strong>This is for everyone</strong></p>
+</li>
+</ul>
+<div class="video-container"><iframe src="https://www.youtube.com/embed/UMNFehJIi0E" frameborder="0" loading="lazy" allowfullscreen></iframe></div>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag"># 计算机网络</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/16/2020-03-16-Java-BitOps/" rel="prev" title="位运算的运用">
+      <i class="fa fa-chevron-left"></i> 位运算的运用
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/03/19/2020-03-19-Algo-Sorting/" rel="next" title="排序算法">
+      排序算法 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-基础知识"><span class="nav-number">1.</span> <span class="nav-text">1 基础知识</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-TCP-的三次牵手四次分手"><span class="nav-number">2.</span> <span class="nav-text">2 TCP 的三次牵手四次分手</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-三次握手：建立连接"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 三次握手：建立连接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-四次分手：断了联系"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 四次分手：断了联系</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-TCP-与-UDP-的区别"><span class="nav-number">3.</span> <span class="nav-text">3 TCP 与 UDP 的区别</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-TCP-的滑动窗口机制"><span class="nav-number">4.</span> <span class="nav-text">4 TCP 的滑动窗口机制</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-TCP的拥塞控制"><span class="nav-number">5.</span> <span class="nav-text">5 TCP的拥塞控制</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-HTTP与HTTPS"><span class="nav-number">6.</span> <span class="nav-text">6 HTTP与HTTPS</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#6-1-请求方法"><span class="nav-number">6.1.</span> <span class="nav-text">6.1 请求方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-2-状态码"><span class="nav-number">6.2.</span> <span class="nav-text">6.2 状态码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-3-HTTPS-工作流程"><span class="nav-number">6.3.</span> <span class="nav-text">6.3 HTTPS 工作流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-4-SSL-与-TLS"><span class="nav-number">6.4.</span> <span class="nav-text">6.4 SSL 与 TLS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-5-Cookie与Session"><span class="nav-number">6.5.</span> <span class="nav-text">6.5 Cookie与Session</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-6-GET-与-POST"><span class="nav-number">6.6.</span> <span class="nav-text">6.6 GET 与 POST</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">6.7.</span> <span class="nav-text">参考</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">忘川三途</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">忘川三途</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">325k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">4:55</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

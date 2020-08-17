@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"raymond-zhao.top","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="MySQL中的索引及慢查询优化，一反常态，用Xmind来整理一部分。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL-索引与慢查询优化">
+<meta property="og:url" content="http://raymond-zhao.top/2020/03/29/2020-03-29-MySQL-Index/index.html">
+<meta property="og:site_name" content="Raymond&#39;s Blog">
+<meta property="og:description" content="MySQL中的索引及慢查询优化，一反常态，用Xmind来整理一部分。">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1ghae0rq9atj30qs0i3dhr.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1ghafktgxhbj30u01m2ndc.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1ghb9ye1j2tj314z01fjrg.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1ghbaq7xbq7j308r0470sp.jpg">
+<meta property="article:published_time" content="2020-03-29T02:58:26.000Z">
+<meta property="article:modified_time" content="2020-08-16T13:05:36.501Z">
+<meta property="article:author" content="忘川三途">
+<meta property="article:tag" content="MySQL">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1ghae0rq9atj30qs0i3dhr.jpg">
+
+<link rel="canonical" href="http://raymond-zhao.top/2020/03/29/2020-03-29-MySQL-Index/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>MySQL-索引与慢查询优化 | Raymond's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Raymond's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Get busy Living, or get busy Dying.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://raymond-zhao.top/2020/03/29/2020-03-29-MySQL-Index/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川三途">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Raymond's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          MySQL-索引与慢查询优化
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-03-29 10:58:26" itemprop="dateCreated datePublished" datetime="2020-03-29T10:58:26+08:00">2020-03-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-08-16 21:05:36" itemprop="dateModified" datetime="2020-08-16T21:05:36+08:00">2020-08-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/MySQL/" itemprop="url" rel="index"><span itemprop="name">MySQL</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>3.5k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>3 mins.</span>
+            </span>
+            <div class="post-description">MySQL中的索引及慢查询优化，一反常态，用Xmind来整理一部分。</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="闲聊几句"><a href="#闲聊几句" class="headerlink" title="闲聊几句"></a>闲聊几句</h1><h2 id="数据库范式"><a href="#数据库范式" class="headerlink" title="数据库范式"></a>数据库范式</h2><p>目前关系数据库有六种范式：第一范式$(1NF)$、第二范式$(2NF)$、第三范式$(3NF)$、巴斯-科德范式$(BCNF)$、第四范式$(4NF)$和第五范式$(5NF$，又称完美范式)。</p>
+<ol>
+<li>第一范式$(1NF)$：所有的域都应该是原子性的，即数据库表的每一列都是不可分割的原子数据项，而不能是集合，数组，记录等非原子数据项。</li>
+<li>第二范式$(2NF)$：在$1NF$的基础上，非码属性必须完全依赖于候选码(在$1NF$基础上<strong>消除非主属性对主码的部分函数依赖</strong>)。</li>
+<li>在$2NF$基础上，任何非主属性不依赖于其它非主属性(在$2NF$基础上<strong>消除传递依赖</strong>)。</li>
+<li>在$3NF$基础上，任何非主属性不能对主键子集依赖(在$3NF$基础上<strong>消除对主码子集的依赖</strong>)</li>
+</ol>
+<h2 id="如何设计一个关系型数据库？"><a href="#如何设计一个关系型数据库？" class="headerlink" title="如何设计一个关系型数据库？"></a>如何设计一个关系型数据库？</h2><p>首先应该考虑关系数据库管理系统($RDBMS$)，在 $RDBMS$ 中又包含两个重要组成部分，分别是：</p>
+<ul>
+<li>程序实例：其中又包括存储管理、缓存机制、$SQL$ 解析、日志管理、权限划分、容灾机制、<strong>索引管理</strong>、<strong>锁管理</strong></li>
+<li>存储(文件系统)：硬盘等。</li>
+</ul>
+<h1 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h1><h2 id="索引分类"><a href="#索引分类" class="headerlink" title="索引分类"></a>索引分类</h2><p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ghae0rq9atj30qs0i3dhr.jpg" alt="MySQL索引分类"></p>
+<h3 id="聚簇索引与非聚簇索引"><a href="#聚簇索引与非聚簇索引" class="headerlink" title="聚簇索引与非聚簇索引"></a>聚簇索引与非聚簇索引</h3><ul>
+<li>聚簇索引：<ul>
+<li>表数据是和主键一起存储，主键索引的叶结点存储行数据(包含了主键值)，二级索引的叶结点存储行的主键值。</li>
+<li>使用$B+$树作为索引的存储结构，非叶子节点都是索引关键字，但非叶子节点中的关键字中<strong>不存储对应记录的具体内容或内容地址</strong>。叶子节点上的数据是主键与具体记录(数据内容)。</li>
+</ul>
+</li>
+<li>非聚簇索引：<ul>
+<li>表数据和索引是分成两部分存储的，主键索引和二级索引存储上没有任何区别。</li>
+<li>使用$B+$树作为索引的存储结构，所有的节点都是索引，叶子节点存储的是索引$+$索引对应的记录的地址。</li>
+</ul>
+</li>
+</ul>
+<p><strong>聚簇索引的优缺点</strong></p>
+<ul>
+<li>优点：<ul>
+<li>把相关数据保存在一起，减少$I/O$次数。例如实现电子邮箱时，可以根据用户ID来聚集数据，这样只需要从磁盘读取少数的数据页就能获取某个用户的全部邮件。如果没有聚簇索引，则每封邮件都可能多一次磁盘$I/O$。</li>
+<li>数据访问更快。聚簇索引将索引和数据保存在同一个$B+Tree$中，因此从聚簇索引中获取数据通常比在非聚簇索引中查找要快。</li>
+<li>使用覆盖索引扫描的查询可以直接使用页节点中的主键值。</li>
+</ul>
+</li>
+<li>缺点：<ul>
+<li>聚簇数据最大限度地提高了$I/O$密集型应用的性能，但如果数据全部放在内存中，则访问的顺序就没那么重要了，聚簇索引也就没什么优势了。</li>
+<li><strong>插入速度严重依赖于插入顺序。</strong>按照主键的顺序插入是加载数据到<strong>InnoDB</strong>表中速度最快的方式。但如果不是按照主键顺序加载数据，那么在加载完成后最好使用<code>optimize table</code>命令重新组织一下表。</li>
+<li><strong>更新聚簇索引列的代价很高</strong>，因为会强制$InnoDB$将每个被更新的行移动到新的位置。</li>
+<li><strong>基于聚簇索引的表插入新行，或者主键被更新导致需要移动行的时候，可能面临”页分裂（page split)“的问题。</strong>当行的主键值要求必须将这一行插入到某个已满的页中时，存储引擎会将该页分裂成两个页面来容纳该行，这就是一次分裂操作。页分裂会导致表占用更多的磁盘空间。</li>
+<li>聚簇索引可能导致全表扫描变慢，尤其是行比较稀疏，或者由于页分裂导致数据存储不连续的时候。</li>
+<li>二级索引(非聚簇索引)所占存储单元更大，因为二级索引的叶子节点包含了引用行的主键列。</li>
+<li>二级索引访问需要两次索引查找，而不是一次。即在非索引覆盖的前提下，先到二级索引查询到主键，然后再按主键去查询得到数据。</li>
+</ul>
+</li>
+</ul>
+<h3 id="主键与唯一索引的区别是什么？"><a href="#主键与唯一索引的区别是什么？" class="headerlink" title="主键与唯一索引的区别是什么？"></a>主键与唯一索引的区别是什么？</h3><table>
+<thead>
+<tr>
+<th>对比项</th>
+<th>主键</th>
+<th>唯一索引</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>功能</td>
+<td>不仅是索引，还是约束。</td>
+<td>是索引的一种</td>
+</tr>
+<tr>
+<td>包含性</td>
+<td>主键索引一定是唯一索引</td>
+<td>唯一索引不一定是主键索引</td>
+</tr>
+<tr>
+<td>空值</td>
+<td>主键列不允许<code>null</code></td>
+<td>允许为<code>null</code></td>
+</tr>
+<tr>
+<td>外键</td>
+<td>可以做外键</td>
+<td>不可以</td>
+</tr>
+<tr>
+<td>数量</td>
+<td>只有一个主键</td>
+<td>可以有多个唯一索引</td>
+</tr>
+<tr>
+<td>优先级</td>
+<td>执行计划优先级高于唯一索引</td>
+<td>执行计划优先级低于主键</td>
+</tr>
+<tr>
+<td>包含列</td>
+<td>主键可以包含多个列，作为联合主键。</td>
+<td>包含一列</td>
+</tr>
+</tbody></table>
+<h3 id="索引的数据结构"><a href="#索引的数据结构" class="headerlink" title="索引的数据结构"></a>索引的数据结构</h3><ul>
+<li>树结构：二叉排序树、红黑树、B-树、B+树、</li>
+<li>Hash结构：<code>BitMap</code> 位图索引是神器<ul>
+<li>缺点仅能满足 <code>=, in</code> 操作，不能使用范围查询</li>
+<li>无法被用来避免数据的排序操作</li>
+<li>不能利用部分索引键查询</li>
+<li>不能避免表扫描遇到大量 <code>Hash</code> 值相同的情况，此时性能并不一定比 <code>B-树</code> 高。</li>
+</ul>
+</li>
+</ul>
+<h2 id="来自灵魂的拷问"><a href="#来自灵魂的拷问" class="headerlink" title="来自灵魂的拷问"></a>来自灵魂的拷问</h2><p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ghafktgxhbj30u01m2ndc.jpg" alt="数据库索引总结"></p>
+<h2 id="索引的最左匹配"><a href="#索引的最左匹配" class="headerlink" title="索引的最左匹配"></a>索引的最左匹配</h2><p>👩‍🏫：为什么索引是最左匹配，而不是最右匹配，不是中间匹配？</p>
+<p>👨‍🎓：$\dots$</p>
+<p><strong>最左前缀匹配原则</strong></p>
+<ul>
+<li>MySQL会一直从左向右匹配直到遇到范围查询(<code>&gt;, &lt;, between, like</code>)就停止匹配，比如 <code>a=3 and b=4 and c&gt;5 and d=6</code> , 如果建立 <code>(a,b,c,d)</code> 顺序的索引，则 <code>d</code> 是用不到索引的，因为到 <code>c</code> 就已经停止了，如果建立 <code>a,b,d,c</code> 的索引则都可以用到， <code>a,b,d</code> 的顺序可以任意调整。</li>
+<li><code>=, in</code> 可以乱序，比如建立 <code>(a,b,c)</code> 索引，那么 <code>a=1 and b=2 and c=3</code> 与<code>a=1 and c=3 and b=2</code>都可以命中索引，<code>MySQL</code>的查询优化器会帮助优化成索引可以识别的形式。</li>
+</ul>
+<p>假如有如下这张表结构：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">create table &#96;student&#96; (</span><br><span class="line">    &#96;id&#96; int(11) not null auto_increment,</span><br><span class="line">    &#96;name&#96; varchar(32) default null,</span><br><span class="line">    &#96;cid&#96; int(11) default null,</span><br><span class="line">    primary key (&#96;id&#96;),</span><br><span class="line">    key &#96;name_cid_idx&#96; (&#96;name&#96;, &#96;cid&#96;)</span><br><span class="line">) engine &#x3D; InnoDB auto_increment&#x3D;8 default charset&#x3D;utf8;</span><br></pre></td></tr></table></figure>
+
+<p>插入五条数据后表为</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>cid</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>raymond</td>
+<td>2</td>
+</tr>
+<tr>
+<td>8</td>
+<td>raymond</td>
+<td>1</td>
+</tr>
+<tr>
+<td>9</td>
+<td>ramona</td>
+<td>3</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Bezos</td>
+<td>4</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Bill</td>
+<td>6</td>
+</tr>
+</tbody></table>
+<p>如果执行下面这条查询，可以看到用了联合索引<code>name_cid_idx</code>，这是没有什么疑问的。而且<code>rows = 1</code>，<code>filtered = 100</code>。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 查询 1</span><br><span class="line">explain select * from student where name &#x3D; &#39;raymond&#39; and cid &#x3D; 2;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ghb9ye1j2tj314z01fjrg.jpg" alt="image-20200801140354338"></p>
+<p>但是如果执行了下面两条查询呢？</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 查询 2</span><br><span class="line">explain select * from student where cid &#x3D; 2;</span><br><span class="line"></span><br><span class="line"># 查询 3</span><br><span class="line">explain select * from student where cid &#x3D; 2 and name &#x3D; &#39;raymond&#39;;</span><br></pre></td></tr></table></figure>
+
+<p>查询结果分别如下(列名与上面图片相同，只放结果。) 从中可以看到，上面的查询 $2$ 使用了索引扫描(<code>rows = 5</code>)；查询 $3$ 的结果与查询 $1$ 的结果完全相同，说明$MySQL$ 的查询优化器为我们做了调整。</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span>,SIMPLE,student,&lt;<span class="literal">null</span>&gt;,index,&lt;<span class="literal">null</span>&gt;,name_cid_idx,<span class="number">104</span>,&lt;<span class="literal">null</span>&gt;,<span class="number">5</span>,<span class="number">20</span>,Using where; Using index</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="number">1</span>,SIMPLE,student,,<span class="built_in">ref</span>,name_cid_idx,name_cid_idx,<span class="number">104</span>,<span class="string">"const,const"</span>,<span class="number">1</span>,<span class="number">100</span>,Using index</span><br></pre></td></tr></table></figure>
+
+<p>那么为什么要强调最左匹配时要进行等值查询，而遇到范围查询时就失效呢？</p>
+<p>$MySQL$ 创建符合索引的规则时首先会对符合索引的最左边的列，也就是第一个<code>name</code>字段的数据进行排序，在第一个排序的基础上再对第二个字段<code>cid</code>进行排序。其实就相当于进行了<code>order by name asc, cid asc</code>这样的排序。</p>
+<p>所以如果对上面表格中的几条数据按<code>name</code>进行排序的话就会变成下面图片中的样子，既然按<code>name</code>排序，那么<code>cid</code>不再有序。</p>
+<ul>
+<li>如果是<strong>等值</strong>的话，将是有序的。观察$4,5$列同名的<code>raymond</code>，可以看到<code>cid</code>便是有序的。</li>
+<li>如果<strong>非等值(区间或范围)</strong>的话，将是无序的。观察$1,2,3$ 列可以看到，假如查询名字首字母在<code>B-r</code>之间的人，<code>cid</code>已经乱序，而在使用索引时需要顺序查询，但是<code>cid</code>依次为<code>4,6,3</code>，不能再按序查询。</li>
+</ul>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ghbaq7xbq7j308r0470sp.jpg" alt="按name排序"></p>
+<p>所以，为什么$MySQL$默认是最左匹配而不是最右匹配，为还是没清楚。</p>
+<h2 id="密集索引与稀疏索引"><a href="#密集索引与稀疏索引" class="headerlink" title="密集索引与稀疏索引"></a>密集索引与稀疏索引</h2><p>密集索引文件中的每个搜索码值都对应一个索引值</p>
+<p>稀疏索引文件只为索引码的某些值建立索引项</p>
+<ul>
+<li>MyISAM</li>
+<li>InnoDB<ul>
+<li>若一个主键被定义，则该主键为密集索引</li>
+<li>若没有主键被定义，则该表的第一个唯一非空索引作为密集索引</li>
+<li>若不满足以上条件，InnoDB内部会生成一个隐藏主键(密集索引)</li>
+<li>非主键索引存储相关键位和其对应的主键值，包含两次查找</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/24/2020-03-24-Redis-RedisInAction/" rel="prev" title="Redis基础">
+      <i class="fa fa-chevron-left"></i> Redis基础
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/03/30/2020-03-30-Redis-Basic/" rel="next" title="好好学 Redis">
+      好好学 Redis <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#闲聊几句"><span class="nav-number">1.</span> <span class="nav-text">闲聊几句</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#数据库范式"><span class="nav-number">1.1.</span> <span class="nav-text">数据库范式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何设计一个关系型数据库？"><span class="nav-number">1.2.</span> <span class="nav-text">如何设计一个关系型数据库？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#索引"><span class="nav-number">2.</span> <span class="nav-text">索引</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#索引分类"><span class="nav-number">2.1.</span> <span class="nav-text">索引分类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#聚簇索引与非聚簇索引"><span class="nav-number">2.1.1.</span> <span class="nav-text">聚簇索引与非聚簇索引</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主键与唯一索引的区别是什么？"><span class="nav-number">2.1.2.</span> <span class="nav-text">主键与唯一索引的区别是什么？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#索引的数据结构"><span class="nav-number">2.1.3.</span> <span class="nav-text">索引的数据结构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#来自灵魂的拷问"><span class="nav-number">2.2.</span> <span class="nav-text">来自灵魂的拷问</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#索引的最左匹配"><span class="nav-number">2.3.</span> <span class="nav-text">索引的最左匹配</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#密集索引与稀疏索引"><span class="nav-number">2.4.</span> <span class="nav-text">密集索引与稀疏索引</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">忘川三途</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">忘川三途</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">325k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">4:55</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

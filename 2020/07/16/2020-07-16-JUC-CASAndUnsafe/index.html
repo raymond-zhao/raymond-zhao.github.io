@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"raymond-zhao.top","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="CAS与Unsafe源码笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CAS与Unsafe源码笔记">
+<meta property="og:url" content="http://raymond-zhao.top/2020/07/16/2020-07-16-JUC-CASAndUnsafe/index.html">
+<meta property="og:site_name" content="Raymond&#39;s Blog">
+<meta property="og:description" content="CAS与Unsafe源码笔记">
+<meta property="og:image" content="https://i.loli.net/2020/07/17/v3fayDdCmwHe4jk.jpg">
+<meta property="article:published_time" content="2020-07-16T14:05:38.000Z">
+<meta property="article:modified_time" content="2020-08-16T13:05:36.507Z">
+<meta property="article:author" content="忘川三途">
+<meta property="article:tag" content="CAS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2020/07/17/v3fayDdCmwHe4jk.jpg">
+
+<link rel="canonical" href="http://raymond-zhao.top/2020/07/16/2020-07-16-JUC-CASAndUnsafe/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>CAS与Unsafe源码笔记 | Raymond's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Raymond's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Get busy Living, or get busy Dying.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://raymond-zhao.top/2020/07/16/2020-07-16-JUC-CASAndUnsafe/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川三途">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Raymond's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CAS与Unsafe源码笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-07-16 22:05:38" itemprop="dateCreated datePublished" datetime="2020-07-16T22:05:38+08:00">2020-07-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-08-16 21:05:36" itemprop="dateModified" datetime="2020-08-16T21:05:36+08:00">2020-08-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%B9%B6%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">多线程与并发</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>3.7k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>3 mins.</span>
+            </span>
+            <div class="post-description">CAS与Unsafe源码笔记</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="CAS与Unsafe源码笔记"><a href="#CAS与Unsafe源码笔记" class="headerlink" title="CAS与Unsafe源码笔记"></a>CAS与Unsafe源码笔记</h1><h2 id="乐观锁与悲观锁"><a href="#乐观锁与悲观锁" class="headerlink" title="乐观锁与悲观锁"></a>乐观锁与悲观锁</h2><h3 id="乐观锁"><a href="#乐观锁" class="headerlink" title="乐观锁"></a>乐观锁</h3><p>总是假设最好的情况，每次去操作数据的时候都认为别人不会修改，所以不会加锁，但是在更新的时候会判断一下在此期间别人有没有去更新这个数据，可以使用<strong>版本号机制</strong>和<code>CAS</code>实现。在Java中<code>java.util.concurrent.atomic</code>包下面的原子变量类就是使用了乐观锁的一种实现方式<strong>CAS</strong>实现的。乐观锁适用于<strong>读多写少</strong>的应用场景，这样可以<strong>提高吞吐量</strong>，像数据库提供的类似于<strong>write_condition机制</strong>，其实都是提供的乐观锁。</p>
+<h3 id="悲观锁"><a href="#悲观锁" class="headerlink" title="悲观锁"></a>悲观锁</h3><p>总是假设最坏的情况，每次去操作数据的时候都认为别人会修改，所以每次在拿数据的时候都会先上锁，这样别人想拿这个数据就会阻塞，直到它拿到锁（<strong>共享资源每次只给一个线程使用，其它线程阻塞，用完后再把资源转让给其它线程</strong>）。传统的关系型数据库里边就用到了很多这种锁机制，比如行锁，表锁等，读锁，写锁等，都是在操作之前先上锁。$Java$中<code>synchronized</code>和<code>ReentrantLock</code>等独占锁就是悲观锁思想的实现。悲观锁比较适合<strong>多写</strong>的场景。</p>
+<h2 id="CAS作用原理"><a href="#CAS作用原理" class="headerlink" title="CAS作用原理"></a>CAS作用原理</h2><p> $CAS(Compare \ And \ Swap)$ 也就是比较并交换的意思，在 $CAS$ 中有三个参数：</p>
+<ul>
+<li>$V$ : 要更新的变量( $var$ )</li>
+<li>$E$ : 期望值( $expected$ )</li>
+<li>$U$: 新值( $update$ )</li>
+</ul>
+<p>在 $CAS$ 操作过程中，判断 $V$ 是否等于 $E$，如果等于，将 $V$ 的值设置为 $U$；如果不等，说明已经有其它线程更新了 $V$，则当前线程放弃更新，什么都不做。如果用代码可以表示为：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">compareAndSwap</span><span class="params">(<span class="keyword">int</span> value, <span class="keyword">int</span> expected, <span class="keyword">int</span> update)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (value == expect) &#123;</span><br><span class="line">        value = update;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="AtomicInteger"><a href="#AtomicInteger" class="headerlink" title="AtomicInteger"></a>AtomicInteger</h2><p><code>AtomicInteger</code>是<code>java.util.concurrent.atomic</code>包下的一个原子类，那么<code>AtomicInteger</code>是怎么实现原子性的呢？点开源码看到：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Unsafe unsafe = Unsafe.getUnsafe(); <span class="comment">// Unsafe 类</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> valueOffset; <span class="comment">// 偏移量</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">int</span> value; <span class="comment">// 整型变量</span></span><br></pre></td></tr></table></figure>
+
+<p>往下随手一翻可以看到很多使用了 $CAS$ 的方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">compareAndSet</span><span class="params">(<span class="keyword">int</span> expect, <span class="keyword">int</span> update)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> unsafe.compareAndSwapInt(<span class="keyword">this</span>, valueOffset, expect, update);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">getAndAccumulate</span><span class="params">(<span class="keyword">int</span> x, IntBinaryOperator accumulatorFunction)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> prev, next;</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        prev = get();</span><br><span class="line">        next = accumulatorFunction.applyAsInt(prev, x);</span><br><span class="line">    &#125; <span class="keyword">while</span> (!compareAndSet(prev, next));</span><br><span class="line">    <span class="keyword">return</span> prev;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Unsafe"><a href="#Unsafe" class="headerlink" title="Unsafe"></a>Unsafe</h3><p>以<code>AtomicInteger</code>的源码中可以看到一个动作出现了不止一次。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">compareAndSet</span><span class="params">(<span class="keyword">int</span> expect, <span class="keyword">int</span> update)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> unsafe.compareAndSwapInt(<span class="keyword">this</span>, valueOffset, expect, update);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">weakCompareAndSet</span><span class="params">(<span class="keyword">int</span> expect, <span class="keyword">int</span> update)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> unsafe.compareAndSwapInt(<span class="keyword">this</span>, valueOffset, expect, update);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个理的<code>unsafe</code>就是前面所说的<code>Unsafe</code>对象，加上限定名后可以表示为：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> jdk.internal.misc.Unsafe U = jdk.internal.misc.Unsafe.getUnsafe();</span><br></pre></td></tr></table></figure>
+
+<p>我们拿下面这个变量来分析一下。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">native</span> <span class="keyword">boolean</span> <span class="title">compareAndSwapInt</span><span class="params">(Object var1, <span class="keyword">long</span> var2, <span class="keyword">int</span> var4, <span class="keyword">int</span> var5)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>compareAndSwapInt(x, x, x, x)</code>这个方法是比较内存中的一个整形值是否和我们的期望值<code>var4</code>一样，如果一样则将内存中的这个值更新为<code>var5</code>，参数<code>var1</code>是值所在的对象(<code>AtomicInteger</code>)，参数<code>var2</code>是值在对象中<code>var1</code>的内存偏移量，它们的组合作用是计算出值所在的内存的地址。</p>
+<p>看到<code>native</code>这和关键字就应该想到这已经不是<code>java</code>语言编写的库了，通常是<code>C/C++</code>编写的。</p>
+<p>在此借用 <a href="https://ddnd.cn/2019/03/13/java-cas/" target="_blank" rel="noopener">薛8</a>的一张图。</p>
+<p><img src="https://i.loli.net/2020/07/17/v3fayDdCmwHe4jk.jpg" alt="img"></p>
+<ul>
+<li><code>Unsafe.java</code><ul>
+<li>将对象引用、值在对象中的偏移量、期望的值和打算更新的新值传递给<code>Unsafe.cpp</code></li>
+<li>如果值更新成功则返回<code>true</code>给调用者，否则返回<code>false</code></li>
+</ul>
+</li>
+<li><code>Unsafe.cpp</code><ul>
+<li>接收从<code>Unsafe</code>传递过来的对象引用、偏移量、期望值与更新值，根据对象引用和偏移量计算出值的地址，然后将值地址，期望值，更新值传递给$CPU$</li>
+<li>如果更新成功则返回<code>true</code>给<code>Unsafe.java</code>，否则返回<code>false</code></li>
+</ul>
+</li>
+<li><code>CPU</code><ul>
+<li>接收从<code>Unsafe.cpp</code>传递过来的地址、期望值、更新值，执行指令 $cmpxchg(x, addr, e)$，比较地址中的值是否和期望值一样。是则更新，否则什么也不做。在此<code>cmpxchg</code>可以理解为 $(compare\ and\ change)$，也就是比较并改变的意思。</li>
+<li>将操作结果返回给<code>Unsafe.cpp</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="CAS实现原子操作的代价"><a href="#CAS实现原子操作的代价" class="headerlink" title="CAS实现原子操作的代价"></a>CAS实现原子操作的代价</h2><h3 id="ABA问题"><a href="#ABA问题" class="headerlink" title="ABA问题"></a>ABA问题</h3><p>所谓 $ABA$ 问题，也就是说一个值原来是 $A$ ，然后被改成了 $B$ ，最后又被改成了 $A$ 。而 $CAS$ 比较的重点就是它期待的值是不是 $A$ ，如果是就更新。</p>
+<p> $A$ ：“二狗，你再也不是当年的那个二狗了。”</p>
+<p>二狗：“$A$，你再也不是当时的那个 $A$ 了。”</p>
+<p>但是 $CAS$ 本身是检查不出这个变化的。</p>
+<p>为了解决这个问题，可以使用<strong>版本号机制</strong>或者<strong>时间戳</strong>，也就是加上时间的判断(现在的我们总还不能与时间为敌吧？)，在 $MySQL$ 的写操作常常会加上这个，在 $J.U.C$ 下也提供了相应的实现，也就是<code>java.util.concurrent.atomic</code>下的<code>AtomicStampedReference</code>。</p>
+<p> 这个类的<code>compareAndSet</code>方法的作用是首先检查当前引用是否等于预期引用，并且检查当前标志是否等于预期标志，如果二者都相等，才使用 $CAS$ 设置为新的值和标志。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">compareAndSet</span><span class="params">(V   expectedReference,</span></span></span><br><span class="line"><span class="function"><span class="params">                             V   newReference,</span></span></span><br><span class="line"><span class="function"><span class="params">                             <span class="keyword">int</span> expectedStamp,</span></span></span><br><span class="line"><span class="function"><span class="params">                             <span class="keyword">int</span> newStamp)</span> </span>&#123;</span><br><span class="line">    Pair&lt;V&gt; current = pair;</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">        expectedReference == current.reference &amp;&amp;</span><br><span class="line">        expectedStamp == current.stamp &amp;&amp;</span><br><span class="line">        ((newReference == current.reference &amp;&amp;</span><br><span class="line">          newStamp == current.stamp) ||</span><br><span class="line">         casPair(current, Pair.of(newReference, newStamp)));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="循环开销可能会很大"><a href="#循环开销可能会很大" class="headerlink" title="循环开销可能会很大"></a>循环开销可能会很大</h3><p>$CAS$多与自旋结合。如果自旋 $CAS$ 长时间不成功，会占用大量的 $CPU$ 资源。</p>
+<p>解决思路是</p>
+<ul>
+<li>让 $JVM$ 支持处理器提供的 $pause$ 指令。$pause$ 指令能让自旋失败时 $CPU$ 睡眠一小段时间再继续自旋，从而使得读操作的频率低很多，为解决内存顺序冲突而导致的 $CPU$ 流水线重排的代价也会小很多。</li>
+<li>限制自旋次数。比如重试 $10$ 次失败后暂时放弃，歇歇再来。</li>
+</ul>
+<h3 id="只能保证一个共享变量的原子操作"><a href="#只能保证一个共享变量的原子操作" class="headerlink" title="只能保证一个共享变量的原子操作"></a>只能保证一个共享变量的原子操作</h3><p><code>CAS</code>的原子操作只能针对一个共享变量，可以用以下两种方法解决。</p>
+<ul>
+<li>使用 $JDK 1.5$ 开始就提供的<code>AtomicReference</code>类保证对象之间的原子性，把多个变量放到一个对象里面进行 $CAS$ 操作</li>
+<li>使用锁，锁内的临界区代码可以保证只有当前线程能操作。</li>
+</ul>
+<h2 id="CAS的应用"><a href="#CAS的应用" class="headerlink" title="CAS的应用"></a>CAS的应用</h2><p><code>CAS</code>操作并不会锁住共享变量，是一种<strong>非阻塞</strong>的同步机制，<code>CAS</code>就是乐观锁的实现。</p>
+<p><code>Java</code>利用<code>CAS</code>的乐观锁、原子性的特性高效解决了多线程的安全性问题，例如 $JDK1.8$ 中的集合类<code>ConcurrentHashMap</code>、关键字<code>volatile</code>、<code>ReentrantLock</code>等。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://juejin.im/post/5b4977ae5188251b146b2fc8" target="_blank" rel="noopener">面试必备之乐观锁与悲观锁</a></li>
+<li><a href="https://ddnd.cn/2019/03/13/java-cas/" target="_blank" rel="noopener">CAS原理分析及ABA问题详解</a></li>
+<li><a href="https://redspider.gitbook.io/concurrent/di-er-pian-yuan-li-pian/10" target="_blank" rel="noopener">CAS与原子操作</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CAS/" rel="tag"># CAS</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/07/13/2020-07-13-LeetCode-Concurrency/" rel="prev" title="LeetCode多线程题目">
+      <i class="fa fa-chevron-left"></i> LeetCode多线程题目
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/07/17/2020-07-17-DS-Graph/" rel="next" title="数据结构-图">
+      数据结构-图 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#CAS与Unsafe源码笔记"><span class="nav-number">1.</span> <span class="nav-text">CAS与Unsafe源码笔记</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#乐观锁与悲观锁"><span class="nav-number">1.1.</span> <span class="nav-text">乐观锁与悲观锁</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#乐观锁"><span class="nav-number">1.1.1.</span> <span class="nav-text">乐观锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#悲观锁"><span class="nav-number">1.1.2.</span> <span class="nav-text">悲观锁</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CAS作用原理"><span class="nav-number">1.2.</span> <span class="nav-text">CAS作用原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AtomicInteger"><span class="nav-number">1.3.</span> <span class="nav-text">AtomicInteger</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Unsafe"><span class="nav-number">1.3.1.</span> <span class="nav-text">Unsafe</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CAS实现原子操作的代价"><span class="nav-number">1.4.</span> <span class="nav-text">CAS实现原子操作的代价</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ABA问题"><span class="nav-number">1.4.1.</span> <span class="nav-text">ABA问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#循环开销可能会很大"><span class="nav-number">1.4.2.</span> <span class="nav-text">循环开销可能会很大</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#只能保证一个共享变量的原子操作"><span class="nav-number">1.4.3.</span> <span class="nav-text">只能保证一个共享变量的原子操作</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CAS的应用"><span class="nav-number">1.5.</span> <span class="nav-text">CAS的应用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">1.6.</span> <span class="nav-text">参考</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">忘川三途</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">忘川三途</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">325k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">4:55</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

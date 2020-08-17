@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"raymond-zhao.top","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="MySQL事务的特性、事务隔离级别笔记。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL-事务与锁">
+<meta property="og:url" content="http://raymond-zhao.top/2020/08/01/2020-08-01-MySQL-TransactionAndLock/index.html">
+<meta property="og:site_name" content="Raymond&#39;s Blog">
+<meta property="og:description" content="MySQL事务的特性、事务隔离级别笔记。">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1ghbkevnm28j306903it8l.jpg">
+<meta property="article:published_time" content="2020-08-01T07:12:32.000Z">
+<meta property="article:modified_time" content="2020-08-16T13:05:36.508Z">
+<meta property="article:author" content="忘川三途">
+<meta property="article:tag" content="MySQL事务与锁">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1ghbkevnm28j306903it8l.jpg">
+
+<link rel="canonical" href="http://raymond-zhao.top/2020/08/01/2020-08-01-MySQL-TransactionAndLock/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>MySQL-事务与锁 | Raymond's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Raymond's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Get busy Living, or get busy Dying.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://raymond-zhao.top/2020/08/01/2020-08-01-MySQL-TransactionAndLock/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川三途">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Raymond's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          MySQL-事务与锁
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-08-01 15:12:32" itemprop="dateCreated datePublished" datetime="2020-08-01T15:12:32+08:00">2020-08-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-08-16 21:05:36" itemprop="dateModified" datetime="2020-08-16T21:05:36+08:00">2020-08-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/MySQL/" itemprop="url" rel="index"><span itemprop="name">MySQL</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>7.1k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+            <div class="post-description">MySQL事务的特性、事务隔离级别笔记。</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="MySQL-事务与锁"><a href="#MySQL-事务与锁" class="headerlink" title="MySQL-事务与锁"></a>MySQL-事务与锁</h1><h2 id="事务四大特性"><a href="#事务四大特性" class="headerlink" title="事务四大特性"></a>事务四大特性</h2><ul>
+<li>原子性（atomicity): 一个事务必须被视为一个不可分割的最小工作单元，整个事务中的所有操作要么全部提交成功，要么全部失败回滚，对于一个事务来说，不可能只执行其中的一部分操作，这就是事务的原子性。</li>
+</ul>
+<ul>
+<li>一致性（consistency): 数据库总是从一个一致性的状态转换到另外一个一致性的状态。</li>
+<li>隔离性（isolation): 一个事务所做的修改在最终提交以前，对其他事务是不可见的。</li>
+<li>持久性（durability): 一旦事务提交，则其所做的修改就会永久保存到数据库中。此时即使系统崩溃，修改的数据也不会丢失。</li>
+</ul>
+<p>就像锁粒度的升级会增加系统开销一样，这种事务处理过程中额外的安全性，也会需要数据库系统做更多的额外工作。一个实现了 $ACID$ 的数据库，相比没有实现 $ACID$ 的数据库，通常会需要更强的 $CPU$ 处理能力、更大的内存和更多的磁盘空间。</p>
+<h2 id="事务隔离级别"><a href="#事务隔离级别" class="headerlink" title="事务隔离级别"></a>事务隔离级别</h2><p>上面提到的隔离性其实并不只是那么寥寥几语就足以概括。在 $SQL$ 标准中定义了四种隔离级别，每一种级别都规定了一个事务中所做的修改，哪些在事务内和事务间是可见的，哪些是不可见的。较低级别的隔离通常可以执行更高的并发，系统的开销也更低。</p>
+<ul>
+<li><p><code>READ UNCOMMITTED</code>（未提交读）</p>
+<p>在 <code>READ UNCOMMITTED</code>级别，事务中的修改，即使没有提交，对其他事务也都是可见的。事务可以读取未提交的数据，这也被称为脏读（<code>Dirty Read</code>）。这个级别会导致很多问题，从性能上来说，<code>READ UNCOMMITTED</code> 不会比其他的级别好太多，但却缺乏其他级别的很多好处。</p>
+</li>
+<li><p><code>READ COMMITTED</code>（提交读）</p>
+<p>大多数数据库系统的默认隔离级别都是 <code>READ COMMITTED</code>（但 $MYSQL$ 是<code>REPEATABLE READ</code> ）。<code>READ CMITTED</code> 满足前面提到的隔离性的简单定义：一个事务开始时，只能“看见”已经提交的事务所做的修改。换句话说，一个事务从开始直到提交之前，所做的任何修改对其他事务都是不可见的。这个级别有时候也叫做不可重复读（<code>nonrepeatable read</code>），因为两次执行同样的查询，可能会得到不一样的结果 </p>
+</li>
+<li><p><code>REPEATABLE READ</code>（可重复读）<code>MySQL</code> 的认事务隔离级别</p>
+<p><code>REPEATABLE READ</code> 解决了脏读的问题，保证了在<strong>同一个事务中多次读取同样记录</strong>的结果是一致的。但是理论上，可重复读隔离级别还是无法解决另外一个幻读（<code>Phantom Read</code>）的问题。</p>
+<p><strong>所谓幻读</strong>，指的是当某个事务在读取某个范围内的记录时另外一个事务又在该范围内<strong>插入</strong>了新的记录，当之前的事务再次读取该范围的记录时，会产生幻行（<code>Phantom Row</code>）。<code>InnoDB</code> 和 <code>XtraDB</code> 存储引擎通过多版本并发控制（<code>MVCC, Multiversion Concurrency Control</code>）解决了幻读的问题。</p>
+</li>
+<li><p><code>SERIALIZABLE</code>（可串行化）</p>
+<p>最高的隔离级别。通过强制事务串行执行，避免了幻读问题。简单来说，<code>SERIALIZABLE</code> 会在读取的每一行数据上都加锁，所以可能导致大量的<strong>超时和锁争用</strong>的问题。</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>隔离级别</th>
+<th>脏读可能性</th>
+<th>不可重复读可能性</th>
+<th>幻读可能性</th>
+<th>加锁读</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>READ UNCOMMITTED</code></td>
+<td>$YES$</td>
+<td>$YES$</td>
+<td>$YES$</td>
+<td>$NO$</td>
+</tr>
+<tr>
+<td><code>READ COMMITTED</code></td>
+<td>$NO$</td>
+<td>$YES$</td>
+<td>$YES$</td>
+<td>$NO$</td>
+</tr>
+<tr>
+<td><code>REPEATABLE READ</code></td>
+<td>$NO$</td>
+<td>$NO$</td>
+<td>$YES$</td>
+<td>$NO$</td>
+</tr>
+<tr>
+<td><code>SERIALIZABLE</code></td>
+<td>$NO$</td>
+<td>$NO$</td>
+<td>$NO$</td>
+<td>$YES$</td>
+</tr>
+</tbody></table>
+<h3 id="修改事务隔离级别"><a href="#修改事务隔离级别" class="headerlink" title="修改事务隔离级别"></a>修改事务隔离级别</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"># 查看当前事务隔离级别</span><br><span class="line">select @@tx_isolation;</span><br><span class="line"></span><br><span class="line"># 设置事务隔离级别</span><br><span class="line">set session transaction isolation level repeatable read;</span><br><span class="line"></span><br><span class="line"># 默认 ON 只在当前 session 有效 先关闭进行并发模拟</span><br><span class="line">show variables like &#39;autocommit&#39;;</span><br><span class="line"></span><br><span class="line"># 关闭默认提交</span><br><span class="line">set autocommit &#x3D; 0;</span><br><span class="line"></span><br><span class="line"># 开启一个事务</span><br><span class="line">start transaction;</span><br><span class="line"># 需要在一个事务中进行的操作</span><br><span class="line">select * from t_name;</span><br><span class="line"># 手动提交事务</span><br><span class="line">commit;</span><br></pre></td></tr></table></figure>
+
+<h3 id="并发访问问题及解决"><a href="#并发访问问题及解决" class="headerlink" title="并发访问问题及解决"></a>并发访问问题及解决</h3><ul>
+<li>更新丢失(<code>Lost update</code>)：$MySQL$ 所有事务隔离级别在数据库层面上均可避免。</li>
+<li>脏读(<code>Dirty Read</code>)：$READ-COMMITED$ 事务隔离级别以上可避免。</li>
+</ul>
+<h2 id="InnoDB可重复读隔离级别下如何避免幻读"><a href="#InnoDB可重复读隔离级别下如何避免幻读" class="headerlink" title="InnoDB可重复读隔离级别下如何避免幻读"></a>InnoDB可重复读隔离级别下如何避免幻读</h2><h3 id="多版本并发控制-MVCC"><a href="#多版本并发控制-MVCC" class="headerlink" title="多版本并发控制 MVCC"></a>多版本并发控制 MVCC</h3><p>可以认为 MVCC 是行级锁的一个变种，但是在多数情况下避免了加锁，因此开销较低。虽然 MySQL、Oracle、PostgreSQL 中 MVCC 的实现方式不尽相同，但大都实现了非阻塞的读操作，写操作也只锁定必要的行。</p>
+<p>MVCC 的实现，是通过保存数据在某个时间点的<strong>快照</strong>来实现的(<strong>Snapshot 快照图</strong>)。也就是说，不管需要执行多长时间，每个事务看到的数据都是一致的。<strong>根据事务开始的时间不同，每个事务对同一张表，同一时刻看到的数据可能是不一样的。</strong></p>
+<p>另外，不同存储引擎的 MVCC 实现是不同的，典型的有乐观并发控制与悲观并发控制两种。下面简单地说一下 InnoDB 中的 MVCC 是如何工作的。</p>
+<p>InnoDB 的 MVCC，是通过在每行记录后面保存两个隐藏的列来实现的。一个保存了行的<strong>创建时间</strong>，一个保存行的<strong>过期时间</strong>（或删除时间）。存储的并不是实际的时间值，而是系统版本号（system version number）。每开始一个新的事务，系统版本号都会自动递增。事务开始时刻的系统版本号会作为事务的版本号，用来和査询到的每行记录的版本号进行比较。</p>
+<p>下面看一下在 REPEATABLE READ 隔离级别下，MVCC 具体是如何操作的。</p>
+<p><strong>SELECT</strong>： InnoDB 会根据以下两个条件检查每行记录：</p>
+<ul>
+<li><p>InnoDB 只査找<strong>版本早于当前事务版本的数据行</strong>（行的系统版本号 $\le$ 事务的系统版本号），这样可以确保事务读取的行，要么是在事务开始前已经存在的，要么是事务自身插入或者修改过的。</p>
+</li>
+<li><p>行的删除版本要么未定义，要么大于当前事务版本号。这可以确保事务读取到的行，在事务开始之前未被删除。</p>
+<p>只有符合上述两个条件的记录，才能返回作为査询结果。</p>
+</li>
+</ul>
+<p><strong>INSERT</strong></p>
+<p>  InnoDB 为新插人的每一行保存<strong>当前系统版本号</strong>作为行版本。</p>
+<p><strong>DELETE</strong></p>
+<p>  InnoDB 为删除的每一行保存<strong>当前系统版本号</strong>作为行删除标识。</p>
+<p><strong>UPDATE</strong></p>
+<p>  InnoDB 为插入一行新记录，保存<strong>当前系统版本号</strong>作为行版本号，同时保存当前系统版本号到原来的行作为行删除标识。</p>
+<p>保存这两个额外系统版本号，使大多数读操作都可以不用加锁。但是每行记录都需要额外的存储空间，需要做更多的行检查工作，以及一些额外的维护工作。</p>
+<p>MVCC 只在 REPEATABLE READ 和 READ COMMITTED 两个隔离级别下工作。其他两个隔离级别都和 MVCC 不兼容, 因为 READ UNCOMMITTED 总是读取最新的数据行，而不是符合当前事务版本的数据行。而 SERIALIZABLE 则会对所有读取的行都加锁。</p>
+<h3 id="快照读与当前读"><a href="#快照读与当前读" class="headerlink" title="快照读与当前读"></a>快照读与当前读</h3><p>新建一张表到<code>demo</code>数据库中，作测试用。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE &#96;dept&#96; (</span><br><span class="line">  &#96;id&#96; int(11) NOT NULL AUTO_INCREMENT,</span><br><span class="line">  &#96;name&#96; varchar(20) DEFAULT NULL,</span><br><span class="line">  PRIMARY KEY (&#96;id&#96;)</span><br><span class="line">) ENGINE&#x3D;InnoDB AUTO_INCREMENT&#x3D;12 DEFAULT CHARSET&#x3D;utf8;</span><br><span class="line"></span><br><span class="line">insert into dept(name) values(&#39;后勤部&#39;);</span><br></pre></td></tr></table></figure>
+
+<p>然后打开两个 session 对话(两个查询窗口)，手动关闭事务自动提交<code>set autocommit = 0;</code>，进行如下操作：</p>
+<table>
+<thead>
+<tr>
+<th>手动时间戳</th>
+<th>Transaction-1</th>
+<th>Transaction-2</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><code>set autocommit = 0;</code></td>
+<td><code>set autocommit = 0;</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>start transaction;</code></td>
+<td><code>start transaction;</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>select * from dept;</code></td>
+<td></td>
+</tr>
+<tr>
+<td>4</td>
+<td></td>
+<td><code>insert into dept(name) values (&#39;研发部&#39;);</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td></td>
+<td><code>commit;</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>select * from dept;</code></td>
+<td></td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>commit;</code></td>
+<td></td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>select * from dept;</code></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>执行结果是在时间戳 $3$ 只查到一条数据，时间戳 $6$ 只查到一条数据，而时间戳 $8$ 则查到两条数据。</p>
+<p>此时，InnoDB 的默认隔离级别是 R R，在我们没有加锁，没有加索引，没有其他影响因素，并且仅使用 MVCC 的情况下，似乎是没有发生幻读。</p>
+<p>上面 Transaction-1 的操作是 <strong>读操作(select)</strong>，接下来是一个<strong>写操作(update)</strong>吧。</p>
+<table>
+<thead>
+<tr>
+<th>手动时间戳</th>
+<th>Transaction-1</th>
+<th>Transaction-2</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><code>set autocommit = 0;</code></td>
+<td><code>set autocommit = 0;</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>start transaction;</code></td>
+<td><code>start transaction;</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>select * from dept;</code></td>
+<td></td>
+</tr>
+<tr>
+<td>4</td>
+<td></td>
+<td><code>insert into dept(name) values (&#39;研发部&#39;);</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td></td>
+<td><code>commit;</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>update dept set name = &#39;行政部&#39;(没写where)</code></td>
+<td></td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>select * from dept;</code></td>
+<td></td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>commit;</code></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>最后的结果如下图所示，可以看到的是在执行到时间戳 $3$ 时，查询结果为 $3$ 条，但是到时间戳 $7$ 时，事务尚未提交，但是查询到的结果已经有 $4$ 条了，也就是在 Transaction-1 尚未结束前，Transaction-2 已经插入了，并不是 REPEATABLE READ，出现了幻读。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ghbkevnm28j306903it8l.jpg" alt="MVCC下的Update"></p>
+<p>👨‍🏫：MVCC 解决幻读问题了吗？</p>
+<p>👨‍🎓：在一定程度上解决了幻读问题(<code>select</code>)，但是没有彻底解决幻读问题(<code>update</code>)。在 InnoDB 的 RR 级别下，通过 MVCC 虽然让数据变得可重复读，但是读到的数据是历史数据(事务开始前的快照，同一个事务内可重复读。)，而不是数据库最新的数据。读取历史数据的方式叫做<strong>快照读</strong>，而读取最新版本数据的方式，叫做<strong>当前读</strong>。</p>
+<p><strong>SELECT 快照读</strong></p>
+<p>当执行 SELECT 操作时 InnoDB 默认会执行快照读，记录下此次 SELECT 的结果，之后再 SELECT 的则返回此次快照结果，即使其他事务提交了不会影响当前 SELECT 的数据，也就是<strong>可重复读</strong>。快照的生成时间为当前事务中第一次执行 SELECT 时刻，也就是说假设 A 开启了事务，然后在执行 SELECT 操作前，事务 B 插入了一条数据然后 COMMIT，此时 A 执行 SELECT，结果中将会出现 B 新添加的那条数据。之后即使仍有事务 C、D、E 继续开启事务、提交数据、提交事务，事务 A 的 SELECT 结果不变，因为<strong>快照已经生成</strong>。</p>
+<p><strong>当前读</strong></p>
+<p>对于写操作作(update、insert、delete)均采用当前读。执行这三个操作时会读取最新的记录，即使是别的事务新提交的数据也可以查询到。比如事务 A 准备要 UPDATE 一条数据，但是事务 B 已经 DELETE 这条数据并且 COMMIT ，此时事务 A 进行 UPDATE 将会失败，在 UPDATE 的时候需要知道最新的数据。正因如此，才导致上面 UPDATE 测试的那种情况。</p>
+<p>SELECT 的当前读需要手动加锁：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select * from table where ? lock in share mode;</span><br><span class="line"></span><br><span class="line">select * from table where ? for update;</span><br></pre></td></tr></table></figure>
+
+<p>所以 $BB$ 了这么久怎么解决幻读？🙄</p>
+<p>最简单的方式，将上面的例子时间戳 $3$ 手动加锁，改为<code>select * from dept for update;</code>，此时 Transaction-2 将会阻塞。</p>
+<h3 id="InnoDB-RR级别下如何避免幻读"><a href="#InnoDB-RR级别下如何避免幻读" class="headerlink" title="InnoDB RR级别下如何避免幻读"></a>InnoDB RR级别下如何避免幻读</h3><blockquote>
+<p>刚刚看到 GitHub 上关于<a href="https://github.com/Yhzhtk/note/issues/42" target="_blank" rel="noopener">InnoDB 中 RR 隔离级别能否防止幻读？</a>的讨论，很值得一读。</p>
+</blockquote>
+<p>从上面一节可以看到在 RR 级别下没有彻底解决幻读，如果想要彻底解决的话有两种方式：</p>
+<ul>
+<li>实现最高事务隔离级别 SERIALIZABLE；</li>
+<li>MVCC $+$ Next-Key Locks: <code>next-key locks</code>由 <code>record locks</code>(索引加锁) 和 <code>gap locks</code>(间隙锁，每次锁住的不光是需要使用的数据，还会锁住这些数据附近的数据)。</li>
+</ul>
+<h3 id="MVCC-Next-Key-Locks"><a href="#MVCC-Next-Key-Locks" class="headerlink" title="MVCC $+$ Next-Key Locks"></a>MVCC $+$ Next-Key Locks</h3><blockquote>
+<p><a href="https://dev.mysql.com/doc/refman/8.0/en/innodb-locking.html" target="_blank" rel="noopener">MySQL 官方 InnoDB Locking</a></p>
+</blockquote>
+<p>先从上文中翻译几个锁的意思。</p>
+<h4 id="Record-Locks"><a href="#Record-Locks" class="headerlink" title="Record Locks"></a>Record Locks</h4><p>「Record Locks」: 即行锁，比如<code>select c1 from t where c1 = 10 for update;</code>这条查询将会阻止其他事务对 <code>t.c1 = 10</code> 这条记录的 insert、update、delete。</p>
+<p>「Record Locks」总是会锁住带索引的记录，即使一张表上并没有定义任何索引，InnoDB 也会隐式地创建一个聚簇索引(主键)，并且将这个索引用于 record locking.</p>
+<h4 id="Gap-Locks"><a href="#Gap-Locks" class="headerlink" title="Gap Locks"></a>Gap Locks</h4><p>「Gap Locks」用于锁定索引记录之间的间隙，或者锁定<strong>(before the first index record)第一条索引记录之前</strong>或<strong>(after the last index record)最后一条索引记录之后</strong>。比如<code>select c1 from t where c1 between 10 and 20 for update;</code>，由于<code>10-20</code>之间的数据被锁定，可以防止其他事务将<code>t.c1 = 15</code> 的记录插入表中。</p>
+<p>「Gap Locks」可以包含单个索引值，多个索引值，或者为空。</p>
+<p>「Gap Locks」是性能与并发之间的一种权衡与妥协，只能应用在某些事务隔离级别之下，并不是所有事务隔离级别。</p>
+<p>对于使用「唯一索引」来锁定唯一行的语句不需要使用 Gap Locks 而只会使用 Record Locks (这并不包括查询条件包含多列索引其中部分列的情况，在这种情况下 Gap Locks 仍会出现)。比如，如果<code>id</code>这列包含唯一索引(unique index)，下面的这条语句只会使用<code>index-record</code>来锁定<code>id = 100</code>的行，即使其他事务可以在<code>id = 100</code>之前的间隙插入数据。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from child where id &#x3D; 100;</span><br></pre></td></tr></table></figure>
+
+<p>如果 <code>id</code> 没有索引或者是非唯一索引，上面这条语句仍然会锁住<code>id = 100</code>的前置区间。</p>
+<p>总结一下：</p>
+<ul>
+<li>用于锁住<code>Index Record</code>之间的间隙</li>
+<li>如果是<code>通过唯一索引来搜索一行记录</code>的时候，不需要使用<code>Gap Locks</code>，此时<code>Gap Locks</code>降级为<code>Record Locks</code></li>
+<li><code>Gap S-Lock</code>与<code>Gap X-Lock</code>是兼容的</li>
+<li><code>Gap Locks</code>只能_<strong><code>阻止其他事务在该Gap中插入记录</code></strong>_，但<strong><code>无法阻止</code></strong>其他事务获取<code>同一个Gap</code>上的<code>Gap Lock</code></li>
+<li>可以通过将事务隔离级别设置为 READ COMMITTED 禁用<code>Gap Locks</code>。</li>
+</ul>
+<h4 id="Next-Key-Locks"><a href="#Next-Key-Locks" class="headerlink" title="Next-Key Locks"></a>Next-Key Locks</h4><ul>
+<li><strong><code>Next-Key Locks</code> = <code>Record Locks</code> + <code>Gap Locks</code></strong></li>
+<li>若在<code>id</code>列上没有索引或者是非唯一索引，并且有<code>id = 10、11、13、20</code>这几条数据，那么可以锁定的区间为 $(-\infty, 10],(10,11],(11,13],(13,20],(20,+\infty)$，左开右闭。若执行<code>select * from t where id = 13 for update;</code><ul>
+<li>将在<code>id = 13</code>上有一个 <code>X Lock</code>，在$(11,13)$有个<code>Gap Lock</code></li>
+<li><code>id = 13</code>的<code>Next-Key</code> 为$20$，将在<code>id = 20</code>上有一个 <code>X Lock</code>，在$(13,20)$有一个<code>Gap Lock</code></li>
+<li>因此，在<code>id = 13</code>上有一个<code>X Lock</code>，在$(11,20)$上有一个<code>Gap Lock</code></li>
+<li>也可以理解为在<code>id = 13</code>和<code>id = 20</code>上各有一个<code>X Lock</code>，在 $(11,13)$ 和 $(13, 20)$ 上各有一个<code>Gap Lock</code></li>
+</ul>
+</li>
+<li>在 InnoDB 的默认隔离级别 RR 下，支持 Next-Key Locks.</li>
+</ul>
+<h4 id="各种锁测试"><a href="#各种锁测试" class="headerlink" title="各种锁测试"></a>各种锁测试</h4><ul>
+<li>[InnoDB – Next-Key Lock](<a href="http://zhongmingmao.me/2017/05/18/innodb-next-key-lock/" target="_blank" rel="noopener">InnoDB – Next-Key Lock</a>)</li>
+</ul>
+<h2 id="RC、RR级别下的InnoDB的非阻塞读如何实现"><a href="#RC、RR级别下的InnoDB的非阻塞读如何实现" class="headerlink" title="RC、RR级别下的InnoDB的非阻塞读如何实现"></a>RC、RR级别下的InnoDB的非阻塞读如何实现</h2><ul>
+<li><p>其实主要就是上面提到的 MVCC. </p>
+</li>
+<li><p><a href="https://www.zhihu.com/question/66320138" target="_blank" rel="noopener">MySQL 在 RC 隔离级别下是如何实现读不阻塞的？</a></p>
+</li>
+<li><p><a href="http://m.imooc.com/article/details?article_id=17290" target="_blank" rel="noopener">MySQL数据库事务各隔离级别加锁情况–read committed &amp;&amp; MVCC</a></p>
+</li>
+</ul>
+<h2 id="MySQL-锁"><a href="#MySQL-锁" class="headerlink" title="MySQL 锁"></a>MySQL 锁</h2><h3 id="锁的分类"><a href="#锁的分类" class="headerlink" title="锁的分类"></a>锁的分类</h3><ul>
+<li>按粒度划分：表级锁，行级锁，页级锁。</li>
+<li>按读写划分：共享锁，排它锁。</li>
+<li>按加锁方式划分：自动锁，显式锁。</li>
+<li>按操作划分：$DML$锁，$DDL$锁。</li>
+<li>按使用方式划分：乐观锁(通过版本号)，悲观锁。</li>
+</ul>
+<h3 id="锁的使用"><a href="#锁的使用" class="headerlink" title="锁的使用"></a>锁的使用</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># MyISAM 的表级锁</span><br><span class="line"># read 读锁、共享锁 write 写锁、排它锁</span><br><span class="line">lock tables t_name read | write;</span><br><span class="line">unlock tables;</span><br><span class="line"></span><br><span class="line"># InnoDB 的行级锁</span><br><span class="line"># 加共享锁</span><br><span class="line">select * from t_name where id &#x3D; ? lock in share mode;</span><br><span class="line"># 加排它锁</span><br><span class="line">select * from t_name where id &#x3D; ? for update;</span><br></pre></td></tr></table></figure>
+
+<p><strong>共享锁与排它锁的兼容性</strong></p>
+<table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">X(排它锁)</th>
+<th align="center">S(共享锁)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">X(排它锁)</td>
+<td align="center">冲突</td>
+<td align="center">冲突</td>
+</tr>
+<tr>
+<td align="center">S(共享锁)</td>
+<td align="center">冲突</td>
+<td align="center">兼容</td>
+</tr>
+</tbody></table>
+<h3 id="隐式和显式锁定"><a href="#隐式和显式锁定" class="headerlink" title="隐式和显式锁定"></a>隐式和显式锁定</h3><p>InnoDB 采用的是两阶段锁定协议（two- phase locking protocol）。在事务执行过程中，随时都可以执行锁定，锁只有在执行 COMMIT 或者 ROLLBACK 的时候才会释放，并且所有的锁是在同一时刻被释放。InnoDB 会根据隔离级别在需要的时候自动加锁。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>《高性能MySQL》第三版</li>
+<li><a href="https://juejin.im/post/6844903799534911496" target="_blank" rel="noopener">MySQL的可重复读级别能解决幻读吗 - 掘金</a></li>
+<li>[InnoDB – Next-Key Lock](<a href="http://zhongmingmao.me/2017/05/18/innodb-next-key-lock/" target="_blank" rel="noopener">InnoDB – Next-Key Lock</a>)</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/MySQL%E4%BA%8B%E5%8A%A1%E4%B8%8E%E9%94%81/" rel="tag"># MySQL事务与锁</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/07/19/2020-07-19-JUC-ProcessAndThread/" rel="prev" title="进程、线程与线程池">
+      <i class="fa fa-chevron-left"></i> 进程、线程与线程池
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/08/02/2020-08-02-MySQL-Explain-Cols/" rel="next" title="MySQL-Explain中的列">
+      MySQL-Explain中的列 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#MySQL-事务与锁"><span class="nav-number">1.</span> <span class="nav-text">MySQL-事务与锁</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#事务四大特性"><span class="nav-number">1.1.</span> <span class="nav-text">事务四大特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#事务隔离级别"><span class="nav-number">1.2.</span> <span class="nav-text">事务隔离级别</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#修改事务隔离级别"><span class="nav-number">1.2.1.</span> <span class="nav-text">修改事务隔离级别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#并发访问问题及解决"><span class="nav-number">1.2.2.</span> <span class="nav-text">并发访问问题及解决</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#InnoDB可重复读隔离级别下如何避免幻读"><span class="nav-number">1.3.</span> <span class="nav-text">InnoDB可重复读隔离级别下如何避免幻读</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#多版本并发控制-MVCC"><span class="nav-number">1.3.1.</span> <span class="nav-text">多版本并发控制 MVCC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#快照读与当前读"><span class="nav-number">1.3.2.</span> <span class="nav-text">快照读与当前读</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#InnoDB-RR级别下如何避免幻读"><span class="nav-number">1.3.3.</span> <span class="nav-text">InnoDB RR级别下如何避免幻读</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MVCC-Next-Key-Locks"><span class="nav-number">1.3.4.</span> <span class="nav-text">MVCC $+$ Next-Key Locks</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Record-Locks"><span class="nav-number">1.3.4.1.</span> <span class="nav-text">Record Locks</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Gap-Locks"><span class="nav-number">1.3.4.2.</span> <span class="nav-text">Gap Locks</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Next-Key-Locks"><span class="nav-number">1.3.4.3.</span> <span class="nav-text">Next-Key Locks</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#各种锁测试"><span class="nav-number">1.3.4.4.</span> <span class="nav-text">各种锁测试</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RC、RR级别下的InnoDB的非阻塞读如何实现"><span class="nav-number">1.4.</span> <span class="nav-text">RC、RR级别下的InnoDB的非阻塞读如何实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL-锁"><span class="nav-number">1.5.</span> <span class="nav-text">MySQL 锁</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#锁的分类"><span class="nav-number">1.5.1.</span> <span class="nav-text">锁的分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#锁的使用"><span class="nav-number">1.5.2.</span> <span class="nav-text">锁的使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#隐式和显式锁定"><span class="nav-number">1.5.3.</span> <span class="nav-text">隐式和显式锁定</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">1.6.</span> <span class="nav-text">参考</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">忘川三途</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">忘川三途</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">325k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">4:55</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

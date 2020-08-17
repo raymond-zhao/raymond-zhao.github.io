@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"raymond-zhao.top","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Linux常用知识">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux常用知识">
+<meta property="og:url" content="http://raymond-zhao.top/2020/03/30/2020-03-30-OS-Linux/index.html">
+<meta property="og:site_name" content="Raymond&#39;s Blog">
+<meta property="og:description" content="Linux常用知识">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/00831rSTly1gdcc5xttn4j30sq0dmmyv.jpg">
+<meta property="article:published_time" content="2020-03-30T14:44:09.000Z">
+<meta property="article:modified_time" content="2020-08-16T13:05:36.501Z">
+<meta property="article:author" content="忘川三途">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/00831rSTly1gdcc5xttn4j30sq0dmmyv.jpg">
+
+<link rel="canonical" href="http://raymond-zhao.top/2020/03/30/2020-03-30-OS-Linux/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Linux常用知识 | Raymond's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Raymond's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Get busy Living, or get busy Dying.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://raymond-zhao.top/2020/03/30/2020-03-30-OS-Linux/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川三途">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Raymond's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux常用知识
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-03-30 22:44:09" itemprop="dateCreated datePublished" datetime="2020-03-30T22:44:09+08:00">2020-03-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-08-16 21:05:36" itemprop="dateModified" datetime="2020-08-16T21:05:36+08:00">2020-08-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>2.3k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>2 mins.</span>
+            </span>
+            <div class="post-description">Linux常用知识</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="1-Linux-的体系结构"><a href="#1-Linux-的体系结构" class="headerlink" title="1 Linux 的体系结构"></a>1 Linux 的体系结构</h1><ul>
+<li>体系结构主要分为<strong>用户态</strong>(用户上层活动)和<strong>内核态</strong></li>
+<li>内核：<strong>本质</strong>上是一段管理计算机硬件设备的<strong>程序</strong></li>
+<li>系统调用：内核的访问接口，是一种能再简化的操作。</li>
+<li>公用函数库：系统调用的组合拳</li>
+<li><strong><code>Shell</code>: 命令解释器，可编程</strong></li>
+</ul>
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gdcc5xttn4j30sq0dmmyv.jpg" alt="Linux体系结构"></p>
+<h1 id="2-如何操作特定的文件"><a href="#2-如何操作特定的文件" class="headerlink" title="2 如何操作特定的文件"></a>2 如何操作特定的文件</h1><h2 id="2-1-检索文件名-find"><a href="#2-1-检索文件名-find" class="headerlink" title="2.1 检索文件名 find"></a>2.1 检索文件名 find</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">find path [options] params</span><br><span class="line"><span class="meta">#</span><span class="bash"> 作用：在指定目录下查找文件</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 不加 path 作用域时的默认路径为当前目录及其子目录</span></span><br><span class="line">find -name "helloworld.java"</span><br><span class="line"><span class="meta">#</span><span class="bash"> linux 系统中 / 代表 root 根目录 ~ 代表 home 目录</span></span><br><span class="line">find / -name "helloworld.java"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 支持模糊查询</span></span><br><span class="line">find ~ -name "hello*"</span><br><span class="line"><span class="meta">#</span><span class="bash"> -iname 忽略大小写</span></span><br><span class="line">find ~ -iname "hello*"</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-2-检索文件内容-grep"><a href="#2-2-检索文件内容-grep" class="headerlink" title="2.2 检索文件内容 grep"></a>2.2 检索文件内容 grep</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> grep : global regular expression <span class="built_in">print</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 用于查找文件里符合条件的字符串 可以使用正则表达式 最终输出到终端</span></span><br><span class="line">grep [options] pattern file</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 从以 hello 开头的文件中寻找含 hello 的字符串</span></span><br><span class="line">grep "hello" "hello*"</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-3-管道操作符"><a href="#2-3-管道操作符" class="headerlink" title="2.3 管道操作符 |"></a>2.3 管道操作符 |</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 可将指令连接起来 前一个指令的输出(stdout)作为后一个指令的输入(stdin)</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 只处理前一个命令的正确输出 不处理错误输出</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 右边的命令必须能够接收标准输入流 否则传递过程中会被抛弃</span></span><br><span class="line">find ~ | grep "hello"</span><br><span class="line"><span class="meta">#</span><span class="bash"> grep -o</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> grep -v</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="2-4-对文件内容做统计-awk"><a href="#2-4-对文件内容做统计-awk" class="headerlink" title="2.4 对文件内容做统计 awk"></a>2.4 对文件内容做统计 awk</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">awk [options] 'cmd' file</span><br><span class="line"><span class="meta">#</span><span class="bash"> 一次读取一行文本 按输入分隔符进行切片 切成多个组成部分</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 将切片直接保存在内建的变量中 <span class="variable">$1</span>, <span class="variable">$2</span>... (<span class="variable">$0</span> 表示行的全部)</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 支持对耽搁切片的判断，支持循环判断，默认分隔符为空格。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 打印 netstat.txt 文件中第一列，第四列的内容</span></span><br><span class="line">awk '&#123;print $1, $4&#125;' netstat.txt</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 打印 netstat.txt 文件中 第一列中为 tcp 第二列为 1 的所有内容</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> NR</span></span><br><span class="line">awk '$1=="tcp" &amp;&amp; $2=1 &#123;print $0&#125;' netstat.txt</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> enginearr[] 为变量名</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以先用 grep 过滤数据，然后用 awk 来整理</span></span><br><span class="line">awk '&#123;enginearr[$1]++&#125;END&#123;for(i in enginearr) print i "\t" enginearr[i]&#125;'</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-5-批量替换掉文档中的内容-sed"><a href="#2-5-批量替换掉文档中的内容-sed" class="headerlink" title="2.5 批量替换掉文档中的内容 sed"></a>2.5 批量替换掉文档中的内容 sed</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// replace.java</span></span><br><span class="line">Str a = <span class="string">"The girl's boyfriend is Jack"</span>.</span><br><span class="line">Str b = <span class="string">"The girl often chats with Jack and Jack is Jack"</span>.</span><br><span class="line">Str c = <span class="string">"The girl loves Jack so muck"</span>.</span><br><span class="line">    </span><br><span class="line">Integer bf = <span class="keyword">new</span> Integer(<span class="number">2</span>);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">sed [option] 'sed command' filename</span><br><span class="line"><span class="meta">#</span><span class="bash"> 全名 stream editor 流编辑器</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 适合用于对文本的行内容进行处理</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 将 replace.java 中所有 Str 字符串替换为 String</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 第一个 / 之前的 s 代表对字符串进行操作 </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 第一个 / 与第二个 / 之间的代表要操作的内容</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 第二个 / 与第三个 / 之间的内容表示要操作后的内容</span></span><br><span class="line">sed 's/^Str/String/' replace.java</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 上面的命令指示将修改后的内容输出到 终端</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果需要输出到文件中需要加 -i</span></span><br><span class="line">sed -i 's/^Str/String/' replace.java</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> \ 为转义字符</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 将 replace.java 中所有以 . 作为结尾的变为以 ; 结尾的</span></span><br><span class="line">sed -i 's/\.$/\;/' replace.java</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 默认只替换每行文件中第一个出现等于 Jack 的字符串</span></span><br><span class="line">sed -i 's/Jack/me/' replace.java</span><br><span class="line"><span class="meta">#</span><span class="bash"> 全局替换</span></span><br><span class="line">sed -i 's/Jack/me/g' replace.java</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除 3-4 行的空行 注意 ^ 与 *$ 之间的空格代表空行 /d 代表删除</span></span><br><span class="line">sed -i '/^ *$/d' replace.java</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除含有 Integer 的行</span></span><br><span class="line">sed -i '/Integer/d' replace.java</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-6-查看或者编辑文件"><a href="#2-6-查看或者编辑文件" class="headerlink" title="2.6 查看或者编辑文件"></a>2.6 查看或者编辑文件</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> cat 猫一眼, 可以合并文件</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> head -n N 头几行</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> tail -n N 尾几行</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> more 较大文件, 分页显示, 提示文件显示百分比</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> less  less 可以随意浏览文件, 而 more 仅能向前移动, 而且 less 在查看之前不会加载整个文件</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> vi </span></span><br><span class="line"><span class="meta">$</span><span class="bash"> vim</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如何查看大文件</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 就跟所有操作大文件的方法一样: 分治</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> vim默认加载整个文件, 但是可以按需取用, 使用 less 最好, 可以把命令直接加进去.</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="3-如何查看系统的负载"><a href="#3-如何查看系统的负载" class="headerlink" title="3 如何查看系统的负载"></a>3 如何查看系统的负载</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> uptime <span class="comment"># 获取主机运行时间和查询linux系统负载等信息</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> w <span class="comment"># 和uptime差不多</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> top <span class="comment"># 实时监控系统状态</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> iostat -x 1 10 <span class="comment"># 监控IO, -x表示显示所有参数信息, 1表示每秒监控一次, 10 表示工监控10次</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> vmstat <span class="comment"># 获得有关进程、虚存、页面交换空间及CPU活动的信息</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> free -m <span class="comment"># 查看系统内存的使用情况, -m参数表示按照兆字节展示</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> sar -n DEV 1 <span class="comment"># 查看网络设备的吞吐率</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> mpstat -P ALL 1 <span class="comment"># 显示每个CPU的占用情况, 如果CPU占用率特别高, 可能是单线程应用程序引起</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> dmesg | tail <span class="comment"># 输出系统日志的最后10行</span></span></span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/30/2020-03-30-Redis-Basic/" rel="prev" title="好好学 Redis">
+      <i class="fa fa-chevron-left"></i> 好好学 Redis
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/03/2020-04-03-Java-ClassLib/" rel="next" title="常用类库与技巧">
+      常用类库与技巧 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-Linux-的体系结构"><span class="nav-number">1.</span> <span class="nav-text">1 Linux 的体系结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-如何操作特定的文件"><span class="nav-number">2.</span> <span class="nav-text">2 如何操作特定的文件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-检索文件名-find"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 检索文件名 find</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-检索文件内容-grep"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 检索文件内容 grep</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-管道操作符"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 管道操作符 |</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-对文件内容做统计-awk"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 对文件内容做统计 awk</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-5-批量替换掉文档中的内容-sed"><span class="nav-number">2.5.</span> <span class="nav-text">2.5 批量替换掉文档中的内容 sed</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-6-查看或者编辑文件"><span class="nav-number">2.5.1.</span> <span class="nav-text">2.6 查看或者编辑文件</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-如何查看系统的负载"><span class="nav-number">3.</span> <span class="nav-text">3 如何查看系统的负载</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">忘川三途</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">忘川三途</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">325k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">4:55</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

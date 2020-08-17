@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"raymond-zhao.top","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="图的遍历与力扣中的一些题目">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据结构-图">
+<meta property="og:url" content="http://raymond-zhao.top/2020/07/17/2020-07-17-DS-Graph/index.html">
+<meta property="og:site_name" content="Raymond&#39;s Blog">
+<meta property="og:description" content="图的遍历与力扣中的一些题目">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1ggubfgi87tj30qy08fdgd.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1ggubotwmzdj308c07p3yk.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1ggubsokco1j308c07p74c.jpg">
+<meta property="article:published_time" content="2020-07-17T13:41:14.000Z">
+<meta property="article:modified_time" content="2020-08-16T13:05:36.507Z">
+<meta property="article:author" content="忘川三途">
+<meta property="article:tag" content="数据结构-图">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1ggubfgi87tj30qy08fdgd.jpg">
+
+<link rel="canonical" href="http://raymond-zhao.top/2020/07/17/2020-07-17-DS-Graph/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>数据结构-图 | Raymond's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Raymond's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Get busy Living, or get busy Dying.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://raymond-zhao.top/2020/07/17/2020-07-17-DS-Graph/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川三途">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Raymond's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          数据结构-图
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-07-17 21:41:14" itemprop="dateCreated datePublished" datetime="2020-07-17T21:41:14+08:00">2020-07-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-08-16 21:05:36" itemprop="dateModified" datetime="2020-08-16T21:05:36+08:00">2020-08-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>9.9k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>9 mins.</span>
+            </span>
+            <div class="post-description">图的遍历与力扣中的一些题目</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="图的遍历与力扣中的一些题目"><a href="#图的遍历与力扣中的一些题目" class="headerlink" title="图的遍历与力扣中的一些题目"></a>图的遍历与力扣中的一些题目</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>每次说到”图”这个字，总是会想起一个名为 <a href="https://zh.wikipedia.org/wiki/%E5%85%AD%E5%BA%A6%E5%88%86%E9%9A%94%E7%90%86%E8%AE%BA" target="_blank" rel="noopener">六度分割</a> 的理论。</p>
+<blockquote>
+<p><strong>六度分隔理论</strong>（英语：Six Degrees of Separation）认为世界上任何互不相识的两人，只需要很少的中间人就能够建立起联系。</p>
+</blockquote>
+<h2 id="图的基本知识"><a href="#图的基本知识" class="headerlink" title="图的基本知识"></a>图的基本知识</h2><p>图是一种数据结构，现在应用的越来越广泛，如非关系型数据库<code>Neo4j</code>，但是目前图应用的最广泛的领域应该还是社交网络，被重多互联网公司用来分析用户间的关系，分析人际网络，朋友圈。</p>
+<p>图由顶点($vertex$) 和 边($edge$) 来表示，其中顶点用来表示实体，而边则用来表示关系。</p>
+<h3 id="图的分类"><a href="#图的分类" class="headerlink" title="图的分类"></a>图的分类</h3><p>图可以分为无向图，有向图($Directed\ Graph$)，以及加权图($Weighted\ Graph$)三类。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ggubfgi87tj30qy08fdgd.jpg" alt="图的类型"></p>
+<ul>
+<li>无向图：边之间没有方向，可以假设他们现在没什么特殊的联系，也许就是在<code>Twitter</code>上看到了某人的<code>Tweet</code>。</li>
+<li>有向图：边之间有方向，可以假设他们在<code>Twitter</code>上谁谁关注了谁谁。</li>
+<li>加权图：边上有权重，可以假设为他们之间已经认识了多久的时间了。</li>
+</ul>
+<h3 id="图的表示方式"><a href="#图的表示方式" class="headerlink" title="图的表示方式"></a>图的表示方式</h3><p>依然记得本科的数据结构课本上提过图有两种表示方式，分别是邻接矩阵与邻接表。</p>
+<p><strong>邻接矩阵</strong></p>
+<p>邻接矩阵是一个正方形矩阵，其边长等于结点的个数。矩阵的元素通常为数值。在无向图中是关于主对角线对称的。在下图中，矩阵中的元素为 $1$ 则表示两人之间有关系，为 $0$ 则表示没有关系。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ggubotwmzdj308c07p3yk.jpg" alt="img"></p>
+<p>用邻接矩阵的方式来表示图的查询效率很高，但是，空间利用率却很低，有时候会变成稀疏矩阵。</p>
+<p><strong>邻接表</strong></p>
+<p>邻接表是一个列表数组，数组的大小等于图中的顶点数。数组特定索引处的列表表示与该顶点相邻的所有顶点。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ggubsokco1j308c07p74c.jpg" alt="img"></p>
+<p>用邻接矩阵的方式来表示图，比较难以创建，而且查询效率较低，但是空间利用率相对较高。</p>
+<h2 id="利用Java实现图"><a href="#利用Java实现图" class="headerlink" title="利用Java实现图"></a>利用Java实现图</h2><p>在 $Java$ 里是没有提供图这个数据结构的，通过上面几部分可以知道，图的组成要素为顶点和边，那就手动创建一下吧。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Vertex</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> String label;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Vertex</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Vertex</span><span class="params">(String label)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.label = label;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// equals() and hashCode() 需要重写</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面定义的顶点内部属性为 $String$ ，考虑通用性，是应该设置成泛型的。</p>
+<p>接下来就选择使用邻接表的方式来表示图。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Graph</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> Map&lt;Vertex, List&lt;Vertex&gt;&gt; adjVertices;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Graph</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Graph</span><span class="params">(Map&lt;Vertex, List&lt;Vertex&gt;&gt; adjVertices)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.adjVertices = adjVertices;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="添加-删除顶点"><a href="#添加-删除顶点" class="headerlink" title="添加/删除顶点"></a>添加/删除顶点</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 在顶点集合中增加结点。</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addVertex</span><span class="params">(String label)</span> </span>&#123;</span><br><span class="line">    adjVertices.putIfAbsent(<span class="keyword">new</span> Vertex(label), <span class="keyword">new</span> ArrayList&lt;&gt;());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 在顶点集合中删除结点。</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeVertex</span><span class="params">(String label)</span> </span>&#123;</span><br><span class="line">    Vertex v = <span class="keyword">new</span> Vertex(label);</span><br><span class="line">    adjVertices.values().stream().forEach(e -&gt; e.remove(v));</span><br><span class="line">    adjVertices.remove(<span class="keyword">new</span> Vertex(label));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="添加-删除边"><a href="#添加-删除边" class="headerlink" title="添加/删除边"></a>添加/删除边</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 创建一条新的边并更新相邻的顶点</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addEdge</span><span class="params">(String label1, String label2)</span> </span>&#123;</span><br><span class="line">    Vertex v1 = <span class="keyword">new</span> Vertex(label1);</span><br><span class="line">    Vertex v2 = <span class="keyword">new</span> Vertex(label2);</span><br><span class="line">    adjVertices.get(v1).add(v2);</span><br><span class="line">    adjVertices.get(v2).add(v1);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 删除边</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeEdge</span><span class="params">(String label1, String label2)</span> </span>&#123;</span><br><span class="line">    Vertex v1 = <span class="keyword">new</span> Vertex(label1);</span><br><span class="line">    Vertex v2 = <span class="keyword">new</span> Vertex(label2);</span><br><span class="line">    List&lt;Vertex&gt; eV1 = adjVertices.get(v1);</span><br><span class="line">    List&lt;Vertex&gt; eV2 = adjVertices.get(v2);</span><br><span class="line">    <span class="keyword">if</span> (eV1 != <span class="keyword">null</span>)</span><br><span class="line">        eV1.remove(v2);</span><br><span class="line">    <span class="keyword">if</span> (eV2 != <span class="keyword">null</span>)</span><br><span class="line">        eV2.remove(v1);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="构造图"><a href="#构造图" class="headerlink" title="构造图"></a>构造图</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Graph <span class="title">createGraph</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Graph graph = <span class="keyword">new</span> Graph();</span><br><span class="line">    graph.addVertex(<span class="string">"Bob"</span>);</span><br><span class="line">    graph.addVertex(<span class="string">"Alice"</span>);</span><br><span class="line">    graph.addVertex(<span class="string">"Mark"</span>);</span><br><span class="line">    graph.addVertex(<span class="string">"Rob"</span>);</span><br><span class="line">    graph.addVertex(<span class="string">"Maria"</span>);</span><br><span class="line">    graph.addEdge(<span class="string">"Bob"</span>, <span class="string">"Alice"</span>);</span><br><span class="line">    graph.addEdge(<span class="string">"Bob"</span>, <span class="string">"Rob"</span>);</span><br><span class="line">    graph.addEdge(<span class="string">"Alice"</span>, <span class="string">"Mark"</span>);</span><br><span class="line">    graph.addEdge(<span class="string">"Rob"</span>, <span class="string">"Mark"</span>);</span><br><span class="line">    graph.addEdge(<span class="string">"Alice"</span>, <span class="string">"Maria"</span>);</span><br><span class="line">    graph.addEdge(<span class="string">"Rob"</span>, <span class="string">"Maria"</span>);</span><br><span class="line">    <span class="keyword">return</span> graph;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="获取某个顶点的邻接点"><a href="#获取某个顶点的邻接点" class="headerlink" title="获取某个顶点的邻接点"></a>获取某个顶点的邻接点</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> List&lt;Vertex&gt; <span class="title">getAdjVertices</span><span class="params">(String label)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> adjVertices.get(<span class="keyword">new</span> Vertex(label));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="图的遍历"><a href="#图的遍历" class="headerlink" title="图的遍历"></a>图的遍历</h2><p>前面定义好了图的基本结构与方法，是时候开始真正的操作了。</p>
+<h3 id="DFS"><a href="#DFS" class="headerlink" title="DFS"></a>DFS</h3><p>深度优先遍历从任意根顶点开始，并<strong>沿每个分支探索尽可能深的顶点，然后再探索同一级别的顶点</strong>。</p>
+<p>涉及到深度的用栈，涉及到广度的用队列。这应该没什么疑问吧？</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 深度优先遍历</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Set&lt;String&gt; <span class="title">depthFirstTraversal</span><span class="params">(Graph graph, String root)</span> </span>&#123;</span><br><span class="line">    Set&lt;String&gt; visited = <span class="keyword">new</span> LinkedHashSet&lt;&gt;();</span><br><span class="line">    Stack&lt;String&gt; stack = <span class="keyword">new</span> Stack&lt;&gt;();</span><br><span class="line">    stack.push(root);</span><br><span class="line">    <span class="keyword">while</span> (!stack.isEmpty()) &#123;</span><br><span class="line">        String vertex = stack.pop();</span><br><span class="line">        <span class="keyword">if</span> (!visited.contains(vertex)) &#123;</span><br><span class="line">            visited.add(vertex);</span><br><span class="line">            <span class="keyword">for</span> (Vertex v : graph.getAdjVertices(vertex))</span><br><span class="line">                stack.push(v.label);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> visited;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="BFS"><a href="#BFS" class="headerlink" title="BFS"></a>BFS</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Set&lt;String&gt; <span class="title">breadthFirstTraversal</span><span class="params">(Graph graph, String root)</span> </span>&#123;</span><br><span class="line">    Set&lt;String&gt; visited = <span class="keyword">new</span> LinkedHashSet&lt;&gt;();</span><br><span class="line">    Queue&lt;String&gt; queue = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">    queue.add(root);</span><br><span class="line">    visited.add(root);</span><br><span class="line">    <span class="keyword">while</span> (!queue.isEmpty()) &#123;</span><br><span class="line">        String vertex = queue.poll();</span><br><span class="line">        <span class="keyword">for</span> (Vertex v : graph.getAdjVertices(vertex)) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!visited.contains(v.label)) &#123;</span><br><span class="line">                visited.add(v.label);</span><br><span class="line">                queue.add(v.label);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> visited;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="求图的强连通分量"><a href="#求图的强连通分量" class="headerlink" title="求图的强连通分量"></a>求图的强连通分量</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@AUTHOR</span>: raymond</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@DATETIME</span>: 2020/8/12  08:38</span></span><br><span class="line"><span class="comment"> * DESCRIPTION: 寻找图中的最大强连通分量</span></span><br><span class="line"><span class="comment"> * 采用邻接表表示</span></span><br><span class="line"><span class="comment"> * 算法思想：一个具有最大强连通分量的有向图的逆转图仍然具有相同的强连通分量</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">KosarajuGraph</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> V;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> LinkedList&lt;Integer&gt;[] adj;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">KosarajuGraph</span><span class="params">(<span class="keyword">int</span> V)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.V = V;</span><br><span class="line">        adj = <span class="keyword">new</span> LinkedList[V];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; V; ++i)</span><br><span class="line">            adj[i] = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 添加边 注意只有有向图才有强连通分量</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> s 起点</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> d 终点</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addEdge</span><span class="params">(<span class="keyword">int</span> s, <span class="keyword">int</span> d)</span> </span>&#123;</span><br><span class="line">        adj[s].add(d);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 深度优先遍历工具类</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> s 起点</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> visitedVertices 访问列表</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">DFSUtil</span><span class="params">(<span class="keyword">int</span> s, <span class="keyword">boolean</span>[] visitedVertices)</span> </span>&#123;</span><br><span class="line">        visitedVertices[s] = <span class="keyword">true</span>;</span><br><span class="line">        System.out.print(s + <span class="string">" "</span>);</span><br><span class="line">        <span class="keyword">int</span> n;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (Integer integer : adj[s]) &#123;</span><br><span class="line">            n = integer;</span><br><span class="line">            <span class="keyword">if</span> (!visitedVertices[n])</span><br><span class="line">                DFSUtil(n, visitedVertices);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 逆转图</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 方向调转之后的图</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> KosarajuGraph <span class="title">transpose</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        KosarajuGraph g = <span class="keyword">new</span> KosarajuGraph(V);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> s = <span class="number">0</span>; s &lt; V; s++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (Integer integer : adj[s])</span><br><span class="line">                g.adj[integer].add(s);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> g;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">fillOrder</span><span class="params">(<span class="keyword">int</span> s, <span class="keyword">boolean</span>[] visitedVertices, Deque&lt;Integer&gt; stack)</span> </span>&#123;</span><br><span class="line">        visitedVertices[s] = <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> n : adj[s]) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!visitedVertices[n])</span><br><span class="line">                fillOrder(n, visitedVertices, stack);</span><br><span class="line">        &#125;</span><br><span class="line">        stack.push(s);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">printSCC</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Deque&lt;Integer&gt; stack = <span class="keyword">new</span> ArrayDeque&lt;&gt;();</span><br><span class="line">        <span class="keyword">boolean</span>[] visitedVertices = <span class="keyword">new</span> <span class="keyword">boolean</span>[V];</span><br><span class="line">        <span class="comment">// 1. 初始化访问列表</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; V; i++)</span><br><span class="line">            visitedVertices[i] = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; V; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!visitedVertices[i])</span><br><span class="line">                fillOrder(i, visitedVertices, stack);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        KosarajuGraph graph = transpose();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; V; i++)</span><br><span class="line">            visitedVertices[i] = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (!stack.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">int</span> s = stack.pop();</span><br><span class="line">            <span class="keyword">if</span> (!visitedVertices[s]) &#123;</span><br><span class="line">                graph.DFSUtil(s, visitedVertices);</span><br><span class="line">                System.out.println();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String args[])</span> </span>&#123;</span><br><span class="line">        KosarajuGraph g = <span class="keyword">new</span> KosarajuGraph(<span class="number">8</span>);</span><br><span class="line">        g.addEdge(<span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line">        g.addEdge(<span class="number">1</span>, <span class="number">2</span>);</span><br><span class="line">        g.addEdge(<span class="number">2</span>, <span class="number">3</span>);</span><br><span class="line">        g.addEdge(<span class="number">2</span>, <span class="number">4</span>);</span><br><span class="line">        g.addEdge(<span class="number">3</span>, <span class="number">0</span>);</span><br><span class="line">        g.addEdge(<span class="number">4</span>, <span class="number">5</span>);</span><br><span class="line">        g.addEdge(<span class="number">5</span>, <span class="number">6</span>);</span><br><span class="line">        g.addEdge(<span class="number">6</span>, <span class="number">4</span>);</span><br><span class="line">        g.addEdge(<span class="number">6</span>, <span class="number">7</span>);</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">"Strongly Connected Components:"</span>);</span><br><span class="line">        g.printSCC();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Kruskal-MST"><a href="#Kruskal-MST" class="headerlink" title="Kruskal MST"></a>Kruskal MST</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@AUTHOR</span>: raymond</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@DATETIME</span>: 2020/8/12  09:08</span></span><br><span class="line"><span class="comment"> * DESCRIPTION: Kruskal 算法生成最小生成树 O(e*lge)</span></span><br><span class="line"><span class="comment"> * 1. Sort all the edges from low weight to high</span></span><br><span class="line"><span class="comment"> * 2. Take the edge with the lowest weight and add it to the spanning tree.</span></span><br><span class="line"><span class="comment"> *      If adding the edge created a cycle, then reject this edge.</span></span><br><span class="line"><span class="comment"> * 3. Keep adding edges until we reach all vertices.</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">KruskalGraph</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> vertices, edges;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Edge[] edge;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">KruskalGraph</span><span class="params">(<span class="keyword">int</span> v, <span class="keyword">int</span> e)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.vertices = v;</span><br><span class="line">        <span class="keyword">this</span>.edges = e;</span><br><span class="line">        <span class="keyword">this</span>.edge = <span class="keyword">new</span> Edge[edges];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; e; i++)</span><br><span class="line">            edge[i] = <span class="keyword">new</span> Edge();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">find</span><span class="params">(Subset[] subsets, <span class="keyword">int</span> i)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (subsets[i].parent != i)</span><br><span class="line">            subsets[i].parent = find(subsets, subsets[i].parent);</span><br><span class="line">        <span class="keyword">return</span> subsets[i].parent;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">union</span><span class="params">(Subset[] subsets, <span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> xRoot = find(subsets, x);</span><br><span class="line">        <span class="keyword">int</span> yRoot = find(subsets, x);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (subsets[xRoot].rank &lt; subsets[yRoot].rank)</span><br><span class="line">            subsets[xRoot].parent = yRoot;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (subsets[xRoot].rank &gt; subsets[yRoot].rank)</span><br><span class="line">            subsets[yRoot].parent = xRoot;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            subsets[yRoot].parent = xRoot;</span><br><span class="line">            subsets[xRoot].rank++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Kruskal 具体实现</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">kruskal</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Edge[] res = <span class="keyword">new</span> Edge[vertices];</span><br><span class="line">        <span class="keyword">int</span> e = <span class="number">0</span>, i = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; vertices; ++i)</span><br><span class="line">            res[i] = <span class="keyword">new</span> Edge();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 1. 排序</span></span><br><span class="line">        Arrays.sort(edge);</span><br><span class="line">        Subset[] subsets = <span class="keyword">new</span> Subset[vertices];</span><br><span class="line">        <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; vertices; ++i)</span><br><span class="line">            subsets[i] = <span class="keyword">new</span> Subset();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> v = <span class="number">0</span>; v &lt; vertices; ++v) &#123;</span><br><span class="line">            subsets[v].parent = v;</span><br><span class="line">            subsets[v].rank = <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        i = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span> (e &lt; vertices - <span class="number">1</span>) &#123;</span><br><span class="line">            Edge nextEdge = <span class="keyword">new</span> Edge();</span><br><span class="line">            nextEdge = edge[i++];</span><br><span class="line">            <span class="keyword">int</span> x = find(subsets, nextEdge.src);</span><br><span class="line">            <span class="keyword">int</span> y = find(subsets, nextEdge.dest);</span><br><span class="line">            <span class="keyword">if</span> (x != y) &#123;</span><br><span class="line">                res[e++] = nextEdge;</span><br><span class="line">                union(subsets, x, y);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; e; ++i)</span><br><span class="line">            System.out.println(<span class="string">"src-"</span> + res[i].src + <span class="string">" - "</span> + <span class="string">"dest-"</span> + res[i].dest + <span class="string">" - "</span> + <span class="string">"weight-"</span> + res[i].weight);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> vertices = <span class="number">6</span>; <span class="comment">// Number of vertices</span></span><br><span class="line">        <span class="keyword">int</span> edges = <span class="number">8</span>; <span class="comment">// Number of edges</span></span><br><span class="line">        KruskalGraph G = <span class="keyword">new</span> KruskalGraph(vertices, edges);</span><br><span class="line"></span><br><span class="line">        G.edge[<span class="number">0</span>].src = <span class="number">0</span>;</span><br><span class="line">        G.edge[<span class="number">0</span>].dest = <span class="number">1</span>;</span><br><span class="line">        G.edge[<span class="number">0</span>].weight = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line">        G.edge[<span class="number">1</span>].src = <span class="number">0</span>;</span><br><span class="line">        G.edge[<span class="number">1</span>].dest = <span class="number">2</span>;</span><br><span class="line">        G.edge[<span class="number">1</span>].weight = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line">        G.edge[<span class="number">2</span>].src = <span class="number">1</span>;</span><br><span class="line">        G.edge[<span class="number">2</span>].dest = <span class="number">2</span>;</span><br><span class="line">        G.edge[<span class="number">2</span>].weight = <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">        G.edge[<span class="number">3</span>].src = <span class="number">2</span>;</span><br><span class="line">        G.edge[<span class="number">3</span>].dest = <span class="number">3</span>;</span><br><span class="line">        G.edge[<span class="number">3</span>].weight = <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line">        G.edge[<span class="number">4</span>].src = <span class="number">2</span>;</span><br><span class="line">        G.edge[<span class="number">4</span>].dest = <span class="number">5</span>;</span><br><span class="line">        G.edge[<span class="number">4</span>].weight = <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">        G.edge[<span class="number">5</span>].src = <span class="number">2</span>;</span><br><span class="line">        G.edge[<span class="number">5</span>].dest = <span class="number">4</span>;</span><br><span class="line">        G.edge[<span class="number">5</span>].weight = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line">        G.edge[<span class="number">6</span>].src = <span class="number">3</span>;</span><br><span class="line">        G.edge[<span class="number">6</span>].dest = <span class="number">4</span>;</span><br><span class="line">        G.edge[<span class="number">6</span>].weight = <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line">        G.edge[<span class="number">7</span>].src = <span class="number">5</span>;</span><br><span class="line">        G.edge[<span class="number">7</span>].dest = <span class="number">4</span>;</span><br><span class="line">        G.edge[<span class="number">7</span>].weight = <span class="number">3</span>;</span><br><span class="line">        G.kruskal();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 需要比较边的权重大小</span></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Edge</span> <span class="keyword">implements</span> <span class="title">Comparable</span>&lt;<span class="title">Edge</span>&gt; </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> src, dest, weight;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compareTo</span><span class="params">(Edge o)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>.weight - o.weight;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Subset</span> </span>&#123; <span class="keyword">int</span> parent, rank; &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Prim-MST"><a href="#Prim-MST" class="headerlink" title="Prim MST"></a>Prim MST</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@AUTHOR</span>: raymond</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@DATETIME</span>: 2020/8/12  09:33</span></span><br><span class="line"><span class="comment"> * DESCRIPTION: Prim 算法生成最小生成树 O(ElgV)</span></span><br><span class="line"><span class="comment"> * 1. Initialize the minimum spanning tree with a vertex chosen at random.</span></span><br><span class="line"><span class="comment"> * 2. Find all the edges that connect the tree to new vertices, find the minimum and add it to the tree.</span></span><br><span class="line"><span class="comment"> * 3. Keep repeating step 2 until we get a minimum spanning tree.</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PrimGraph</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">prim</span><span class="params">(<span class="keyword">int</span> G[][], <span class="keyword">int</span> V)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> noEdge; <span class="comment">// number of edge</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 创建一个数组，用于跟踪已选择的边。已选为 true，否则为 false.</span></span><br><span class="line">        <span class="keyword">boolean</span>[] selected = <span class="keyword">new</span> <span class="keyword">boolean</span>[V];</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 初始化</span></span><br><span class="line">        Arrays.fill(selected, <span class="keyword">false</span>);</span><br><span class="line">        noEdge = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Step 1: 选择第 0 个结点</span></span><br><span class="line">        selected[<span class="number">0</span>] = <span class="keyword">true</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 打印边与权重表头</span></span><br><span class="line">        System.out.println(<span class="string">"Edge : Weight"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 最小生成树中的边的数量总是会小于 V - 1</span></span><br><span class="line">        <span class="keyword">while</span> (noEdge &lt; V - <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">int</span> min = Integer.MAX_VALUE;</span><br><span class="line">            <span class="keyword">int</span> x = <span class="number">0</span>; <span class="comment">// row number</span></span><br><span class="line">            <span class="keyword">int</span> y = <span class="number">0</span>; <span class="comment">// col number</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; V; i++) &#123;</span><br><span class="line">                <span class="comment">// 对于集合 S 中的每个顶点，找到这个顶点的所有邻接顶点，</span></span><br><span class="line">                <span class="keyword">if</span> (selected[i]) &#123;</span><br><span class="line">                    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; V; j++) &#123;</span><br><span class="line">                        <span class="comment">// 未被选择并且两点之间存在边</span></span><br><span class="line">                        <span class="keyword">if</span> (!selected[j] &amp;&amp; G[i][j] != <span class="number">0</span>) &#123;</span><br><span class="line">                            <span class="comment">// 比较 Step 1 中选择的顶点与其邻接点之间的距离</span></span><br><span class="line">                            <span class="keyword">if</span> (min &gt; G[i][j]) &#123;</span><br><span class="line">                                min = G[i][j];</span><br><span class="line">                                x = i;</span><br><span class="line">                                y = j;</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println(x + <span class="string">" - "</span> + y + <span class="string">" :  "</span> + G[x][y]);</span><br><span class="line">            <span class="comment">// 如果顶点已经在集合 S 中，丢弃。</span></span><br><span class="line">            <span class="comment">// 否则选择另一个与 Step 1 选出的顶点最近的顶点</span></span><br><span class="line">            selected[y] = <span class="keyword">true</span>;</span><br><span class="line">            noEdge++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        PrimGraph g = <span class="keyword">new</span> PrimGraph();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// number of vertices in graph</span></span><br><span class="line">        <span class="keyword">int</span> V = <span class="number">5</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 创建一个 5x5 大小的二维邻接矩阵</span></span><br><span class="line">        <span class="keyword">int</span>[][] G = &#123; &#123; <span class="number">0</span>, <span class="number">9</span>, <span class="number">75</span>, <span class="number">0</span>, <span class="number">0</span> &#125;,</span><br><span class="line">                      &#123; <span class="number">9</span>, <span class="number">0</span>, <span class="number">95</span>, <span class="number">19</span>, <span class="number">42</span> &#125;,</span><br><span class="line">                      &#123; <span class="number">75</span>, <span class="number">95</span>, <span class="number">0</span>, <span class="number">51</span>, <span class="number">66</span> &#125;,</span><br><span class="line">                      &#123; <span class="number">0</span>, <span class="number">19</span>, <span class="number">51</span>, <span class="number">0</span>, <span class="number">31</span> &#125;,</span><br><span class="line">                      &#123; <span class="number">0</span>, <span class="number">42</span>, <span class="number">66</span>, <span class="number">31</span>, <span class="number">0</span> &#125; &#125;;</span><br><span class="line"></span><br><span class="line">        g.prim(G, V);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="图的Java库"><a href="#图的Java库" class="headerlink" title="图的Java库"></a>图的Java库</h2><ul>
+<li><a href="https://jgrapht.org/" target="_blank" rel="noopener">JGraphT</a></li>
+<li><a href="https://github.com/google/guava/wiki/GraphsExplained" target="_blank" rel="noopener">Google Guava</a></li>
+<li><a href="https://commons.apache.org/sandbox/commons-graph/" target="_blank" rel="noopener">Apache Commons</a></li>
+<li><a href="http://jung.sourceforge.net/" target="_blank" rel="noopener">Java Universal Network / Graph（JUNG）</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E5%9B%BE/" rel="tag"># 数据结构-图</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/07/16/2020-07-16-JUC-CASAndUnsafe/" rel="prev" title="CAS与Unsafe源码笔记">
+      <i class="fa fa-chevron-left"></i> CAS与Unsafe源码笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/07/19/2020-07-19-JUC-ProcessAndThread/" rel="next" title="进程、线程与线程池">
+      进程、线程与线程池 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#图的遍历与力扣中的一些题目"><span class="nav-number">1.</span> <span class="nav-text">图的遍历与力扣中的一些题目</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#图的基本知识"><span class="nav-number">1.2.</span> <span class="nav-text">图的基本知识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#图的分类"><span class="nav-number">1.2.1.</span> <span class="nav-text">图的分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#图的表示方式"><span class="nav-number">1.2.2.</span> <span class="nav-text">图的表示方式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#利用Java实现图"><span class="nav-number">1.3.</span> <span class="nav-text">利用Java实现图</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#添加-删除顶点"><span class="nav-number">1.3.1.</span> <span class="nav-text">添加&#x2F;删除顶点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#添加-删除边"><span class="nav-number">1.3.2.</span> <span class="nav-text">添加&#x2F;删除边</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#构造图"><span class="nav-number">1.3.3.</span> <span class="nav-text">构造图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获取某个顶点的邻接点"><span class="nav-number">1.3.4.</span> <span class="nav-text">获取某个顶点的邻接点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#图的遍历"><span class="nav-number">1.4.</span> <span class="nav-text">图的遍历</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#DFS"><span class="nav-number">1.4.1.</span> <span class="nav-text">DFS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BFS"><span class="nav-number">1.4.2.</span> <span class="nav-text">BFS</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#求图的强连通分量"><span class="nav-number">1.5.</span> <span class="nav-text">求图的强连通分量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kruskal-MST"><span class="nav-number">1.6.</span> <span class="nav-text">Kruskal MST</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Prim-MST"><span class="nav-number">1.7.</span> <span class="nav-text">Prim MST</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#图的Java库"><span class="nav-number">1.8.</span> <span class="nav-text">图的Java库</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">忘川三途</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">忘川三途</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">325k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">4:55</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
