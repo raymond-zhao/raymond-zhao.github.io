@@ -38,10 +38,14 @@
 <meta property="og:image" content="https://tva1.sinaimg.cn/large/00831rSTly1gd9wcefwrej315w0li46o.jpg">
 <meta property="og:image" content="https://tva1.sinaimg.cn/large/00831rSTly1gd9xtsj9nvj316c0ay444.jpg">
 <meta property="og:image" content="https://tva1.sinaimg.cn/large/00831rSTly1gd9y0c49wrj315a0fywlq.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0r9c0msvj30k60g0480.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0rcx6t6hj30hw0fldjy.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0rrhm2boj30k30og13g.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0sk6p3nuj30jh0cb11y.jpg">
 <meta property="og:image" content="https://tva1.sinaimg.cn/large/00831rSTly1gda16yd3y9j30qi0d6gnh.jpg">
 <meta property="og:image" content="https://tva1.sinaimg.cn/large/00831rSTly1gda1a9ou70j30sq0bcjwe.jpg">
 <meta property="article:published_time" content="2020-03-17T21:20:20.000Z">
-<meta property="article:modified_time" content="2020-08-19T03:06:20.107Z">
+<meta property="article:modified_time" content="2020-08-23T09:06:56.772Z">
 <meta property="article:author" content="忘川三途">
 <meta property="article:tag" content="计算机网络">
 <meta name="twitter:card" content="summary">
@@ -159,7 +163,7 @@
   </li>
         <li class="menu-item menu-item-tags">
 
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">26</span></a>
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">27</span></a>
 
   </li>
         <li class="menu-item menu-item-categories">
@@ -169,7 +173,7 @@
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">30</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">31</span></a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -262,7 +266,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-08-19 11:06:20" itemprop="dateModified" datetime="2020-08-19T11:06:20+08:00">2020-08-19</time>
+                <time title="修改时间：2020-08-23 17:06:56" itemprop="dateModified" datetime="2020-08-23T17:06:56+08:00">2020-08-23</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -301,14 +305,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>7.6k</span>
+              <span>9.6k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>7 分钟</span>
+              <span>9 分钟</span>
             </span>
             <div class="post-description">梳理一下计算机网络中的基础知识</div>
 
@@ -321,7 +325,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="1-分层体系"><a href="#1-分层体系" class="headerlink" title="1 分层体系"></a>1 分层体系</h1><p>OSI的七层协议体系结构的概念清楚，理论也较完整，但它既复杂又不实用。TCP/IP体系结构则不同，但它现在却得到了非常广泛的应用。</p>
+        <h2 id="分层体系"><a href="#分层体系" class="headerlink" title="分层体系"></a>分层体系</h2><p>OSI的七层协议体系结构的概念清楚，理论也较完整，但它既复杂又不实用。TCP/IP体系结构则不同，但它现在却得到了非常广泛的应用。</p>
 <p>TCP/IP是一个四层的体系结构，它包含应用层、运输层、网际层和网络接口层(用网际层这个名字是强调这一层是为了解决不同网络的互连问题)。不过从实质上讲，TCP/IP只有最上面的三层，因为最下面的网络接口层并没有什么具体内容。</p>
 <p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9qb100evj31f40ocdvs.jpg" alt="计算机网络体系结构"></p>
 <ul>
@@ -350,7 +354,7 @@
 </ul>
 <p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gczcfmgbzjg30u016i0yk.gif" alt="计算机网络分层体系图"></p>
 <p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9rqohwupj31ea0jgk38.jpg" alt="数据在各层之间的传递过程"></p>
-<h1 id="2-TCP-的三次牵手四次分手"><a href="#2-TCP-的三次牵手四次分手" class="headerlink" title="2 TCP 的三次牵手四次分手"></a>2 TCP 的三次牵手四次分手</h1><h2 id="2-1-三次握手：建立连接"><a href="#2-1-三次握手：建立连接" class="headerlink" title="2.1 三次握手：建立连接"></a>2.1 三次握手：建立连接</h2><p>TCP建立连接的过程叫做握手，握手需要在客户和服务器之间交换三个TCP报文段。</p>
+<h2 id="TCP-与UDP"><a href="#TCP-与UDP" class="headerlink" title="TCP 与UDP"></a>TCP 与UDP</h2><h3 id="三次握手：建立连接"><a href="#三次握手：建立连接" class="headerlink" title="三次握手：建立连接"></a>三次握手：建立连接</h3><p>TCP建立连接的过程叫做握手，握手需要在客户和服务器之间交换三个TCP报文段。</p>
 <p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9tsfxtkyj31ce0okdrn.jpg" alt="三报文握手建立连接"></p>
 <p>假定主机A运行的是TCP客户程序，而B运行TCP服务器程序。最初两端的 TCP 进程都处 CLOSED(关闭)状态。</p>
 <ol>
@@ -377,7 +381,7 @@
 <p>这是一个早已失效的报文段，但 B 收到此失效的连接请求报文段后，就误认为是 A 又发出一次新的连接请求。于是就向 A 发出确认报文段，同意建立连接。假定不采用三报文握手，那么只要 B 发出确认，新的连接就建立了。</p>
 <p>由于现在 A 并没有发出建立连接的请求，因此不会理睬 B 的确认，也不会向B发送数据。但 B 却以为新的运输连接已经建立了，并一直等待 A 发来数据。B 的许多资源就这样白白浪费了。</p>
 <p>采用三报文握手的办法，可以防止上述现象的发生。例如在刚才的异常情况下，A 不会向 B 的确认发出确认。B 由于收不到确认，就知道 A 并没有要求建立连接。</p>
-<h2 id="2-2-四次分手：断了联系"><a href="#2-2-四次分手：断了联系" class="headerlink" title="2.2 四次分手：断了联系"></a>2.2 四次分手：断了联系</h2><p><strong>数据传输结束后，通信的双方都可释放连接</strong>。</p>
+<h3 id="四次分手：断了联系"><a href="#四次分手：断了联系" class="headerlink" title="四次分手：断了联系"></a>四次分手：断了联系</h3><p><strong>数据传输结束后，通信的双方都可释放连接</strong>。</p>
 <p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9uuv1g7cj31ew0r2qje.jpg" alt="TCP连接的释放过程"></p>
 <ol>
 <li>A 和 B 都处于 ESTABLISHED 状态。</li>
@@ -409,7 +413,7 @@
 
 <figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">1. </span>为了保证 A 发送的最后一个 ACK 报文段能够到达 B。这个 ACK 报文段有可能丢失，因而使处在 LAST-ACK 状态的 B 收不到对已发送的 FIN+ACK报文段 的确认。B会超时重传这个 FIN+ACK 报文段，而 A 就能在 2MSL 时间内收到这个重传的 FIN+ACK 报文段。接着 A 重传一次确认，重新启动 2MSL 计时器。最后，A 和 B 都正常进入到 CLOSED 状态。如果 A 在 TIME-WAIT 状态不等待一段时间，而是在发送完 ACK 报文段后立即释放连接，那么就无法收到 B 重传的 FIN+ACK 报文段，因而也不会再发送一次确认报文段。这样，B就无法按照正常步骤进入 CLOSED 状态。</span><br><span class="line"></span><br><span class="line"><span class="bullet">2. </span>防止“已失效的连接请求报文段”出现在本连接中。A 在发送完最后一个 ACK 报文段后，再经过时间 2MSL，就可以使本连接持续的时间内所产生的所有报文段都从网络中消失。这样就可以使下一个新的连接中不会出现这种旧的连接请求报文段。</span><br></pre></td></tr></table></figure>
 
-<h1 id="3-TCP-与-UDP-的区别"><a href="#3-TCP-与-UDP-的区别" class="headerlink" title="3 TCP 与 UDP 的区别"></a>3 TCP 与 UDP 的区别</h1><table>
+<h3 id="TCP-与-UDP-的区别"><a href="#TCP-与-UDP-的区别" class="headerlink" title="TCP 与 UDP 的区别"></a>TCP 与 UDP 的区别</h3><table>
 <thead>
 <tr>
 <th align="center">TCP</th>
@@ -451,13 +455,13 @@
 </tbody></table>
 <p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9wbh2rblj315a0rqn73.jpg" alt="UDP报文段的首部"></p>
 <p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9wcefwrej315w0li46o.jpg" alt="TCP报文段的首部格式"></p>
-<h1 id="4-TCP-的滑动窗口机制"><a href="#4-TCP-的滑动窗口机制" class="headerlink" title="4 TCP 的滑动窗口机制"></a>4 TCP 的滑动窗口机制</h1><p>滑动窗口机制可以很方便地在TCP连接上实现对发送方的流量控制，与超时重传，选择确认一起保证可靠传输。</p>
+<h3 id="TCP-的滑动窗口机制"><a href="#TCP-的滑动窗口机制" class="headerlink" title="TCP 的滑动窗口机制"></a>TCP 的滑动窗口机制</h3><p>滑动窗口机制可以很方便地在TCP连接上实现对发送方的流量控制，与超时重传，选择确认一起保证可靠传输。</p>
 <p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9xtsj9nvj316c0ay444.jpg" alt="滑动窗口"></p>
 <p>发送窗口里面的序号表示允许发送的序号。显然，窗口越大，发送方就可以在收到对方确认之前连续发送更多的数据，因而可能获得更高的传输效率。</p>
 <p>发送窗口后沿的后面部分表示已发送且已收到了确认。</p>
 <p>发送窗口的位置由窗口前沿和后沿的位置共同确定。发送窗口后沿的变化情况有两种可能，即不动(没有收到新的确认)和前移(收到了新的确认)。发送窗口后沿不可能向后移动，因为不能撤销掉已收到的确认。发送窗口前沿通常是不断向前移动，但也有可能不动。这对应于两种情况:一是没有收到新的确认，对方通知的窗口大小也不变;二是收到了新的确认但对方通知的窗口缩小了，使得发送窗口前沿正好不动。</p>
 <p>发送窗口前沿也有可能向后收缩。这发生在对方通知的窗口缩小了。</p>
-<h1 id="5-TCP的拥塞控制"><a href="#5-TCP的拥塞控制" class="headerlink" title="5 TCP的拥塞控制"></a>5 TCP的拥塞控制</h1><p>拥塞控制与流量控制的关系密切，它们之间也存在着一些差别。所谓拥塞控制就是防止过多的数据注入到网络中，这样可以使网络中的路由器或链路不致过载。拥塞控制所要做的都有一个前提，就是网络能够承受现有的网络负荷。拥塞控制是一个全局性的过程，涉及到所有的主机、所有的路由器，以及与降低网络传输性能有关的所有因素。但TCP连接的端点只要迟迟不能收到对方的确认信息，就猜想在当前网络中的某处很可能发生了拥塞，但这时却无法知道拥塞到底发生在网络的何处，也无法知道发生拥塞的具体原因。(是访问某个服务器的通信量过大?还是在某个地区出现自然灾害?)</p>
+<h3 id="TCP的拥塞控制"><a href="#TCP的拥塞控制" class="headerlink" title="TCP的拥塞控制"></a>TCP的拥塞控制</h3><p>拥塞控制与流量控制的关系密切，它们之间也存在着一些差别。所谓拥塞控制就是防止过多的数据注入到网络中，这样可以使网络中的路由器或链路不致过载。拥塞控制所要做的都有一个前提，就是网络能够承受现有的网络负荷。拥塞控制是一个全局性的过程，涉及到所有的主机、所有的路由器，以及与降低网络传输性能有关的所有因素。但TCP连接的端点只要迟迟不能收到对方的确认信息，就猜想在当前网络中的某处很可能发生了拥塞，但这时却无法知道拥塞到底发生在网络的何处，也无法知道发生拥塞的具体原因。(是访问某个服务器的通信量过大?还是在某个地区出现自然灾害?)</p>
 <p>相反，流量控制往往是指点对点通信量的控制，是个端到端的问题(接收端控制发送端)。流量控制所要做的就是抑制发送端发送数据的速率，以便使接收端来得及接收。</p>
 <p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9y0c49wrj315a0fywlq.jpg" alt="拥塞控制所起的作用"></p>
 <p>拥塞控制的算法种类</p>
@@ -467,13 +471,13 @@
 <li>快重传(fast retransmit)</li>
 <li>快恢复(fast recovery)</li>
 </ul>
-<h1 id="6-HTTP与HTTPS"><a href="#6-HTTP与HTTPS" class="headerlink" title="6 HTTP与HTTPS"></a>6 HTTP与HTTPS</h1><p>主要来源于<strong>维基百科</strong></p>
+<h2 id="HTTP与HTTPS"><a href="#HTTP与HTTPS" class="headerlink" title="HTTP与HTTPS"></a>HTTP与HTTPS</h2><p>主要来源于<strong>维基百科</strong></p>
 <p><strong>超文本传输协议</strong>（英语：<strong>H</strong>yper<strong>T</strong>ext <strong>T</strong>ransfer <strong>P</strong>rotocol，缩写：<strong>HTTP</strong>）是一种用于分布式、协作式和<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv6LaF5aqS6auU">超媒体<i class="fa fa-external-link-alt"></i></span>信息系统的<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5bqU55So5bGC">应用层<i class="fa fa-external-link-alt"></i></span><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv572R57uc5Lyg6L6T5Y2P6K6u">协议<i class="fa fa-external-link-alt"></i></span><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv6LaF5paH5pys5Lyg6L6T5Y2P6K6uI2NpdGVfbm90ZS1pZXRmMjYxNi0x">[1]<i class="fa fa-external-link-alt"></i></span>。HTTP是<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5YWo55CD6LOH6KiK57ay">万维网<i class="fa fa-external-link-alt"></i></span>的数据通信的基础，无状态，明文传输。</p>
 <p><strong>超文本传输安全协议</strong>（英语：<strong>H</strong>yper<strong>T</strong>ext <strong>T</strong>ransfer <strong>P</strong>rotocol <strong>S</strong>ecure，缩写：<strong>HTTPS</strong>；常称为HTTP over TLS、HTTP over SSL或HTTP Secure）是一种通过<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv6KiI566X5qmf57ay57Wh">计算机网络<i class="fa fa-external-link-alt"></i></span>进行安全通信的<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv57ay6Lev5YKz6Ly45Y2U5a6a">传输协议<i class="fa fa-external-link-alt"></i></span>。HTTPS经由<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUA==">HTTP<i class="fa fa-external-link-alt"></i></span>进行通信，但利用<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5Lyg6L6T5bGC5a6J5YWo">SSL/TLS<i class="fa fa-external-link-alt"></i></span>来<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5Yqg5a+G">加密<i class="fa fa-external-link-alt"></i></span>数据包。HTTPS开发的主要目的，是提供对<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv57ay56uZ">网站<i class="fa fa-external-link-alt"></i></span>服务器的<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv6Lqr5Lu96aqM6K+B">身份认证<i class="fa fa-external-link-alt"></i></span>，保护交换数据的隐私与<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5a6M5pW05oCn">完整性<i class="fa fa-external-link-alt"></i></span>。</p>
-<p>HTTP是一个客户端（用户）和服务端（网站）之间请求和应答的标准，通常使用<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5Lyg6L6T5o6n5Yi25Y2P6K6u">TCP协议<i class="fa fa-external-link-alt"></i></span>。默认端口 80, HTTPS默认端口 443.</p>
+<p>HTTP是一个客户端（用户）和服务端（网站）之间请求和应答的标准，通常使用<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5Lyg6L6T5o6n5Yi25Y2P6K6u">TCP协议<i class="fa fa-external-link-alt"></i></span>。默认端口 80, HTTPS默认端口 443。</p>
 <p>HTTP协议和安全协议同属于应用层（<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvT1NJ5qih5Z6L">OSI模型<i class="fa fa-external-link-alt"></i></span>的最高层），具体来讲，安全协议工作在HTTP之下，传输层之上：安全协议向运行HTTP的进程提供一个类似于TCP的套接字，供进程向其中注入报文，安全协议将报文加密并注入运输层套接字；或是从运输层获取加密报文，解密后交给对应的进程。严格地讲，HTTPS并不是一个单独的协议，而是对工作在一加密连接（<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5Lyg6L6T5bGC5a6J5YWo">TLS<i class="fa fa-external-link-alt"></i></span>或SSL）上的常规HTTP协议的称呼。</p>
 <p>HTTP使用TCP三次握手建立连接，客户端和服务器需要交换3个包；HTTPS除了TCP的三个包，还要加上ssl握手需要的9个包，所以一共是12个包。</p>
-<h2 id="6-1-请求方法"><a href="#6-1-请求方法" class="headerlink" title="6.1 请求方法"></a>6.1 请求方法</h2><table>
+<h3 id="请求方法"><a href="#请求方法" class="headerlink" title="请求方法"></a>请求方法</h3><table>
 <thead>
 <tr>
 <th align="center">方法名</th>
@@ -517,7 +521,76 @@
 <td align="center">通常用于SSL加密服务器的链接</td>
 </tr>
 </tbody></table>
-<h2 id="6-2-状态码"><a href="#6-2-状态码" class="headerlink" title="6.2 状态码"></a>6.2 状态码</h2><p>所有HTTP响应的第一行都是<strong>状态行</strong>，依次是当前HTTP版本号，3位数字组成的<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggQ==">状态代码<i class="fa fa-external-link-alt"></i></span>，以及描述状态的短语，彼此由空格分隔。</p>
+<h3 id="GET-与-POST的区别"><a href="#GET-与-POST的区别" class="headerlink" title="GET 与 POST的区别"></a>GET 与 POST的区别</h3><table>
+<thead>
+<tr>
+<th align="center">比较方面</th>
+<th align="center">GET</th>
+<th align="center">POST</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">请求主体(Body)</td>
+<td align="center">只有URL，无请求主体</td>
+<td align="center">有请求主体</td>
+</tr>
+<tr>
+<td align="center">响应主体</td>
+<td align="center">有</td>
+<td align="center">有</td>
+</tr>
+<tr>
+<td align="center">后退按钮/刷新</td>
+<td align="center">无副作用</td>
+<td align="center">数据会被重新提交</td>
+</tr>
+<tr>
+<td align="center">书签</td>
+<td align="center">可收藏为书签</td>
+<td align="center">不可收藏为书签</td>
+</tr>
+<tr>
+<td align="center">缓存</td>
+<td align="center">可被缓存</td>
+<td align="center">不能缓存</td>
+</tr>
+<tr>
+<td align="center">编码类型</td>
+<td align="center"><code>application/x-www-form-urlencoded</code></td>
+<td align="center"><code>application/x-www-form-urlencoded</code><br /><code>multipart/form-data</code><br /><code>text/plain</code></td>
+</tr>
+<tr>
+<td align="center">历史</td>
+<td align="center">参数保留在浏览器历史中</td>
+<td align="center">参数不会保存在浏览器历史中</td>
+</tr>
+<tr>
+<td align="center">URL长度</td>
+<td align="center">有限制，但不同浏览器限制又不同<br />常说的2KB其实是指IE8，Chrome和Apache为8KB</td>
+<td align="center">无限制(Post请求本身不限制长度，但是服务器是会限制的。)</td>
+</tr>
+<tr>
+<td align="center">对数据类型的限制</td>
+<td align="center">只允许 ASCII 字符</td>
+<td align="center">没有限制、也允许二进制数据，Percent Encoding编码</td>
+</tr>
+<tr>
+<td align="center">安全性</td>
+<td align="center">与 POST 相比，GET 的安全性较差，因为所发送的数据是 URL 的一部分。在发送密码或其他敏感信息时绝不要使用 GET</td>
+<td align="center">POST 比 GET 更安全，因为参数不会被保存在浏览器历史或 web 服务器日志中。</td>
+</tr>
+<tr>
+<td align="center">幂等性</td>
+<td align="center">支持</td>
+<td align="center">不支持</td>
+</tr>
+<tr>
+<td align="center">可见性</td>
+<td align="center">数据在 URL 中对所有人都是可见的</td>
+<td align="center">数据不会显示在 URL 中</td>
+</tr>
+</tbody></table>
+<h3 id="状态码"><a href="#状态码" class="headerlink" title="状态码"></a>状态码</h3><p>所有HTTP响应的第一行都是<strong>状态行</strong>，依次是当前HTTP版本号，3位数字组成的<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggQ==">状态代码<i class="fa fa-external-link-alt"></i></span>，以及描述状态的短语，彼此由空格分隔。</p>
 <p>状态代码的第一个数字代表当前响应的类型：</p>
 <ul>
 <li><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSMxeHjmtojmga8=">1xx消息<i class="fa fa-external-link-alt"></i></span>——请求已被服务器接收，继续处理</li>
@@ -538,33 +611,62 @@
 </ul>
 </li>
 </ul>
-<h2 id="6-3-HTTPS-工作流程"><a href="#6-3-HTTPS-工作流程" class="headerlink" title="6.3 HTTPS 工作流程"></a>6.3 HTTPS 工作流程</h2><ol>
+<hr>
+<h3 id="HTTP的缺点"><a href="#HTTP的缺点" class="headerlink" title="HTTP的缺点"></a>HTTP的缺点</h3><ul>
+<li>通信使用明文(不加密)，内容可能会被窃听。</li>
+<li>不验证通信方的身份，因此有可能遭遇伪装。</li>
+<li>无法证明报文的完整性，所以有可能已遭篡改。</li>
+</ul>
+<h3 id="HTTPS的工作流程"><a href="#HTTPS的工作流程" class="headerlink" title="HTTPS的工作流程"></a>HTTPS的工作流程</h3><h4 id="证明公开密钥正确性的证书"><a href="#证明公开密钥正确性的证书" class="headerlink" title="证明公开密钥正确性的证书"></a>证明公开密钥正确性的证书</h4><p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0r9c0msvj30k60g0480.jpg" alt="证明公开密钥正确性的证书"></p>
+<h4 id="简易版的HTTPS工作流程"><a href="#简易版的HTTPS工作流程" class="headerlink" title="简易版的HTTPS工作流程"></a>简易版的HTTPS工作流程</h4><p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0rcx6t6hj30hw0fldjy.jpg" alt="简易版的HTTPS工作流程"></p>
+<ol>
 <li><p><strong>客户端发起HTTPS请求</strong></p>
 <p>用户在浏览器里输入一个https网址，然后连接到server的443端口。</p>
 </li>
 <li><p><strong>服务端的配置</strong></p>
-<p>采用HTTPS协议的服务器必须要有一套数字证书，可以自己制作，也可以向组织申请，区别就是自己颁发的证书需要客户端验证通过，才可以继续访问，而使用受信任的公司申请的证书则不会弹出提示页面。证书其实就是一对公钥和私钥。</p>
+<p>参考上面的<strong>证明公开密钥正确性的证书</strong>部分。</p>
 </li>
 <li><p><strong>传送证书</strong></p>
-<p>其实就是公钥，只是包含了很多信息，如证书的颁发机构，过期时间等等。</p>
+<p>将自己的数字证书的部分信息返回给客户端，其中包括公钥，以及支持的SSL版本等信息。</p>
 </li>
 <li><p><strong>客户端解析证书</strong></p>
-<p>是由客户端的TLS来完成的，首先会验证公钥是否有效，如颁发机构，过期时间等等，如果发现异常，则会弹出一个警告框，提示证书存在问题。如果证书没有问题，那么就生成一个随机值，然后用证书对该随机值进行加密。</p>
+<p>客户端首先会验证公钥是否有效，如果发现异常，则弹出警告。否则那么就生成一个随机值，然后用公钥对该随机值进行加密。</p>
 </li>
 <li><p><strong>传送加密信息</strong></p>
 <p>传送的是用证书加密后的随机值，目的就是让服务端得到这个随机值，以后客户端和服务端的通信就可以通过这个随机值来进行加密解密了。</p>
 </li>
 <li><p><strong>服务段解密信息</strong></p>
-<p>服务端用私钥解密后，得到了客户端传过来的随机值(私钥)，然后把内容通过该值进行对称加密，所谓对称加密就是，将信息和私钥通过某种算法混合在一起，这样除非知道私钥，不然无法获取内容，而正好客户端和服务端都知道这个私钥，所以只要加密算法够彪悍，私钥够复杂，数据就够安全。</p>
+<p>服务端用私钥解密后，得到客户端传过来的随机值。从客户端生成随机值到服务器解密获取随机值这个过程称为<strong>非对称加密</strong>。</p>
 </li>
 <li><p><strong>传输加密后的信息</strong></p>
-<p>这部分信息是服务端用私钥加密后的信息，可以在客户端被还原。</p>
+<p>服务器用刚刚解密得到的随机值加密需要传输的内容，并将加密后的信息发送给客户端。</p>
 </li>
 <li><p><strong>客户端解密信息</strong></p>
-<p>客户端用之前生成的私钥解密服务段传过来的信息，于是获取了解密后的内容，整个过程第三方即使监听到了数据，也束手无策。</p>
+<p>客户端用之前生成的随机值解密服务器传过来的信息，获取实际传输的内容。这个过程称为<strong>对称加密</strong>。</p>
 </li>
 </ol>
-<h2 id="6-4-SSL-与-TLS"><a href="#6-4-SSL-与-TLS" class="headerlink" title="6.4 SSL 与 TLS"></a>6.4 SSL 与 TLS</h2><ul>
+<h4 id="完整版HTTPS通信流程"><a href="#完整版HTTPS通信流程" class="headerlink" title="完整版HTTPS通信流程"></a>完整版HTTPS通信流程</h4><blockquote>
+<p>继续借用《图解HTTP》中的图文。</p>
+<p>HTTP连接需要交换3个包，而HTTPS连接需要交换 3 + 9 个包(SSL/TLS连接)。</p>
+</blockquote>
+<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0rrhm2boj30k30og13g.jpg" alt="HTTPS通信"></p>
+<ol>
+<li><strong>客户端</strong>发送 Client Hello 报文开始 SSL 通信。报文中包含客户端支持的 SSL 的指定版本、加密组件(Cipher Suite)列表(所使用的加密算法及密钥长度等)。</li>
+<li><strong>服务器</strong>确定可进行 SSL 通信时，以 Server Hello 报文作为应答。报文中包含 SSL 版本以及加密组件。服务器的加密组件内容是<strong>从接收到的客户端加密组件内筛选出来的。</strong></li>
+<li><strong>服务器</strong>继续发送 Certificate 报文。报文中包含公钥证书。</li>
+<li><strong>服务器</strong>继续发送 ServerHelloDone 报文。通知客户端第一阶段的 SSL 握手协商部分结束。</li>
+<li><strong>客户端</strong>发送 Client Key Exchange 报文作为回应。报文中包含通信加密中一种被称为 <code>Pre-master secret</code>的随机密码串。这个报文已用第 3 步中的公钥进行加密。</li>
+<li><strong>客户端</strong>继续发送 Change Cipher Spec 报文。该报文会提示服务器，在此报文之后的通信都将会采用 <code>Pre-master secret</code>秘钥加密。</li>
+<li><strong>客户端</strong>发送 Finished 报文。该报文包含连接至今，全部报文的整体校验值。此次握手协商能否成功，取决于服务器能否正确解密该报文。</li>
+<li><strong>服务器</strong>同样发送 Change Cipher Spec 报文。</li>
+<li><strong>服务器</strong>继续发送 Finished 报文。</li>
+<li>服务器与客户端交换完 Finished 报文之后，SSL 连接建立成功，通信将会受到 SSL 的保护。从此处开始进行<strong>应用层协议</strong>的通信，即发送 HTTP 请求。</li>
+<li><strong>应用层协议</strong>通信，即发送 HTTP 响应。</li>
+<li>由<strong>客户端</strong>断开连接。发送 close_notify 报文，之后发送 TCP FIN 报文来关闭与 TCP 的通信。</li>
+</ol>
+<p>下面是对整个流程的图解。图中说明了从仅使用服务器端的公开密钥证书(服务器证书)建立 HTTPS 通信的整个过程。</p>
+<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0sk6p3nuj30jh0cb11y.jpg" alt="HTTPS 通信的整个过程"></p>
+<h3 id="SSL-与-TLS"><a href="#SSL-与-TLS" class="headerlink" title="SSL 与 TLS"></a>SSL 与 TLS</h3><ul>
 <li><span class="exturl" data-url="aHR0cHM6Ly9iYWlrZS5iYWlkdS5jb20vaXRlbS/lronlhajlpZfmjqXlsYI=">SSL(Secure Sockets Layer安全套接层)<i class="fa fa-external-link-alt"></i></span></li>
 <li><a href="https://zh.wikipedia.org/wiki/%E5%82%B3%E8%BC%B8%E5%B1%A4%E5%AE%89%E5%85%A8%E6%80%A7%E5%8D%94%E5%AE%9A" target="_blank" rel="noopener">TLS (<strong>T</strong>ransport <strong>L</strong>ayer <strong>S</strong>ecurity 传输层安全性协议)</a></li>
 </ul>
@@ -575,45 +677,149 @@
 <li>哈希算法：将任意长度的信息转换为固定长度的值，不可逆</li>
 <li>数字签名：证明某个信息或者文件是某人发出/认同的</li>
 </ul>
-<h2 id="6-5-Cookie与Session"><a href="#6-5-Cookie与Session" class="headerlink" title="6.5 Cookie与Session"></a>6.5 Cookie与Session</h2><p>Cookie简介</p>
+<h3 id="HTTP与HTTPS的区别"><a href="#HTTP与HTTPS的区别" class="headerlink" title="HTTP与HTTPS的区别"></a>HTTP与HTTPS的区别</h3><table>
+<thead>
+<tr>
+<th align="center">方面</th>
+<th align="center">HTTP</th>
+<th align="center">HTTPS</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">开发目的</td>
+<td align="center">发布和接收 HTML 页面<br />浏览器和网站服务器之间传递信息</td>
+<td align="center">提供对网站服务器的身份认证<br />保护交换数据的隐私与完整性。</td>
+</tr>
+<tr>
+<td align="center">连接端口</td>
+<td align="center">80</td>
+<td align="center">443</td>
+</tr>
+<tr>
+<td align="center">安全协议</td>
+<td align="center">无</td>
+<td align="center">SSL/TLS</td>
+</tr>
+<tr>
+<td align="center">加密方式</td>
+<td align="center">无</td>
+<td align="center">对称加密、非对称加密、哈希算法、数字签名</td>
+</tr>
+<tr>
+<td align="center">安全性</td>
+<td align="center">明文传输、相对较低</td>
+<td align="center">加密传输、相对较高</td>
+</tr>
+<tr>
+<td align="center">建立连接</td>
+<td align="center">TCP三次握手交换3个包</td>
+<td align="center">TCP3个包+SSL9个包</td>
+</tr>
+<tr>
+<td align="center">响应速度</td>
+<td align="center">相对较快</td>
+<td align="center">相对较慢(比HTTP慢2到100倍)</td>
+</tr>
+<tr>
+<td align="center">所需费用</td>
+<td align="center">免费</td>
+<td align="center">可能需要购买证书</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="Cookie-与-Session"><a href="#Cookie-与-Session" class="headerlink" title="Cookie 与 Session"></a>Cookie 与 Session</h3><p>由于HTTP协议是无状态的协议，每一个 HTTP 请求都是互相独立的，服务器分辨不出两次请求是否来自同一个浏览器或同一位用户。</p>
+<p>所以服务端需要记录用户的状态时，就需要用某种机制来识具体的用户，这个机制就是Session。</p>
+<p><strong>Cookie 简介</strong></p>
 <ul>
-<li>由服务器发给客户端的特殊信息，以文本的形式存放在客户端</li>
-<li>客户端再次请求的时候，会把 <code>Cookie</code> 回发</li>
-<li>服务器收到后，会解析 <code>Cookie</code> 生成与客户端相对应的内容</li>
+<li>浏览器第一次连接服务器时Cookie是不存在的</li>
+<li>服务器响应客户端时，回在 Header 中设置 Set-Cookie，此时定义了 Cookie。</li>
+<li>每一个 Cookie 都是 name-value 对</li>
+<li>此后浏览器再连接服务器，都会包含上 Cookie，服务器可以用它来关联特定的请求。</li>
+</ul>
+<p><strong>Cookie里有什么？</strong></p>
+<ul>
+<li>Name and data.<ul>
+<li>数据大小通常被浏览器所限定，一般小于 4KB</li>
+<li>一个服务器可以通过不同的 Name 定义多个 Cookie，但是浏览器限制了每一个服务器可以拥有的 Cookie 数量(50个左右)</li>
+</ul>
+</li>
+<li>当前 Cookie 的 Domain(作用域)信息：Server、port(可选)、URL 前缀(可选)。Cookie 只会被包含在匹配的作用域的请求之中。</li>
+<li>过期时间：浏览器可以删除老旧的 Cookies。</li>
+</ul>
+<p><strong>工作流程</strong></p>
+<ul>
+<li><p>由服务器发给客户端的特殊信息，以文本的形式存放在客户端</p>
+</li>
+<li><p>客户端再次请求的时候，会把 <code>Cookie</code> 回发</p>
+</li>
+<li><p>服务器收到后，会解析 <code>Cookie</code> 生成与客户端相对应的内容</p>
+</li>
 </ul>
 <p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gda16yd3y9j30qi0d6gnh.jpg" alt="Cookie的设置与工作过程"></p>
-<p>Session简介</p>
+<p><strong>Session简介</strong></p>
 <ul>
-<li>服务器端的机制，在服务器上保存的信息</li>
-<li>解析客户端请求并操作 <code>Session Id</code> ，按需保存状态信息</li>
+<li>Cookie 是服务器用来实现 Session 的一种方式</li>
+<li>Cookie 中包含了 Session 的表示，通常被称为 SessionID。</li>
+<li>Session的管理<ul>
+<li>可以储存在内存里</li>
+<li>或者储存在磁盘中的文件中</li>
+<li>或者存在数据库中</li>
+</ul>
+</li>
+</ul>
+<p><strong>简单工作流程</strong></p>
+<ul>
+<li>保存在服务器上的信息</li>
+<li>解析客户端请求并操作 <code>SessionId</code> ，按需保存状态信息。</li>
 <li>实现方式<ul>
 <li>使用 <code>Cookie</code> 来实现</li>
-<li>使用 <code>URL</code> 回写来实现</li>
+<li>当客户端禁用 <code>Cookie</code> 时，可以使用 <code>URL</code> 回写来实现</li>
 </ul>
 </li>
 </ul>
 <p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gda1a9ou70j30sq0bcjwe.jpg" alt="Session的工作方式"></p>
 <p> <code>Cookie</code> 和 <code>Session</code> 的区别</p>
-<ul>
-<li><code>Cookie</code> 数据存放在客户的浏览器上， <code>Session</code> 数据存放在服务器上</li>
-<li><code>Session</code> 相对于 <code>Cookie</code> 更安全</li>
-<li>若考虑减轻服务器负担，应当使用 <code>Cookie</code> </li>
-</ul>
-<h2 id="6-6-GET-与-POST"><a href="#6-6-GET-与-POST" class="headerlink" title="6.6 GET 与 POST"></a>6.6 GET 与 POST</h2><ul>
-<li>HTTP 报文层面：<code>GET</code> 将请求信息放在 <code>URL</code> 中，而 <code>POST</code> 放在报文体中</li>
-<li>数据库层面： <code>GET</code> 符合 <strong>幂等性</strong> 和 <strong>安全性</strong>， 而  <code>POST</code> 不符合</li>
-<li>其他层面： <code>GET</code> 可以被缓存，被存储，而 <code>POST</code> 不行</li>
-</ul>
+<table>
+<thead>
+<tr>
+<th>对比角度</th>
+<th>Cookie</th>
+<th>Session</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>存放位置</td>
+<td>位于客户端、包含用户信息</td>
+<td>位于服务器的文件，包含用户信息。如果是Tomcat的话，位于StandManager中。</td>
+</tr>
+<tr>
+<td>生存时间</td>
+<td>可以手动设定</td>
+<td>当关闭浏览器时就消失</td>
+</tr>
+<tr>
+<td>容量大小</td>
+<td>一般最大为 4KB</td>
+<td>理论上可以存储随意多的信息，唯一的限制是一个脚本一次最大能占用的内存，默认是128MB</td>
+</tr>
+<tr>
+<td>依赖性</td>
+<td>Cookie不依赖于Session，Cookie是Session的一种实现方式。</td>
+<td>Session依赖于Cookie</td>
+</tr>
+<tr>
+<td>安全性</td>
+<td>相对较低</td>
+<td>相对较高</td>
+</tr>
+</tbody></table>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
-<li><p>参考书籍：《计算机网络》第七版，谢希仁。</p>
-</li>
-<li><p>提到网络总忍不住想起伦敦奥运会开幕式上的 万维网发明者 <strong>Tim Berners-Lee</strong> </p>
-</li>
-<li><p><strong>This is for everyone</strong></p>
-</li>
+<li>《计算机网络》第七版，谢希仁。</li>
+<li>《图解HTTP》上野 宣、于均良 译。</li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9qdWVqaW4uaW0vcG9zdC82ODQ0OTAzNTc1Njg0OTA3MDE2">掘金 - Cookie 和 Session 关系和区别<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cuamlhbnNodS5jb20vcC8yNTgwMjAyMWJlNjM=">简书 - 看完就彻底懂了session和cookie<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly93ZWIuc3RhbmZvcmQuZWR1L35vdXN0ZXIvY2dpLWJpbi9jczE0Mi1mYWxsMTAvaW5kZXgucGhw">Stanford University - CS 142: Web Applications (Fall 2010)<i class="fa fa-external-link-alt"></i></span></li>
 </ul>
-<div class="video-container"><iframe src="https://www.youtube.com/embed/UMNFehJIi0E" frameborder="0" loading="lazy" allowfullscreen></iframe></div>
-
 
     </div>
 
@@ -701,7 +907,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-分层体系"><span class="nav-text">1 分层体系</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-TCP-的三次牵手四次分手"><span class="nav-text">2 TCP 的三次牵手四次分手</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-三次握手：建立连接"><span class="nav-text">2.1 三次握手：建立连接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-四次分手：断了联系"><span class="nav-text">2.2 四次分手：断了联系</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-TCP-与-UDP-的区别"><span class="nav-text">3 TCP 与 UDP 的区别</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-TCP-的滑动窗口机制"><span class="nav-text">4 TCP 的滑动窗口机制</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-TCP的拥塞控制"><span class="nav-text">5 TCP的拥塞控制</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-HTTP与HTTPS"><span class="nav-text">6 HTTP与HTTPS</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#6-1-请求方法"><span class="nav-text">6.1 请求方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-2-状态码"><span class="nav-text">6.2 状态码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-3-HTTPS-工作流程"><span class="nav-text">6.3 HTTPS 工作流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-4-SSL-与-TLS"><span class="nav-text">6.4 SSL 与 TLS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-5-Cookie与Session"><span class="nav-text">6.5 Cookie与Session</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-6-GET-与-POST"><span class="nav-text">6.6 GET 与 POST</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-text">参考</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#分层体系"><span class="nav-text">分层体系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TCP-与UDP"><span class="nav-text">TCP 与UDP</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#三次握手：建立连接"><span class="nav-text">三次握手：建立连接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#四次分手：断了联系"><span class="nav-text">四次分手：断了联系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TCP-与-UDP-的区别"><span class="nav-text">TCP 与 UDP 的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TCP-的滑动窗口机制"><span class="nav-text">TCP 的滑动窗口机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TCP的拥塞控制"><span class="nav-text">TCP的拥塞控制</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP与HTTPS"><span class="nav-text">HTTP与HTTPS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#请求方法"><span class="nav-text">请求方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GET-与-POST的区别"><span class="nav-text">GET 与 POST的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#状态码"><span class="nav-text">状态码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTP的缺点"><span class="nav-text">HTTP的缺点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTPS的工作流程"><span class="nav-text">HTTPS的工作流程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#证明公开密钥正确性的证书"><span class="nav-text">证明公开密钥正确性的证书</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#简易版的HTTPS工作流程"><span class="nav-text">简易版的HTTPS工作流程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#完整版HTTPS通信流程"><span class="nav-text">完整版HTTPS通信流程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SSL-与-TLS"><span class="nav-text">SSL 与 TLS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTP与HTTPS的区别"><span class="nav-text">HTTP与HTTPS的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cookie-与-Session"><span class="nav-text">Cookie 与 Session</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-text">参考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -717,7 +923,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">30</span>
+          <span class="site-state-item-count">31</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -730,7 +936,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-count">27</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -807,12 +1013,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">329k</span>
+    <span title="站点总字数">333k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">4:59</span>
+    <span title="站点阅读时长">5:03</span>
 </div>
   <div class="powered-by">由 <span class="exturl theme-link" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl theme-link" data-url="aHR0cHM6Ly90aGVtZS1uZXh0Lm9yZw==">NexT.Gemini</span> 强力驱动
   </div>
