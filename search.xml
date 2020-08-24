@@ -114,23 +114,56 @@
 <p>对象<code>object 5、object 6、object 7</code>虽然互有关联，但是它们到<code>GC Roots</code>是不可达的，因此它们将会被判定为可回收的对象。</p>
 <img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gdi13cbho6j313k0okq8g.jpg" alt="可达性分析判断对象是否可达" style="zoom:67%;" />
 
-<p>可作为GC Roots的对象包括：</p>
+<p>可作为 GC Roots 的对象包括：</p>
 <ul>
-<li><p>在<strong>虚拟机栈</strong>(栈帧中的本地变量表)中引用的对象，譬如各个线程被调用的方法堆栈中使用到的参数、局部变量、临时变量等。</p>
+<li>在<strong>虚拟机栈</strong>(栈帧中的本地变量表)中引用的对象，譬如各个线程被调用的方法堆栈中使用到的参数、局部变量、临时变量等。</li>
+<li>在<strong>方法区中类静态属性引用的对象</strong>，譬如Java类的引用类型静态变量。</li>
+<li>在<strong>方法区中常量引用的对象</strong>，譬如字符串常量池(String Table)里的引用。</li>
+<li>在<strong>本地方法栈中JNI</strong>(即通常所说的Native方法)引用的对象。</li>
+<li>Java<strong>虚拟机内部的引用</strong>，如基本数据类型对应的Class对象，一些常驻的异常对象(比如<code>NPE、OOM</code>)等，还有系统类加载器。</li>
+<li>所有被<strong>同步锁(synchronized关键字)持有的对象</strong>。</li>
+<li>反映Java虚拟机内部情况的JMXBean、JVM TI中注册的回调、本地代码缓存等。</li>
+</ul>
+<h3 id="并发时的可达性分析"><a href="#并发时的可达性分析" class="headerlink" title="并发时的可达性分析"></a>并发时的可达性分析</h3><p>可达性分析算法理论上要求全过程都基于一个能保障一致性的快照中才能够进行分析， 这意味着必须全程冻结用户线程的运行。在根节点枚举时，由于GC Roots相比整个 Java 堆中全部的对象毕竟还算是极少数，且在各种优化技巧(如OopMap)的加持下，它带来的停顿已经是非常短暂且相对固定(不随堆容量而增长)的了。</p>
+<p>为什么必须在一个能保障一致性的快照上才能进行对象图的遍历？引入三色标记(Tri-color Marking)作为工具来辅助推导，把遍历对象图过程中遇到的对象，按照“是否访问过”这个条件标记成以下三种颜色：</p>
+<ul>
+<li>白色：表示对象尚未被垃圾收集器访问过。显然在可达性分析刚刚开始的阶段，所有的对象都是白色的，若在分析结束的阶段，仍然是白色的对象，即代表不可达。</li>
+<li>黑色：表示对象已经被垃圾收集器访问过，且这个对象的所有引用都已经扫描过。黑色的对象代表已经扫描过，它是安全存活的，如果有其他对象引用指向了黑色对象，无须重新扫描一遍。黑色对象不可能直接(不经过灰色对象)指向某个白色对象。</li>
+<li>灰色：表示对象已经被垃圾收集器访问过，但这个对象上至少存在一个引用还没有被扫描过。</li>
+</ul>
+<p>如果用户线程与收集器并发工作呢，收集器在对象图上标记颜色，同时用户线程在修改引用关系—即修改对象图的结构，这样可能出现两种后果。</p>
+<ul>
+<li>把原本已消亡的对象错误标记为存活(浮动垃圾，可清理)</li>
+<li>把原本存活的对象错误标记为已消亡</li>
+</ul>
+<blockquote>
+<p>对象消失问题示意图</p>
+</blockquote>
+<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi24f9m1s6j30h50i4tdu.jpg" alt="并发出现“对象消失”问题的示意"></p>
+<p>Wilson 于 1994 年在理论上证明了，当且仅当以下两个条件同时满足时，会产生“对象消失”的问题，即原本应该是黑色的对象被误标为白色：</p>
+<ul>
+<li>赋值器插入了一条或多条从黑色对象到白色对象的新引用；</li>
+<li>赋值器删除了全部从灰色对象到该白色对象的直接或间接引用。</li>
+</ul>
+<p>显然，要解决并发扫描时的对象消失问题，只需破坏二者之一即可。由此分别产生了两种解决方案：增量更新(Incremental Update)和原始快照(Snapshot At The Beginning, SATB) 。</p>
+<ul>
+<li>增量更新：破坏第一个条件。当黑色对象插入新的指向白色对象的引用关系时，<ul>
+<li>将新插入的引用记录下来</li>
+<li>在并发扫描结束之后，再以这些记录过的引用关系中的黑色对象为根，重新扫描一次。</li>
+<li>可以理解为，黑色对象一旦新插入了指向白色对象的引用之后，它就变回灰色对象了(白加黑会变灰)。</li>
+</ul>
 </li>
-<li><p>在<strong>方法区中类静态属性引用的对象</strong>，譬如Java类的引用类型静态变量。</p>
-</li>
-<li><p>在<strong>方法区中常量引用的对象</strong>，譬如字符串常量池(String Table)里的引用。</p>
-</li>
-<li><p>在<strong>本地方法栈中JNI</strong>(即通常所说的Native方法)引用的对象。</p>
-</li>
-<li><p>Java<strong>虚拟机内部的引用</strong>，如基本数据类型对应的Class对象，一些常驻的异常对象(比如<code>NPE、OOM</code>)等，还有系统类加载器。</p>
-</li>
-<li><p>所有被<strong>同步锁(synchronized关键字)持有的对象</strong>。</p>
-</li>
-<li><p>反映Java虚拟机内部情况的JMXBean、JVM TI中注册的回调、本地代码缓存等。</p>
+<li>原始快照：破坏第二个条件。当灰色对象要删除指向白色对象的引用关系时，<ul>
+<li>将要删除的引用记录下来</li>
+<li>在并发扫描结束之后，再以这些记录过的引用关系中的灰色对象为根，重新扫描 一次。</li>
+<li>可以理解为，无论引用关系删除与否，都会按照刚刚开始扫描那一刻的对象图快照来进行搜索(又回到最初的起点，记忆中你青涩的脸…怎么又唱起来了？？)。</li>
+</ul>
 </li>
 </ul>
+<blockquote>
+<p>无论是对引用关系记录插入还是删除，虚拟机的记录操作都是通过<strong>写屏障</strong>实现的。</p>
+<p>CMS基于增量更新实现并发标记，G1、Shenandoah基于原始快照实现。</p>
+</blockquote>
 <h3 id="四大引用"><a href="#四大引用" class="headerlink" title="四大引用"></a>四大引用</h3><p>无论是通过引用计数算法判断对象的引用数量，还是通过可达性分析算法判断对象是否引用链可达，判定对象是否存活都和<strong>“引用”</strong>离不开关系。</p>
 <p>引用分为强引用(Strongly Reference)、软引用(Soft Reference)、弱引用(Weak Reference)和虚引用(Phantom Reference)4种，这4种引用强度依次逐渐减弱。</p>
 <ul>
@@ -196,7 +229,7 @@
 </tr>
 </tbody></table>
 <ul>
-<li>引用队列(ReferenceQueue)<ul>
+<li>引用队列(Reference Queue)<ul>
 <li>无实际存储结构，存储逻辑依赖于内部节点之间的关系来表达。</li>
 <li>存储关联的且被 GC 的软引用，弱引用以及虚引用。</li>
 </ul>
@@ -331,7 +364,7 @@
 <ul>
 <li><strong>初始标记(</strong>CMS initial mark)：标记GC Roots能直接关联到的对象。</li>
 <li><strong>并发标记</strong>(CMS concurrent mark)：从GC Roots的直接关联对象开始遍历整个对象图，耗时较长但是不需要停顿用户线程，可以与垃圾收集线程一起并发运行。</li>
-<li><strong>重新标记</strong>(CMS remark)：为了修正并发标记期间，因用户程序继续运作而导致标记产生变动的那一部分对象的标记记录，停顿时间通常会比初始标记阶段稍长，但远比并发标记阶段的时间短。</li>
+<li><strong>重新标记</strong>(CMS remark)：为了修正并发标记期间，因用户程序继续运行而导致标记产生变动的那部分对象。停顿时间通常会比初始标记阶段稍长，但远比并发标记阶段的时间短。</li>
 <li><strong>并发清除</strong>(CMS concurrent sweep)：清理删除掉标记阶段判断的已经死亡的对象，由于不需要移动存活对象，所以这个阶段也可以与用户线程同时并发。</li>
 </ul>
 <blockquote>
@@ -341,44 +374,71 @@
 <p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gdi68lrm7qj30xy07cgrb.jpg" alt="CMS收集器运行示意图"></p>
 <p>CMS收集器是 HotSpot虚拟机追求低停顿的第一次成功尝试，但是它还远达不到完美的程度，至少有以下三个明显的 缺点:</p>
 <ul>
-<li>CMS收集器对处理器<strong>资源非常敏感</strong>，CMS 默认启动的回收线程数是(处理器核心数量 +3)/4</li>
+<li>CMS收集器对处理器<strong>资源非常敏感</strong>，CMS 默认启动的回收线程数是(处理器核心数量 +3)/4。</li>
 <li>无法处理“<strong>浮动垃圾</strong>”(FloatingGarbage)，有可能出现“Concurrent Mode Failure”失败进而导致另一次完全“Stop The World”的Full GC的产生。<ul>
 <li>适当调高参数<code>-XX:CMSInitiatingOccupancyFraction</code>的值来提高CMS的触发百分比，降低内存回收频率，获取更好的性能。这个参数设置得太高将会很容易导致大量的并发失败产生，性能反而降低。</li>
 </ul>
 </li>
 <li>基于“<strong>标记-清除</strong>”算法实现的收集器，收集结束时可能会有大量空间碎片产生，将会给<strong>大对象分配</strong>带来很大麻烦，往往会出现老年代还有很多剩余空间，但就是无法找到足够大的连续空间来分配当前对象，而不得不提前触发一次Full GC的情况。<ul>
 <li>为了解决这个问题， CMS收集器提供了一个<code>-XX:+UseCMSCompactAtFullCollection</code>开关参数(默认是开启的，JDK 9开始废弃)，用于在CMS收集器不得不进行Full GC时开启<strong>内存碎片的合并整理</strong>过程，由于这个内存整理必须移动存活对象，(在Shenandoah和ZGC出现前)是无法并发的。这样<strong>空间碎片问题是解决了，但停顿时间又会变长</strong>。</li>
-<li>参数<code>-XX:CMSFullGCsBefore-Compaction</code>(JDK9开始废弃)的作用是要求CMS收集器在执行过若干次(数量由参数值决定)不整理空间的Full GC之后，下一次进入Full GC前会先进行碎片整理(默认值为0，表示每次进入FullGC时都进行碎片整理)。</li>
+<li>参数<code>-XX:CMSFullGCsBeforeCompaction</code>(JDK9开始废弃)的作用是要求CMS收集器在执行过若干次(数量由参数值决定)不整理空间的Full GC之后，下一次进入Full GC前会先进行碎片整理(默认值为0，表示每次进入FullGC时都进行碎片整理)。</li>
 </ul>
 </li>
 </ul>
 <blockquote>
 <p>*<em>浮动垃圾: *</em> 在CMS的并发标记和并发清理阶段，用户线程仍在继续运行的，程序在运行自然就还会伴随有新的垃圾对象不断产生，但这一部分垃圾对象是出现在标记过程结束以后，CMS无法在当次收集中处理掉它们，只好下一次垃圾收集时再清理掉。</p>
 </blockquote>
-<h3 id="G1收集器"><a href="#G1收集器" class="headerlink" title="G1收集器"></a>G1收集器</h3><p>Garbage First(简称G1)收集器开创了收集器面向<strong>局部收集</strong>的设计思路和基于<strong>Region</strong>的内存布局形式。</p>
-<p>在G1收集器出现之前的所有其他收集器，包括CMS在内，垃圾收集的目标范围要么是整个新生代(Minor GC)，要么就是整个老年代(Major GC)，再要么就是整个Java堆(Full GC)。而G1可以面向堆内存任何部分来组成<strong>回收集</strong>(Collection Set)进行回收，衡量标准不再是它属于哪个分代，而是<strong>哪块内存中存放的垃圾数量最多，回收收益最大</strong>，这就是G1收集器的Mixed GC模式。</p>
-<p>G1不再坚持固定大小以及固定数量的分代区域划分，而是把连续的Java堆划分为多个大小相等的独立区域(Region)，每一个Region都可以根据需要，扮演新生代的Eden空间、Survivor空间，或者老年代空间。收集器能够对扮演不同角色的 Region采用不同的策略去处理。</p>
+<h3 id="G1收集器"><a href="#G1收集器" class="headerlink" title="G1收集器"></a>G1收集器</h3><p>Garbage First(简称G1)收集器</p>
+<ul>
+<li>设计思路：面向<strong>局部收集</strong></li>
+<li>内存布局：基于<strong>Region</strong>的内存布局</li>
+</ul>
+<p>在G1收集器出现之前的所有其他收集器，包括CMS在内，垃圾收集的目标范围要么是整个新生代(Minor GC)，要么就是整个老年代(Major GC)，再要么就是整个Java堆(Full GC)。</p>
+<blockquote>
+<p>G1 面向堆内存任何部分组成<strong>回收集</strong>(Collection Set)来进行回收，衡量标准不再是它属于哪个分代，而是<strong>哪块内存中存放的垃圾数量最多，回收收益最大</strong>，这就是 G1 的 Mixed GC 模式。</p>
+</blockquote>
+<p>G1不再坚持固定大小以及固定数量的分代区域划分，而是把连续的Java堆划分为<strong>多个大小相等</strong>的独立区域<strong>(Region)</strong>，每一个Region都可以根据需要，扮演新生代的Eden空间、Survivor空间，或者老年代空间。收集器能够对扮演不同角色的 Region 采用不同的策略去处理。</p>
 <p>Region中还有一类特殊的Humongous区域，专门用来存储大对象。</p>
-<p>G1认为只要大小超过了一个Region容量一半的对象即可判定为大对象。每个Region的大小可以通过参数<code>-XX:G1HeapRegionSize</code>设定，取值范围为1MB~32MB，且应为2的N次幂。对于那些超过了整个Region容量的超级大对象，将会被存放在N个连续的Humongous Region之中，G1的大多数行为都把Humongous Region作为老年代的一部分来进行看待，如下图所示。</p>
+<p>G1 认为只要大小超过了一个Region容量一半的对象即可判定为<strong>大对象</strong>。每个Region的大小可以通过参数<code>-XX:G1HeapRegionSize</code>设定，取值范围为1MB~32MB，且应为2的N次幂。对于那些超过了整个Region容量的超级大对象，将会被存放在N个连续的 Humongous Region 之中，G1 的大多数行为都把 Humongous Region 作为老年代的一部分来进行看待，如下图所示。</p>
 <img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gdk4k1e8rqj31340q2dk6.jpg" alt="G1收集器Region分区示意图" style="zoom:67%;" />
 
-<p>虽然G1仍然保留新生代和老年代的概念，但新生代和老年代不再是固定的了，它们都是一系列区域(不需要连续)的动态集合。</p>
-<p>G1收集器之所以能建立可预测的停顿时间模型，是因为它将Region作为单次回收的最小单元，即每次收集到的内存空间都是Region大小的整数倍，这样可以有计划地避免在整个Java堆中进行全区域的垃圾收集。</p>
-<p>更具体的思路是让G1收集器去跟踪各个Region里面的垃圾堆积的“价值”大小，<strong>价值即回收所获得的空间大小以及回收所需时间的经验值</strong>，然后在后台维护一个优先级列表，每次根据用户设定允许的收集停顿时间(使用参数<code>-XX:MaxGCPauseMillis</code>指定，默认值是200毫秒)，优先处理回收价值收益最大的那些Region。这种使用Region划分内存空间，以及具有优先级的区域回收方式，保证了G1收集器在有限的时间内获取尽可能高的收集效率。</p>
+<blockquote>
+<ol>
+<li>仍然有新生代与老年代概念之分，但是新生代与老年代不再是固定不变的了，它们都是一系列区域(不需要连续)的动态集合。</li>
+<li>不再坚持回收区域大小。</li>
+</ol>
+</blockquote>
+<p>G1 收集器之所以能建立可预测的停顿时间模型，是因为它将 Region 作为单次回收的最小单元，即每次收集到的内存空间都是 Region 大小的整数倍，这样可以有计划地避免在整个Java堆中进行全区域的垃圾收集。因为不再是回收整个老年代或者整个新生代，所以可以比较容易停下。</p>
+<p>更具体的思路是让G1收集器去跟踪各个 Region 里面的垃圾堆积的“价值”大小，<strong>价值即回收所获得的空间大小以及回收所需时间的经验值</strong>，然后在后台维护一个<strong>优先级列表</strong>，每次根据用户设定允许的收集停顿时间(使用参数<code>-XX:MaxGCPauseMillis</code>指定，默认值是200毫秒)，<strong>优先处理</strong>回收价值收益最大的那些 Region。这种使用Region划分内存空间，以及具有优先级的区域回收方式，保证了G1收集器在有限的时间内获取尽可能高的收集效率。</p>
 <p>在并发标记阶段如何保证收集线程与用户线程互不干扰地运行?</p>
 <ul>
-<li>CMS收集器采用增量更新算法</li>
-<li>G1收集器则是通过原始快照(SATB)算法</li>
+<li>CMS收集器采用<strong>增量更新</strong>算法</li>
+<li>G1收集器则是通过<strong>原始快照</strong>(SATB)算法</li>
 </ul>
-<p>如果不去计算用户线程运行过程中的动作(如使用写屏障维护记忆集的操作)，G1收集器的运作过程大致可划分为以下四个步骤:</p>
+<p>如果不去计算用户线程运行过程中的动作(如使用<strong>写屏障维护记忆集</strong>的操作)，G1收集器的运作过程大致可划分为以下四个步骤:</p>
 <ul>
-<li><strong>初始标记</strong>(Initial Marking): 标记一下GC Roots能直接关联到的对象，并且修改TAMS指针的值，让下一阶段用户线程并发运行时，能正确地在可用的Region中分配新对象。这个阶段需要停顿线程，但耗时很短，而且是借用进行Minor GC的时候同步完成的，所以G1收集器在这个阶段实际并没有额外的停顿。</li>
+<li><strong>初始标记</strong>(Initial Marking): 标记一下GC Roots能直接关联到的对象，并且修改<strong>TAMS指针</strong>的值，让下一阶段用户线程并发运行时，能正确地在可用的Region中分配新对象。这个阶段需要停顿线程，但耗时很短，而且是借用进行Minor GC的时候同步完成的，所以G1收集器在这个阶段实际并没有额外的停顿。</li>
 <li><strong>并发标记</strong>(Concurrent Marking): 从GC Roots开始对堆中对象进行可达性分析，递归扫描整个堆里的对象图，找出要回收的对象，耗时较长，但可与用户程序并发执行。当对象图扫描完成以后，还要重新处理SATB记录下的在并发时有引用变动的对象。</li>
-<li><strong>最终标记</strong>(Final Marking): 对用户线程做另一个短暂的暂停，用于处理并发阶段结束后仍遗留下来的最后那少量的SATB记录。</li>
-<li><strong>筛选回收</strong>(Live Data Counting and Evacuation): 负责更新Region的统计数据，对各个Region的回收价值和成本进行排序，根据用户所期望的停顿时间来制定回收计划，可以自由选择任意多个Region构成回收集，然后把决定回收的那一部分Region的存活对象复制到空的Region中，再清理掉整个旧Region的全部空间。这里的操作涉及存活对象的移动，必须暂停用户线程，由多条收集器线程并行完成的。</li>
+<li><strong>最终标记</strong>(Final Marking): 对用户线程做另一个短暂的暂停，用于处理并发标记阶段结束后仍遗留下来的少量的SATB记录(参见书本3.4.6节)。</li>
+<li><strong>筛选回收</strong>(Live Data Counting and Evacuation): <ul>
+<li>更新 Region 的统计数据，对各个Region的回收价值和成本进行排序；</li>
+<li>根据用户所期望的停顿时间制定回收计划，自由选择任意多个Region构成<strong>回收集</strong>；</li>
+<li>把决定回收的那部分 Region 中的存活对象复制到空的 Region 中(<strong>复制</strong>)；</li>
+<li>清理掉整个旧 Region 的全部空间；</li>
+<li>以上操作涉及存活对象的移动，必须暂停用户线程，由多条收集器线程并行完成的。</li>
+</ul>
+</li>
 </ul>
 <p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gdk4zcd5qlj30zw08cgrc.jpg" alt="G1收集器运行示意图"></p>
-<p><strong>G1从整体是基于“标记-整理”算法实现的收集器，但从局部(两个Region之间)上看又是基于“标记-复制”算法实现</strong>，无论如何，这两种算法都意味着G1运作期间不会产生内存空间碎片，垃圾收集完成之后能提供规整的可用内存。这种特性有利于程序长时间运行，在程序为大对象分配内存时不容易因无法找到连续内存空间而提前触发下一次收集。</p>
+<p>从上面可以看出，G1</p>
+<ul>
+<li><strong>整体上</strong>基于<strong>标记-整理算法</strong>实现；</li>
+<li><strong>局部(两个Region之间)</strong>角度看是基于<strong>标记-复制算法</strong>实现。</li>
+</ul>
+<p>因为没有采用<strong>标记-清除算法</strong>，所以 G1 运作期间不会产生内存空间碎片，垃圾收集完成之后能提供规整的可用内存。有利于程序长时间运行，在程序需要为大对象分配内存时，因为连续内存空间较多，所以发生 Full GC 的概率也较小。</p>
+<blockquote>
+<p>TAMS(Top at Mark Start)指针：有两个，把 Region 中的一部分空间划分出来用于并发回收过程中的新对象分配，并发回收时新分配的对象地址都必须要在这两个指针位置以上。</p>
+</blockquote>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><table>
 <thead>
 <tr>
@@ -6671,16 +6731,28 @@
 <td align="center">解决变量在多个线程之间的可见性</td>
 </tr>
 </tbody></table>
-<h3 id="说说-synchronized-和-Lock-的区别吧"><a href="#说说-synchronized-和-Lock-的区别吧" class="headerlink" title="说说 synchronized 和 Lock 的区别吧"></a>说说 synchronized 和 Lock 的区别吧</h3><table>
+<h3 id="说说-synchronized-和-ReentrantLock-的区别吧"><a href="#说说-synchronized-和-ReentrantLock-的区别吧" class="headerlink" title="说说 synchronized 和 ReentrantLock 的区别吧"></a>说说 synchronized 和 ReentrantLock 的区别吧</h3><table>
 <thead>
 <tr>
-<th align="center">Synchronized</th>
-<th align="center">Lock</th>
+<th align="center">synchronized</th>
+<th align="center">ReentrantLock</th>
 </tr>
 </thead>
 <tbody><tr>
+<td align="center">关键字</td>
+<td align="center">类</td>
+</tr>
+<tr>
+<td align="center">可重入</td>
+<td align="center">可重入</td>
+</tr>
+<tr>
 <td align="center">基于JVM，JVM层面</td>
-<td align="center"><code>java.util.concurrent.lock</code>包下的接口、API层面</td>
+<td align="center"><code>java.util.concurrent.locks</code>包下的类、JDK层面</td>
+</tr>
+<tr>
+<td align="center">基于对象头中的Mark Word实现</td>
+<td align="center">基于AQS实现</td>
 </tr>
 <tr>
 <td align="center">非公平锁</td>
@@ -6693,10 +6765,6 @@
 <tr>
 <td align="center">使用完后自动释放锁</td>
 <td align="center">需要手动加锁与释放锁</td>
-</tr>
-<tr>
-<td align="center">基于对象头中的Mark Word实现</td>
-<td align="center">基于AQS实现</td>
 </tr>
 </tbody></table>
 <h3 id="说说乐观锁与悲观锁的区别吧"><a href="#说说乐观锁与悲观锁的区别吧" class="headerlink" title="说说乐观锁与悲观锁的区别吧"></a>说说乐观锁与悲观锁的区别吧</h3><table>
@@ -6906,7 +6974,7 @@
 <h3 id="直接内存"><a href="#直接内存" class="headerlink" title="直接内存"></a>直接内存</h3><p>直接内存(Direct Memory)并不是虚拟机运行时数据区的一部分，也不是《Java虚拟机规范》中定义的内存区域。但是这部分内存也被频繁地使用，而且也可能导致<code>OutOfMemoryError</code>异常出现。</p>
 <hr>
 <h2 id="new-的过程发生了什么？"><a href="#new-的过程发生了什么？" class="headerlink" title="new 的过程发生了什么？"></a>new 的过程发生了什么？</h2><h3 id="对象的创建"><a href="#对象的创建" class="headerlink" title="对象的创建"></a>对象的创建</h3><p>当Java虚拟机遇到一条字节码 <code>new</code> 指令时，首先将去检查这个指令的参数是否能在常量池中定位到一个类的<strong>符号引用</strong>，并且检查这个符号引用代表的类是否已被<strong>加载、解析和初始化</strong>过。如果没有，那必须先执行相应的<strong>类加载过程</strong>。</p>
-<p>在类加载检查通过后，接下来虚拟机将为新生对象<strong>分配内存</strong>，为对象分配空间的任务实际上便等同于把一块确定大小的内存块从Java堆中划分出来。</p>
+<p>在类加载检查通过后，接下来虚拟机将会在<strong>堆(Heap)</strong>上为新生对象<strong>分配内存</strong>，分配内存的方式可以选择<strong>指针碰撞</strong>或者<strong>空闲列表</strong>。</p>
 <ul>
 <li><strong>指针碰撞</strong>：假设Java堆中内存是绝对规整的，所有被使用过的内存都被放在一边，空闲的内存被放在另一边，中间放着一个指针作为分界点的指示器，那所分配内存就仅仅是把那个指针向空闲空间方向挪动一段与对象大小相等的距离。</li>
 <li><strong>空闲列表</strong>：如果Java堆中的内存并不规整，已被使用的内存和空闲的内存相互交错，那就没有办法简单地进行指针碰撞了，虚拟机就必须维护一个列表，记录上哪些内存块是可用的，在分配的时候从列表中找到一块足够大的空间划分给对象实例，并更新列表上的记录。</li>
@@ -6914,17 +6982,17 @@
 <p>解决对象创建时可能出现的<strong>线程不安全</strong>这个问题有两种可选方案:</p>
 <ul>
 <li>一种是对分配内存空间的动作进行同步处理—实际上虚拟机是采用<strong>CAS配上失败重试</strong>的方式保证更新操作的原子性；</li>
-<li>一种是把内存分配的动作按照线程划分在不同的空间之中进行，即每个线程在Java堆中预先分配一小块内存，称为<strong>本地线程分配缓冲</strong>(ThreadLocalAllocationBuffer，TLAB)，哪个线程要分配内存，就在哪个线程的本地缓冲区中分配，只有本地缓冲区用完了，分配新的缓存区时才需要同步锁定。虚拟机是否使用TLAB，可以通过<code>-XX:+/-UseTLAB</code>参数来设定。</li>
+<li>一种是把内存分配的动作按照线程划分在不同的空间之中进行，即每个线程在Java堆中预先分配一小块内存，称为<strong>本地线程分配缓冲</strong>(Thread Local Allocation Buffer，TLAB)，哪个线程要分配内存，就在哪个线程的本地缓冲区中分配，只有本地缓冲区用完了，分配新的缓存区时才需要同步锁定。虚拟机是否使用TLAB，可以通过<code>-XX:+/-UseTLAB</code>参数来设定。</li>
 </ul>
 <p>内存分配完成之后，虚拟机必须将分配到的内存空间(但不包括对象头)都<strong>初始化为零值</strong>。</p>
-<p>接下来，Java虚拟机还要<strong>对对象进行必要的设置</strong>，例如这个对象是哪个类的实例、如何才能找到类的元数据信息、对象的哈希码(实际上对象的哈希码会延后到真正调用<code>Object::hashCode()</code>方法时才计算)、对象的GC分代年龄等信息。这些信息存放在对象的对象头(ObjectHeader)之中。</p>
-<p>在上面工作都完成之后，从虚拟机的视角来看，一个新的对象已经产生了。但是从Java程序的视角看来，对象创建才刚刚开始，构造函数，即Class文件中的<code>&lt;init&gt;()</code>方法还没有执行，所有的字段都为默认的零值，对象需要的其他资源和状态信息也还没有按照预定的意图构造好。</p>
+<p>接下来，Java虚拟机还要<strong>对对象进行必要的设置</strong>，例如这个对象是哪个类的实例、如何才能找到类的元数据信息、对象的哈希码(实际上对象的哈希码会延后到真正调用<code>Object::hashCode()</code>方法时才计算)、对象的GC分代年龄等信息。这些信息存放在对象的<strong>对象头(Object Header)</strong>之中。</p>
+<p>在上面工作都完成之后，从虚拟机的视角来看，一个新的对象已经产生了。但是从Java程序的视角看来，对象创建才刚刚开始，<strong>构造函数还没有执行</strong>，即Class文件中的<code>&lt;init&gt;()</code>方法还没有执行，所有的字段都为默认的零值，对象需要的其他资源和状态信息也还没有按照预定的意图构造好。</p>
 <p><code>new</code>指令之后会接着执行<code>&lt;init&gt;()</code>方法，按照程序员的意愿对对象进行初始化，这样一个真正可用的对象才算完全被构造出来。</p>
 <p>总结一下，对象的创建大致为：</p>
 <ol>
 <li>类加载检查</li>
 <li>分配内存</li>
-<li>对象初始化为零值</li>
+<li>将新分配的内存初始化为零值</li>
 <li>设置对象头</li>
 <li>执行Class文件中的<code>&lt;init&gt;()</code> 方法</li>
 </ol>
@@ -9647,8 +9715,8 @@
 </blockquote>
 <p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0rrhm2boj30k30og13g.jpg" alt="HTTPS通信"></p>
 <ol>
-<li><strong>客户端</strong>发送 Client Hello 报文开始 SSL 通信。报文中包含客户端支持的 SSL 的指定版本、加密组件(Cipher Suite)列表(所使用的加密算法及密钥长度等)。</li>
-<li><strong>服务器</strong>确定可进行 SSL 通信时，以 Server Hello 报文作为应答。报文中包含 SSL 版本以及加密组件。服务器的加密组件内容是<strong>从接收到的客户端加密组件内筛选出来的。</strong></li>
+<li><strong>客户端</strong>发送 Client Hello 报文开始 SSL 通信。报文中包含客户端支持的 SSL 的指定版本、加密组件列表(所使用的加密算法及密钥长度等)。</li>
+<li><strong>服务器</strong>确定可进行 SSL 通信时，以 Server Hello 报文作为应答。报文中包含 SSL 版本以及加密组件(Cipher Suite)。服务器的加密组件内容是<strong>从接收到的客户端加密组件内筛选出来的。</strong></li>
 <li><strong>服务器</strong>继续发送 Certificate 报文。报文中包含公钥证书。</li>
 <li><strong>服务器</strong>继续发送 ServerHelloDone 报文。通知客户端第一阶段的 SSL 握手协商部分结束。</li>
 <li><strong>客户端</strong>发送 Client Key Exchange 报文作为回应。报文中包含通信加密中一种被称为 <code>Pre-master secret</code>的随机密码串。这个报文已用第 3 步中的公钥进行加密。</li>
