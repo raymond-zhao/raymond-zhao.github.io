@@ -1,6 +1,398 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>操作系统常见问题QA</title>
+    <url>/2020/08/28/2020-08-28-OS-Interview-QA/</url>
+    <content><![CDATA[<blockquote>
+<p>还没开始，面试中…</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>操作系统</category>
+      </categories>
+      <tags>
+        <tag>操作系统</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>TCP的运输连接管理</title>
+    <url>/2020/08/26/2020-08-26-Network-TCPAndUDP/</url>
+    <content><![CDATA[<h2 id="TCP的运输连接管理"><a href="#TCP的运输连接管理" class="headerlink" title="TCP的运输连接管理"></a>TCP的运输连接管理</h2><p>TCP 是面向连接的协议，运输连接是用来传送 TCP 报文的。TCP 运输连接的建立和释放是每一次面向连接的通信中必不可少的过程。因此，运输连接就有三个阶段，即：连接建立、数据传送和连接释放。运输连接的管理就是使运输连接的建立和释放都能正常地进行。</p>
+<p>在TCP连接建立过程中要解决以下三个问题:</p>
+<ul>
+<li>要使每一方能够确知对方的存在。</li>
+<li>要允许双方协商一些参数(如最大窗口值、是否使用窗口扩大选项和时间戳选项以及服务质量等)。</li>
+<li>能够对运输实体资源(如缓存大小、连接表中的项目等)进行分配。</li>
+</ul>
+<h3 id="三次握手：建立连接"><a href="#三次握手：建立连接" class="headerlink" title="三次握手：建立连接"></a>三次握手：建立连接</h3><p>TCP建立连接的过程叫做握手，握手需要在客户和服务器之间交换三个TCP报文段。</p>
+<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9tsfxtkyj31ce0okdrn.jpg" alt="三报文握手建立连接"></p>
+<p>假定主机A运行的是TCP客户程序，而B运行TCP服务器程序。最初两端的 TCP 进程都处 CLOSED(关闭)状态。</p>
+<ol>
+<li>A主动打开连接，而B被动打开连接。</li>
+<li>B的TCP服务器进程创建传输控制块TCB，准备接受客户进程的连接请求，进入监听(Listen)状态。</li>
+<li>A的TCP客户端进程创建传输控制块TCB。</li>
+<li>A向B请求建立连接时，发出连接请求报文段，首部中同步位 SYN=1，选择初始序号 seq=x。TCP客户进程进入SYN-SENT(同步已发送)状态。</li>
+<li>B收到连接请求报文段后，如同意建立连接，则向A发送确认。在确认报文段中携带 SYN=1，ACK=1，ack=x+1，seq=y。服务器进程进入SYN-RCVD(同步收到)状态。</li>
+<li>TCP客户进程收到B的确认后，向B发出确认。携带 ACK=1，ack=y+1，seq=x+1。TCP连接已经建立，A 进入 ESTABLISHED (已建立连接)状态。</li>
+<li>当 B 收到 A 的确认后，也进入 ESTABLISHED 状态。</li>
+</ol>
+<blockquote>
+<p>SYN报文段不能携带数据，但要消耗一个序号。</p>
+<p>确认报文段也不能携带数据，但同样要消耗掉一个序号。也可以把SYN=1，ACK=1拆成两个报文段，这样变成四报文握手，效果一样。</p>
+<p>ACK报文段可以携带数据。但如果不携带数据则不消耗序号。</p>
+</blockquote>
+<figure class="highlight dns"><table><tr><td class="code"><pre><span class="line">Q：为什么 <span class="keyword">A</span> 最后还要发送一次确认呢?</span><br><span class="line"><span class="keyword">A</span>：这主要是为了防止已失效的连接请求报文段突然又传送到了 B，因而产生错误。</span><br></pre></td></tr></table></figure>
+
+<p>“已失效的连接请求报文段”是指，在 A 发出连接请求后，因连接请求报文丢失而未收到确认，于是 A 再重传一次连接请求，并且收到了确认，建立了连接。数据传输完毕后，就释放了连接。</p>
+<p>A 共发送了两个连接请求报文段，其中第一个丢失，第二个到达了B，没有“已失效的连接请求报文段”。</p>
+<blockquote>
+<p>现假定出现一种异常情况，即 A 发出的第一个连接请求报文段并没有丢失，而是在某些网络结点长时间滞留了，以致延误到连接释放以后的某个时间才到达B。</p>
+</blockquote>
+<p>这是一个早已失效的报文段，但 B 收到此失效的连接请求报文段后，就误认为是 A 又发出一次新的连接请求。于是就向 A 发出确认报文段，同意建立连接。假定不采用三报文握手，那么只要 B 发出确认，新的连接就建立了。</p>
+<p>由于现在 A 并没有发出建立连接的请求，因此不会理睬 B 的确认，也不会向B发送数据。但 B 却以为新的运输连接已经建立了，并一直等待 A 发来数据。B 的许多资源就这样白白浪费了。</p>
+<p>采用三报文握手的办法，可以防止上述现象的发生。例如在刚才的异常情况下，A 不会向 B 的确认发出确认。B 由于收不到确认，就知道 A 并没有要求建立连接。</p>
+<h3 id="四次分手：断了联系"><a href="#四次分手：断了联系" class="headerlink" title="四次分手：断了联系"></a>四次分手：断了联系</h3><p><strong>数据传输结束后，通信的双方都可释放连接</strong>。</p>
+<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9uuv1g7cj31ew0r2qje.jpg" alt="TCP连接的释放过程"></p>
+<ol>
+<li>A 和 B 都处于 ESTABLISHED 状态。</li>
+<li><strong>A 的应用进程</strong>先向其 TCP 发出连接释放报文段，并停止再发送数据，主动关闭 TCP 连接。连接释放报文段首部终止控制位 FIN=1，seq=u，它等于前面已传送过的数据的最后一个字节的序号加 1。A进入 <strong>FIN-WAIT-1(终止等待1)</strong> 状态，等待 B 的确认。</li>
+<li>B 收到连接释放报文段后即发出确认，确认号是 ack=u+1，而这个报文段自己的序号是 v，等于 B 前面已传送过的数据的最后一个字节的序号加 1。<ol>
+<li>进入 <strong>CLOSE-WAIT(关闭等待)</strong> 状态。</li>
+<li>TCP 服务器进程通知高层应用进程，此时从 A 到 B 这个方向的连接已释放，TCP连接处于 <strong>半关闭(half-close)</strong> 状态，即 A 已经没有数据要发送了，但 <strong>B 若发送数据，A 仍要接收</strong>。也就是说，从B到A这个方向的连接并未关闭，这个状态可能会持续一段时间。</li>
+</ol>
+</li>
+<li>A 收到 B 的确认后，进入 <strong>FIN-WAIT-2(终止等待2)</strong> 状态，等待 B 发出的连接释放报文段。</li>
+<li>若 B 已经没有要向A发送的数据，其应用进程就通知 TCP 释放连接。<ol>
+<li>B 发出的连接释放报文段 FIN=1，seq=w (半关闭状态下 B 可能又发送了一些数据)。</li>
+<li>B 还必须<strong>重复上次已发送过的确认号 ack=u+1</strong>。B进入 <strong>LAST-ACK(最后确认)</strong> 状态，等待A的确认。</li>
+</ol>
+</li>
+<li>A 收到 B 的连接释放报文段后，对此发出确认。<ol>
+<li>在确认报文段中，ACK=1，ack=w+1，seq=u+1，然后进入 <strong>TIME-WAIT(时间等待)</strong> 状态。</li>
+<li>此时 <strong>TCP连接还没有释放掉</strong>，必须经过 <strong>2MSL</strong> 后，A才进入到 <strong>CLOSED状态</strong>。</li>
+<li>MSL叫做最长报文段寿命(Maximum Segment Lifetime)，RFC793建议设为2分钟。但 TCP 允许不同实现自定义。因此，从A进入到 <strong>TIME-WAIT状态</strong>后，要经过 <code>2MSL</code> 才能进入到 <strong>CLOSED状态</strong>，才能开始建立下一个新的连接。</li>
+<li>当A撤销相应的传输控制块TCB后，就结束了这次的TCP连接。</li>
+</ol>
+</li>
+<li>B 收到 A 发出的确认后，才进入 <strong>CLOSED状态</strong>，在 B 撤销 PCB 后，本次 TCP 连接才算结束。</li>
+</ol>
+<blockquote>
+<p>B 结束 TCP 连接的时间要比 A 早一些，因为 A 要等待 2MSL。</p>
+</blockquote>
+<figure class="highlight gauss"><table><tr><td class="code"><pre><span class="line">为什么A在<span class="built_in">TIME</span>-<span class="built_in">WAIT</span>状态必须等待<span class="number">2</span>MSL的时间?</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight markdown"><table><tr><td class="code"><pre><span class="line"><span class="bullet">1. </span>为了保证 A 发送的最后一个 ACK 报文段能够到达 B。这个 ACK 报文段有可能丢失，因而使处在 LAST-ACK 状态的 B 收不到对已发送的 FIN+ACK报文段 的确认。B会超时重传这个 FIN+ACK 报文段，而 A 就能在 2MSL 时间内收到这个重传的 FIN+ACK 报文段。接着 A 重传一次确认，重新启动 2MSL 计时器。最后，A 和 B 都正常进入到 CLOSED 状态。如果 A 在 TIME-WAIT 状态不等待一段时间，而是在发送完 ACK 报文段后立即释放连接，那么就无法收到 B 重传的 FIN+ACK 报文段，因而也不会再发送一次确认报文段。这样，B就无法按照正常步骤进入 CLOSED 状态。</span><br><span class="line"></span><br><span class="line"><span class="bullet">2. </span>防止“已失效的连接请求报文段”出现在本连接中。A 在发送完最后一个 ACK 报文段后，再经过时间 2MSL，就可以使本连接持续的时间内所产生的所有报文段都从网络中消失。这样就可以使下一个新的连接中不会出现这种旧的连接请求报文段。</span><br></pre></td></tr></table></figure>
+
+<h3 id="TCP与UDP的首部"><a href="#TCP与UDP的首部" class="headerlink" title="TCP与UDP的首部"></a>TCP与UDP的首部</h3><blockquote>
+<p>UDP 的首部</p>
+</blockquote>
+<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9wbh2rblj315a0rqn73.jpg" alt="UDP报文段的首部"></p>
+<blockquote>
+<p>TCP 的首部</p>
+</blockquote>
+<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9wcefwrej315w0li46o.jpg" alt="TCP报文段的首部格式"></p>
+<h3 id="TCP-与-UDP-的对比"><a href="#TCP-与-UDP-的对比" class="headerlink" title="TCP 与 UDP 的对比"></a>TCP 与 UDP 的对比</h3><table>
+<thead>
+<tr>
+<th align="center">TCP</th>
+<th align="center">UDP</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"></td>
+<td align="center">用户数据报协议UDP只在IP的数据报服务之上增加了很少一点的功能，这就是复用和分用的功能以及差错检测的功能</td>
+</tr>
+<tr>
+<td align="center">面向连接，应用程序在使用TCP协议之前，必须先建立TCP连接。在传送数据完毕后，必须释放已经建立的TCP连接。</td>
+<td align="center">无连接的，即发送数据之前不需要建立连接，发送数据之后也不需要断开连接，因此减少了开销和发送数据之前的时延。</td>
+</tr>
+<tr>
+<td align="center">提供可靠交付，通过TCP连接传送的数据，无差错、不丢失、不重复，并且按序到达。</td>
+<td align="center">尽最大努力交付，即不保证可靠交付，因此主机不需要维持复杂的连接状态表</td>
+</tr>
+<tr>
+<td align="center">面向字节流。TCP中的“流”(stream)指的是流入到进程或从进程流出的字节序列。</td>
+<td align="center">UDP是面向报文的</td>
+</tr>
+<tr>
+<td align="center">滑动窗口，流量控制，拥塞控制，停止等待协议，连续ARQ协议</td>
+<td align="center">没有拥塞控制，因此网络出现的拥塞不会使源主机的发送速率降低。这对实时应用是很重要的。吞吐量只受限于数据生成速率，传输速率以及机器性能</td>
+</tr>
+<tr>
+<td align="center">每一条TCP连接只能有两个端点(endpoint)，每一条TCP连接只能是点对点的(一对一)</td>
+<td align="center">支持一对一、一对多、多对一和多对多的交互通信。</td>
+</tr>
+<tr>
+<td align="center">首部至少20个字节</td>
+<td align="center">首部开销小，只有8个字节</td>
+</tr>
+<tr>
+<td align="center">TCP提供全双工通信。TCP允许通信双方的应用进程在任何时候都能发送数据。TCP连接的两端都设有发送缓存和接收缓存，用来临时存放双向通信的数据。</td>
+<td align="center">提供全双工通信</td>
+</tr>
+</tbody></table>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>《计算机网络》第七版，谢希仁。</li>
+</ul>
+]]></content>
+      <categories>
+        <category>计算机网络</category>
+      </categories>
+      <tags>
+        <tag>TCP</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>TCP传输为什么是可靠的？</title>
+    <url>/2020/08/26/2020-08-26-Network-WhyTCPReliable/</url>
+    <content><![CDATA[<h2 id="TCP可靠传输的工作原理"><a href="#TCP可靠传输的工作原理" class="headerlink" title="TCP可靠传输的工作原理"></a>TCP可靠传输的工作原理</h2><p>TCP 发送的报文段是交给 IP层 传送的。但 IP层 只能提供尽最大努力交付，也就是说，TCP 下面的网络所提供的是<strong>不可靠的传输</strong>。因此，TCP必须采用适当的措施才能使得两个运输层之间的通信变得可靠。</p>
+<p>理想的传输信道有以下两个特点：</p>
+<ul>
+<li>传输信道不产生差错</li>
+<li>不管发送方发送速度多快，接收方总是来得及处理到来的数据。</li>
+</ul>
+<p>然鹅，理想很丰满，现实很骨感。实际网络并不具备这两个条件，但是可以使用一些可靠的传输协议，当</p>
+<ul>
+<li>出现差错时让发送方<strong>重传</strong>出现差错的数据</li>
+<li>在接收方来不及处理到来的数据时，及时告诉发送方适当降低发送数据的速率。</li>
+</ul>
+<h3 id="停止等待协议"><a href="#停止等待协议" class="headerlink" title="停止等待协议"></a>停止等待协议</h3><p>全双工通信的双方既是发送方也是接收方。以下仅考虑 A 发送数据而 B 接收数据并发送确认。称 A 为发送方，B 为接收方。</p>
+<p>这里讨论可靠传输的原理，因此把传送的数据单元都称为<strong>分组</strong>，而并不考虑数据是在哪一层次上传送的。</p>
+<blockquote>
+<p>“停止等待”就是每发送完一个分组就停止发送，等待对方的确认。在收到确认后再发送下一个分组。</p>
+</blockquote>
+<ol>
+<li>无差错情况</li>
+</ol>
+<p>最简单的情况，如 (a) 所示，A 发送完分组 $M_1$ ，发完就暂停发送，等待 B 的确认。B 收到 $M_1$ 后向 A 发送确认，A 收到对 $M_1$ 的确认后才发送下一个分组 $M_2$ 。其他的分组也采用同样的策略发送。</p>
+<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4d0o095nj30um0cuq7e.jpg" alt="停止等待协议"></p>
+<ol start="2">
+<li>出现差错</li>
+</ol>
+<p>图 (b) 是分组在传输中出现差错的情况。</p>
+<ul>
+<li>B 收到 $M_1$ 时检测到差错便丢弃 $M_1$，不对 A 作出应答。 </li>
+<li>$M_1$  在传输过程中走丢了，B 没有收到过，也不会作出应答。</li>
+</ul>
+<blockquote>
+<p><strong>可靠传输协议</strong>：A只要超过了一段时间仍然没有收到确认，就认为刚才发送的分组丢失了，因而重传前面发送过的分组。这就叫做<strong>超时重传</strong>。</p>
+</blockquote>
+<p>要实现<strong>超时重传</strong>，要在每发送完一个分组时设置一个超时计时器。如果在超时计时器到期之前<strong>收到确认</strong>，就撤销已设置的超时计时器。</p>
+<p>🧐 需要注意三点：</p>
+<ul>
+<li>A 在发送完一个分组后，必须暂存已发送的分组的副本(超时重传时是用)，收到相应的确认后才能清除。</li>
+<li>分组和确认分组都必须进行编号，这样才能知道是哪一个发送出去的分组收到了确认，而哪一个分组还没有收到确认。</li>
+<li>超时计时器设置的重传时间应当比数据在分组传输的平均往返时间更长一些。(其实这个时间的选择很有讲究)</li>
+</ul>
+<ol start="3">
+<li>确认丢失和确认迟到</li>
+</ol>
+<p>如下图 (a) 所示，B 收到了 $M_1$ 并且也对 A 发出了确认，但是确认在中途丢失了。A 在设定的超时重传时间内没有收到确认，它也无法得知是自己发送的 $M_1$ 出错、丢失、还是 B 的确认丢失了，总之，A 会重传。</p>
+<p>A 重传之后，B 收到了重传的分组 $M_1$ ，这时摆在它面前的有两个选择：</p>
+<ul>
+<li>直接丢弃 $M_1$ ，不向上层报告(交付)。</li>
+<li>继续对 A 发送确认。B 不能认为已经发送给确认就不再崇法确认，毕竟 A 就是因为没有收到确认才重发的，如果不回复确认，A 还会一直重发。</li>
+</ul>
+<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4denxlg9j30uw0bajvg.jpg" alt="确认丢失和确认迟到"></p>
+<p>上图 (b) 是另一种可能的情况。B 对 A 发出了确认，但是确认在网络中滞留了很久(可能是迷路了，可能是堵车了，可能是被裹挟了)，此时 A 会收到重复的确认，对重复的确认的处理很简单：收下后就丢弃。B 仍然会收到重复的 $M_1$(超时重传的)，并且同样要丢弃重复的 $M_1$，并重传确认分组。</p>
+<p>通常 A 最终总是可以收到对所有发出的分组的确认。如果 A 不断重传分组但总是收不到确认，就说明通信线路太差，不能进行通信。</p>
+<blockquote>
+<p>上述可靠传输协议称为<strong>自动重传请求ARQ</strong>(Automatic Repeat reQuest)。</p>
+<p>意思是重传的请求是自动进行的，接收方不需要请求发送方重传某个出错的分组。</p>
+</blockquote>
+<ol start="4">
+<li>信道利用率</li>
+</ol>
+<p>显而易见，每次只传一个分组有点太浪费了，完全没有充分利用信道。</p>
+<blockquote>
+<p>想起 Amdahl 定律，我想我们应该意识到的一点是：现代社会如果想获得最大限度的发展，那就要用尽种种方法去压榨机器的潜能，提高机器的利用率。</p>
+</blockquote>
+<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4dt1aj4bj30uc07sjto.jpg" alt="停止等待协议的信道利用率太低"></p>
+<p>为了提高传输效率，发送方可以不使用低效率的停止等待协议，而采用<strong>流水线传输</strong>。</p>
+<p>流水线传输就是发送方可连续发送多个分组，不必每发完一个分组就停顿下来等待对方的确认。这样可使信道上一直有数据不间断地在传送。</p>
+<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4dzrsygaj30u00680vp.jpg" alt="流水线传输可提高信道利用率"></p>
+<p>当使用流水线传输时，就要使用下面将要介绍的<strong>连续ARQ协议</strong>和<strong>滑动窗口协议</strong>。</p>
+<h3 id="连续-ARQ-协议"><a href="#连续-ARQ-协议" class="headerlink" title="连续 ARQ 协议"></a>连续 ARQ 协议</h3><p>下图（a）表示发送方维持的发送窗口，它的意义是：位于发送窗口内的5个分组都可连续发送出去，而不需要等待对方的确认。</p>
+<p>向前是指向着时间增大的方向，分组发送是按照分组序号从小到大发送的。</p>
+<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4e3kzgqtj30um0cejvg.jpg" alt="连续ARQ协议的工作原理"></p>
+<p>连续 ARQ 协议规定：发送方每收到一个确认，就把发送窗口向前滑动一个分组的位置。</p>
+<p>上图（b）表示发送方收到了对第1个分组的确认，于是把发送窗口向前移动一个分组的位置。</p>
+<p>接收方采用<strong>累积确认</strong>的方式。即，接收方不必对收到的分组逐个发送确认，而是在收到几个分组后，<strong>对</strong>按序到达的<strong>最后一个分组发送确认</strong>。这表示：到这个分组为止的所有分组都已正确收到了。</p>
+<p>累积确认有优点也有缺点</p>
+<ul>
+<li>优点：容易实现，即使确认丢失也不必重传。</li>
+<li>缺点：不能向发送方反映出接收方已经正确收到的所有分组的信息。</li>
+</ul>
+<p>比如，发送方发送了前 5 个分组，而第 3 个分组丢失了。接收方只能对前两个分组发出确认，发送方无法知道后面三个分组的下落，而只好把后面的三个分组都再重传一次。这就叫做 <strong>Go-back-N</strong>(回退 N 帧)，表示需要再退回来重传 已发送过的 N 个分组。</p>
+<h2 id="TCP-可靠传输的实现"><a href="#TCP-可靠传输的实现" class="headerlink" title="TCP 可靠传输的实现"></a>TCP 可靠传输的实现</h2><h3 id="TCP报文段的首部格式"><a href="#TCP报文段的首部格式" class="headerlink" title="TCP报文段的首部格式"></a>TCP报文段的首部格式</h3><p>TCP 虽然是面向字节流的，但 TCP 传送的数据单元却是报文段。一个TCP报文段分为<strong>首部</strong>和<strong>数据</strong>两部分，而 TCP 的全部功能都体现在它首部中各字段的作用。</p>
+<p>TCP 报文段首部的前 20 个字节是固定的，后面有 4n 字节是根据需要而增加的选项(n是整数)。因此TCP首部的最小长度是 20 字节，而 UDP 首部 8 字节。</p>
+<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4eev1dpbj30ue0gw43u.jpg" alt="TCP报文段的首部格式"></p>
+<p>TCP 首部中的信息有很多，参考图片基本已经可以见字知意了。如果没有，那就要反思一下自己的六级了。</p>
+<h3 id="TCP-可靠传输的实现-1"><a href="#TCP-可靠传输的实现-1" class="headerlink" title="TCP 可靠传输的实现"></a>TCP 可靠传输的实现</h3><p>假定数据传输只在一个方向进行，即 A 发送数据，B 给出确认。但是不要忘记 A 与 B 的通信其实是全双工通信。</p>
+<h4 id="以字节为单位的滑动窗口"><a href="#以字节为单位的滑动窗口" class="headerlink" title="以字节为单位的滑动窗口"></a>以字节为单位的滑动窗口</h4><p>TCP的滑动窗口是以字节为单位的。为方便，图中字节编号都取得很小。</p>
+<p>假定 A 收到了 B 发来的确认报文段，其中窗口是 20 字节，而确认号是 31 (表明 B 期望收到的下一个序号是 31，而序号 30 为止的数据已经收到了)。根据这两个数据，A就构造出自己的发送窗口。</p>
+<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4el62ss3j30ua07ggow.jpg" alt="根据B给出的窗口值，A构造出自己的发送窗口"></p>
+<p>A 的发送窗口：在没有收到 B 的确认的情下，A 可以连续把窗口内的数据都发送出去。凡是已经发送过的数据，在未收到确认之前都必须暂时保留，以便在<strong>超时重传</strong>时使用。</p>
+<p>接收方会把自己的接收窗口数值放在<strong>窗口字段</strong>(首部字段)中发送给对方。 因此，A 的发送窗口一定不能超过 B 的接收窗口数值。</p>
+<p>发送方的发送窗口大小还要受到当时<strong>网络拥塞程度</strong>的制约。</p>
+<p>发送窗口后沿的后面部分表示已发送且已收到了确认，不需要保留。而发送窗口前沿的前面部分不允许发送，因为接收方都没有为这部分数据保留临时存放的缓存空间。</p>
+<p>发送窗口的位置由窗口前沿和后沿的位置共同确定。发送窗口后沿的变化情况 有且仅有两种可能，即<strong>不动</strong>(没有收到新的确认)和<strong>前移</strong>(收到了新的确认)，不能走回头路。</p>
+<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4exvs3zcj30t20biwjy.jpg" alt="A发送了11个字节的数据"></p>
+<p>从所述可以看出，要描述一个发送窗口的状态需要三个指针：P1、P2和 P3，指针都指向字节的序号。</p>
+<p>小于 $P_1$ 的是已发送并已收到确认的部分，而大于 $P_3$ 的是不允许发送的部分。</p>
+<ul>
+<li>$P_3–P_1$=A的发送窗口</li>
+<li>$P_2–P_1$=已发送但尚未收到确认的字节数</li>
+<li>$P_3–P_2$=允许发送但当前尚未发送的字节数(又称为可用窗口或有效窗口)</li>
+</ul>
+<p>B 的接收窗口：B 只能对按序收到的数据中的<strong>最高序号给出确认</strong>，因此 B 发送的确认报文段中的确认号仍然是 31。</p>
+<blockquote>
+<p>可能情况：发送窗口内所有的数据都已正确到达 B，B 也早已发出了确认。但所有确认都滞留在网络中。</p>
+<p>在没有收到 B 的确认时，A 不能猜测：“或许 B 已经收到了？” 为了保证可靠传输，A 只能认为 B 还没有收到这些数据。于是，A 在经过一段时间后(超时计时器控制)就重传这部分数据，重新设置超时计时器，直到收到 B 的确认为止。</p>
+</blockquote>
+<p>发送方的应用进程把字节流写入 TCP 的<strong>发送缓存</strong>，接收方的应用进程从 TCP 的<strong>接收缓存</strong>中读取字节流。</p>
+<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4f9c0riaj30ug0a4wjv.jpg" alt="TCP的缓存和窗口的关系"></p>
+<p>发送缓存用来暂时存放：</p>
+<ul>
+<li>发送应用程序传送给发送方 TCP 准备发送的数据</li>
+<li>TCP已发送出但尚未收到确认的数据</li>
+</ul>
+<p>接收缓存用来暂时存放：</p>
+<ul>
+<li>按序到达的、但尚未被接收应用程序读取的数据</li>
+<li>未按序到达的数据</li>
+</ul>
+<p>根据以上内容，需要注意三点：</p>
+<ul>
+<li>虽然 A 的发送窗口是根据 B 的接收窗口设置的，但在同一时刻，A 的发送窗口并不总是和 B 的接收窗口一样大。</li>
+<li>TCP 通常对<strong>不按序到达</strong>的数据是先临时存放在<strong>接收窗口</strong>中，等到字节流中所缺少的字节收到后，再按序交付上层的应用进程。</li>
+<li>TCP 要求接收方必须有累积确认的功能，这样可以减小传输开销。</li>
+</ul>
+<h4 id="超时重传时间的选择"><a href="#超时重传时间的选择" class="headerlink" title="超时重传时间的选择"></a>超时重传时间的选择</h4><p>报文段每重传一次，就把超时重传时间 RTO 增大一些。典型的做法是取新的重传时间为旧的重传时间的 2 倍。当不再发生报文段的重传时，才根据下式计算超时重传时间。<br>$$<br>RTO=RTT_s+4\times RTT_d\tag{1}<br>$$<br>$RTT_S$代表加权平均往返时间，$RTT_D$ 是 RTT 的偏差的加权平均值。<br>$$<br>新RTT_d=(1-\beta)\times (旧RTT_d)+\beta \times |RTT_s-新的RTT样本|\tag{2}<br>$$<br>$\beta$ 是小于 1 的系数，推荐值为 0.25。</p>
+<h4 id="选择确认SACK"><a href="#选择确认SACK" class="headerlink" title="选择确认SACK"></a>选择确认SACK</h4><p>若收到的报文段无差错，只是未按序号，中间缺少某些序号的数据，那么能否设法只传送缺少的数据而不重传已经正确到达接收方的数据？</p>
+<p>选择确认(Selective ACK) 就是一种可行的方法。</p>
+<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4fifcaa7j30u404sjt1.jpg" alt="接收到的字节流序号不连续"></p>
+<p>RFC 2018 规定，如果要使用选择确认SACK，那么在建立TCP连接时，就要在TCP首部的选项中加上“允许SACK”的选项，双方必须事先商定好。</p>
+<blockquote>
+<p>SACK 并没有指明发送方应当怎样响应 SACK，大多数的实现还是重传所有未被确认的数据块。</p>
+</blockquote>
+<h2 id="TCP的流量控制"><a href="#TCP的流量控制" class="headerlink" title="TCP的流量控制"></a>TCP的流量控制</h2><blockquote>
+<p>利用滑动窗口实现流量控制</p>
+</blockquote>
+<p>如果发送方把数据发送得过快，接收方就可能来不及接收，这就会造成数据的丢失。所谓<strong>流量控制</strong>(flow control)就是让发送方的发送速率不要太快，要让接收方来得及接收。</p>
+<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4fuhuylkj30ra0ec48c.jpg" alt="利用可变窗口进行流量控制举例"></p>
+<p>在上图最下面，B 向 A发送了零窗口的报文段。</p>
+<p>如果 B 的接收缓存又有了一些存储空间，于是 B 向 A 发送了 rwnd=400 的报文段。然而这个报文段在传送过程中丢失了。A 一直等待收到 B 发送的非零窗口的通知，而 B 也一直等待A发送的数据。形成 <strong>死锁</strong> 局面。</p>
+<p>为了解决这个问题，TCP 为每一个连接设有一个持续计时器(persistence timer)。只要 TCP 连接的一方收到对方的<strong>零窗口通知</strong>，就启动持续计时器。</p>
+<p>若持续计时器设置的时间到期，就发送一个<strong>零窗口探测报文段</strong>(仅携带1字节的数据)，而对方就在确认这个探测报文段时给出现在的窗口值。如果窗口仍然是零，那么收到这个报文段的一方就重新设置持续计时器。如果窗口不是零，死锁的僵局就可以打破。</p>
+<h2 id="TCP的拥塞控制"><a href="#TCP的拥塞控制" class="headerlink" title="TCP的拥塞控制"></a>TCP的拥塞控制</h2><blockquote>
+<p>拥塞(congestion)：在某段时间，若对网络中某一资源的需求超过了该资源所能提供的可用部分，网络的性能就要变坏。</p>
+</blockquote>
+<p>$$<br>\sum对资源的需求&gt;可用资源\tag{3}<br>$$</p>
+<p>要进行拥塞控制，实际上就是寻求打破表达式(3) 的条件。</p>
+<p>TCP 进行拥塞控制的算法有四种，即</p>
+<ul>
+<li>慢开始(slow-start)</li>
+<li>拥塞避免 (congestion avoidance)</li>
+<li>快重传(fast retransmit)</li>
+<li>快恢复(fast recovery)</li>
+</ul>
+<p>仍通之前一样，假定：</p>
+<ul>
+<li>数据是单方向传送的，对方只传送确认报文。</li>
+<li>接收方总是有足够大的缓存空间，因而发送窗口的大小由网络的拥塞程度 来决定。</li>
+</ul>
+<h3 id="慢开始和拥塞避免"><a href="#慢开始和拥塞避免" class="headerlink" title="慢开始和拥塞避免"></a>慢开始和拥塞避免</h3><p>发送方控制拥塞窗口：</p>
+<ul>
+<li>只要网络没有出现拥塞，拥塞窗口就可以再增 大一些，以便把更多的分组发送出去，这样就可以提高网络的利用率。</li>
+<li>只要网络出现拥塞或有可能出现拥塞，就必须把拥塞窗口减小一些，以减少注入到网络中的分组数，以便缓解网络出现的拥塞。</li>
+</ul>
+<p>发送方确认网络拥塞：</p>
+<ul>
+<li>网络发生拥塞时，路由器就要丢弃分组。</li>
+<li>因此，只要发送方没有按时收到应当到达的确认报文，也就是说，只要出现了超时，就可以猜想网络可能出现了拥塞。</li>
+</ul>
+<blockquote>
+<p>慢开始算法的思路:</p>
+<p>当主机开始发送数据时，由于并不清楚网络的负荷情况，所以如果立即把大量数据字节注入到网络，那么就有可能引起网络发生拥塞。经验证明，较好的方法是先探测一下，即由小到大逐渐增大发送窗口，也就是说，由小到大逐渐增大拥塞窗口数值。</p>
+</blockquote>
+<p>慢开始规定，在每收到一个对新的报文段的确认后，可以把拥塞窗口增加最多 一个最大报文段SMSS(Sender Maximum Segment Size)的数值。</p>
+<p>使用慢开始算法后，每经过一个传输轮次(transmission round)，拥塞窗口 cwnd 就加倍。(指数增长)</p>
+<p>为了防止拥塞窗口 cwnd 增长过大引起网络拥塞，还需要设置一个慢开始门限</p>
+<p><code>ssthresh</code> 状态变量。</p>
+<ul>
+<li>当<code>cwnd&lt;ssthresh</code>时，使用慢开始算法。</li>
+<li>当<code>cwnd&gt;ssthresh</code>时，停止使用慢开始算法，改用拥塞避免算法。</li>
+<li>当<code>cwnd=ssthresh</code>时，既可使用慢开始算法，也可使用拥塞避免算法。</li>
+</ul>
+<p>拥塞避免算法的思路是让拥塞窗口cwnd缓慢地增大，即每经过一个往返时间 RTT就把发送方的拥塞窗口 cwnd 加 1。(线性增长)</p>
+<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4glfprynj30uk09aq6r.jpg" alt="TCP拥塞窗口cwnd在拥塞控制时的变化情况"></p>
+<h3 id="快重传与快恢复"><a href="#快重传与快恢复" class="headerlink" title="快重传与快恢复"></a>快重传与快恢复</h3><p>快重传算法：要求接收方不要等待自己发送数据时才进行捎带确认，而是要立即发送确认，即使收到了失序的报文段也要立即发出对已收到的报文段的重复确认。</p>
+<p>快重传算法规定，发送方只要一连收到 3 个重复确认，就知道接收方确实没有收到报文段 $M_3$，因而应当立即进行重传(即“快重传”)，这样就不会出现超时，发送方也不就会误认为出现了网络拥塞。</p>
+<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4go0pwcbj30u00dwjyp.jpg" alt="快重传的示意图"></p>
+<p>快恢复：是把快恢复开始时的拥塞窗口 cwnd 值再增大一些 (增大3个报文段的长度)，即等于新的<code>ssthresh+3xMS</code>。</p>
+<h3 id="拥塞避免流程图"><a href="#拥塞避免流程图" class="headerlink" title="拥塞避免流程图"></a>拥塞避免流程图</h3><p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4gtatekrj30u60dydjq.jpg" alt="TCP的拥塞控制的流程图"></p>
+<h2 id="TCP-可靠传输的总结"><a href="#TCP-可靠传输的总结" class="headerlink" title="TCP 可靠传输的总结"></a>TCP 可靠传输的总结</h2><ul>
+<li>首先，采用三次握手来建立 TCP 连接，四次握手来释放 TCP 连接，从而保证建立的<strong>传输信道可靠</strong>。</li>
+<li>其次，TCP 采用了<strong>停止等待协议</strong>与<strong>连续 ARQ 协议</strong>（回退N，Go-back-N；超时自动重传）来保证数据传输的正确性。</li>
+<li>使用<strong>滑动窗口协议</strong>来保证接方能够及时处理所接收到的数据，进行<strong>流量控制</strong>。</li>
+<li>最后，TCP 使用<strong>慢开始</strong>、<strong>拥塞避免</strong>、<strong>快重传</strong>和<strong>快恢复</strong>来进行拥塞控制，避免网络拥塞。</li>
+</ul>
+<blockquote>
+<p>也看到网上比较流行的另外一个版本的总结：</p>
+</blockquote>
+<p><code>TCP</code> 通过<strong>序列号</strong>、<strong>超时重传</strong>、<strong>检验和</strong>、<strong>流量控制</strong>、<strong>滑动窗口</strong>、<strong>拥塞控制</strong>实现可靠性。</p>
+<ol>
+<li>应用数据被分割成 <code>TCP</code> 认为最适合发送的数据块。</li>
+<li><code>TCP</code> 给发送的每一个包进行编号，接收方对数据包进行排序，把有序数据传送给应用层。</li>
+<li><code>TCP</code> 的接收端会丢弃重复的数据。</li>
+<li><strong>超时重传</strong>：当 <code>TCP</code> 发出一个段后，它启动一个定时器，等待目的端确认收到这个报文段。如果不能及时收到一个确认，将重发这个报文段。</li>
+<li><strong>校验和</strong>：<code>TCP</code> 将保持它首部和数据的检验和，发送的数据包的二进制相加然后取反。这是一个端到端的检验和，目的是检测数据在传输过程中的任何变化。如果收到段的检验和有差错，<code>TCP</code>将丢弃这个报文段和不确认收到此报文段。</li>
+<li><strong>流量控制</strong>：<code>TCP</code> 连接的每一方都有固定大小的缓冲空间，<code>TCP</code> 的接收端只允许发送端发送接收端缓冲区能接纳的我数据。当接收方来不及处理发送方的数据，能提示发送方降低发送的速率，防止包丢失。<code>TCP</code> 使用的流量控制协议是可变大小的滑动窗口协议。接收方有即时窗口（滑动窗口），随 <code>ACK</code> 报文发送。（<code>TCP</code> 利用滑动窗口实现流量控制）</li>
+<li><strong>滑动窗口</strong>：实际中的传输方式。</li>
+<li><strong>拥塞控制</strong>：当网络拥塞时，减少数据的发送。发送方有拥塞窗口，发送数据前比对接收方发过来的即使窗口，取小慢启动、拥塞避免、拥塞发送、快速恢复。应用数据被分割成TCP认为最适合发送的数据块，<code>TCP</code> 的接收端会丢弃重复的数据。</li>
+</ol>
+<p><span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL0phc29uSmUvbm90ZXMvaXNzdWVzLzEwOQ==">停止等待协议<i class="fa fa-external-link-alt"></i></span>也是为了 <code>TCP</code> 协议传输稳定可靠，它的基本原理就是每发完一个分组就停止发送，等待对方确认。在收到确认后再发下一个分组。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>《计算机网络》第七版，谢希仁。</li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL0phc29uSmUvbm90ZXMvaXNzdWVzLzExMA==">GitHub - TCP 如何保证可靠传输<i class="fa fa-external-link-alt"></i></span></li>
+</ul>
+]]></content>
+      <categories>
+        <category>计算机网络</category>
+      </categories>
+      <tags>
+        <tag>TCP</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>TCP传输为什么是可靠的？</title>
+    <url>/2020/08/25/2020-08-25-Network-TCP-Reliable/</url>
+    <content><![CDATA[<h2 id="可靠传输的工作原理"><a href="#可靠传输的工作原理" class="headerlink" title="可靠传输的工作原理"></a>可靠传输的工作原理</h2><p>TCP 发送的报文段是交给 IP 层传送的，但IP层只能提供尽最大努力服务，也就是说，TCP下面的网络所提供的是不可靠的传输。因此，TCP必须采用适当的措施才能使得两个运输层之间的通信变得可靠。</p>
+<p>理想的传输条件有以下两个特点：</p>
+<ul>
+<li>传输信道不产生差错</li>
+<li>不管发送方以多快的速度发送数据，接收方总是来得及处理收到的数据。</li>
+</ul>
+<p>在这样的理想传输条件下，不需要采取任何措施就能够实现可靠传输。然而，理想很丰满，现实很骨感。</p>
+<blockquote>
+<p>如果使用一些可靠传输协议，当出现差错时让发送方重传出现差错的数据，同时在接收方来不及处理收到的数据时，及时告诉发送方适当降低发送数据的速度。那么本来不可靠的传输信道就能够实现可靠传输了。</p>
+</blockquote>
+<h3 id="停止等待协议"><a href="#停止等待协议" class="headerlink" title="停止等待协议"></a>停止等待协议</h3><p>全双工通信的双方既是发送方也是接收方。下面为了讨论问题的方便，仅考虑</p>
+<ul>
+<li>A 发送数据而 B 接收数据并发送确认，因此A叫做发送方，而B叫做接收方。</li>
+<li>这里讨论可靠传输的原理，因此把传送的数据单元都称为分组，而并不考虑数据是在哪一个层次上传送的。</li>
+</ul>
+<p>“停止等待”就是每发送完一个分组就停止发送，等待对方的确认，在收到确认后再发送下一个分组。</p>
+]]></content>
+      <categories>
+        <category>计算机网络</category>
+      </categories>
+      <tags>
+        <tag>TCP</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>volatile底层实现原理</title>
     <url>/2020/08/20/2020-08-19-volatile/</url>
     <content><![CDATA[<h2 id="volatile底层实现原理"><a href="#volatile底层实现原理" class="headerlink" title="volatile底层实现原理"></a>volatile底层实现原理</h2><p>《Java并发编程的艺术》这本书的每一节基本上都是面试中的高频考点或者是重难点，实体书在书桌上摆了许久竟然都忽视掉了，现在必须要把这本书整理成电子版的。</p>
@@ -3253,6 +3645,1917 @@
 <ul>
 <li><input disabled="" type="checkbox"> 37、51、56.2、57.2、58.1、58.2、59.1</li>
 </ul>
+<hr>
+<h2 id="题目及对应的知识点"><a href="#题目及对应的知识点" class="headerlink" title="题目及对应的知识点"></a>题目及对应的知识点</h2><p>下表划分了解决各题使用的算法。由于题目往往有多种解法，本表格只列举最优解法（时间与空间复杂度最低）的对应算法。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th align="center">动态规划</th>
+<th align="center">回溯算法</th>
+<th align="center">查找算法</th>
+<th align="center">搜索算法</th>
+<th align="center">贪心算法</th>
+<th align="center">分治算法</th>
+<th align="center">位运算</th>
+<th align="center">双指针</th>
+<th align="center">排序</th>
+<th align="center">模拟</th>
+<th>数学</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvc2h1LXp1LXpob25nLXpob25nLWZ1LWRlLXNodS16aS1sY29mLw==">03. 数组中重复的数字<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZXItd2VpLXNodS16dS16aG9uZy1kZS1jaGEtemhhby1sY29mLw==">04. 二维数组中的查找<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvdGktaHVhbi1rb25nLWdlLWxjb2Yv">05. 替换空格<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvY29uZy13ZWktZGFvLXRvdS1kYS15aW4tbGlhbi1iaWFvLWxjb2Yv">06. 从尾到头打印链表<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvemhvbmctamlhbi1lci1jaGEtc2h1LWxjb2Yv">07. 重建二叉树<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMveW9uZy1saWFuZy1nZS16aGFuLXNoaS14aWFuLWR1aS1saWUtbGNvZi8=">09. 用两个栈实现队列<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZmVpLWJvLW5hLXFpLXNodS1saWUtbGNvZi8=">10- I. 斐波那契数列<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvcWluZy13YS10aWFvLXRhaS1qaWUtd2VuLXRpLWxjb2Yv">10- II. 青蛙跳台阶问题<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMveHVhbi16aHVhbi1zaHUtenUtZGUtenVpLXhpYW8tc2h1LXppLWxjb2Yv">11. 旋转数组的最小数字<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvanUtemhlbi16aG9uZy1kZS1sdS1qaW5nLWxjb2Yv">12. 矩阵中的路径<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvamktcWktcmVuLWRlLXl1bi1kb25nLWZhbi13ZWktbGNvZi8=">13. 机器人的运动范围<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvamlhbi1zaGVuZy16aS1sY29mLw==">14- I. 剪绳子<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td>√</td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvamlhbi1zaGVuZy16aS1paS1sY29mLw==">14- II. 剪绳子 II<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td>√</td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZXItamluLXpoaS16aG9uZy0xZGUtZ2Utc2h1LWxjb2Yv">15. 二进制中 1 的个数<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvc2h1LXpoaS1kZS16aGVuZy1zaHUtY2ktZmFuZy1sY29mLw==">16. 数值的整数次方<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZGEteWluLWNvbmctMWRhby16dWktZGEtZGUtbndlaS1zaHUtbGNvZi8=">17. 打印从 1 到最大的 n 位数<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvc2hhbi1jaHUtbGlhbi1iaWFvLWRlLWppZS1kaWFuLWxjb2Yv">18. 删除链表的节点<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvemhlbmctemUtYmlhby1kYS1zaGktcGktcGVpLWxjb2Yv">19. 正则表达式匹配<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvYmlhby1zaGktc2h1LXpoaS1kZS16aS1mdS1jaHVhbi1sY29mLw==">20. 表示数值的字符串<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZGlhby16aGVuZy1zaHUtenUtc2h1bi14dS1zaGktcWktc2h1LXdlaS15dS1vdS1zaHUtcWlhbi1taWFuLWxjb2Yv">21. 调整数组顺序使奇数位于偶数前面<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvbGlhbi1iaWFvLXpob25nLWRhby1zaHUtZGkta2dlLWppZS1kaWFuLWxjb2Yv">22. 链表中倒数第 k 个节点<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZmFuLXpodWFuLWxpYW4tYmlhby1sY29mLw==">24. 反转链表<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvaGUtYmluZy1saWFuZy1nZS1wYWkteHUtZGUtbGlhbi1iaWFvLWxjb2Yv">25. 合并两个排序的链表<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvc2h1LWRlLXppLWppZS1nb3UtbGNvZi8=">26. 树的子结构<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZXItY2hhLXNodS1kZS1qaW5nLXhpYW5nLWxjb2Yv">27. 二叉树的镜像<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZHVpLWNoZW5nLWRlLWVyLWNoYS1zaHUtbGNvZi8=">28. 对称的二叉树<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvc2h1bi1zaGktemhlbi1kYS15aW4tanUtemhlbi1sY29mLw==">29. 顺时针打印矩阵<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvYmFvLWhhbi1taW5oYW4tc2h1LWRlLXpoYW4tbGNvZi8=">30. 包含 min 函数的栈<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvemhhbi1kZS15YS1ydS1kYW4tY2h1LXh1LWxpZS1sY29mLw==">31. 栈的压入、弹出序列<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvY29uZy1zaGFuZy1kYW8teGlhLWRhLXlpbi1lci1jaGEtc2h1LWxjb2Yv">32 - I. 从上到下打印二叉树<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvY29uZy1zaGFuZy1kYW8teGlhLWRhLXlpbi1lci1jaGEtc2h1LWlpLWxjb2Yv">32 - II. 从上到下打印二叉树 II<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvY29uZy1zaGFuZy1kYW8teGlhLWRhLXlpbi1lci1jaGEtc2h1LWlpaS1sY29mLw==">32 - III. 从上到下打印二叉树 III<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZXItY2hhLXNvdS1zdW8tc2h1LWRlLWhvdS14dS1iaWFuLWxpLXh1LWxpZS1sY29mLw==">33. 二叉搜索树的后序遍历序列<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZXItY2hhLXNodS16aG9uZy1oZS13ZWktbW91LXlpLXpoaS1kZS1sdS1qaW5nLWxjb2Yv">34. 二叉树中和为某一值的路径<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZnUtemEtbGlhbi1iaWFvLWRlLWZ1LXpoaS1sY29mLw==">35. 复杂链表的复制<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZXItY2hhLXNvdS1zdW8tc2h1LXl1LXNodWFuZy14aWFuZy1saWFuLWJpYW8tbGNvZi8=">36. 二叉搜索树与双向链表<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMveHUtbGllLWh1YS1lci1jaGEtc2h1LWxjb2Yv">37. 序列化二叉树<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvemktZnUtY2h1YW4tZGUtcGFpLWxpZS1sY29mLw==">38. 字符串的排列<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvc2h1LXp1LXpob25nLWNodS14aWFuLWNpLXNodS1jaGFvLWd1by15aS1iYW4tZGUtc2h1LXppLWxjb2Yv">39. 数组中出现次数超过一半的数字<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvenVpLXhpYW8tZGUta2dlLXNodS1sY29mLw==">40. 最小的 k 个数<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvc2h1LWp1LWxpdS16aG9uZy1kZS16aG9uZy13ZWktc2h1LWxjb2Yv">41. 数据流中的中位数<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvbGlhbi14dS16aS1zaHUtenUtZGUtenVpLWRhLWhlLWxjb2Yv">42. 连续子数组的最大和<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvMW56aGVuZy1zaHUtemhvbmctMWNodS14aWFuLWRlLWNpLXNodS1sY29mLw==">43. 1 ～ n整数中 1 出现的次数<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td>√</td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvc2h1LXppLXh1LWxpZS16aG9uZy1tb3UteWktd2VpLWRlLXNodS16aS1sY29mLw==">44. 数字序列中某一位的数字<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td>√</td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvYmEtc2h1LXp1LXBhaS1jaGVuZy16dWkteGlhby1kZS1zaHUtbGNvZi8=">45. 把数组排成最小的数<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvYmEtc2h1LXppLWZhbi15aS1jaGVuZy16aS1mdS1jaHVhbi1sY29mLw==">46. 把数字翻译成字符串<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvbGktd3UtZGUtenVpLWRhLWppZS16aGktbGNvZi8=">47. 礼物的最大价值<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvenVpLWNoYW5nLWJ1LWhhbi16aG9uZy1mdS16aS1mdS1kZS16aS16aS1mdS1jaHVhbi1sY29mLw==">48. 最长不含重复字符的子字符串<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvY2hvdS1zaHUtbGNvZi8=">49. 丑数<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZGkteWktZ2UtemhpLWNodS14aWFuLXlpLWNpLWRlLXppLWZ1LWxjb2Yv">50. 第一个只出现一次的字符<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvc2h1LXp1LXpob25nLWRlLW5pLXh1LWR1aS1sY29mLw==">51. 数组中的逆序对<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvbGlhbmctZ2UtbGlhbi1iaWFvLWRlLWRpLXlpLWdlLWdvbmctZ29uZy1qaWUtZGlhbi1sY29mLw==">52. 两个链表的第一个公共节点<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvemFpLXBhaS14dS1zaHUtenUtemhvbmctY2hhLXpoYW8tc2h1LXppLWxjb2Yv">53 - I. 在排序数组中查找数字 I<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvcXVlLXNoaS1kZS1zaHUtemktbGNvZi8=">53 - II. 0 ～ n - 1 中缺失的数字<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZXItY2hhLXNvdS1zdW8tc2h1LWRlLWRpLWtkYS1qaWUtZGlhbi1sY29mLw==">54. 二叉搜索树的第 k 大节点<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZXItY2hhLXNodS1kZS1zaGVuLWR1LWxjb2Yv">55 - I. 二叉树的深度<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvcGluZy1oZW5nLWVyLWNoYS1zaHUtbGNvZi8=">55 - II. 平衡二叉树<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvc2h1LXp1LXpob25nLXNodS16aS1jaHUteGlhbi1kZS1jaS1zaHUtbGNvZi8=">56 - I. 数组中数字出现的次数<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvc2h1LXp1LXpob25nLXNodS16aS1jaHUteGlhbi1kZS1jaS1zaHUtaWktbGNvZi8=">56 - II. 数组中数字出现的次数 II<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvaGUtd2VpLXNkZS1saWFuZy1nZS1zaHUtemktbGNvZi8=">57. 和为 s 的两个数字<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvaGUtd2VpLXNkZS1saWFuLXh1LXpoZW5nLXNodS14dS1saWUtbGNvZi8=">57 - II. 和为 s 的连续正数序列<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZmFuLXpodWFuLWRhbi1jaS1zaHVuLXh1LWxjb2Yv">58 - I. 翻转单词顺序<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvenVvLXh1YW4temh1YW4temktZnUtY2h1YW4tbGNvZi8=">58 - II. 左旋转字符串<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvaHVhLWRvbmctY2h1YW5nLWtvdS1kZS16dWktZGEtemhpLWxjb2Yv">59 - I. 滑动窗口的最大值<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZHVpLWxpZS1kZS16dWktZGEtemhpLWxjb2Yv">59 - II. 队列的最大值<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvbmdlLXRvdS16aS1kZS1kaWFuLXNodS1sY29mLw==">60. n 个骰子的点数<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvYnUta2UtcGFpLXpob25nLWRlLXNodW4temktbGNvZi8=">61. 扑克牌中的顺子<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMveXVhbi1xdWFuLXpob25nLXp1aS1ob3Utc2hlbmcteGlhLWRlLXNodS16aS1sY29mLw==">62. 圆圈中最后剩下的数字<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td>√</td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZ3UtcGlhby1kZS16dWktZGEtbGktcnVuLWxjb2Yv">63. 股票的最大利润<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvcWl1LTEybi1sY29mLw==">64. 求 1 + 2 + … + n<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvYnUteW9uZy1qaWEtamlhbi1jaGVuZy1jaHUtenVvLWppYS1mYS1sY29mLw==">65. 不用加减乘除做加法<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZ291LWppYW4tY2hlbmctamktc2h1LXp1LWxjb2Yv">66. 构建乘积数组<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td>√</td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvYmEtemktZnUtY2h1YW4temh1YW4taHVhbi1jaGVuZy16aGVuZy1zaHUtbGNvZi8=">67. 把字符串转换成整数<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZXItY2hhLXNvdS1zdW8tc2h1LWRlLXp1aS1qaW4tZ29uZy1nb25nLXp1LXhpYW4tbGNvZi8=">68 - I. 二叉搜索树的最近公共祖先<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZXItY2hhLXNodS1kZS16dWktamluLWdvbmctZ29uZy16dS14aWFuLWxjb2Yv">68 - II. 二叉树的最近公共祖先<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>下表列举了各题涉及到的主要的数据结构。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th align="center">数组</th>
+<th align="center">字符串</th>
+<th align="center">栈 / 队列</th>
+<th align="center">链表</th>
+<th align="center">树</th>
+<th align="center">图</th>
+<th align="center">堆</th>
+<th align="center">哈希表</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvc2h1LXp1LXpob25nLXpob25nLWZ1LWRlLXNodS16aS1sY29mLw==">03. 数组中重复的数字<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZXItd2VpLXNodS16dS16aG9uZy1kZS1jaGEtemhhby1sY29mLw==">04. 二维数组中的查找<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvdGktaHVhbi1rb25nLWdlLWxjb2Yv">05. 替换空格<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvY29uZy13ZWktZGFvLXRvdS1kYS15aW4tbGlhbi1iaWFvLWxjb2Yv">06. 从尾到头打印链表<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvemhvbmctamlhbi1lci1jaGEtc2h1LWxjb2Yv">07. 重建二叉树<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMveW9uZy1saWFuZy1nZS16aGFuLXNoaS14aWFuLWR1aS1saWUtbGNvZi8=">09. 用两个栈实现队列<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZmVpLWJvLW5hLXFpLXNodS1saWUtbGNvZi8=">10- I. 斐波那契数列<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvcWluZy13YS10aWFvLXRhaS1qaWUtd2VuLXRpLWxjb2Yv">10- II. 青蛙跳台阶问题<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMveHVhbi16aHVhbi1zaHUtenUtZGUtenVpLXhpYW8tc2h1LXppLWxjb2Yv">11. 旋转数组的最小数字<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvanUtemhlbi16aG9uZy1kZS1sdS1qaW5nLWxjb2Yv">12. 矩阵中的路径<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvamktcWktcmVuLWRlLXl1bi1kb25nLWZhbi13ZWktbGNvZi8=">13. 机器人的运动范围<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvamlhbi1zaGVuZy16aS1sY29mLw==">14- I. 剪绳子<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvamlhbi1zaGVuZy16aS1paS1sY29mLw==">14- II. 剪绳子 II<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZXItamluLXpoaS16aG9uZy0xZGUtZ2Utc2h1LWxjb2Yv">15. 二进制中 1 的个数<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvc2h1LXpoaS1kZS16aGVuZy1zaHUtY2ktZmFuZy1sY29mLw==">16. 数值的整数次方<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZGEteWluLWNvbmctMWRhby16dWktZGEtZGUtbndlaS1zaHUtbGNvZi8=">17. 打印从 1 到最大的 n 位数<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvc2hhbi1jaHUtbGlhbi1iaWFvLWRlLWppZS1kaWFuLWxjb2Yv">18. 删除链表的节点<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvemhlbmctemUtYmlhby1kYS1zaGktcGktcGVpLWxjb2Yv">19. 正则表达式匹配<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvYmlhby1zaGktc2h1LXpoaS1kZS16aS1mdS1jaHVhbi1sY29mLw==">20. 表示数值的字符串<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZGlhby16aGVuZy1zaHUtenUtc2h1bi14dS1zaGktcWktc2h1LXdlaS15dS1vdS1zaHUtcWlhbi1taWFuLWxjb2Yv">21. 调整数组顺序使奇数位于偶数前面<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvbGlhbi1iaWFvLXpob25nLWRhby1zaHUtZGkta2dlLWppZS1kaWFuLWxjb2Yv">22. 链表中倒数第 k 个节点<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZmFuLXpodWFuLWxpYW4tYmlhby1sY29mLw==">24. 反转链表<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvaGUtYmluZy1saWFuZy1nZS1wYWkteHUtZGUtbGlhbi1iaWFvLWxjb2Yv">25. 合并两个排序的链表<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvc2h1LWRlLXppLWppZS1nb3UtbGNvZi8=">26. 树的子结构<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZXItY2hhLXNodS1kZS1qaW5nLXhpYW5nLWxjb2Yv">27. 二叉树的镜像<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZHVpLWNoZW5nLWRlLWVyLWNoYS1zaHUtbGNvZi8=">28. 对称的二叉树<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvc2h1bi1zaGktemhlbi1kYS15aW4tanUtemhlbi1sY29mLw==">29. 顺时针打印矩阵<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvYmFvLWhhbi1taW5oYW4tc2h1LWRlLXpoYW4tbGNvZi8=">30. 包含 min 函数的栈<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvemhhbi1kZS15YS1ydS1kYW4tY2h1LXh1LWxpZS1sY29mLw==">31. 栈的压入、弹出序列<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvY29uZy1zaGFuZy1kYW8teGlhLWRhLXlpbi1lci1jaGEtc2h1LWxjb2Yv">32 - I. 从上到下打印二叉树<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvY29uZy1zaGFuZy1kYW8teGlhLWRhLXlpbi1lci1jaGEtc2h1LWlpLWxjb2Yv">32 - II. 从上到下打印二叉树 II<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvY29uZy1zaGFuZy1kYW8teGlhLWRhLXlpbi1lci1jaGEtc2h1LWlpaS1sY29mLw==">32 - III. 从上到下打印二叉树 III<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZXItY2hhLXNvdS1zdW8tc2h1LWRlLWhvdS14dS1iaWFuLWxpLXh1LWxpZS1sY29mLw==">33. 二叉搜索树的后序遍历序列<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZXItY2hhLXNodS16aG9uZy1oZS13ZWktbW91LXlpLXpoaS1kZS1sdS1qaW5nLWxjb2Yv">34. 二叉树中和为某一值的路径<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZnUtemEtbGlhbi1iaWFvLWRlLWZ1LXpoaS1sY29mLw==">35. 复杂链表的复制<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZXItY2hhLXNvdS1zdW8tc2h1LXl1LXNodWFuZy14aWFuZy1saWFuLWJpYW8tbGNvZi8=">36. 二叉搜索树与双向链表<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMveHUtbGllLWh1YS1lci1jaGEtc2h1LWxjb2Yv">37. 序列化二叉树<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvemktZnUtY2h1YW4tZGUtcGFpLWxpZS1sY29mLw==">38. 字符串的排列<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvc2h1LXp1LXpob25nLWNodS14aWFuLWNpLXNodS1jaGFvLWd1by15aS1iYW4tZGUtc2h1LXppLWxjb2Yv">39. 数组中出现次数超过一半的数字<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvenVpLXhpYW8tZGUta2dlLXNodS1sY29mLw==">40. 最小的 k 个数<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvc2h1LWp1LWxpdS16aG9uZy1kZS16aG9uZy13ZWktc2h1LWxjb2Yv">41. 数据流中的中位数<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvbGlhbi14dS16aS1zaHUtenUtZGUtenVpLWRhLWhlLWxjb2Yv">42. 连续子数组的最大和<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvMW56aGVuZy1zaHUtemhvbmctMWNodS14aWFuLWRlLWNpLXNodS1sY29mLw==">43. 1 ～ n整数中 1 出现的次数<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvc2h1LXppLXh1LWxpZS16aG9uZy1tb3UteWktd2VpLWRlLXNodS16aS1sY29mLw==">44. 数字序列中某一位的数字<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvYmEtc2h1LXp1LXBhaS1jaGVuZy16dWkteGlhby1kZS1zaHUtbGNvZi8=">45. 把数组排成最小的数<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvYmEtc2h1LXppLWZhbi15aS1jaGVuZy16aS1mdS1jaHVhbi1sY29mLw==">46. 把数字翻译成字符串<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvbGktd3UtZGUtenVpLWRhLWppZS16aGktbGNvZi8=">47. 礼物的最大价值<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvenVpLWNoYW5nLWJ1LWhhbi16aG9uZy1mdS16aS1mdS1kZS16aS16aS1mdS1jaHVhbi1sY29mLw==">48. 最长不含重复字符的子字符串<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvY2hvdS1zaHUtbGNvZi8=">49. 丑数<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZGkteWktZ2UtemhpLWNodS14aWFuLXlpLWNpLWRlLXppLWZ1LWxjb2Yv">50. 第一个只出现一次的字符<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvc2h1LXp1LXpob25nLWRlLW5pLXh1LWR1aS1sY29mLw==">51. 数组中的逆序对<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvbGlhbmctZ2UtbGlhbi1iaWFvLWRlLWRpLXlpLWdlLWdvbmctZ29uZy1qaWUtZGlhbi1sY29mLw==">52. 两个链表的第一个公共节点<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvemFpLXBhaS14dS1zaHUtenUtemhvbmctY2hhLXpoYW8tc2h1LXppLWxjb2Yv">53 - I. 在排序数组中查找数字 I<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvcXVlLXNoaS1kZS1zaHUtemktbGNvZi8=">53 - II. 0 ～ n - 1 中缺失的数字<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZXItY2hhLXNvdS1zdW8tc2h1LWRlLWRpLWtkYS1qaWUtZGlhbi1sY29mLw==">54. 二叉搜索树的第 k 大节点<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZXItY2hhLXNodS1kZS1zaGVuLWR1LWxjb2Yv">55 - I. 二叉树的深度<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvcGluZy1oZW5nLWVyLWNoYS1zaHUtbGNvZi8=">55 - II. 平衡二叉树<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvc2h1LXp1LXpob25nLXNodS16aS1jaHUteGlhbi1kZS1jaS1zaHUtbGNvZi8=">56 - I. 数组中数字出现的次数<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvc2h1LXp1LXpob25nLXNodS16aS1jaHUteGlhbi1kZS1jaS1zaHUtaWktbGNvZi8=">56 - II. 数组中数字出现的次数 II<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvaGUtd2VpLXNkZS1saWFuZy1nZS1zaHUtemktbGNvZi8=">57. 和为 s 的两个数字<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvaGUtd2VpLXNkZS1saWFuLXh1LXpoZW5nLXNodS14dS1saWUtbGNvZi8=">57 - II. 和为 s 的连续正数序列<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZmFuLXpodWFuLWRhbi1jaS1zaHVuLXh1LWxjb2Yv">58 - I. 翻转单词顺序<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvenVvLXh1YW4temh1YW4temktZnUtY2h1YW4tbGNvZi8=">58 - II. 左旋转字符串<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvaHVhLWRvbmctY2h1YW5nLWtvdS1kZS16dWktZGEtemhpLWxjb2Yv">59 - I. 滑动窗口的最大值<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZHVpLWxpZS1kZS16dWktZGEtemhpLWxjb2Yv">59 - II. 队列的最大值<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvbmdlLXRvdS16aS1kZS1kaWFuLXNodS1sY29mLw==">60. n 个骰子的点数<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvYnUta2UtcGFpLXpob25nLWRlLXNodW4temktbGNvZi8=">61. 扑克牌中的顺子<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMveXVhbi1xdWFuLXpob25nLXp1aS1ob3Utc2hlbmcteGlhLWRlLXNodS16aS1sY29mLw==">62. 圆圈中最后剩下的数字<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZ3UtcGlhby1kZS16dWktZGEtbGktcnVuLWxjb2Yv">63. 股票的最大利润<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvcWl1LTEybi1sY29mLw==">64. 求 1 + 2 + … + n<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvYnUteW9uZy1qaWEtamlhbi1jaGVuZy1jaHUtenVvLWppYS1mYS1sY29mLw==">65. 不用加减乘除做加法<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZ291LWppYW4tY2hlbmctamktc2h1LXp1LWxjb2Yv">66. 构建乘积数组<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvYmEtemktZnUtY2h1YW4temh1YW4taHVhbi1jaGVuZy16aGVuZy1zaHUtbGNvZi8=">67. 把字符串转换成整数<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZXItY2hhLXNvdS1zdW8tc2h1LWRlLXp1aS1qaW4tZ29uZy1nb25nLXp1LXhpYW4tbGNvZi8=">68 - I. 二叉搜索树的最近公共祖先<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvZXItY2hhLXNodS1kZS16dWktamluLWdvbmctZ29uZy16dS14aWFuLWxjb2Yv">68 - II. 二叉树的最近公共祖先<i class="fa fa-external-link-alt"></i></span></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">√</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+</tbody></table>
 <hr>
 <h2 id="3-数组中重复的数字"><a href="#3-数组中重复的数字" class="headerlink" title="3. 数组中重复的数字"></a><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvc2h1LXp1LXpob25nLXpob25nLWZ1LWRlLXNodS16aS1sY29mLw==">3. 数组中重复的数字<i class="fa fa-external-link-alt"></i></span></h2><h3 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h3><p>在一个长度为 $n$ 的数组里的所有数字都在 $0$ 到 $n-1$ 的范围内。数组中某些数字是重复的，但不知道有几个数字是重复的，也不知道每个数字重复几次。请找出数组中任意一个重复的数字。</p>
 <figure class="highlight markdown"><table><tr><td class="code"><pre><span class="line">Input:</span><br><span class="line">&#123;2, 3, 1, 0, 2, 5&#125;</span><br><span class="line"></span><br><span class="line">Output:</span><br><span class="line">2</span><br><span class="line"></span><br><span class="line">2, 3, 1, 0, 2, 5</span><br></pre></td></tr></table></figure>
@@ -9387,154 +11690,37 @@
       </tags>
   </entry>
   <entry>
-    <title>一文打尽计网</title>
-    <url>/2020/03/18/2020-03-18-Network-Basic/</url>
-    <content><![CDATA[<h2 id="分层体系"><a href="#分层体系" class="headerlink" title="分层体系"></a>分层体系</h2><p>OSI的七层协议体系结构的概念清楚，理论也较完整，但它既复杂又不实用。TCP/IP体系结构则不同，但它现在却得到了非常广泛的应用。</p>
-<p>TCP/IP是一个四层的体系结构，它包含应用层、运输层、网际层和网络接口层(用网际层这个名字是强调这一层是为了解决不同网络的互连问题)。不过从实质上讲，TCP/IP只有最上面的三层，因为最下面的网络接口层并没有什么具体内容。</p>
+    <title>HTTP与HTTPS</title>
+    <url>/2020/03/18/2020-03-18-Network-HTTPSAndHTTP/</url>
+    <content><![CDATA[<h2 id="分层体系"><a href="#分层体系" class="headerlink" title="分层体系"></a>分层体系</h2><p>OSI 的七层协议体系结构的概念清楚，理论也较完整，但它既复杂又不实用。TCP/IP体系结构则不同，但它现在却得到了非常广泛的应用。</p>
+<p>TCP/IP是一个四层的体系结构，它包含应用层、运输层、网际层和网络接口层。</p>
 <p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9qb100evj31f40ocdvs.jpg" alt="计算机网络体系结构"></p>
 <ul>
-<li><p>应用层(application layer)：应用层的任务是通过应用进程间的交互来完成特定网络应用。应用层协议定义的是应用进程间通信和交互的规则。这里的进程就是指主机中正在运行的程序。对于不同的网络应用需要有不同的应用层协议。在互联网中的应用层协议很多，如域名系统DNS，支持万维网应用的HTTP协议，支持电子邮件的SMTP协议等等。我们把应用层交互的数据单元称为报文(message)。</p>
+<li><p>应用层(application layer)：应用层的任务是<strong>通过应用进程间的交互来完成特定网络应用</strong>。应用层协议定义的是<strong>应用进程间</strong>通信和交互的规则。在互联网中的应用层协议很多，如域名系统DNS，支持万维网应用的HTTP协议，支持电子邮件的SMTP协议等等。应用层交互的数据单元称为<strong>报文(message)</strong>。</p>
 </li>
-<li><p>运输层(transportlayer)：运输层的任务就是负责向两台主机中进程之间的通信提供通用的数据传输服务。应用进程利用该服务传送应用层报文。所谓“通用的”，是指并不针对某个特定网络应用，而是多种应用可以使用同一个运输层服务。由于一台主机可同时运行多个进程，因此运输层有复用和分用的功能。复用就是多个应用层进程可同时使用下面运输层的服务，分用和复用相反，是运输层把收到的信息分别交付上面应用层中的相应进程。运输层主要使用以下两种协议:</p>
+<li><p>运输层(transport layer)：运输层的任务就是负责<strong>向两台主机中进程之间的通信提供通用的数据传输服务</strong>。应用进程利用该服务传送应用层报文。所谓“通用的”，是指并不针对某个特定网络应用，而是多种应用可以使用同一个运输层服务。由于一台主机可同时运行多个进程，因此运输层有<strong>复用和分用</strong>的功能。复用就是多个应用层进程可同时使用下面运输层的服务，分用和复用相反，是运输层把收到的信息分别交付上面应用层中的相应进程。运输层主要使用以下两种协议:</p>
 <ul>
-<li>传输控制协议TCP(TransmissionControlProtocol)—提供面向连接的、可靠的数据传输服务，其数据传输的单位是<strong>报文段(segment)</strong>。</li>
-<li>用户数据报协议UDP(UserDatagramProtocol)—提供无连接的、尽最大努力(best-effort)的数据传输服务(不保证数据传输的可靠性)，其数据传输的单位是<strong>用户数据报</strong>。</li>
+<li>传输控制协议TCP(Transmission Control Protocol)—提供面向连接的、可靠的数据传输服务，其数据传输的单位是<strong>报文段(segment)</strong>。</li>
+<li>用户数据报协议UDP(User Datagram Protocol)—提供无连接的、尽最大努力(best-effort)的数据传输服务(不保证数据传输的可靠性)，其数据传输的单位是<strong>用户数据报</strong>。</li>
 </ul>
 </li>
-<li><p>网络层：网络层负责为分组交换网上的不同主机提供通信服务。在发送数据时，网络层把运输层产生的<strong>报文段或用户数据报封装成分组或包进行传送</strong>。在TCP/IP体系中，由于网络层使用IP协议，因此分组也叫做IP数据报，或简称为数据报。</p>
+<li><p>网络层：网络层负责<strong>为分组交换网上的不同主机提供通信服务</strong>。在发送数据时，网络层把运输层产生的<strong>报文段或用户数据报封装成分组或包进行传送</strong>。在TCP/IP体系中，由于网络层使用IP协议，因此分组也叫做IP数据报，或简称为数据报。</p>
 <ul>
 <li>网络层的另一个任务就是要选择合适的路由，使源主机运输层所传下来的分组，能够通过网络中的路由器找到目的主机。</li>
 <li>不要将运输层的“用户数据报UDP”和网络层的“IP数据报”弄混。此外，无论在哪一层传送的数据单元，都可笼统地用“分组”来表示。</li>
 </ul>
 </li>
-<li><p>数据链路层(datalinklayer)：两台主机之间的数据传输，总是在一段一段的链路上传送的，这就需要使用专门的链路层的协议。在两个相邻结点之间传送数据时，数据链路层将网络层交下来的<strong>IP数据报组装成帧(framing)</strong>，在两个相邻结点间的链路上传送<strong>帧(frame)</strong>。每一帧包括数据和必要的控制信息(如同步信息、地址信息、差错控制等)。</p>
+<li><p>数据链路层(data link layer)：两台主机之间的数据传输，总是在一段一段的链路上传送的，这就需要使用专门的链路层的协议。在两个相邻结点之间传送数据时，数据链路层将网络层交下来的<strong>IP数据报组装成帧(framing)</strong>，在两个相邻结点间的链路上传送<strong>帧(frame)</strong>。每一帧包括数据和必要的控制信息(如同步信息、地址信息、差错控制等)。</p>
 <ul>
 <li>在接收数据时，控制信息使接收端能够知道一个帧从哪个比特开始和到哪个比特结束。</li>
 <li>控制信息还使接收端能够检测到所收到的帧中有无差错。</li>
 </ul>
 </li>
-<li><p>物理层(physicallayer)：考虑的是怎样在传输媒体上透明地传输数据比特流，而不是指具体的传输媒体。物理层的作用是尽可能屏蔽传输媒体和通信手段的差异，使数据链路层感觉不到这些差异。</p>
+<li><p>物理层(physical layer)：考虑的是怎样在传输媒体上<strong>透明地传输数据比特流</strong>，而不是指具体的传输媒体。物理层的作用是尽可能屏蔽传输媒体和通信手段的差异，使数据链路层感觉不到这些差异。</p>
 </li>
 </ul>
 <p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gczcfmgbzjg30u016i0yk.gif" alt="计算机网络分层体系图"></p>
 <p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9rqohwupj31ea0jgk38.jpg" alt="数据在各层之间的传递过程"></p>
-<h2 id="TCP-与UDP"><a href="#TCP-与UDP" class="headerlink" title="TCP 与UDP"></a>TCP 与UDP</h2><h3 id="三次握手：建立连接"><a href="#三次握手：建立连接" class="headerlink" title="三次握手：建立连接"></a>三次握手：建立连接</h3><p>TCP建立连接的过程叫做握手，握手需要在客户和服务器之间交换三个TCP报文段。</p>
-<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9tsfxtkyj31ce0okdrn.jpg" alt="三报文握手建立连接"></p>
-<p>假定主机A运行的是TCP客户程序，而B运行TCP服务器程序。最初两端的 TCP 进程都处 CLOSED(关闭)状态。</p>
-<ol>
-<li>A主动打开连接，而B被动打开连接。</li>
-<li>B的TCP服务器进程创建传输控制块TCB，准备接受客户进程的连接请求，进入监听(Listen)状态。</li>
-<li>A的TCP客户端进程创建传输控制块TCB。</li>
-<li>A向B请求建立连接时，发出连接请求报文段，首部中同步位 SYN=1，选择初始序号 seq=x。TCP客户进程进入SYN-SENT(同步已发送)状态。</li>
-<li>B收到连接请求报文段后，如同意建立连接，则向A发送确认。在确认报文段中携带 SYN=1，ACK=1，ack=x+1，seq=y。服务器进程进入SYN-RCVD(同步收到)状态。</li>
-<li>TCP客户进程收到B的确认后，向B发出确认。携带 ACK=1，ack=y+1，seq=x+1。TCP连接已经建立，A 进入 ESTABLISHED (已建立连接)状态。</li>
-<li>当 B 收到 A 的确认后，也进入 ESTABLISHED 状态。</li>
-</ol>
-<blockquote>
-<p>SYN报文段不能携带数据，但要消耗一个序号。</p>
-<p>确认报文段也不能携带数据，但同样要消耗掉一个序号。也可以把SYN=1，ACK=1拆成两个报文段，这样变成四报文握手，效果一样。</p>
-<p>ACK报文段可以携带数据。但如果不携带数据则不消耗序号。</p>
-</blockquote>
-<figure class="highlight dns"><table><tr><td class="code"><pre><span class="line">Q：为什么 <span class="keyword">A</span> 最后还要发送一次确认呢?</span><br><span class="line"><span class="keyword">A</span>：这主要是为了防止已失效的连接请求报文段突然又传送到了 B，因而产生错误。</span><br></pre></td></tr></table></figure>
-
-<p>“已失效的连接请求报文段”是指，在 A 发出连接请求后，因连接请求报文丢失而未收到确认，于是 A 再重传一次连接请求，并且收到了确认，建立了连接。数据传输完毕后，就释放了连接。</p>
-<p>A 共发送了两个连接请求报文段，其中第一个丢失，第二个到达了B，没有“已失效的连接请求报文段”。</p>
-<blockquote>
-<p>现假定出现一种异常情况，即 A 发出的第一个连接请求报文段并没有丢失，而是在某些网络结点长时间滞留了，以致延误到连接释放以后的某个时间才到达B。</p>
-</blockquote>
-<p>这是一个早已失效的报文段，但 B 收到此失效的连接请求报文段后，就误认为是 A 又发出一次新的连接请求。于是就向 A 发出确认报文段，同意建立连接。假定不采用三报文握手，那么只要 B 发出确认，新的连接就建立了。</p>
-<p>由于现在 A 并没有发出建立连接的请求，因此不会理睬 B 的确认，也不会向B发送数据。但 B 却以为新的运输连接已经建立了，并一直等待 A 发来数据。B 的许多资源就这样白白浪费了。</p>
-<p>采用三报文握手的办法，可以防止上述现象的发生。例如在刚才的异常情况下，A 不会向 B 的确认发出确认。B 由于收不到确认，就知道 A 并没有要求建立连接。</p>
-<h3 id="四次分手：断了联系"><a href="#四次分手：断了联系" class="headerlink" title="四次分手：断了联系"></a>四次分手：断了联系</h3><p><strong>数据传输结束后，通信的双方都可释放连接</strong>。</p>
-<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9uuv1g7cj31ew0r2qje.jpg" alt="TCP连接的释放过程"></p>
-<ol>
-<li>A 和 B 都处于 ESTABLISHED 状态。</li>
-<li><strong>A 的应用进程</strong>先向其 TCP 发出连接释放报文段，并停止再发送数据，主动关闭 TCP 连接。连接释放报文段首部终止控制位 FIN=1，seq=u，它等于前面已传送过的数据的最后一个字节的序号加 1。A进入 <strong>FIN-WAIT-1(终止等待1)</strong> 状态，等待 B 的确认。</li>
-<li>B 收到连接释放报文段后即发出确认，确认号是 ack=u+1，而这个报文段自己的序号是 v，等于 B 前面已传送过的数据的最后一个字节的序号加 1。<ol>
-<li>进入 <strong>CLOSE-WAIT(关闭等待)</strong> 状态。</li>
-<li>TCP 服务器进程通知高层应用进程，此时从 A 到 B 这个方向的连接已释放，TCP连接处于 <strong>半关闭(half-close)</strong> 状态，即 A 已经没有数据要发送了，但 <strong>B 若发送数据，A 仍要接收</strong>。也就是说，从B到A这个方向的连接并未关闭，这个状态可能会持续一段时间。</li>
-</ol>
-</li>
-<li>A 收到 B 的确认后，进入 <strong>FIN-WAIT-2(终止等待2)</strong> 状态，等待 B 发出的连接释放报文段。</li>
-<li>若 B 已经没有要向A发送的数据，其应用进程就通知 TCP 释放连接。<ol>
-<li>B 发出的连接释放报文段 FIN=1，seq=w (半关闭状态下 B 可能又发送了一些数据)。</li>
-<li>B 还必须<strong>重复上次已发送过的确认号 ack=u+1</strong>。B进入 <strong>LAST-ACK(最后确认)</strong> 状态，等待A的确认。</li>
-</ol>
-</li>
-<li>A 收到 B 的连接释放报文段后，对此发出确认。<ol>
-<li>在确认报文段中，ACK=1，ack=w+1，seq=u+1，然后进入 <strong>TIME-WAIT(时间等待)</strong> 状态。</li>
-<li>此时 <strong>TCP连接还没有释放掉</strong>，必须经过 <strong>2MSL</strong> 后，A才进入到 <strong>CLOSED状态</strong>。</li>
-<li>MSL叫做最长报文段寿命(Maximum Segment Lifetime)，RFC793建议设为2分钟。但 TCP 允许不同实现自定义。因此，从A进入到 <strong>TIME-WAIT状态</strong>后，要经过 <code>2MSL</code> 才能进入到 <strong>CLOSED状态</strong>，才能开始建立下一个新的连接。</li>
-<li>当A撤销相应的传输控制块TCB后，就结束了这次的TCP连接。</li>
-</ol>
-</li>
-<li>B 收到 A 发出的确认后，才进入 <strong>CLOSED状态</strong>，在 B 撤销 PCB 后，本次 TCP 连接才算结束。</li>
-</ol>
-<blockquote>
-<p>B 结束 TCP 连接的时间要比 A 早一些，因为 A 要等待 2MSL。</p>
-</blockquote>
-<figure class="highlight gauss"><table><tr><td class="code"><pre><span class="line">为什么A在<span class="built_in">TIME</span>-<span class="built_in">WAIT</span>状态必须等待<span class="number">2</span>MSL的时间?</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight markdown"><table><tr><td class="code"><pre><span class="line"><span class="bullet">1. </span>为了保证 A 发送的最后一个 ACK 报文段能够到达 B。这个 ACK 报文段有可能丢失，因而使处在 LAST-ACK 状态的 B 收不到对已发送的 FIN+ACK报文段 的确认。B会超时重传这个 FIN+ACK 报文段，而 A 就能在 2MSL 时间内收到这个重传的 FIN+ACK 报文段。接着 A 重传一次确认，重新启动 2MSL 计时器。最后，A 和 B 都正常进入到 CLOSED 状态。如果 A 在 TIME-WAIT 状态不等待一段时间，而是在发送完 ACK 报文段后立即释放连接，那么就无法收到 B 重传的 FIN+ACK 报文段，因而也不会再发送一次确认报文段。这样，B就无法按照正常步骤进入 CLOSED 状态。</span><br><span class="line"></span><br><span class="line"><span class="bullet">2. </span>防止“已失效的连接请求报文段”出现在本连接中。A 在发送完最后一个 ACK 报文段后，再经过时间 2MSL，就可以使本连接持续的时间内所产生的所有报文段都从网络中消失。这样就可以使下一个新的连接中不会出现这种旧的连接请求报文段。</span><br></pre></td></tr></table></figure>
-
-<h3 id="TCP-与-UDP-的区别"><a href="#TCP-与-UDP-的区别" class="headerlink" title="TCP 与 UDP 的区别"></a>TCP 与 UDP 的区别</h3><table>
-<thead>
-<tr>
-<th align="center">TCP</th>
-<th align="center">UDP</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center"></td>
-<td align="center">用户数据报协议UDP只在IP的数据报服务之上增加了很少一点的功能，这就是复用和分用的功能以及差错检测的功能</td>
-</tr>
-<tr>
-<td align="center">面向连接，应用程序在使用TCP协议之前，必须先建立TCP连接。在传送数据完毕后，必须释放已经建立的TCP连接。</td>
-<td align="center">无连接的，即发送数据之前不需要建立连接，发送数据之后也不需要断开连接，因此减少了开销和发送数据之前的时延。</td>
-</tr>
-<tr>
-<td align="center">提供可靠交付，通过TCP连接传送的数据，无差错、不丢失、不重复，并且按序到达。</td>
-<td align="center">尽最大努力交付，即不保证可靠交付，因此主机不需要维持复杂的连接状态表</td>
-</tr>
-<tr>
-<td align="center">面向字节流。TCP中的“流”(stream)指的是流入到进程或从进程流出的字节序列。</td>
-<td align="center">UDP是面向报文的</td>
-</tr>
-<tr>
-<td align="center">滑动窗口，流量控制，拥塞控制，停止等待协议，连续ARQ协议</td>
-<td align="center">没有拥塞控制，因此网络出现的拥塞不会使源主机的发送速率降低。这对实时应用是很重要的。吞吐量只受限于数据生成速率，传输速率以及机器性能</td>
-</tr>
-<tr>
-<td align="center">每一条TCP连接只能有两个端点(endpoint)，每一条TCP连接只能是点对点的(一对一)</td>
-<td align="center">支持一对一、一对多、多对一和多对多的交互通信。</td>
-</tr>
-<tr>
-<td align="center">首部至少20个字节</td>
-<td align="center">首部开销小，只有8个字节</td>
-</tr>
-<tr>
-<td align="center">TCP提供全双工通信。TCP允许通信双方的应用进程在任何时候都能发送数据。TCP连接的两端都设有发送缓存和接收缓存，用来临时存放双向通信的数据。</td>
-<td align="center">提供全双工通信</td>
-</tr>
-</tbody></table>
-<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9wbh2rblj315a0rqn73.jpg" alt="UDP报文段的首部"></p>
-<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9wcefwrej315w0li46o.jpg" alt="TCP报文段的首部格式"></p>
-<h3 id="TCP-的滑动窗口机制"><a href="#TCP-的滑动窗口机制" class="headerlink" title="TCP 的滑动窗口机制"></a>TCP 的滑动窗口机制</h3><p>滑动窗口机制可以很方便地在TCP连接上实现对发送方的流量控制，与超时重传，选择确认一起保证可靠传输。</p>
-<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9xtsj9nvj316c0ay444.jpg" alt="滑动窗口"></p>
-<p>发送窗口里面的序号表示允许发送的序号。显然，窗口越大，发送方就可以在收到对方确认之前连续发送更多的数据，因而可能获得更高的传输效率。</p>
-<p>发送窗口后沿的后面部分表示已发送且已收到了确认。</p>
-<p>发送窗口的位置由窗口前沿和后沿的位置共同确定。发送窗口后沿的变化情况有两种可能，即不动(没有收到新的确认)和前移(收到了新的确认)。发送窗口后沿不可能向后移动，因为不能撤销掉已收到的确认。发送窗口前沿通常是不断向前移动，但也有可能不动。这对应于两种情况:一是没有收到新的确认，对方通知的窗口大小也不变;二是收到了新的确认但对方通知的窗口缩小了，使得发送窗口前沿正好不动。</p>
-<p>发送窗口前沿也有可能向后收缩。这发生在对方通知的窗口缩小了。</p>
-<h3 id="TCP的拥塞控制"><a href="#TCP的拥塞控制" class="headerlink" title="TCP的拥塞控制"></a>TCP的拥塞控制</h3><p>拥塞控制与流量控制的关系密切，它们之间也存在着一些差别。所谓拥塞控制就是防止过多的数据注入到网络中，这样可以使网络中的路由器或链路不致过载。拥塞控制所要做的都有一个前提，就是网络能够承受现有的网络负荷。拥塞控制是一个全局性的过程，涉及到所有的主机、所有的路由器，以及与降低网络传输性能有关的所有因素。但TCP连接的端点只要迟迟不能收到对方的确认信息，就猜想在当前网络中的某处很可能发生了拥塞，但这时却无法知道拥塞到底发生在网络的何处，也无法知道发生拥塞的具体原因。(是访问某个服务器的通信量过大?还是在某个地区出现自然灾害?)</p>
-<p>相反，流量控制往往是指点对点通信量的控制，是个端到端的问题(接收端控制发送端)。流量控制所要做的就是抑制发送端发送数据的速率，以便使接收端来得及接收。</p>
-<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9y0c49wrj315a0fywlq.jpg" alt="拥塞控制所起的作用"></p>
-<p>拥塞控制的算法种类</p>
-<ul>
-<li>慢开始(slow-start)</li>
-<li>拥塞避免 (congestion avoidance)</li>
-<li>快重传(fast retransmit)</li>
-<li>快恢复(fast recovery)</li>
-</ul>
 <h2 id="HTTP与HTTPS"><a href="#HTTP与HTTPS" class="headerlink" title="HTTP与HTTPS"></a>HTTP与HTTPS</h2><p>主要来源于<strong>维基百科</strong></p>
 <p><strong>超文本传输协议</strong>（英语：<strong>H</strong>yper<strong>T</strong>ext <strong>T</strong>ransfer <strong>P</strong>rotocol，缩写：<strong>HTTP</strong>）是一种用于分布式、协作式和<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv6LaF5aqS6auU">超媒体<i class="fa fa-external-link-alt"></i></span>信息系统的<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5bqU55So5bGC">应用层<i class="fa fa-external-link-alt"></i></span><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv572R57uc5Lyg6L6T5Y2P6K6u">协议<i class="fa fa-external-link-alt"></i></span><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv6LaF5paH5pys5Lyg6L6T5Y2P6K6uI2NpdGVfbm90ZS1pZXRmMjYxNi0x">[1]<i class="fa fa-external-link-alt"></i></span>。HTTP是<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5YWo55CD6LOH6KiK57ay">万维网<i class="fa fa-external-link-alt"></i></span>的数据通信的基础，无状态，明文传输。</p>
 <p><strong>超文本传输安全协议</strong>（英语：<strong>H</strong>yper<strong>T</strong>ext <strong>T</strong>ransfer <strong>P</strong>rotocol <strong>S</strong>ecure，缩写：<strong>HTTPS</strong>；常称为HTTP over TLS、HTTP over SSL或HTTP Secure）是一种通过<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv6KiI566X5qmf57ay57Wh">计算机网络<i class="fa fa-external-link-alt"></i></span>进行安全通信的<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv57ay6Lev5YKz6Ly45Y2U5a6a">传输协议<i class="fa fa-external-link-alt"></i></span>。HTTPS经由<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUA==">HTTP<i class="fa fa-external-link-alt"></i></span>进行通信，但利用<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5Lyg6L6T5bGC5a6J5YWo">SSL/TLS<i class="fa fa-external-link-alt"></i></span>来<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5Yqg5a+G">加密<i class="fa fa-external-link-alt"></i></span>数据包。HTTPS开发的主要目的，是提供对<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv57ay56uZ">网站<i class="fa fa-external-link-alt"></i></span>服务器的<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv6Lqr5Lu96aqM6K+B">身份认证<i class="fa fa-external-link-alt"></i></span>，保护交换数据的隐私与<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5a6M5pW05oCn">完整性<i class="fa fa-external-link-alt"></i></span>。</p>
@@ -9666,12 +11852,12 @@
 <li><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSM0eHjor7fmsYLplJnor68=">4xx请求错误<i class="fa fa-external-link-alt"></i></span>——请求含有词法错误或者无法被执行<ul>
 <li>401 Unauthorized：请求未经授权，这个状态码必须要和 <code>WWW-Authenticate</code> 一起使用</li>
 <li>403 Forbidden：服务器收到请求，但是拒绝提供服务</li>
-<li>404 Not Found：请求资源部存在。最常见的就是URL错误</li>
+<li>404 Not Found：请求资源不存在。最常见的就是URL错误</li>
 </ul>
 </li>
 <li><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSM1eHjmnI3liqHlmajplJnor68=">5xx服务器错误<i class="fa fa-external-link-alt"></i></span>——服务器在处理某个正确请求时发生错误<ul>
 <li>500 Internal Server Error：服务器发生不可预期的错误</li>
-<li>505 Server Unavailable：服务器当前不能处理客户端的请求，一段时间后可能恢复正常</li>
+<li>505 Server Unavailable：服务器当前不能处理客户端的请求，一段时间后可能恢复正常。</li>
 </ul>
 </li>
 </ul>
@@ -9889,7 +12075,7 @@
         <category>计算机网络</category>
       </categories>
       <tags>
-        <tag>计算机网络</tag>
+        <tag>HTTPS</tag>
       </tags>
   </entry>
   <entry>
