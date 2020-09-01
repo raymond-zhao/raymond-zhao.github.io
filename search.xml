@@ -1,20 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>操作系统常见问题QA</title>
-    <url>/2020/08/28/2020-08-28-OS-Interview-QA/</url>
-    <content><![CDATA[<blockquote>
-<p>还没开始，面试中…</p>
-</blockquote>
-]]></content>
-      <categories>
-        <category>操作系统</category>
-      </categories>
-      <tags>
-        <tag>操作系统</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>TCP的运输连接管理</title>
     <url>/2020/08/26/2020-08-26-Network-TCPAndUDP/</url>
     <content><![CDATA[<h2 id="TCP的运输连接管理"><a href="#TCP的运输连接管理" class="headerlink" title="TCP的运输连接管理"></a>TCP的运输连接管理</h2><p>TCP 是面向连接的协议，运输连接是用来传送 TCP 报文的。TCP 运输连接的建立和释放是每一次面向连接的通信中必不可少的过程。因此，运输连接就有三个阶段，即：连接建立、数据传送和连接释放。运输连接的管理就是使运输连接的建立和释放都能正常地进行。</p>
@@ -366,33 +352,6 @@
       </tags>
   </entry>
   <entry>
-    <title>TCP传输为什么是可靠的？</title>
-    <url>/2020/08/25/2020-08-25-Network-TCP-Reliable/</url>
-    <content><![CDATA[<h2 id="可靠传输的工作原理"><a href="#可靠传输的工作原理" class="headerlink" title="可靠传输的工作原理"></a>可靠传输的工作原理</h2><p>TCP 发送的报文段是交给 IP 层传送的，但IP层只能提供尽最大努力服务，也就是说，TCP下面的网络所提供的是不可靠的传输。因此，TCP必须采用适当的措施才能使得两个运输层之间的通信变得可靠。</p>
-<p>理想的传输条件有以下两个特点：</p>
-<ul>
-<li>传输信道不产生差错</li>
-<li>不管发送方以多快的速度发送数据，接收方总是来得及处理收到的数据。</li>
-</ul>
-<p>在这样的理想传输条件下，不需要采取任何措施就能够实现可靠传输。然而，理想很丰满，现实很骨感。</p>
-<blockquote>
-<p>如果使用一些可靠传输协议，当出现差错时让发送方重传出现差错的数据，同时在接收方来不及处理收到的数据时，及时告诉发送方适当降低发送数据的速度。那么本来不可靠的传输信道就能够实现可靠传输了。</p>
-</blockquote>
-<h3 id="停止等待协议"><a href="#停止等待协议" class="headerlink" title="停止等待协议"></a>停止等待协议</h3><p>全双工通信的双方既是发送方也是接收方。下面为了讨论问题的方便，仅考虑</p>
-<ul>
-<li>A 发送数据而 B 接收数据并发送确认，因此A叫做发送方，而B叫做接收方。</li>
-<li>这里讨论可靠传输的原理，因此把传送的数据单元都称为分组，而并不考虑数据是在哪一个层次上传送的。</li>
-</ul>
-<p>“停止等待”就是每发送完一个分组就停止发送，等待对方的确认，在收到确认后再发送下一个分组。</p>
-]]></content>
-      <categories>
-        <category>计算机网络</category>
-      </categories>
-      <tags>
-        <tag>TCP</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>volatile底层实现原理</title>
     <url>/2020/08/20/2020-08-19-volatile/</url>
     <content><![CDATA[<h2 id="volatile底层实现原理"><a href="#volatile底层实现原理" class="headerlink" title="volatile底层实现原理"></a>volatile底层实现原理</h2><p>《Java并发编程的艺术》这本书的每一节基本上都是面试中的高频考点或者是重难点，实体书在书桌上摆了许久竟然都忽视掉了，现在必须要把这本书整理成电子版的。</p>
@@ -485,7 +444,7 @@
 <ul>
 <li>在每个<code>volatile</code>写操作的前面插入一个<code>StoreStore</code>屏障</li>
 <li>在每个<code>volatile</code>写操作的后面插入一个<code>StoreLoad</code>屏障</li>
-<li>在每个<code>volatile</code>读操作的前面插入一个<code>LoadLoad</code>屏障</li>
+<li>在每个<code>volatile</code>读操作的后面插入一个<code>LoadLoad</code>屏障</li>
 <li>在每个<code>volatile</code>读操作的后面插入一个<code>LoadStore</code>屏障</li>
 </ul>
 <p>由于<code>volatile</code>仅仅保证对单个<code>volatile</code>变量的读/写具有原子性，而锁的互斥执行的特性可以确保对整个临界区代码的执行具有原子性。在功能上，锁比volatile更强大；在可伸缩性和执行性能上，volatile更有优势。</p>
@@ -2113,7 +2072,7 @@
 
 <h3 id="Solution-5-Semaphore"><a href="#Solution-5-Semaphore" class="headerlink" title="Solution 5 - Semaphore"></a>Solution 5 - Semaphore</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Foo03</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 声明两个Semaphore 变量</span></span><br><span class="line">    <span class="keyword">private</span> Semaphore spa,spb;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Foo03</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 初始化 Semaphore 为 0 的原因</span></span><br><span class="line">        <span class="comment">// 如果这个Semaphore 为零，如果另一线程调用(acquire)这个Semaphore就会产生阻塞</span></span><br><span class="line">        <span class="comment">// 便可以控制 second 和 third 线程的执行</span></span><br><span class="line">        spa = <span class="keyword">new</span> Semaphore(<span class="number">0</span>);</span><br><span class="line">        spb = <span class="keyword">new</span> Semaphore(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">first</span><span class="params">(Runnable printFirst)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">            <span class="comment">// printFirst.run() outputs "first". Do not change or remove this line.</span></span><br><span class="line">            printFirst.run();</span><br><span class="line">            <span class="comment">// 只有等first线程释放Semaphore后使Semaphore值为1,另外一个线程才可以调用（acquire）</span></span><br><span class="line">            spa.release();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">second</span><span class="params">(Runnable printSecond)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">            <span class="comment">//只有spa为1才能执行acquire，如果为0就会产生阻塞</span></span><br><span class="line">            spa.acquire();</span><br><span class="line">            <span class="comment">// printSecond.run() outputs "second". Do not change or remove this line.</span></span><br><span class="line">            printSecond.run();</span><br><span class="line">            spb.release();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">third</span><span class="params">(Runnable printThird)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">            <span class="comment">//只有spb为1才能通过，如果为0就会阻塞</span></span><br><span class="line">            spb.acquire();</span><br><span class="line">            <span class="comment">// printThird.run() outputs "third". Do not change or remove this line.</span></span><br><span class="line">            printThird.run();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h2 id="1115-交替打印FooBar"><a href="#1115-交替打印FooBar" class="headerlink" title="1115. 交替打印FooBar"></a><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvcHJpbnQtZm9vYmFyLWFsdGVybmF0ZWx5Lw==">1115. 交替打印FooBar<i class="fa fa-external-link-alt"></i></span></h2><figure class="highlight markdown"><table><tr><td class="code"><pre><span class="line">我们提供一个类：</span><br><span class="line"></span><br><span class="line">class FooBar &#123;</span><br><span class="line">  public void foo() &#123;</span><br><span class="line">    for (int i = 0; i <span class="xml"><span class="tag">&lt; <span class="attr">n</span>; <span class="attr">i</span>++) &#123;</span></span></span><br><span class="line"><span class="xml">      print("foo");</span></span><br><span class="line"><span class="xml">    &#125;</span></span><br><span class="line"><span class="xml">  &#125;</span></span><br><span class="line"></span><br><span class="line"><span class="xml">  public void bar() &#123;</span></span><br><span class="line"><span class="xml">    for (int i = 0; i <span class="tag">&lt; <span class="attr">n</span>; <span class="attr">i</span>++) &#123;</span></span></span><br><span class="line"><span class="xml">      print("bar");</span></span><br><span class="line"><span class="xml">    &#125;</span></span><br><span class="line"><span class="xml">  &#125;</span></span><br><span class="line"><span class="xml">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="xml">两个不同的线程将会共用一个 FooBar 实例。其中一个线程将会调用 foo() 方法，另一个线程将会调用 bar() 方法。</span></span><br><span class="line"><span class="xml">请设计修改程序，以确保 "foobar" 被输出 n 次。</span></span><br><span class="line"></span><br><span class="line"><span class="xml">示例 1:</span></span><br><span class="line"><span class="xml">输入: n = 1</span></span><br><span class="line"><span class="xml">输出: "foobar"</span></span><br><span class="line"><span class="xml">解释: 这里有两个线程被异步启动。其中一个调用 foo() 方法, 另一个调用 bar() 方法，"foobar" 将被输出一次。</span></span><br><span class="line"></span><br><span class="line"><span class="xml">示例 2:</span></span><br><span class="line"><span class="xml">输入: n = 2</span></span><br><span class="line"><span class="xml">输出: "foobarfoobar"</span></span><br><span class="line"><span class="xml">解释: "foobar" 将被输出两次。</span></span><br></pre></td></tr></table></figure>
+<h2 id="1115-交替打印FooBar"><a href="#1115-交替打印FooBar" class="headerlink" title="1115. 交替打印FooBar"></a><span class="exturl" data-url="aHR0cHM6Ly9sZWV0Y29kZS1jbi5jb20vcHJvYmxlbXMvcHJpbnQtZm9vYmFyLWFsdGVybmF0ZWx5Lw==">1115. 交替打印FooBar<i class="fa fa-external-link-alt"></i></span></h2><figure class="highlight arduino"><table><tr><td class="code"><pre><span class="line">我们提供一个类：</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FooBar</span> &#123;</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">      <span class="built_in">print</span>(<span class="string">"foo"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">bar</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">      <span class="built_in">print</span>(<span class="string">"bar"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">两个不同的线程将会共用一个 FooBar 实例。其中一个线程将会调用 foo() 方法，另一个线程将会调用 bar() 方法。</span><br><span class="line">请设计修改程序，以确保 <span class="string">"foobar"</span> 被输出 n 次。</span><br><span class="line"></span><br><span class="line">示例 <span class="number">1</span>:</span><br><span class="line">输入: n = <span class="number">1</span></span><br><span class="line">输出: <span class="string">"foobar"</span></span><br><span class="line">解释: 这里有两个线程被异步启动。其中一个调用 foo() 方法, 另一个调用 bar() 方法，<span class="string">"foobar"</span> 将被输出一次。</span><br><span class="line"></span><br><span class="line">示例 <span class="number">2</span>:</span><br><span class="line">输入: n = <span class="number">2</span></span><br><span class="line">输出: <span class="string">"foobarfoobar"</span></span><br><span class="line">解释: <span class="string">"foobar"</span> 将被输出两次。</span><br></pre></td></tr></table></figure>
 
 ]]></content>
       <categories>
@@ -11685,8 +11644,8 @@
         <category>算法</category>
       </categories>
       <tags>
-        <tag>Java</tag>
         <tag>算法</tag>
+        <tag>Java</tag>
       </tags>
   </entry>
   <entry>
@@ -11727,7 +11686,10 @@
 <p>HTTP是一个客户端（用户）和服务端（网站）之间请求和应答的标准，通常使用<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5Lyg6L6T5o6n5Yi25Y2P6K6u">TCP协议<i class="fa fa-external-link-alt"></i></span>。默认端口 80, HTTPS默认端口 443。</p>
 <p>HTTP协议和安全协议同属于应用层（<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvT1NJ5qih5Z6L">OSI模型<i class="fa fa-external-link-alt"></i></span>的最高层），具体来讲，安全协议工作在HTTP之下，传输层之上：安全协议向运行HTTP的进程提供一个类似于TCP的套接字，供进程向其中注入报文，安全协议将报文加密并注入运输层套接字；或是从运输层获取加密报文，解密后交给对应的进程。严格地讲，HTTPS并不是一个单独的协议，而是对工作在一加密连接（<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5Lyg6L6T5bGC5a6J5YWo">TLS<i class="fa fa-external-link-alt"></i></span>或SSL）上的常规HTTP协议的称呼。</p>
 <p>HTTP使用TCP三次握手建立连接，客户端和服务器需要交换3个包；HTTPS除了TCP的三个包，还要加上ssl握手需要的9个包，所以一共是12个包。</p>
-<h3 id="请求方法"><a href="#请求方法" class="headerlink" title="请求方法"></a>请求方法</h3><table>
+<h3 id="请求方法"><a href="#请求方法" class="headerlink" title="请求方法"></a>请求方法</h3><blockquote>
+<p>问题：POST 方法与 PUT 方法的区别?</p>
+</blockquote>
+<table>
 <thead>
 <tr>
 <th align="center">方法名</th>
@@ -11867,6 +11829,63 @@
 <li>不验证通信方的身份，因此有可能遭遇伪装。</li>
 <li>无法证明报文的完整性，所以有可能已遭篡改。</li>
 </ul>
+<h3 id="HTTP各版本区别"><a href="#HTTP各版本区别" class="headerlink" title="HTTP各版本区别"></a>HTTP各版本区别</h3><p><strong>HTTP1.0</strong></p>
+<ul>
+<li>短连接：每次发送请求都要重新建立 TCP 连接，即三次握手，数据发送完毕就要关闭连接。</li>
+<li>无 host 头域，也就是 http 请求头里的 host。</li>
+<li>不允许断点续传，而且不能只传输对象的一部分，要求传输整个对象。</li>
+</ul>
+<p><strong>HTTP1.1</strong></p>
+<ul>
+<li>引入了持久连接(persistent connectio)，又称长连接。客户端和服务器发现对方一段时间没有活动，可以主动关闭连接。</li>
+<li>引入了流水线机制(pipelining)，也就是在同一个TCP连接里面，客户端可以同时发送多个请求。</li>
+<li>将 Content-length 字段的作用进行扩充，声明本次回应(Response)的数据长度。</li>
+<li>采用分块传输编码，产生一块数据，就发送一块，采用”流模式”（stream）取代”缓存模式”（buffer）。</li>
+<li>新增许多方法：PUT、PATCH、HEAD、 OPTIONS、DELETE。</li>
+<li>客户端请求的头信息新增了 <strong>Host 字段</strong>，用来指定服务器的域名。</li>
+</ul>
+<blockquote>
+<p>虽然 HTTP1.1 允许复用 TCP 连接，但是同一个 TCP 连接里面，所有的数据通信是按次序进行的。服务器只有处理完一个回应，才会进行下一个回应。要是前面的回应特别慢，后面就会有许多请求排队等着。这称为”队头堵塞”（Head-of-line blocking）。</p>
+<p>为了避免这个问题，只有两种方法：一是减少请求数，二是同时多开持久连接。</p>
+<p>这产生了很多的网页优化技巧，比如合并脚本和样式表、将图片嵌入CSS代码、域名分片（domain sharding）等等。如果HTTP协议设计得更好一些，这些额外的工作是可以避免的。</p>
+</blockquote>
+<p><strong>HTTP1.x</strong>的缺点</p>
+<ol>
+<li>HTTP/1.0一次只允许在一个TCP连接上发起一个请求，HTTP/1.1 使用的流水线技术也只能<strong>部分处理请求并发</strong>，仍然会存在<strong>队列头阻塞</strong>问题，因此客户端在需要发起多次请求时，通常会采用建立多连接来减少延迟。</li>
+<li>单向请求，只能由客户端发起。</li>
+<li>请求报文与响应报文首部信息冗余量大。</li>
+<li>数据未压缩，导致数据的传输量大。</li>
+</ol>
+<p><strong>HTTP2.0</strong></p>
+<blockquote>
+<p>主要基于SPDY协议(Google开发的基于TCP协议的应用层协议)，核心思想是尽量减少TCP连接数。</p>
+<p>目标是优化HTTP协议的性能，通过压缩、多路复用和优先级等技术，缩短网页的加载时间并提高安全性。</p>
+<p>在不改动HTTP语义、方法、状态码、URI及首部字段的情况下，大幅度提高了 Web 性能。</p>
+</blockquote>
+<ul>
+<li>改用二进制传输，HTTP1.x 使用文本传输。<ul>
+<li>在应用层与传输层之间增加一个<strong>二进制分帧层</strong>，在二进制分帧层上，HTTP2.0 会将所有传输的信息分为更小的消息和帧，并采用二进制格式编码。</li>
+<li>其中 HTTP1.x 的首部信息会被封装到 <strong>Headers帧</strong>，而Request Body则封装到 <strong>Data帧</strong>。</li>
+</ul>
+</li>
+<li>头部(Header)压缩：<ul>
+<li>使用 HPACK (头部压缩算法)压缩格式对传输的 header 进行编码，减小了 header 的体积。</li>
+<li>在两端维护了索引表，用于记录出现过的header，后面在传输过程中就可以传输已经记录过的 header 的键名，对端收到数据后就可以通过键名找到对应的值。</li>
+</ul>
+</li>
+<li>多路复用：使用多个流(stream)，每个流分帧传输，使得一个 TCP 连接能够处理多个 HTTP 请求，避免 HTTP1.x版本的队头阻塞问题。</li>
+<li>服务器Push：服务端可以在客户端某个请求后，主动推送其他资源。</li>
+<li>更安全：使用了 TLS 的 拓展ALPN 作为协议升级，除此之外，HTTP2.0 对 tls 的安全性做了近一步加强，通过黑名单机制禁用了几百种不再安全的加密算法。</li>
+</ul>
+<p><strong>HTTP3.0</strong></p>
+<ul>
+<li>基于 Google 的 QUIC 协议，利用UDP实现可靠数据传输。</li>
+<li>减少了 TCP 三次握手时间，以及 TLS 握手时间。</li>
+<li>解决了 HTTP 2.0 中前一个 stream 丢包导致后一个 stream 被阻塞的问题。</li>
+<li>优化了重传策略，重传包和原包的编号不同，降低后续重传计算的消耗。</li>
+<li>连接迁移，不再用 TCP 四元组确定一个连接，而是用一个 64 位随机数来确定这个连接。</li>
+<li>更合适的流量控制。</li>
+</ul>
 <h3 id="HTTPS的工作流程"><a href="#HTTPS的工作流程" class="headerlink" title="HTTPS的工作流程"></a>HTTPS的工作流程</h3><h4 id="证明公开密钥正确性的证书"><a href="#证明公开密钥正确性的证书" class="headerlink" title="证明公开密钥正确性的证书"></a>证明公开密钥正确性的证书</h4><p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0r9c0msvj30k60g0480.jpg" alt="证明公开密钥正确性的证书"></p>
 <h4 id="简易版的HTTPS工作流程"><a href="#简易版的HTTPS工作流程" class="headerlink" title="简易版的HTTPS工作流程"></a>简易版的HTTPS工作流程</h4><p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0rcx6t6hj30hw0fldjy.jpg" alt="简易版的HTTPS工作流程"></p>
 <ol>
@@ -11895,9 +11914,10 @@
 <p>客户端用之前生成的随机值解密服务器传过来的信息，获取实际传输的内容。这个过程称为<strong>对称加密</strong>。</p>
 </li>
 </ol>
-<h4 id="完整版HTTPS通信流程"><a href="#完整版HTTPS通信流程" class="headerlink" title="完整版HTTPS通信流程"></a>完整版HTTPS通信流程</h4><blockquote>
+<h4 id="详细版HTTPS通信流程"><a href="#详细版HTTPS通信流程" class="headerlink" title="详细版HTTPS通信流程"></a>详细版HTTPS通信流程</h4><blockquote>
 <p>继续借用《图解HTTP》中的图文。</p>
-<p>HTTP连接需要交换3个包，而HTTPS连接需要交换 3 + 9 个包(SSL/TLS连接)。</p>
+<p>HTTP连接需要交换3个包，而HTTPS连接需要交换 3(TCP) + 9 个包(SSL/TLS连接)。</p>
+<p>这里说的加密过程是指 SSL 的加密，至于 TLS 的加密…</p>
 </blockquote>
 <p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0rrhm2boj30k30og13g.jpg" alt="HTTPS通信"></p>
 <ol>
@@ -11906,7 +11926,7 @@
 <li><strong>服务器</strong>继续发送 Certificate 报文。报文中包含公钥证书。</li>
 <li><strong>服务器</strong>继续发送 ServerHelloDone 报文。通知客户端第一阶段的 SSL 握手协商部分结束。</li>
 <li><strong>客户端</strong>发送 Client Key Exchange 报文作为回应。报文中包含通信加密中一种被称为 <code>Pre-master secret</code>的随机密码串。这个报文已用第 3 步中的公钥进行加密。</li>
-<li><strong>客户端</strong>继续发送 Change Cipher Spec 报文。该报文会提示服务器，在此报文之后的通信都将会采用 <code>Pre-master secret</code>秘钥加密。</li>
+<li><strong>客户端</strong>继续发送 Change Cipher Spec 报文。该报文会提示服务器，在此报文之后的通信都将会采用 <code>Premaster secret</code>秘钥加密。</li>
 <li><strong>客户端</strong>发送 Finished 报文。该报文包含连接至今，全部报文的整体校验值。此次握手协商能否成功，取决于服务器能否正确解密该报文。</li>
 <li><strong>服务器</strong>同样发送 Change Cipher Spec 报文。</li>
 <li><strong>服务器</strong>继续发送 Finished 报文。</li>
@@ -11920,12 +11940,28 @@
 <li><span class="exturl" data-url="aHR0cHM6Ly9iYWlrZS5iYWlkdS5jb20vaXRlbS/lronlhajlpZfmjqXlsYI=">SSL(Secure Sockets Layer安全套接层)<i class="fa fa-external-link-alt"></i></span></li>
 <li><a href="https://zh.wikipedia.org/wiki/%E5%82%B3%E8%BC%B8%E5%B1%A4%E5%AE%89%E5%85%A8%E6%80%A7%E5%8D%94%E5%AE%9A" target="_blank" rel="noopener">TLS (<strong>T</strong>ransport <strong>L</strong>ayer <strong>S</strong>ecurity 传输层安全性协议)</a></li>
 </ul>
-<p>加密方式</p>
+<p>TLS 与  SSL 的差异</p>
 <ul>
-<li>对称加密：加密和解密都是用同一个秘钥</li>
-<li>非对称加密：加密和解密使用的秘钥是不同的</li>
-<li>哈希算法：将任意长度的信息转换为固定长度的值，不可逆</li>
-<li>数字签名：证明某个信息或者文件是某人发出/认同的</li>
+<li><p>版本号：TLS 记录格式与 SSL 记录格式相同，但版本号的值不同，TLS1.0 使用的版本号为 SSLv3.1。</p>
+</li>
+<li><p>报文鉴别码：SSLv3.0 和 TLS 的 MAC 算法及 MAC 计算的范围不同。TLS 使用 HMAC 算法。SSLv3.0使用了相似的算法，两者差别在于 SSLv3.0 中，填充字节与密钥之间采用的是<strong>连接运算</strong>，而 HMAC 算法采用的是<strong>异或运算</strong>。</p>
+</li>
+<li><p>伪随机函数：TLS 使用了称为 PRF 的伪随机函数来将密钥扩展成数据块。</p>
+</li>
+<li><p>报警代码：TLS 在支持几乎所有的SSLv3.0报警代码的基础上，补充定义了很多报警代码，如解密失败（decryption_failed）、记录溢出（record_overflow）、未知CA（unknown_ca）、拒绝访问（access_denied）等。</p>
+</li>
+<li><p>密文族和客户证书：SSLv3.0 和 TLS 存在少量差别，TLS 不支持 Fortezza 密钥交换、加密算法和客户证书。</p>
+</li>
+<li><p>certificate_verify 和 finished 消息：SSLv3.0 和 TLS 在用 certificate_verify 和 finished 消息计算 MD5 和 SHA-1 散列码时，计算的输入有少许差别，但安全性相当。</p>
+</li>
+<li><p>加密计算：TLS 与 SSLv3.0 在计算<strong>主密值(master secret)</strong>时采用的方式不同。</p>
+</li>
+<li><p>填充：用户数据加密之前需要增加的填充字节。</p>
+<ul>
+<li>在 SSL 中，填充后的数据长度要达到密文块长度的最小整数倍。</li>
+<li>在 TLS 中，填充后的数据长度可以是密文块长度的任意整数倍（但填充的最大长度为255字节），这种方式可以防止基于对报文长度进行分析的攻击。</li>
+</ul>
+</li>
 </ul>
 <h3 id="HTTP与HTTPS的区别"><a href="#HTTP与HTTPS的区别" class="headerlink" title="HTTP与HTTPS的区别"></a>HTTP与HTTPS的区别</h3><table>
 <thead>
@@ -12105,10 +12141,10 @@
 
 ]]></content>
       <categories>
-        <category>技巧</category>
+        <category>算法</category>
       </categories>
       <tags>
-        <tag>技巧</tag>
+        <tag>算法</tag>
       </tags>
   </entry>
 </search>
