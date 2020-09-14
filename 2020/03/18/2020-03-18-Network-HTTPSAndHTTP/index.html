@@ -39,7 +39,7 @@
 <meta property="og:image" content="https://tva1.sinaimg.cn/large/00831rSTly1gda16yd3y9j30qi0d6gnh.jpg">
 <meta property="og:image" content="https://tva1.sinaimg.cn/large/00831rSTly1gda1a9ou70j30sq0bcjwe.jpg">
 <meta property="article:published_time" content="2020-03-17T21:20:20.000Z">
-<meta property="article:modified_time" content="2020-09-02T09:27:51.348Z">
+<meta property="article:modified_time" content="2020-09-12T07:53:04.753Z">
 <meta property="article:author" content="Not Today.">
 <meta property="article:tag" content="HTTPS">
 <meta name="twitter:card" content="summary">
@@ -260,7 +260,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-09-02 17:27:51" itemprop="dateModified" datetime="2020-09-02T17:27:51+08:00">2020-09-02</time>
+                <time title="修改时间：2020-09-12 15:53:04" itemprop="dateModified" datetime="2020-09-12T15:53:04+08:00">2020-09-12</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -299,7 +299,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>8.6k</span>
+              <span>8.8k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -478,16 +478,23 @@
 <li>200: 正常返回信息</li>
 </ul>
 </li>
-<li><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSMzeHjph43lrprlkJE=">3xx重定向<i class="fa fa-external-link-alt"></i></span>——需要后续操作才能完成这一请求</li>
+<li><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSMzeHjph43lrprlkJE=">3xx重定向<i class="fa fa-external-link-alt"></i></span>——需要后续操作才能完成这一请求<ul>
+<li><strong>300 Multiple Choices</strong></li>
+<li>301 Moved Permanently: 资源已经被永久移动，通常会发送HTTP Location来重定向到正确的新位置。Google 认为这是将网站从HTTP迁移到HTTPS的最佳方法。</li>
+<li>302 Found: 临时重定向。</li>
+<li>304 Not Modified: 资源在请求头中指定版本之后未被修改过。</li>
+</ul>
+</li>
 <li><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSM0eHjor7fmsYLplJnor68=">4xx请求错误<i class="fa fa-external-link-alt"></i></span>——请求含有词法错误或者无法被执行<ul>
-<li>401 Unauthorized：请求未经授权，这个状态码必须要和 <code>WWW-Authenticate</code> 一起使用</li>
+<li>401 Unauthorized：请求未经授权，即用户没有权限执行这个请求。</li>
 <li>403 Forbidden：服务器收到请求，但是拒绝提供服务</li>
 <li>404 Not Found：请求资源不存在。最常见的就是URL错误</li>
 </ul>
 </li>
 <li><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSM1eHjmnI3liqHlmajplJnor68=">5xx服务器错误<i class="fa fa-external-link-alt"></i></span>——服务器在处理某个正确请求时发生错误<ul>
 <li>500 Internal Server Error：服务器发生不可预期的错误</li>
-<li>505 Server Unavailable：服务器当前不能处理客户端的请求，一段时间后可能恢复正常。</li>
+<li>502 Bad Gateway：作为网关或者代理工作的服务器尝试执行请求时，从上游服务器接收到无效的响应。</li>
+<li>503 Service Unavailable：服务器当前不能处理客户端的请求，一段时间后可能恢复正常。</li>
 </ul>
 </li>
 </ul>
@@ -507,48 +514,49 @@
 <ul>
 <li>引入了持久连接(persistent connectio)，又称长连接。客户端和服务器发现对方一段时间没有活动，可以主动关闭连接。</li>
 <li>引入了流水线机制(pipelining)，也就是在同一个TCP连接里面，客户端可以同时发送多个请求。</li>
-<li>将 Content-length 字段的作用进行扩充，声明本次回应(Response)的数据长度。</li>
-<li>采用分块传输编码，产生一块数据，就发送一块，采用”流模式”（stream）取代”缓存模式”（buffer）。</li>
-<li>新增许多方法：PUT、PATCH、HEAD、 OPTIONS、DELETE。</li>
+<li>采用”流模式”（stream）取代”缓存模式”（buffer），采用分块传输编码，产生一块数据，就发送一块。</li>
 <li>客户端请求的头信息新增了 <strong>Host 字段</strong>，用来指定服务器的域名。</li>
+<li>新增许多方法：PUT、PATCH、HEAD、 OPTIONS、DELETE。</li>
+<li>将 Content-length 字段的作用进行扩充，声明本次回应(Response)的数据长度。</li>
 </ul>
 <blockquote>
 <p>虽然 HTTP1.1 允许复用 TCP 连接，但是同一个 TCP 连接里面，所有的数据通信是按次序进行的。服务器只有处理完一个回应，才会进行下一个回应。要是前面的回应特别慢，后面就会有许多请求排队等着。这称为”队头堵塞”（Head-of-line blocking）。</p>
-<p>为了避免这个问题，只有两种方法：一是减少请求数，二是同时多开持久连接。</p>
+<p>为了避免这个问题，只有两种方法：<strong>一是减少请求数，二是同时多开持久连接。</strong></p>
 <p>这产生了很多的网页优化技巧，比如合并脚本和样式表、将图片嵌入CSS代码、域名分片（domain sharding）等等。如果HTTP协议设计得更好一些，这些额外的工作是可以避免的。</p>
 </blockquote>
 <p><strong>HTTP1.x</strong>的缺点</p>
 <ol>
-<li>HTTP/1.0一次只允许在一个TCP连接上发起一个请求，HTTP/1.1 使用的流水线技术也只能<strong>部分处理请求并发</strong>，仍然会存在<strong>队列头阻塞</strong>问题，因此客户端在需要发起多次请求时，通常会采用建立多连接来减少延迟。</li>
+<li>HTTP/1.0一次只允许在<strong>一个TCP连接上发起一个请求</strong>，HTTP/1.1 使用的流水线技术也只能<strong>部分处理请求并发</strong>，仍然会存在<strong>队列头阻塞</strong>问题，因此客户端在需要发起多次请求时，通常会采用建立<strong>多连接</strong>来减少延迟。</li>
 <li>单向请求，只能由客户端发起。</li>
 <li>请求报文与响应报文首部信息冗余量大。</li>
 <li>数据未压缩，导致数据的传输量大。</li>
 </ol>
 <p><strong>HTTP2.0</strong></p>
 <blockquote>
-<p>主要基于SPDY协议(Google开发的基于TCP协议的应用层协议)，核心思想是尽量减少TCP连接数。</p>
-<p>目标是优化HTTP协议的性能，通过压缩、多路复用和优先级等技术，缩短网页的加载时间并提高安全性。</p>
+<p>主要基于SPDY协议(Google开发的基于TCP协议的应用层协议)</p>
+<p>核心思想是尽量减少TCP连接数。</p>
+<p>目标是优化HTTP协议的性能，通过<strong>压缩、多路复用和优先级</strong>等技术，缩短网页的加载时间并提高安全性。</p>
 <p>在不改动HTTP语义、方法、状态码、URI及首部字段的情况下，大幅度提高了 Web 性能。</p>
 </blockquote>
 <ul>
-<li>改用二进制传输，HTTP1.x 使用文本传输。<ul>
+<li>改用<strong>二进制传输</strong>，HTTP1.x 使用文本传输。<ul>
 <li>在应用层与传输层之间增加一个<strong>二进制分帧层</strong>，在二进制分帧层上，HTTP2.0 会将所有传输的信息分为更小的消息和帧，并采用二进制格式编码。</li>
 <li>其中 HTTP1.x 的首部信息会被封装到 <strong>Headers帧</strong>，而Request Body则封装到 <strong>Data帧</strong>。</li>
 </ul>
 </li>
-<li>头部(Header)压缩：<ul>
+<li><strong>头部(Header)压缩</strong>：<ul>
 <li>使用 HPACK (头部压缩算法)压缩格式对传输的 header 进行编码，减小了 header 的体积。</li>
-<li>在两端维护了索引表，用于记录出现过的header，后面在传输过程中就可以传输已经记录过的 header 的键名，对端收到数据后就可以通过键名找到对应的值。</li>
+<li>在两端维护了索引表(Map)，用于记录出现过的header，后面在传输过程中就可以传输已经记录过的 header 的键名，对端收到数据后就可以通过键名找到对应的值。</li>
 </ul>
 </li>
-<li>多路复用：使用多个流(stream)，每个流分帧传输，使得一个 TCP 连接能够处理多个 HTTP 请求，避免 HTTP1.x版本的队头阻塞问题。</li>
-<li>服务器Push：服务端可以在客户端某个请求后，主动推送其他资源。</li>
-<li>更安全：使用了 TLS 的 拓展ALPN 作为协议升级，除此之外，HTTP2.0 对 tls 的安全性做了近一步加强，通过黑名单机制禁用了几百种不再安全的加密算法。</li>
+<li><strong>多路复用</strong>：使用多个流(stream)，每个流分帧传输，使得一个 TCP 连接能够处理多个 HTTP 请求，避免 HTTP1.x版本的队头阻塞问题。</li>
+<li><strong>服务器端推送</strong>Push：服务端可以在客户端某个请求后，主动推送其他资源。</li>
+<li>更安全：使用了 TLS 的 拓展ALPN 作为协议升级，除此之外，HTTP2.0 对 TLS 的安全性做了近一步加强，通过黑名单机制禁用了几百种不再安全的加密算法。</li>
 </ul>
 <p><strong>HTTP3.0</strong></p>
 <ul>
 <li>基于 Google 的 QUIC 协议，利用UDP实现可靠数据传输。</li>
-<li>减少了 TCP 三次握手时间，以及 TLS 握手时间。</li>
+<li>减少了 TCP 三次握手时间，减少了 TLS 握手时间。</li>
 <li>解决了 HTTP 2.0 中前一个 stream 丢包导致后一个 stream 被阻塞的问题。</li>
 <li>优化了重传策略，重传包和原包的编号不同，降低后续重传计算的消耗。</li>
 <li>连接迁移，不再用 TCP 四元组确定一个连接，而是用一个 64 位随机数来确定这个连接。</li>
@@ -570,7 +578,7 @@
 </thead>
 <tbody><tr>
 <td>侧重点</td>
-<td>用来浏览网站、更多的是为终端用户提供文件传输，比如电影、图片、音乐</td>
+<td>用来浏览网站、更多的是为终端用户提供文件传输，比如电影、图片、音乐。</td>
 <td>用来访问和传输文件，FTP 文件传输常见于批量上传和维护网站。</td>
 </tr>
 <tr>
@@ -596,7 +604,7 @@
 <tr>
 <td>动态端口</td>
 <td>在双向传输中使用动态端口</td>
-<td>使用两个连接，第一个连接用来发送控制指令，当接受或者发送数据的时候，又打开第二个TCP连接。</td>
+<td>使用两个连接，第一个连接用来发送控制指令，当接收或者发送数据的时候，又打开第二个TCP连接。</td>
 </tr>
 <tr>
 <td>持久连接(长连接)</td>
@@ -768,7 +776,7 @@
 <p><strong>Cookie 简介</strong></p>
 <ul>
 <li>浏览器第一次连接服务器时Cookie是不存在的</li>
-<li>服务器响应客户端时，回在 Header 中设置 Set-Cookie，此时定义了 Cookie。</li>
+<li>服务器响应客户端时，会在 Header 中设置 Set-Cookie，服务器收到 Cookie 后存在本地。</li>
 <li>每一个 Cookie 都是 name-value 对</li>
 <li>此后浏览器再连接服务器，都会包含上 Cookie，服务器可以用它来关联特定的请求。</li>
 </ul>

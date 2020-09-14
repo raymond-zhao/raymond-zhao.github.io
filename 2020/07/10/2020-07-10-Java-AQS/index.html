@@ -36,7 +36,7 @@
 <meta property="og:image" content="https://i.loli.net/2020/07/12/iQ2kYSDRUX5Llx9.png">
 <meta property="og:image" content="https://i.loli.net/2020/07/12/HNh8XTdMbwSnk9l.jpg">
 <meta property="article:published_time" content="2020-07-10T15:53:42.000Z">
-<meta property="article:modified_time" content="2020-08-16T13:05:36.506Z">
+<meta property="article:modified_time" content="2020-09-13T01:11:02.833Z">
 <meta property="article:author" content="Not Today.">
 <meta property="article:tag" content="AQS">
 <meta name="twitter:card" content="summary">
@@ -257,7 +257,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-08-16 21:05:36" itemprop="dateModified" datetime="2020-08-16T21:05:36+08:00">2020-08-16</time>
+                <time title="修改时间：2020-09-13 09:11:02" itemprop="dateModified" datetime="2020-09-13T09:11:02+08:00">2020-09-13</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -316,7 +316,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="AQS源码笔记"><a href="#AQS源码笔记" class="headerlink" title="AQS源码笔记"></a>AQS源码笔记</h1><p><code>AQS</code>全称是 <code>AbstractQueuedSynchronizer</code>，顾名思义，是一个用来构建锁和同步器的框架，它底层用了 <code>CAS</code>技术来保证操作的原子性，同时利用 <code>FIFO</code>队列实现线程间的锁竞争，将基础的同步相关抽象细节放在 <code>AQS</code>，这也是 <code>ReentrantLock</code>、<code>CountDownLatch</code>以及其他众多同步工具实现同步的底层实现机制。它能够成为实现大部分同步需求的基础，也是 <code>J.U.C</code> 并发包同步的核心基础组件。</p>
+        <h1 id="AQS源码笔记"><a href="#AQS源码笔记" class="headerlink" title="AQS源码笔记"></a>AQS源码笔记</h1><p><code>AQS</code>全称是 <code>AbstractQueuedSynchronizer</code>，顾名思义，是一个用来构建锁和同步器的框架，它底层用了 <code>CAS</code>来保证操作的原子性，同时利用 <code>FIFO</code>队列实现线程间的锁竞争，将基础的同步相关抽象细节放在 <code>AQS</code>，这也是 <code>ReentrantLock</code>、<code>CountDownLatch</code>以及其他众多同步工具实现同步的底层实现机制。</p>
 <p><img data-src="https://i.loli.net/2020/07/11/GAxf3VBR86khFZM.png" alt="AQS继承关系图"></p>
 <p><code>AQS</code>是抽象类，并不能直接实例化，当需要使用<code>AQS</code>的时候需要继承<code>AQS</code>抽象类并且重写指定的方法，这些重写方法包括<strong>线程获取资源和释放资源的方式</strong>(如<code>ReentractLock</code>通过分别重写线程获取和释放资源的方式实现了<strong>公平锁</strong>和<strong>非公平锁</strong>)，<strong>同时子类还需要负责共享变量<code>state</code>的维护，如当<code>state = 0</code>时表示该锁没有被占，大于 $0$ 时候代表该锁被一个或多个线程占领(重入锁)</strong>，而队列的维护(获取资源失败入队、线程唤醒、线程的状态等)不需要我们考虑，<code>AQS</code>已经帮我们实现好了。<code>AQS</code>的这种设计模式采用的正是<strong>模板方法模式</strong>。</p>
 <p>继承了<code>AQS</code>的子类的主要任务包括：</p>
@@ -448,14 +448,13 @@
 <p>可以看到，其作用与<code>Object</code>原生的<code>wait()/notify()/notifyAll()</code>很相似，但是增加了更多的功能。下面以<code>awaitUninterruptibly()、signal()</code>为例，阐述一下其内部实现。</p>
 <p><img data-src="https://i.loli.net/2020/07/12/HNh8XTdMbwSnk9l.jpg" alt="ConditionObject的内部流程图"></p>
 <h2 id="同步队列和条件队列的关系"><a href="#同步队列和条件队列的关系" class="headerlink" title="同步队列和条件队列的关系"></a>同步队列和条件队列的关系</h2><ul>
-<li><p>线程执行<code>condition.await()</code>方法，将节点从同步队列转移到条件队列中。</p>
-</li>
-<li><p>线程执行<code>condition.signal()</code>方法，将节点从条件队列中转移到同步队列。</p>
-</li>
+<li>线程执行<code>condition.await()</code>方法，将节点从同步队列转移到条件队列中。</li>
+<li>线程执行<code>condition.signal()</code>方法，将节点从条件队列中转移到同步队列。</li>
 </ul>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><span class="exturl" data-url="aHR0cHM6Ly9kZG5kLmNuLzIwMTkvMDMvMTUvamF2YS1hYnN0cmFjdHF1ZXVlZHN5bmNocm9uaXplci8=">一文带你快速掌握AQS<i class="fa fa-external-link-alt"></i></span></li>
 <li><span class="exturl" data-url="aHR0cDovL29iamNvZGluZy5jb20vMjAxOS8wNS8wOC9hcXMtc2hhcmVkLWxvY2sv">Java并发值AQS源码分析<i class="fa fa-external-link-alt"></i></span></li>
+<li>《Java并发编程的艺术》</li>
 </ul>
 
     </div>
