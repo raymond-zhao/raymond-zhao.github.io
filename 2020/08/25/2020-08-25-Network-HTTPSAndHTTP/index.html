@@ -14,21 +14,20 @@
 
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/themes/blue/pace-theme-minimal.min.css">
   <script src="//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.min.js"></script>
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"raymond-zhao.top","root":"/","scheme":"Gemini","version":"7.8.0","exturl":true,"sidebar":{"position":"left","Pisces | Gemini":240,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":true,"comments":{"style":"tabs","active":"valine","storage":true,"lazyload":true,"nav":null,"activeClass":"valine"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"raymond-zhao.top","root":"/","scheme":"Gemini","version":"7.8.0","exturl":true,"sidebar":{"position":"left","Pisces | Gemini":240,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":true,"lazyload":true,"pangu":true,"comments":{"style":"tabs","active":"valine","storage":true,"lazyload":true,"nav":null,"activeClass":"valine"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="HTTPS与HTTP中的常见问题的梳理">
+  <meta name="description" content="HTTP 与 HTTPS 中的常见问题的梳理">
 <meta property="og:type" content="article">
-<meta property="og:title" content="HTTP与HTTPS">
-<meta property="og:url" content="http://raymond-zhao.top/2020/03/18/2020-03-18-Network-HTTPSAndHTTP/index.html">
+<meta property="og:title" content="HTTP 与 HTTPS">
+<meta property="og:url" content="http://raymond-zhao.top/2020/08/25/2020-08-25-Network-HTTPSAndHTTP/index.html">
 <meta property="og:site_name" content="Raymond&#39;s Blog">
-<meta property="og:description" content="HTTPS与HTTP中的常见问题的梳理">
+<meta property="og:description" content="HTTP 与 HTTPS 中的常见问题的梳理">
 <meta property="og:image" content="https://tva1.sinaimg.cn/large/00831rSTly1gd9qb100evj31f40ocdvs.jpg">
 <meta property="og:image" content="https://tva1.sinaimg.cn/large/00831rSTly1gczcfmgbzjg30u016i0yk.gif">
 <meta property="og:image" content="https://tva1.sinaimg.cn/large/00831rSTly1gd9rqohwupj31ea0jgk38.jpg">
@@ -38,14 +37,15 @@
 <meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0sk6p3nuj30jh0cb11y.jpg">
 <meta property="og:image" content="https://tva1.sinaimg.cn/large/00831rSTly1gda16yd3y9j30qi0d6gnh.jpg">
 <meta property="og:image" content="https://tva1.sinaimg.cn/large/00831rSTly1gda1a9ou70j30sq0bcjwe.jpg">
-<meta property="article:published_time" content="2020-03-17T21:20:20.000Z">
-<meta property="article:modified_time" content="2020-09-12T07:53:04.753Z">
+<meta property="article:published_time" content="2020-08-24T21:20:20.000Z">
+<meta property="article:modified_time" content="2020-10-06T02:09:10.743Z">
 <meta property="article:author" content="Not Today.">
+<meta property="article:tag" content="HTTP">
 <meta property="article:tag" content="HTTPS">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://tva1.sinaimg.cn/large/00831rSTly1gd9qb100evj31f40ocdvs.jpg">
 
-<link rel="canonical" href="http://raymond-zhao.top/2020/03/18/2020-03-18-Network-HTTPSAndHTTP/">
+<link rel="canonical" href="http://raymond-zhao.top/2020/08/25/2020-08-25-Network-HTTPSAndHTTP/">
 
 
 <script id="page-configurations">
@@ -58,7 +58,7 @@
   };
 </script>
 
-  <title>HTTP与HTTPS | Raymond's Blog</title>
+  <title>HTTP 与 HTTPS | Raymond's Blog</title>
   
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-153445863-1"></script>
     <script data-pjax>
@@ -157,12 +157,12 @@
   </li>
         <li class="menu-item menu-item-tags">
 
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">27</span></a>
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">29</span></a>
 
   </li>
         <li class="menu-item menu-item-categories">
 
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">15</span></a>
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">16</span></a>
 
   </li>
         <li class="menu-item menu-item-archives">
@@ -228,7 +228,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="http://raymond-zhao.top/2020/03/18/2020-03-18-Network-HTTPSAndHTTP/">
+    <link itemprop="mainEntityOfPage" href="http://raymond-zhao.top/2020/08/25/2020-08-25-Network-HTTPSAndHTTP/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -241,7 +241,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          HTTP与HTTPS
+          HTTP 与 HTTPS
         </h1>
 
         <div class="post-meta">
@@ -253,14 +253,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-03-18 05:20:20" itemprop="dateCreated datePublished" datetime="2020-03-18T05:20:20+08:00">2020-03-18</time>
+              <time title="创建时间：2020-08-25 05:20:20" itemprop="dateCreated datePublished" datetime="2020-08-25T05:20:20+08:00">2020-08-25</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-09-12 15:53:04" itemprop="dateModified" datetime="2020-09-12T15:53:04+08:00">2020-09-12</time>
+                <time title="修改时间：2020-10-06 10:09:10" itemprop="dateModified" datetime="2020-10-06T10:09:10+08:00">2020-10-06</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -288,8 +288,8 @@
       </span>
       <span class="post-meta-item-text">Valine：</span>
     
-    <a title="valine" href="/2020/03/18/2020-03-18-Network-HTTPSAndHTTP/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2020/03/18/2020-03-18-Network-HTTPSAndHTTP/" itemprop="commentCount"></span>
+    <a title="valine" href="/2020/08/25/2020-08-25-Network-HTTPSAndHTTP/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/08/25/2020-08-25-Network-HTTPSAndHTTP/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -299,7 +299,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>8.8k</span>
+              <span>8.5k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -308,7 +308,7 @@
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
               <span>8 分钟</span>
             </span>
-            <div class="post-description">HTTPS与HTTP中的常见问题的梳理</div>
+            <div class="post-description">HTTP 与 HTTPS 中的常见问题的梳理</div>
 
         </div>
       </header>
@@ -348,12 +348,6 @@
 </ul>
 <p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gczcfmgbzjg30u016i0yk.gif" alt="计算机网络分层体系图"></p>
 <p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9rqohwupj31ea0jgk38.jpg" alt="数据在各层之间的传递过程"></p>
-<h2 id="HTTP与HTTPS"><a href="#HTTP与HTTPS" class="headerlink" title="HTTP与HTTPS"></a>HTTP与HTTPS</h2><p>主要来源于<strong>维基百科</strong></p>
-<p><strong>超文本传输协议</strong>（英语：<strong>H</strong>yper<strong>T</strong>ext <strong>T</strong>ransfer <strong>P</strong>rotocol，缩写：<strong>HTTP</strong>）是一种用于分布式、协作式和<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv6LaF5aqS6auU">超媒体<i class="fa fa-external-link-alt"></i></span>信息系统的<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5bqU55So5bGC">应用层<i class="fa fa-external-link-alt"></i></span><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv572R57uc5Lyg6L6T5Y2P6K6u">协议<i class="fa fa-external-link-alt"></i></span><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv6LaF5paH5pys5Lyg6L6T5Y2P6K6uI2NpdGVfbm90ZS1pZXRmMjYxNi0x">[1]<i class="fa fa-external-link-alt"></i></span>。HTTP是<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5YWo55CD6LOH6KiK57ay">万维网<i class="fa fa-external-link-alt"></i></span>的数据通信的基础，无状态，明文传输。</p>
-<p><strong>超文本传输安全协议</strong>（英语：<strong>H</strong>yper<strong>T</strong>ext <strong>T</strong>ransfer <strong>P</strong>rotocol <strong>S</strong>ecure，缩写：<strong>HTTPS</strong>；常称为HTTP over TLS、HTTP over SSL或HTTP Secure）是一种通过<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv6KiI566X5qmf57ay57Wh">计算机网络<i class="fa fa-external-link-alt"></i></span>进行安全通信的<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv57ay6Lev5YKz6Ly45Y2U5a6a">传输协议<i class="fa fa-external-link-alt"></i></span>。HTTPS经由<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUA==">HTTP<i class="fa fa-external-link-alt"></i></span>进行通信，但利用<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5Lyg6L6T5bGC5a6J5YWo">SSL/TLS<i class="fa fa-external-link-alt"></i></span>来<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5Yqg5a+G">加密<i class="fa fa-external-link-alt"></i></span>数据包。HTTPS开发的主要目的，是提供对<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv57ay56uZ">网站<i class="fa fa-external-link-alt"></i></span>服务器的<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv6Lqr5Lu96aqM6K+B">身份认证<i class="fa fa-external-link-alt"></i></span>，保护交换数据的隐私与<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5a6M5pW05oCn">完整性<i class="fa fa-external-link-alt"></i></span>。</p>
-<p>HTTP是一个客户端（用户）和服务端（网站）之间请求和应答的标准，通常使用<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5Lyg6L6T5o6n5Yi25Y2P6K6u">TCP协议<i class="fa fa-external-link-alt"></i></span>。默认端口 80, HTTPS默认端口 443。</p>
-<p>HTTP协议和安全协议同属于应用层（<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvT1NJ5qih5Z6L">OSI模型<i class="fa fa-external-link-alt"></i></span>的最高层），具体来讲，安全协议工作在HTTP之下，传输层之上：安全协议向运行HTTP的进程提供一个类似于TCP的套接字，供进程向其中注入报文，安全协议将报文加密并注入运输层套接字；或是从运输层获取加密报文，解密后交给对应的进程。严格地讲，HTTPS并不是一个单独的协议，而是对工作在一加密连接（<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5Lyg6L6T5bGC5a6J5YWo">TLS<i class="fa fa-external-link-alt"></i></span>或SSL）上的常规HTTP协议的称呼。</p>
-<p>HTTP使用TCP三次握手建立连接，客户端和服务器需要交换3个包；HTTPS除了TCP的三个包，还要加上ssl握手需要的9个包，所以一共是12个包。</p>
 <h3 id="请求方法"><a href="#请求方法" class="headerlink" title="请求方法"></a>请求方法</h3><blockquote>
 <p>问题：POST 方法与 PUT 方法的区别?</p>
 </blockquote>
@@ -446,7 +440,7 @@
 </tr>
 <tr>
 <td align="center">URL长度</td>
-<td align="center">有限制，但不同浏览器限制又不同<br />常说的2KB其实是指IE8，Chrome和Apache为8KB</td>
+<td align="center">有限制，但不同浏览器限制又不同。常说的2KB其实是指IE8，Chrome和Apache为8KB</td>
 <td align="center">无限制(Post请求本身不限制长度，但是服务器是会限制的。)</td>
 </tr>
 <tr>
@@ -473,25 +467,39 @@
 <h3 id="状态码"><a href="#状态码" class="headerlink" title="状态码"></a>状态码</h3><p>所有HTTP响应的第一行都是<strong>状态行</strong>，依次是当前HTTP版本号，3位数字组成的<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggQ==">状态代码<i class="fa fa-external-link-alt"></i></span>，以及描述状态的短语，彼此由空格分隔。</p>
 <p>状态代码的第一个数字代表当前响应的类型：</p>
 <ul>
-<li><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSMxeHjmtojmga8=">1xx消息<i class="fa fa-external-link-alt"></i></span>——请求已被服务器接收，继续处理</li>
-<li><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSMyeHjmiJDlip8=">2xx成功<i class="fa fa-external-link-alt"></i></span>——请求已成功被服务器接收、理解、并接受<ul>
+<li><p><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSMxeHjmtojmga8=">1xx消息<i class="fa fa-external-link-alt"></i></span>——请求已被服务器接收，继续处理</p>
+</li>
+<li><p><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSMyeHjmiJDlip8=">2xx成功<i class="fa fa-external-link-alt"></i></span>——请求已成功被服务器接收、理解、并接受</p>
+<ul>
 <li>200: 正常返回信息</li>
 </ul>
 </li>
-<li><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSMzeHjph43lrprlkJE=">3xx重定向<i class="fa fa-external-link-alt"></i></span>——需要后续操作才能完成这一请求<ul>
+<li><p><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSMzeHjph43lrprlkJE=">3xx重定向<i class="fa fa-external-link-alt"></i></span>——需要后续操作才能完成这一请求</p>
+<ul>
 <li><strong>300 Multiple Choices</strong></li>
 <li>301 Moved Permanently: 资源已经被永久移动，通常会发送HTTP Location来重定向到正确的新位置。Google 认为这是将网站从HTTP迁移到HTTPS的最佳方法。</li>
 <li>302 Found: 临时重定向。</li>
-<li>304 Not Modified: 资源在请求头中指定版本之后未被修改过。</li>
 </ul>
+<blockquote>
+<p>当 301、302、303 响应状态码返回时，几乎所有的浏览器都会把 POST 改成 GET，并删除请求报文内的主体，之后请求会自动再次 发送。</p>
+<p>301、302 标准是禁止将 POST 方法改变成 GET 方法的，但实际使 用时大家都会这么做。</p>
+</blockquote>
+<ul>
+<li>304 Not Modified: 表示客户端发送附带条件的请求时，服务器端允许请求访问资源，但未满足条件的情况。304 状态码返回时，不包含任何响应的主体部分。304 虽然被划分在 3XX 类别中，但是和重定向没有关系。</li>
+</ul>
+<blockquote>
+<p>附带条件的请求是指采用 GET 方法的请求报文中包含 If-Match，If-Modified- Since，If-None-Match，If-Range，If-Unmodified-Since 中任一首部。</p>
+</blockquote>
 </li>
-<li><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSM0eHjor7fmsYLplJnor68=">4xx请求错误<i class="fa fa-external-link-alt"></i></span>——请求含有词法错误或者无法被执行<ul>
+<li><p><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSM0eHjor7fmsYLplJnor68=">4xx请求错误<i class="fa fa-external-link-alt"></i></span>——请求含有词法错误或者无法被执行</p>
+<ul>
 <li>401 Unauthorized：请求未经授权，即用户没有权限执行这个请求。</li>
 <li>403 Forbidden：服务器收到请求，但是拒绝提供服务</li>
 <li>404 Not Found：请求资源不存在。最常见的就是URL错误</li>
 </ul>
 </li>
-<li><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSM1eHjmnI3liqHlmajplJnor68=">5xx服务器错误<i class="fa fa-external-link-alt"></i></span>——服务器在处理某个正确请求时发生错误<ul>
+<li><p><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSM1eHjmnI3liqHlmajplJnor68=">5xx服务器错误<i class="fa fa-external-link-alt"></i></span>——服务器在处理某个正确请求时发生错误</p>
+<ul>
 <li>500 Internal Server Error：服务器发生不可预期的错误</li>
 <li>502 Bad Gateway：作为网关或者代理工作的服务器尝试执行请求时，从上游服务器接收到无效的响应。</li>
 <li>503 Service Unavailable：服务器当前不能处理客户端的请求，一段时间后可能恢复正常。</li>
@@ -644,26 +652,24 @@
 <li>自动的压缩机制使得传输的数据更少。</li>
 <li>没有命令/应答机制最大限度的减少了往返时延。</li>
 </ul>
-<h3 id="HTTPS的工作流程"><a href="#HTTPS的工作流程" class="headerlink" title="HTTPS的工作流程"></a>HTTPS的工作流程</h3><h4 id="证明公开密钥正确性的证书"><a href="#证明公开密钥正确性的证书" class="headerlink" title="证明公开密钥正确性的证书"></a>证明公开密钥正确性的证书</h4><p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0r9c0msvj30k60g0480.jpg" alt="证明公开密钥正确性的证书"></p>
+<h3 id="HTTPS的工作流程"><a href="#HTTPS的工作流程" class="headerlink" title="HTTPS的工作流程"></a>HTTPS的工作流程</h3><h4 id="如何验证公钥证书"><a href="#如何验证公钥证书" class="headerlink" title="如何验证公钥证书"></a>如何验证公钥证书</h4><p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0r9c0msvj30k60g0480.jpg" alt="证明公开密钥正确性的证书"></p>
 <h4 id="简易版的HTTPS工作流程"><a href="#简易版的HTTPS工作流程" class="headerlink" title="简易版的HTTPS工作流程"></a>简易版的HTTPS工作流程</h4><p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0rcx6t6hj30hw0fldjy.jpg" alt="简易版的HTTPS工作流程"></p>
 <ol>
-<li><p><strong>客户端发起HTTPS请求</strong></p>
-<p>用户在浏览器里输入一个https网址，然后连接到server的443端口。</p>
+<li><p><strong>客户端发起HTTPS请求</strong>，连接到 Server 的 443 端口。</p>
 </li>
-<li><p><strong>服务端的配置</strong></p>
-<p>参考上面的<strong>证明公开密钥正确性的证书</strong>部分。</p>
+<li><p><strong>服务器检测并选择客户端能支持的加密方式</strong></p>
 </li>
 <li><p><strong>传送证书</strong></p>
-<p>将自己的数字证书的部分信息返回给客户端，其中包括公钥，以及支持的SSL版本等信息。</p>
+<p>服务器将自己的数字证书的部分信息返回给客户端，其中包括公钥，以及支持的SSL 版本等信息。</p>
 </li>
 <li><p><strong>客户端解析证书</strong></p>
-<p>客户端首先会验证公钥是否有效，如果发现异常，则弹出警告。否则那么就生成一个随机值，然后用公钥对该随机值进行加密。</p>
+<p>客户端首先会验证公钥是否有效，如果发现异常，则弹出警告。否则那么就生成一个随机值（Premaster Secret），然后用公钥对该随机值进行加密。</p>
 </li>
 <li><p><strong>传送加密信息</strong></p>
 <p>传送的是用证书加密后的随机值，目的就是让服务端得到这个随机值，以后客户端和服务端的通信就可以通过这个随机值来进行加密解密了。</p>
 </li>
-<li><p><strong>服务段解密信息</strong></p>
-<p>服务端用私钥解密后，得到客户端传过来的随机值。从客户端生成随机值到服务器解密获取随机值这个过程称为<strong>非对称加密</strong>。</p>
+<li><p><strong>服务端解密信息</strong></p>
+<p>服务端用与公钥配对的私钥解密后，得到客户端传过来的随机值。从客户端生成随机值到服务器解密获取随机值这个过程称为<strong>非对称加密</strong>。</p>
 </li>
 <li><p><strong>传输加密后的信息</strong></p>
 <p>服务器用刚刚解密得到的随机值加密需要传输的内容，并将加密后的信息发送给客户端。</p>
@@ -672,7 +678,7 @@
 <p>客户端用之前生成的随机值解密服务器传过来的信息，获取实际传输的内容。这个过程称为<strong>对称加密</strong>。</p>
 </li>
 </ol>
-<h4 id="详细版HTTPS通信流程"><a href="#详细版HTTPS通信流程" class="headerlink" title="详细版HTTPS通信流程"></a>详细版HTTPS通信流程</h4><blockquote>
+<h4 id="SSL-协商过程"><a href="#SSL-协商过程" class="headerlink" title="SSL 协商过程"></a>SSL 协商过程</h4><blockquote>
 <p>继续借用《图解HTTP》中的图文。</p>
 <p>HTTP连接需要交换3个包，而HTTPS连接需要交换 3(TCP) + 9 个包(SSL/TLS连接)。</p>
 <p>这里说的加密过程是指 SSL 的加密，至于 TLS 的加密…</p>
@@ -876,6 +882,7 @@
       <footer class="post-footer">
           
           <div class="post-tags">
+              <a href="/tags/HTTP/" rel="tag"><i class="fa fa-tag"></i> HTTP</a>
               <a href="/tags/HTTPS/" rel="tag"><i class="fa fa-tag"></i> HTTPS</a>
           </div>
 
@@ -885,12 +892,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/03/16/2020-03-16-Java-BitOps/" rel="prev" title="位运算的运用">
-      <i class="fa fa-chevron-left"></i> 位运算的运用
+    <a href="/2020/08/20/2020-08-19-volatile/" rel="prev" title="volatile底层实现原理">
+      <i class="fa fa-chevron-left"></i> volatile底层实现原理
     </a></div>
       <div class="post-nav-item">
-    <a href="/2020/03/19/2020-03-19-Algo-Sorting/" rel="next" title="排序算法">
-      排序算法 <i class="fa fa-chevron-right"></i>
+    <a href="/2020/08/26/2020-08-26-Network-WhyTCPReliable/" rel="next" title="TCP传输为什么是可靠的？">
+      TCP传输为什么是可靠的？ <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -951,7 +958,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#分层体系"><span class="nav-text">分层体系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP与HTTPS"><span class="nav-text">HTTP与HTTPS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#请求方法"><span class="nav-text">请求方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GET-与-POST的区别"><span class="nav-text">GET 与 POST的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#状态码"><span class="nav-text">状态码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTP的缺点"><span class="nav-text">HTTP的缺点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTP各版本区别"><span class="nav-text">HTTP各版本区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTP-与-FTP"><span class="nav-text">HTTP 与 FTP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTPS的工作流程"><span class="nav-text">HTTPS的工作流程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#证明公开密钥正确性的证书"><span class="nav-text">证明公开密钥正确性的证书</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#简易版的HTTPS工作流程"><span class="nav-text">简易版的HTTPS工作流程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#详细版HTTPS通信流程"><span class="nav-text">详细版HTTPS通信流程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SSL-与-TLS"><span class="nav-text">SSL 与 TLS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTP与HTTPS的区别"><span class="nav-text">HTTP与HTTPS的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cookie-与-Session"><span class="nav-text">Cookie 与 Session</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-text">参考</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#分层体系"><span class="nav-text">分层体系</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#请求方法"><span class="nav-text">请求方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GET-与-POST的区别"><span class="nav-text">GET 与 POST的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#状态码"><span class="nav-text">状态码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTP的缺点"><span class="nav-text">HTTP的缺点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTP各版本区别"><span class="nav-text">HTTP各版本区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTP-与-FTP"><span class="nav-text">HTTP 与 FTP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTPS的工作流程"><span class="nav-text">HTTPS的工作流程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#如何验证公钥证书"><span class="nav-text">如何验证公钥证书</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#简易版的HTTPS工作流程"><span class="nav-text">简易版的HTTPS工作流程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SSL-协商过程"><span class="nav-text">SSL 协商过程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SSL-与-TLS"><span class="nav-text">SSL 与 TLS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTP与HTTPS的区别"><span class="nav-text">HTTP与HTTPS的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cookie-与-Session"><span class="nav-text">Cookie 与 Session</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-text">参考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -974,13 +981,13 @@
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-count">16</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-count">29</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -1103,8 +1110,7 @@
   
   <script src="//cdn.jsdelivr.net/npm/animejs@3.1.0/lib/anime.min.js"></script>
   <script src="//cdn.jsdelivr.net/gh/theme-next/theme-next-pjax@0/pjax.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
-  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/medium-zoom@1/dist/medium-zoom.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/lozad.js/1.14.0/lozad.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/pangu/4.0.7/pangu.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/velocity/1.2.1/velocity.min.js"></script>

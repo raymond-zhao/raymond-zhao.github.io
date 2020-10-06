@@ -352,6 +352,569 @@
       </tags>
   </entry>
   <entry>
+    <title>HTTP 与 HTTPS</title>
+    <url>/2020/08/25/2020-08-25-Network-HTTPSAndHTTP/</url>
+    <content><![CDATA[<h2 id="分层体系"><a href="#分层体系" class="headerlink" title="分层体系"></a>分层体系</h2><p>OSI 的七层协议体系结构的概念清楚，理论也较完整，但它既复杂又不实用。TCP/IP体系结构则不同，但它现在却得到了非常广泛的应用。</p>
+<p>TCP/IP是一个四层的体系结构，它包含应用层、运输层、网际层和网络接口层。</p>
+<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9qb100evj31f40ocdvs.jpg" alt="计算机网络体系结构"></p>
+<ul>
+<li><p>应用层(application layer)：应用层的任务是<strong>通过应用进程间的交互来完成特定网络应用</strong>。应用层协议定义的是<strong>应用进程间</strong>通信和交互的规则。在互联网中的应用层协议很多，如域名系统DNS，支持万维网应用的HTTP协议，支持电子邮件的SMTP协议等等。应用层交互的数据单元称为<strong>报文(message)</strong>。</p>
+</li>
+<li><p>运输层(transport layer)：运输层的任务就是负责<strong>向两台主机中进程之间的通信提供通用的数据传输服务</strong>。应用进程利用该服务传送应用层报文。所谓“通用的”，是指并不针对某个特定网络应用，而是多种应用可以使用同一个运输层服务。由于一台主机可同时运行多个进程，因此运输层有<strong>复用和分用</strong>的功能。复用就是多个应用层进程可同时使用下面运输层的服务，分用和复用相反，是运输层把收到的信息分别交付上面应用层中的相应进程。运输层主要使用以下两种协议:</p>
+<ul>
+<li>传输控制协议TCP(Transmission Control Protocol)—提供面向连接的、可靠的数据传输服务，其数据传输的单位是<strong>报文段(segment)</strong>。</li>
+<li>用户数据报协议UDP(User Datagram Protocol)—提供无连接的、尽最大努力(best-effort)的数据传输服务(不保证数据传输的可靠性)，其数据传输的单位是<strong>用户数据报</strong>。</li>
+</ul>
+</li>
+<li><p>网络层：网络层负责<strong>为分组交换网上的不同主机提供通信服务</strong>。在发送数据时，网络层把运输层产生的<strong>报文段或用户数据报封装成分组或包进行传送</strong>。在TCP/IP体系中，由于网络层使用IP协议，因此分组也叫做IP数据报，或简称为数据报。</p>
+<ul>
+<li>网络层的另一个任务就是要选择合适的路由，使源主机运输层所传下来的分组，能够通过网络中的路由器找到目的主机。</li>
+<li>不要将运输层的“用户数据报UDP”和网络层的“IP数据报”弄混。此外，无论在哪一层传送的数据单元，都可笼统地用“分组”来表示。</li>
+</ul>
+</li>
+<li><p>数据链路层(data link layer)：两台主机之间的数据传输，总是在一段一段的链路上传送的，这就需要使用专门的链路层的协议。在两个相邻结点之间传送数据时，数据链路层将网络层交下来的<strong>IP数据报组装成帧(framing)</strong>，在两个相邻结点间的链路上传送<strong>帧(frame)</strong>。每一帧包括数据和必要的控制信息(如同步信息、地址信息、差错控制等)。</p>
+<ul>
+<li>在接收数据时，控制信息使接收端能够知道一个帧从哪个比特开始和到哪个比特结束。</li>
+<li>控制信息还使接收端能够检测到所收到的帧中有无差错。</li>
+</ul>
+</li>
+<li><p>物理层(physical layer)：考虑的是怎样在传输媒体上<strong>透明地传输数据比特流</strong>，而不是指具体的传输媒体。物理层的作用是尽可能屏蔽传输媒体和通信手段的差异，使数据链路层感觉不到这些差异。</p>
+</li>
+</ul>
+<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gczcfmgbzjg30u016i0yk.gif" alt="计算机网络分层体系图"></p>
+<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9rqohwupj31ea0jgk38.jpg" alt="数据在各层之间的传递过程"></p>
+<h3 id="请求方法"><a href="#请求方法" class="headerlink" title="请求方法"></a>请求方法</h3><blockquote>
+<p>问题：POST 方法与 PUT 方法的区别?</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th align="center">方法名</th>
+<th align="center">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>GET</code></td>
+<td align="center">向指定的资源发出“显示”请求。</td>
+</tr>
+<tr>
+<td align="center"><code>PATCH</code></td>
+<td align="center">用于将局部修改应用到资源。</td>
+</tr>
+<tr>
+<td align="center"><code>POST</code></td>
+<td align="center">向指定资源提交数据，请求服务器进行处理。</td>
+</tr>
+<tr>
+<td align="center"><code>PUT</code></td>
+<td align="center">向指定资源位置上传其最新内容。</td>
+</tr>
+<tr>
+<td align="center"><code>DELETE</code></td>
+<td align="center">请求服务器删除Request-URI所标识的资源。</td>
+</tr>
+<tr>
+<td align="center"><code>HEAD</code></td>
+<td align="center">与GET方法一样，都是向服务器发出指定资源的请求。只不过服务器将不传回资源的本文部分。</td>
+</tr>
+<tr>
+<td align="center"><code>TRACE</code></td>
+<td align="center">回显服务器收到的请求，主要用于测试或诊断。</td>
+</tr>
+<tr>
+<td align="center"><code>OPTIONS</code></td>
+<td align="center">可使服务器传回该资源所支持的所有HTTP请求方法。</td>
+</tr>
+<tr>
+<td align="center"><code>CONNECT</code></td>
+<td align="center">通常用于SSL加密服务器的链接</td>
+</tr>
+</tbody></table>
+<h3 id="GET-与-POST的区别"><a href="#GET-与-POST的区别" class="headerlink" title="GET 与 POST的区别"></a>GET 与 POST的区别</h3><table>
+<thead>
+<tr>
+<th align="center">比较方面</th>
+<th align="center">GET</th>
+<th align="center">POST</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">请求主体(Body)</td>
+<td align="center">只有URL，无请求主体</td>
+<td align="center">有请求主体</td>
+</tr>
+<tr>
+<td align="center">响应主体</td>
+<td align="center">有</td>
+<td align="center">有</td>
+</tr>
+<tr>
+<td align="center">后退按钮/刷新</td>
+<td align="center">无副作用</td>
+<td align="center">数据会被重新提交</td>
+</tr>
+<tr>
+<td align="center">书签</td>
+<td align="center">可收藏为书签</td>
+<td align="center">不可收藏为书签</td>
+</tr>
+<tr>
+<td align="center">缓存</td>
+<td align="center">可被缓存</td>
+<td align="center">不能缓存</td>
+</tr>
+<tr>
+<td align="center">编码类型</td>
+<td align="center"><code>application/x-www-form-urlencoded</code></td>
+<td align="center"><code>application/x-www-form-urlencoded</code><br /><code>multipart/form-data</code><br /><code>text/plain</code></td>
+</tr>
+<tr>
+<td align="center">历史</td>
+<td align="center">参数保留在浏览器历史中</td>
+<td align="center">参数不会保存在浏览器历史中</td>
+</tr>
+<tr>
+<td align="center">URL长度</td>
+<td align="center">有限制，但不同浏览器限制又不同。常说的2KB其实是指IE8，Chrome和Apache为8KB</td>
+<td align="center">无限制(Post请求本身不限制长度，但是服务器是会限制的。)</td>
+</tr>
+<tr>
+<td align="center">对数据类型的限制</td>
+<td align="center">只允许 ASCII 字符</td>
+<td align="center">没有限制、也允许二进制数据，Percent Encoding编码</td>
+</tr>
+<tr>
+<td align="center">安全性</td>
+<td align="center">与 POST 相比，GET 的安全性较差，因为所发送的数据是 URL 的一部分。在发送密码或其他敏感信息时绝不要使用 GET</td>
+<td align="center">POST 比 GET 更安全，因为参数不会被保存在浏览器历史或 web 服务器日志中。</td>
+</tr>
+<tr>
+<td align="center">幂等性</td>
+<td align="center">支持</td>
+<td align="center">不支持</td>
+</tr>
+<tr>
+<td align="center">可见性</td>
+<td align="center">数据在 URL 中对所有人都是可见的</td>
+<td align="center">数据不会显示在 URL 中</td>
+</tr>
+</tbody></table>
+<h3 id="状态码"><a href="#状态码" class="headerlink" title="状态码"></a>状态码</h3><p>所有HTTP响应的第一行都是<strong>状态行</strong>，依次是当前HTTP版本号，3位数字组成的<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggQ==">状态代码<i class="fa fa-external-link-alt"></i></span>，以及描述状态的短语，彼此由空格分隔。</p>
+<p>状态代码的第一个数字代表当前响应的类型：</p>
+<ul>
+<li><p><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSMxeHjmtojmga8=">1xx消息<i class="fa fa-external-link-alt"></i></span>——请求已被服务器接收，继续处理</p>
+</li>
+<li><p><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSMyeHjmiJDlip8=">2xx成功<i class="fa fa-external-link-alt"></i></span>——请求已成功被服务器接收、理解、并接受</p>
+<ul>
+<li>200: 正常返回信息</li>
+</ul>
+</li>
+<li><p><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSMzeHjph43lrprlkJE=">3xx重定向<i class="fa fa-external-link-alt"></i></span>——需要后续操作才能完成这一请求</p>
+<ul>
+<li><strong>300 Multiple Choices</strong></li>
+<li>301 Moved Permanently: 资源已经被永久移动，通常会发送HTTP Location来重定向到正确的新位置。Google 认为这是将网站从HTTP迁移到HTTPS的最佳方法。</li>
+<li>302 Found: 临时重定向。</li>
+</ul>
+<blockquote>
+<p>当 301、302、303 响应状态码返回时，几乎所有的浏览器都会把 POST 改成 GET，并删除请求报文内的主体，之后请求会自动再次 发送。</p>
+<p>301、302 标准是禁止将 POST 方法改变成 GET 方法的，但实际使 用时大家都会这么做。</p>
+</blockquote>
+<ul>
+<li>304 Not Modified: 表示客户端发送附带条件的请求时，服务器端允许请求访问资源，但未满足条件的情况。304 状态码返回时，不包含任何响应的主体部分。304 虽然被划分在 3XX 类别中，但是和重定向没有关系。</li>
+</ul>
+<blockquote>
+<p>附带条件的请求是指采用 GET 方法的请求报文中包含 If-Match，If-Modified- Since，If-None-Match，If-Range，If-Unmodified-Since 中任一首部。</p>
+</blockquote>
+</li>
+<li><p><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSM0eHjor7fmsYLplJnor68=">4xx请求错误<i class="fa fa-external-link-alt"></i></span>——请求含有词法错误或者无法被执行</p>
+<ul>
+<li>401 Unauthorized：请求未经授权，即用户没有权限执行这个请求。</li>
+<li>403 Forbidden：服务器收到请求，但是拒绝提供服务</li>
+<li>404 Not Found：请求资源不存在。最常见的就是URL错误</li>
+</ul>
+</li>
+<li><p><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSM1eHjmnI3liqHlmajplJnor68=">5xx服务器错误<i class="fa fa-external-link-alt"></i></span>——服务器在处理某个正确请求时发生错误</p>
+<ul>
+<li>500 Internal Server Error：服务器发生不可预期的错误</li>
+<li>502 Bad Gateway：作为网关或者代理工作的服务器尝试执行请求时，从上游服务器接收到无效的响应。</li>
+<li>503 Service Unavailable：服务器当前不能处理客户端的请求，一段时间后可能恢复正常。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="HTTP的缺点"><a href="#HTTP的缺点" class="headerlink" title="HTTP的缺点"></a>HTTP的缺点</h3><ul>
+<li>通信使用明文(不加密)，内容可能会被窃听。</li>
+<li>不验证通信方的身份，因此有可能遭遇伪装。</li>
+<li>无法证明报文的完整性，所以有可能已遭篡改。</li>
+</ul>
+<h3 id="HTTP各版本区别"><a href="#HTTP各版本区别" class="headerlink" title="HTTP各版本区别"></a>HTTP各版本区别</h3><p><strong>HTTP1.0</strong></p>
+<ul>
+<li>短连接：每次发送请求都要重新建立 TCP 连接，即三次握手，数据发送完毕就要关闭连接。</li>
+<li>无 host 头域，也就是 http 请求头里的 host。</li>
+<li>不允许断点续传，而且不能只传输对象的一部分，要求传输整个对象。</li>
+</ul>
+<p><strong>HTTP1.1</strong></p>
+<ul>
+<li>引入了持久连接(persistent connectio)，又称长连接。客户端和服务器发现对方一段时间没有活动，可以主动关闭连接。</li>
+<li>引入了流水线机制(pipelining)，也就是在同一个TCP连接里面，客户端可以同时发送多个请求。</li>
+<li>采用”流模式”（stream）取代”缓存模式”（buffer），采用分块传输编码，产生一块数据，就发送一块。</li>
+<li>客户端请求的头信息新增了 <strong>Host 字段</strong>，用来指定服务器的域名。</li>
+<li>新增许多方法：PUT、PATCH、HEAD、 OPTIONS、DELETE。</li>
+<li>将 Content-length 字段的作用进行扩充，声明本次回应(Response)的数据长度。</li>
+</ul>
+<blockquote>
+<p>虽然 HTTP1.1 允许复用 TCP 连接，但是同一个 TCP 连接里面，所有的数据通信是按次序进行的。服务器只有处理完一个回应，才会进行下一个回应。要是前面的回应特别慢，后面就会有许多请求排队等着。这称为”队头堵塞”（Head-of-line blocking）。</p>
+<p>为了避免这个问题，只有两种方法：<strong>一是减少请求数，二是同时多开持久连接。</strong></p>
+<p>这产生了很多的网页优化技巧，比如合并脚本和样式表、将图片嵌入CSS代码、域名分片（domain sharding）等等。如果HTTP协议设计得更好一些，这些额外的工作是可以避免的。</p>
+</blockquote>
+<p><strong>HTTP1.x</strong>的缺点</p>
+<ol>
+<li>HTTP/1.0一次只允许在<strong>一个TCP连接上发起一个请求</strong>，HTTP/1.1 使用的流水线技术也只能<strong>部分处理请求并发</strong>，仍然会存在<strong>队列头阻塞</strong>问题，因此客户端在需要发起多次请求时，通常会采用建立<strong>多连接</strong>来减少延迟。</li>
+<li>单向请求，只能由客户端发起。</li>
+<li>请求报文与响应报文首部信息冗余量大。</li>
+<li>数据未压缩，导致数据的传输量大。</li>
+</ol>
+<p><strong>HTTP2.0</strong></p>
+<blockquote>
+<p>主要基于SPDY协议(Google开发的基于TCP协议的应用层协议)</p>
+<p>核心思想是尽量减少TCP连接数。</p>
+<p>目标是优化HTTP协议的性能，通过<strong>压缩、多路复用和优先级</strong>等技术，缩短网页的加载时间并提高安全性。</p>
+<p>在不改动HTTP语义、方法、状态码、URI及首部字段的情况下，大幅度提高了 Web 性能。</p>
+</blockquote>
+<ul>
+<li>改用<strong>二进制传输</strong>，HTTP1.x 使用文本传输。<ul>
+<li>在应用层与传输层之间增加一个<strong>二进制分帧层</strong>，在二进制分帧层上，HTTP2.0 会将所有传输的信息分为更小的消息和帧，并采用二进制格式编码。</li>
+<li>其中 HTTP1.x 的首部信息会被封装到 <strong>Headers帧</strong>，而Request Body则封装到 <strong>Data帧</strong>。</li>
+</ul>
+</li>
+<li><strong>头部(Header)压缩</strong>：<ul>
+<li>使用 HPACK (头部压缩算法)压缩格式对传输的 header 进行编码，减小了 header 的体积。</li>
+<li>在两端维护了索引表(Map)，用于记录出现过的header，后面在传输过程中就可以传输已经记录过的 header 的键名，对端收到数据后就可以通过键名找到对应的值。</li>
+</ul>
+</li>
+<li><strong>多路复用</strong>：使用多个流(stream)，每个流分帧传输，使得一个 TCP 连接能够处理多个 HTTP 请求，避免 HTTP1.x版本的队头阻塞问题。</li>
+<li><strong>服务器端推送</strong>Push：服务端可以在客户端某个请求后，主动推送其他资源。</li>
+<li>更安全：使用了 TLS 的 拓展ALPN 作为协议升级，除此之外，HTTP2.0 对 TLS 的安全性做了近一步加强，通过黑名单机制禁用了几百种不再安全的加密算法。</li>
+</ul>
+<p><strong>HTTP3.0</strong></p>
+<ul>
+<li>基于 Google 的 QUIC 协议，利用UDP实现可靠数据传输。</li>
+<li>减少了 TCP 三次握手时间，减少了 TLS 握手时间。</li>
+<li>解决了 HTTP 2.0 中前一个 stream 丢包导致后一个 stream 被阻塞的问题。</li>
+<li>优化了重传策略，重传包和原包的编号不同，降低后续重传计算的消耗。</li>
+<li>连接迁移，不再用 TCP 四元组确定一个连接，而是用一个 64 位随机数来确定这个连接。</li>
+<li>更合适的流量控制。</li>
+</ul>
+<h3 id="HTTP-与-FTP"><a href="#HTTP-与-FTP" class="headerlink" title="HTTP 与 FTP"></a>HTTP 与 FTP</h3><blockquote>
+<p>关于文件上传：</p>
+<ul>
+<li><span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpYW5nMTk4OTA4MjAvYXJ0aWNsZS9kZXRhaWxzLzUzMjE1MDg3">断点续传<i class="fa fa-external-link-alt"></i></span></li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>HTTP</th>
+<th>FTP</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>侧重点</td>
+<td>用来浏览网站、更多的是为终端用户提供文件传输，比如电影、图片、音乐。</td>
+<td>用来访问和传输文件，FTP 文件传输常见于批量上传和维护网站。</td>
+</tr>
+<tr>
+<td>客户端</td>
+<td>通常是浏览器</td>
+<td>命令行或特定的图形界面</td>
+</tr>
+<tr>
+<td>头部</td>
+<td>包含 meta-data，比如最后修改日期、编码方式、服务器名称等。</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>数据格式</td>
+<td>只支持二进制格式文件</td>
+<td>支持ASCII与二进制</td>
+</tr>
+<tr>
+<td>流水线</td>
+<td>支持流水线，这就意味着客户端可以在上一个请求处理完之前，发出下一个请求，其结果就是多次请求数据之前省掉了部分服务器客户端往返时延。</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>动态端口</td>
+<td>在双向传输中使用动态端口</td>
+<td>使用两个连接，第一个连接用来发送控制指令，当接收或者发送数据的时候，又打开第二个TCP连接。</td>
+</tr>
+<tr>
+<td>持久连接(长连接)</td>
+<td>可以维护一个单个的连接并使用它进行任意数量的数据传输。</td>
+<td>每次有数据的需要时都创建一个新的连接。</td>
+</tr>
+<tr>
+<td>压缩算法</td>
+<td>提供了在一些压缩算法中客户端和服务器共同协商选择的办法，比如 gzip。</td>
+<td>不存在这种算法</td>
+</tr>
+<tr>
+<td>对代理的支持</td>
+<td>支持代理，这种功能是构建在协议里。</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>面向的对象</td>
+<td>没有这个概念</td>
+<td>面向文件，ftp 可以通过命令列出远程服务器的目录列表。</td>
+</tr>
+<tr>
+<td>文件大小</td>
+<td>比较适合上传小文件</td>
+<td>比较适合上传大文件，不需要将文件全部载入内存中。</td>
+</tr>
+</tbody></table>
+<p><strong>什么使 FTP 服务更快</strong></p>
+<ul>
+<li>发送数据中没有<code>meta-data</code>，仅传输原始的二进制文件。</li>
+<li>没有过度的分块编码。</li>
+</ul>
+<p><strong>什么使HTTP服务更快？</strong></p>
+<ul>
+<li>重用已存在的持久连接，从而有更好的TCP表现。</li>
+<li>流水线的支持使得从同一个服务器上请求多个文件更快。</li>
+<li>自动的压缩机制使得传输的数据更少。</li>
+<li>没有命令/应答机制最大限度的减少了往返时延。</li>
+</ul>
+<h3 id="HTTPS的工作流程"><a href="#HTTPS的工作流程" class="headerlink" title="HTTPS的工作流程"></a>HTTPS的工作流程</h3><h4 id="如何验证公钥证书"><a href="#如何验证公钥证书" class="headerlink" title="如何验证公钥证书"></a>如何验证公钥证书</h4><p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0r9c0msvj30k60g0480.jpg" alt="证明公开密钥正确性的证书"></p>
+<h4 id="简易版的HTTPS工作流程"><a href="#简易版的HTTPS工作流程" class="headerlink" title="简易版的HTTPS工作流程"></a>简易版的HTTPS工作流程</h4><p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0rcx6t6hj30hw0fldjy.jpg" alt="简易版的HTTPS工作流程"></p>
+<ol>
+<li><p><strong>客户端发起HTTPS请求</strong>，连接到 Server 的 443 端口。</p>
+</li>
+<li><p><strong>服务器检测并选择客户端能支持的加密方式</strong></p>
+</li>
+<li><p><strong>传送证书</strong></p>
+<p>服务器将自己的数字证书的部分信息返回给客户端，其中包括公钥，以及支持的SSL 版本等信息。</p>
+</li>
+<li><p><strong>客户端解析证书</strong></p>
+<p>客户端首先会验证公钥是否有效，如果发现异常，则弹出警告。否则那么就生成一个随机值（Premaster Secret），然后用公钥对该随机值进行加密。</p>
+</li>
+<li><p><strong>传送加密信息</strong></p>
+<p>传送的是用证书加密后的随机值，目的就是让服务端得到这个随机值，以后客户端和服务端的通信就可以通过这个随机值来进行加密解密了。</p>
+</li>
+<li><p><strong>服务端解密信息</strong></p>
+<p>服务端用与公钥配对的私钥解密后，得到客户端传过来的随机值。从客户端生成随机值到服务器解密获取随机值这个过程称为<strong>非对称加密</strong>。</p>
+</li>
+<li><p><strong>传输加密后的信息</strong></p>
+<p>服务器用刚刚解密得到的随机值加密需要传输的内容，并将加密后的信息发送给客户端。</p>
+</li>
+<li><p><strong>客户端解密信息</strong></p>
+<p>客户端用之前生成的随机值解密服务器传过来的信息，获取实际传输的内容。这个过程称为<strong>对称加密</strong>。</p>
+</li>
+</ol>
+<h4 id="SSL-协商过程"><a href="#SSL-协商过程" class="headerlink" title="SSL 协商过程"></a>SSL 协商过程</h4><blockquote>
+<p>继续借用《图解HTTP》中的图文。</p>
+<p>HTTP连接需要交换3个包，而HTTPS连接需要交换 3(TCP) + 9 个包(SSL/TLS连接)。</p>
+<p>这里说的加密过程是指 SSL 的加密，至于 TLS 的加密…</p>
+</blockquote>
+<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0rrhm2boj30k30og13g.jpg" alt="HTTPS通信"></p>
+<ol>
+<li><strong>客户端</strong>发送 Client Hello 报文开始 SSL 通信。报文中包含客户端支持的 SSL 的指定版本、加密组件列表(所使用的加密算法及密钥长度等)。</li>
+<li><strong>服务器</strong>确定可进行 SSL 通信时，以 Server Hello 报文作为应答。报文中包含 SSL 版本以及加密组件(Cipher Suite)。服务器的加密组件内容是<strong>从接收到的客户端加密组件内筛选出来的。</strong></li>
+<li><strong>服务器</strong>继续发送 Certificate 报文。报文中包含公钥证书。</li>
+<li><strong>服务器</strong>继续发送 ServerHelloDone 报文。通知客户端第一阶段的 SSL 握手协商部分结束。</li>
+<li><strong>客户端</strong>发送 Client Key Exchange 报文作为回应。报文中包含通信加密中一种被称为 <code>Pre-master secret</code>的随机密码串。这个报文已用第 3 步中的公钥进行加密。</li>
+<li><strong>客户端</strong>继续发送 Change Cipher Spec 报文。该报文会提示服务器，在此报文之后的通信都将会采用 <code>Premaster secret</code>秘钥加密。</li>
+<li><strong>客户端</strong>发送 Finished 报文。该报文包含连接至今，全部报文的整体校验值。此次握手协商能否成功，取决于服务器能否正确解密该报文。</li>
+<li><strong>服务器</strong>同样发送 Change Cipher Spec 报文。</li>
+<li><strong>服务器</strong>继续发送 Finished 报文。</li>
+<li>服务器与客户端交换完 Finished 报文之后，SSL 连接建立成功，通信将会受到 SSL 的保护。从此处开始进行<strong>应用层协议</strong>的通信，即发送 HTTP 请求。</li>
+<li><strong>应用层协议</strong>通信，即发送 HTTP 响应。</li>
+<li>由<strong>客户端</strong>断开连接。发送 close_notify 报文，之后发送 TCP FIN 报文来关闭与 TCP 的通信。</li>
+</ol>
+<p>下面是对整个流程的图解。图中说明了从仅使用服务器端的公开密钥证书(服务器证书)建立 HTTPS 通信的整个过程。</p>
+<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0sk6p3nuj30jh0cb11y.jpg" alt="HTTPS 通信的整个过程"></p>
+<h3 id="SSL-与-TLS"><a href="#SSL-与-TLS" class="headerlink" title="SSL 与 TLS"></a>SSL 与 TLS</h3><ul>
+<li><span class="exturl" data-url="aHR0cHM6Ly9iYWlrZS5iYWlkdS5jb20vaXRlbS/lronlhajlpZfmjqXlsYI=">SSL(Secure Sockets Layer安全套接层)<i class="fa fa-external-link-alt"></i></span></li>
+<li><a href="https://zh.wikipedia.org/wiki/%E5%82%B3%E8%BC%B8%E5%B1%A4%E5%AE%89%E5%85%A8%E6%80%A7%E5%8D%94%E5%AE%9A" target="_blank" rel="noopener">TLS (<strong>T</strong>ransport <strong>L</strong>ayer <strong>S</strong>ecurity 传输层安全性协议)</a></li>
+</ul>
+<p>TLS 与  SSL 的差异</p>
+<ul>
+<li><p>版本号：TLS 记录格式与 SSL 记录格式相同，但版本号的值不同，TLS1.0 使用的版本号为 SSLv3.1。</p>
+</li>
+<li><p>报文鉴别码：SSLv3.0 和 TLS 的 MAC 算法及 MAC 计算的范围不同。TLS 使用 HMAC 算法。SSLv3.0使用了相似的算法，两者差别在于 SSLv3.0 中，填充字节与密钥之间采用的是<strong>连接运算</strong>，而 HMAC 算法采用的是<strong>异或运算</strong>。</p>
+</li>
+<li><p>伪随机函数：TLS 使用了称为 PRF 的伪随机函数来将密钥扩展成数据块。</p>
+</li>
+<li><p>报警代码：TLS 在支持几乎所有的SSLv3.0报警代码的基础上，补充定义了很多报警代码，如解密失败（decryption_failed）、记录溢出（record_overflow）、未知CA（unknown_ca）、拒绝访问（access_denied）等。</p>
+</li>
+<li><p>密文族和客户证书：SSLv3.0 和 TLS 存在少量差别，TLS 不支持 Fortezza 密钥交换、加密算法和客户证书。</p>
+</li>
+<li><p>certificate_verify 和 finished 消息：SSLv3.0 和 TLS 在用 certificate_verify 和 finished 消息计算 MD5 和 SHA-1 散列码时，计算的输入有少许差别，但安全性相当。</p>
+</li>
+<li><p>加密计算：TLS 与 SSLv3.0 在计算<strong>主密值(master secret)</strong>时采用的方式不同。</p>
+</li>
+<li><p>填充：用户数据加密之前需要增加的填充字节。</p>
+<ul>
+<li>在 SSL 中，填充后的数据长度要达到密文块长度的最小整数倍。</li>
+<li>在 TLS 中，填充后的数据长度可以是密文块长度的任意整数倍（但填充的最大长度为255字节），这种方式可以防止基于对报文长度进行分析的攻击。</li>
+</ul>
+</li>
+</ul>
+<h3 id="HTTP与HTTPS的区别"><a href="#HTTP与HTTPS的区别" class="headerlink" title="HTTP与HTTPS的区别"></a>HTTP与HTTPS的区别</h3><table>
+<thead>
+<tr>
+<th align="center">方面</th>
+<th align="center">HTTP</th>
+<th align="center">HTTPS</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">开发目的</td>
+<td align="center">发布和接收 HTML 页面<br />浏览器和网站服务器之间传递信息</td>
+<td align="center">提供对网站服务器的身份认证<br />保护交换数据的隐私与完整性。</td>
+</tr>
+<tr>
+<td align="center">连接端口</td>
+<td align="center">80</td>
+<td align="center">443</td>
+</tr>
+<tr>
+<td align="center">安全协议</td>
+<td align="center">无</td>
+<td align="center">SSL/TLS</td>
+</tr>
+<tr>
+<td align="center">加密方式</td>
+<td align="center">无</td>
+<td align="center">对称加密、非对称加密、哈希算法、数字签名</td>
+</tr>
+<tr>
+<td align="center">安全性</td>
+<td align="center">明文传输、相对较低</td>
+<td align="center">加密传输、相对较高</td>
+</tr>
+<tr>
+<td align="center">建立连接</td>
+<td align="center">TCP三次握手交换3个包</td>
+<td align="center">TCP3个包+SSL9个包</td>
+</tr>
+<tr>
+<td align="center">响应速度</td>
+<td align="center">相对较快</td>
+<td align="center">相对较慢(比HTTP慢2到100倍)</td>
+</tr>
+<tr>
+<td align="center">所需费用</td>
+<td align="center">免费</td>
+<td align="center">可能需要购买证书</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="Cookie-与-Session"><a href="#Cookie-与-Session" class="headerlink" title="Cookie 与 Session"></a>Cookie 与 Session</h3><p>由于HTTP协议是无状态的协议，每一个 HTTP 请求都是互相独立的，服务器分辨不出两次请求是否来自同一个浏览器或同一位用户。</p>
+<p>所以服务端需要记录用户的状态时，就需要用某种机制来识具体的用户，这个机制就是Session。</p>
+<p><strong>Cookie 简介</strong></p>
+<ul>
+<li>浏览器第一次连接服务器时Cookie是不存在的</li>
+<li>服务器响应客户端时，会在 Header 中设置 Set-Cookie，服务器收到 Cookie 后存在本地。</li>
+<li>每一个 Cookie 都是 name-value 对</li>
+<li>此后浏览器再连接服务器，都会包含上 Cookie，服务器可以用它来关联特定的请求。</li>
+</ul>
+<p><strong>Cookie里有什么？</strong></p>
+<ul>
+<li>Name and data.<ul>
+<li>数据大小通常被浏览器所限定，一般小于 4KB</li>
+<li>一个服务器可以通过不同的 Name 定义多个 Cookie，但是浏览器限制了每一个服务器可以拥有的 Cookie 数量(50个左右)</li>
+</ul>
+</li>
+<li>当前 Cookie 的 Domain(作用域)信息：Server、port(可选)、URL 前缀(可选)。Cookie 只会被包含在匹配的作用域的请求之中。</li>
+<li>过期时间：浏览器可以删除老旧的 Cookies。</li>
+</ul>
+<p><strong>工作流程</strong></p>
+<ul>
+<li><p>由服务器发给客户端的特殊信息，以文本的形式存放在客户端</p>
+</li>
+<li><p>客户端再次请求的时候，会把 <code>Cookie</code> 回发</p>
+</li>
+<li><p>服务器收到后，会解析 <code>Cookie</code> 生成与客户端相对应的内容</p>
+</li>
+</ul>
+<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gda16yd3y9j30qi0d6gnh.jpg" alt="Cookie的设置与工作过程"></p>
+<p><strong>Session简介</strong></p>
+<ul>
+<li>Cookie 是服务器用来实现 Session 的一种方式</li>
+<li>Cookie 中包含了 Session 的表示，通常被称为 SessionID。</li>
+<li>Session的管理<ul>
+<li>可以储存在内存里</li>
+<li>或者储存在磁盘中的文件中</li>
+<li>或者存在数据库中</li>
+</ul>
+</li>
+</ul>
+<p><strong>简单工作流程</strong></p>
+<ul>
+<li>保存在服务器上的信息</li>
+<li>解析客户端请求并操作 <code>SessionId</code> ，按需保存状态信息。</li>
+<li>实现方式<ul>
+<li>使用 <code>Cookie</code> 来实现</li>
+<li>当客户端禁用 <code>Cookie</code> 时，可以使用 <code>URL</code> 回写来实现</li>
+</ul>
+</li>
+</ul>
+<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gda1a9ou70j30sq0bcjwe.jpg" alt="Session的工作方式"></p>
+<p> <code>Cookie</code> 和 <code>Session</code> 的区别</p>
+<table>
+<thead>
+<tr>
+<th>对比角度</th>
+<th>Cookie</th>
+<th>Session</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>存放位置</td>
+<td>位于客户端、包含用户信息</td>
+<td>位于服务器的文件，包含用户信息。如果是Tomcat的话，位于StandManager中。</td>
+</tr>
+<tr>
+<td>生存时间</td>
+<td>可以手动设定</td>
+<td>当关闭浏览器时就消失</td>
+</tr>
+<tr>
+<td>容量大小</td>
+<td>一般最大为 4KB</td>
+<td>理论上可以存储随意多的信息，唯一的限制是一个脚本一次最大能占用的内存，默认是128MB</td>
+</tr>
+<tr>
+<td>依赖性</td>
+<td>Cookie不依赖于Session，Cookie是Session的一种实现方式。</td>
+<td>Session依赖于Cookie</td>
+</tr>
+<tr>
+<td>安全性</td>
+<td>相对较低</td>
+<td>相对较高</td>
+</tr>
+</tbody></table>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>《计算机网络》第七版，谢希仁。</li>
+<li>《图解HTTP》上野 宣、于均良 译。</li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9qdWVqaW4uaW0vcG9zdC82ODQ0OTAzNTc1Njg0OTA3MDE2">掘金 - Cookie 和 Session 关系和区别<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cuamlhbnNodS5jb20vcC8yNTgwMjAyMWJlNjM=">简书 - 看完就彻底懂了session和cookie<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly93ZWIuc3RhbmZvcmQuZWR1L35vdXN0ZXIvY2dpLWJpbi9jczE0Mi1mYWxsMTAvaW5kZXgucGhw">Stanford University - CS 142: Web Applications (Fall 2010)<i class="fa fa-external-link-alt"></i></span></li>
+</ul>
+]]></content>
+      <categories>
+        <category>计算机网络</category>
+      </categories>
+      <tags>
+        <tag>HTTP</tag>
+        <tag>HTTPS</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>volatile底层实现原理</title>
     <url>/2020/08/20/2020-08-19-volatile/</url>
     <content><![CDATA[<h2 id="volatile底层实现原理"><a href="#volatile底层实现原理" class="headerlink" title="volatile底层实现原理"></a>volatile底层实现原理</h2><p>《Java并发编程的艺术》这本书的每一节基本上都是面试中的高频考点或者是重难点，实体书在书桌上摆了许久竟然都忽视掉了，现在必须要把这本书整理成电子版的。</p>
@@ -1293,11 +1856,11 @@
         <category>MySQL</category>
       </categories>
       <tags>
-        <tag>Explain中的列</tag>
+        <tag>MySQL Explain</tag>
       </tags>
   </entry>
   <entry>
-    <title>MySQL-事务与锁</title>
+    <title>MySQL-事务</title>
     <url>/2020/08/01/2020-08-01-MySQL-TransactionAndLock/</url>
     <content><![CDATA[<h1 id="MySQL-事务与锁"><a href="#MySQL-事务与锁" class="headerlink" title="MySQL-事务与锁"></a>MySQL-事务与锁</h1><h2 id="事务四大特性"><a href="#事务四大特性" class="headerlink" title="事务四大特性"></a>事务四大特性</h2><ul>
 <li>原子性（atomicity): 一个事务必须被视为一个不可分割的最小工作单元，整个事务中的所有操作要么全部提交成功，要么全部失败回滚，对于一个事务来说，不可能只执行其中的一部分操作，这就是事务的原子性。</li>
@@ -1308,13 +1871,13 @@
 <li>持久性（durability): 一旦事务提交，则其所做的修改就会永久保存到数据库中。此时即使系统崩溃，修改的数据也不会丢失。</li>
 </ul>
 <p>就像锁粒度的升级会增加系统开销一样，这种事务处理过程中额外的安全性，也会需要数据库系统做更多的额外工作。一个实现了 $ACID$ 的数据库，相比没有实现 $ACID$ 的数据库，通常会需要更强的 $CPU$ 处理能力、更大的内存和更多的磁盘空间。</p>
-<h2 id="事务隔离级别"><a href="#事务隔离级别" class="headerlink" title="事务隔离级别"></a>事务隔离级别</h2><p>上面提到的隔离性其实并不只是那么寥寥几语就足以概括。在 $SQL$ 标准中定义了四种隔离级别，每一种级别都规定了一个事务中所做的修改，哪些在事务内和事务间是可见的，哪些是不可见的。较低级别的隔离通常可以执行更高的并发，系统的开销也更低。</p>
+<h2 id="事务隔离级别"><a href="#事务隔离级别" class="headerlink" title="事务隔离级别"></a>事务隔离级别</h2><p>在 $SQL$ 标准中定义了四种隔离级别，每一种级别都规定了一个事务中所做的修改，哪些在事务内和事务间是可见的，哪些是不可见的。较低级别的隔离通常可以执行更高的并发，系统的开销也更低。</p>
 <ul>
 <li><p><code>READ UNCOMMITTED</code>（未提交读）</p>
-<p>在 <code>READ UNCOMMITTED</code>级别，事务中的修改，即使没有提交，对其他事务也都是可见的。事务可以读取未提交的数据，这也被称为脏读（<code>Dirty Read</code>）。这个级别会导致很多问题，从性能上来说，<code>READ UNCOMMITTED</code> 不会比其他的级别好太多，但却缺乏其他级别的很多好处。</p>
+<p>在 <code>READ UNCOMMITTED</code>级别，事务中的修改，即使没有提交，对其他事务也都是可见的。事务可以读取未提交的数据，这也被称为脏读（<code>Dirty Read</code>）。</p>
 </li>
 <li><p><code>READ COMMITTED</code>（提交读）</p>
-<p>大多数数据库系统的默认隔离级别都是 <code>READ COMMITTED</code>（但 $MYSQL$ 是<code>REPEATABLE READ</code> ）。<code>READ CMITTED</code> 满足前面提到的隔离性的简单定义：一个事务开始时，只能“看见”已经提交的事务所做的修改。换句话说，一个事务从开始直到提交之前，所做的任何修改对其他事务都是不可见的。这个级别有时候也叫做不可重复读（<code>nonrepeatable read</code>），因为两次执行同样的查询，可能会得到不一样的结果 </p>
+<p>大多数数据库系统的默认隔离级别都是 <code>READ COMMITTED</code>（但 $MySQL$ 是<code>REPEATABLE READ</code> ）。<code>READ COMITTED</code> 满足前面提到的隔离性的简单定义：一个事务开始时，只能“看见”已经提交的事务所做的修改。换句话说，一个事务从开始直到提交之前，所做的任何修改对其他事务都是不可见的。这个级别有时候也叫做不可重复读（<code>nonrepeatable read</code>），因为两次执行同样的查询，可能会得到不一样的结果。</p>
 </li>
 <li><p><code>REPEATABLE READ</code>（可重复读）<code>MySQL</code> 的认事务隔离级别</p>
 <p><code>REPEATABLE READ</code> 解决了脏读的问题，保证了在<strong>同一个事务中多次读取同样记录</strong>的结果是一致的。但是理论上，可重复读隔离级别还是无法解决另外一个幻读（<code>Phantom Read</code>）的问题。</p>
@@ -1502,7 +2065,7 @@
 <p><strong>SELECT 快照读</strong></p>
 <p>当执行 SELECT 操作时 InnoDB 默认会执行快照读，记录下此次 SELECT 的结果，之后再 SELECT 的则返回此次快照结果，即使其他事务提交了不会影响当前 SELECT 的数据，也就是<strong>可重复读</strong>。快照的生成时间为当前事务中第一次执行 SELECT 时刻，也就是说假设 A 开启了事务，然后在执行 SELECT 操作前，事务 B 插入了一条数据然后 COMMIT，此时 A 执行 SELECT，结果中将会出现 B 新添加的那条数据。之后即使仍有事务 C、D、E 继续开启事务、提交数据、提交事务，事务 A 的 SELECT 结果不变，因为<strong>快照已经生成</strong>。</p>
 <p><strong>当前读</strong></p>
-<p>对于写操作作(update、insert、delete)均采用当前读。执行这三个操作时会读取最新的记录，即使是别的事务新提交的数据也可以查询到。比如事务 A 准备要 UPDATE 一条数据，但是事务 B 已经 DELETE 这条数据并且 COMMIT ，此时事务 A 进行 UPDATE 将会失败，在 UPDATE 的时候需要知道最新的数据。正因如此，才导致上面 UPDATE 测试的那种情况。</p>
+<p>对于写操作(update、insert、delete)均采用当前读。执行这三个操作时会读取最新的记录，即使是别的事务新提交的数据也可以查询到。比如事务 A 准备要 UPDATE 一条数据，但是事务 B 已经 DELETE 这条数据并且 COMMIT ，此时事务 A 进行 UPDATE 将会失败，在 UPDATE 的时候需要知道最新的数据。正因如此，才导致上面 UPDATE 测试的那种情况。</p>
 <p>SELECT 的当前读需要手动加锁：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">select * from table where ? lock in share mode;</span><br><span class="line"></span><br><span class="line">select * from table where ? for update;</span><br></pre></td></tr></table></figure>
 
@@ -1534,7 +2097,7 @@
 <li>用于锁住<code>Index Record</code>之间的间隙</li>
 <li>如果是<code>通过唯一索引来搜索一行记录</code>的时候，不需要使用<code>Gap Locks</code>，此时<code>Gap Locks</code>降级为<code>Record Locks</code></li>
 <li><code>Gap S-Lock</code>与<code>Gap X-Lock</code>是兼容的</li>
-<li><code>Gap Locks</code>只能_<strong><code>阻止其他事务在该Gap中插入记录</code></strong>_，但<strong><code>无法阻止</code></strong>其他事务获取<code>同一个Gap</code>上的<code>Gap Lock</code></li>
+<li><code>Gap Locks</code>只能<strong><code>阻止其他事务在该Gap中插入记录</code></strong>，但<strong><code>无法阻止</code></strong>其他事务获取<code>同一个Gap</code>上的<code>Gap Lock</code></li>
 <li>可以通过将事务隔离级别设置为 READ COMMITTED 禁用<code>Gap Locks</code>。</li>
 </ul>
 <h4 id="Next-Key-Locks"><a href="#Next-Key-Locks" class="headerlink" title="Next-Key Locks"></a>Next-Key Locks</h4><ul>
@@ -1546,7 +2109,7 @@
 <li>也可以理解为在<code>id = 13</code>和<code>id = 20</code>上各有一个<code>X Lock</code>，在 $(11,13)$ 和 $(13, 20)$ 上各有一个<code>Gap Lock</code></li>
 </ul>
 </li>
-<li>在 InnoDB 的默认隔离级别 RR 下，支持 Next-Key Locks.</li>
+<li>在 InnoDB 的默认隔离级别 RR 下，支持 Next-Key Locks。</li>
 </ul>
 <h4 id="各种锁测试"><a href="#各种锁测试" class="headerlink" title="各种锁测试"></a>各种锁测试</h4><ul>
 <li>[InnoDB – Next-Key Lock](<span class="exturl" data-url="aHR0cDovL3pob25nbWluZ21hby5tZS8yMDE3LzA1LzE4L2lubm9kYi1uZXh0LWtleS1sb2NrLw==">InnoDB – Next-Key Lock<i class="fa fa-external-link-alt"></i></span>)</li>
@@ -1592,14 +2155,279 @@
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li>《高性能MySQL》第三版</li>
 <li><span class="exturl" data-url="aHR0cHM6Ly9qdWVqaW4uaW0vcG9zdC82ODQ0OTAzNzk5NTM0OTExNDk2">MySQL的可重复读级别能解决幻读吗 - 掘金<i class="fa fa-external-link-alt"></i></span></li>
-<li>[InnoDB – Next-Key Lock](<span class="exturl" data-url="aHR0cDovL3pob25nbWluZ21hby5tZS8yMDE3LzA1LzE4L2lubm9kYi1uZXh0LWtleS1sb2NrLw==">InnoDB – Next-Key Lock<i class="fa fa-external-link-alt"></i></span>)</li>
+<li><span class="exturl" data-url="aHR0cDovL3pob25nbWluZ21hby5tZS8yMDE3LzA1LzE4L2lubm9kYi1uZXh0LWtleS1sb2NrLw==">InnoDB – Next-Key Lock<i class="fa fa-external-link-alt"></i></span></li>
 </ul>
 ]]></content>
       <categories>
         <category>MySQL</category>
       </categories>
       <tags>
-        <tag>MySQL事务与锁</tag>
+        <tag>MySQL 事务</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MySQL-索引与慢查询优化</title>
+    <url>/2020/07/31/2020-07-31-MySQL-Index/</url>
+    <content><![CDATA[<h1 id="闲聊几句"><a href="#闲聊几句" class="headerlink" title="闲聊几句"></a>闲聊几句</h1><h2 id="数据库范式"><a href="#数据库范式" class="headerlink" title="数据库范式"></a>数据库范式</h2><p>目前关系数据库有六种范式：第一范式$(1NF)$、第二范式$(2NF)$、第三范式$(3NF)$、巴斯-科德范式$(BCNF)$、第四范式$(4NF)$和第五范式$(5NF$，又称完美范式)。</p>
+<ol>
+<li>第一范式$(1NF)$：所有的域都应该是原子性的，即数据库表的每一列都是不可分割的原子数据项，而不能是集合，数组，记录等非原子数据项。</li>
+<li>第二范式$(2NF)$：在$1NF$的基础上，非码属性必须完全依赖于候选码(在$1NF$基础上<strong>消除非主属性对主码的部分函数依赖</strong>)。</li>
+<li>在$2NF$基础上，任何非主属性不依赖于其它非主属性(在$2NF$基础上<strong>消除传递依赖</strong>)。</li>
+<li>在$3NF$基础上，任何非主属性不能对主键子集依赖(在$3NF$基础上<strong>消除对主码子集的依赖</strong>)</li>
+</ol>
+<h2 id="如何设计一个关系型数据库？"><a href="#如何设计一个关系型数据库？" class="headerlink" title="如何设计一个关系型数据库？"></a>如何设计一个关系型数据库？</h2><p>首先应该考虑关系数据库管理系统($RDBMS$)，在 $RDBMS$ 中又包含两个重要组成部分，分别是：</p>
+<ul>
+<li>程序实例：其中又包括存储管理、缓存机制、$SQL$ 解析、日志管理、权限划分、容灾机制、<strong>索引管理</strong>、<strong>锁管理</strong></li>
+<li>存储(文件系统)：硬盘等。</li>
+</ul>
+<h1 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h1><h2 id="索引分类"><a href="#索引分类" class="headerlink" title="索引分类"></a>索引分类</h2><p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1ghae0rq9atj30qs0i3dhr.jpg" alt="MySQL索引分类"></p>
+<h3 id="聚簇索引与非聚簇索引"><a href="#聚簇索引与非聚簇索引" class="headerlink" title="聚簇索引与非聚簇索引"></a>聚簇索引与非聚簇索引</h3><ul>
+<li>聚簇索引：<ul>
+<li>表数据是和主键一起存储，主键索引的叶结点存储行数据(包含了主键值)，二级索引的叶结点存储行的主键值。</li>
+<li>使用$B+$树作为索引的存储结构，非叶子节点都是索引关键字，但非叶子节点中的关键字中<strong>不存储对应记录的具体内容或内容地址</strong>。叶子节点上的数据是主键与具体记录(数据内容)。</li>
+</ul>
+</li>
+<li>非聚簇索引：<ul>
+<li>表数据和索引是分成两部分存储的，主键索引和二级索引存储上没有任何区别。</li>
+<li>使用$B+$树作为索引的存储结构，所有的节点都是索引，叶子节点存储的是索引$+$索引对应的记录的地址。</li>
+</ul>
+</li>
+</ul>
+<p><strong>聚簇索引的优缺点</strong></p>
+<ul>
+<li>优点：<ul>
+<li>把相关数据保存在一起，减少$I/O$次数。例如实现电子邮箱时，可以根据用户ID来聚集数据，这样只需要从磁盘读取少数的数据页就能获取某个用户的全部邮件。如果没有聚簇索引，则每封邮件都可能多一次磁盘$I/O$。</li>
+<li>数据访问更快。聚簇索引将索引和数据保存在同一个$B+Tree$中，因此从聚簇索引中获取数据通常比在非聚簇索引中查找要快。</li>
+<li>使用覆盖索引扫描的查询可以直接使用页节点中的主键值。</li>
+</ul>
+</li>
+<li>缺点：<ul>
+<li>聚簇数据最大限度地提高了$I/O$密集型应用的性能，但如果数据全部放在内存中，则访问的顺序就没那么重要了，聚簇索引也就没什么优势了。</li>
+<li><strong>插入速度严重依赖于插入顺序。</strong>按照主键的顺序插入是加载数据到<strong>InnoDB</strong>表中速度最快的方式。但如果不是按照主键顺序加载数据，那么在加载完成后最好使用<code>optimize table</code>命令重新组织一下表。</li>
+<li><strong>更新聚簇索引列的代价很高</strong>，因为会强制$InnoDB$将每个被更新的行移动到新的位置。</li>
+<li><strong>基于聚簇索引的表插入新行，或者主键被更新导致需要移动行的时候，可能面临”页分裂（page split)“的问题。</strong>当行的主键值要求必须将这一行插入到某个已满的页中时，存储引擎会将该页分裂成两个页面来容纳该行，这就是一次分裂操作。页分裂会导致表占用更多的磁盘空间。</li>
+<li>聚簇索引可能导致全表扫描变慢，尤其是行比较稀疏，或者由于页分裂导致数据存储不连续的时候。</li>
+<li>二级索引(非聚簇索引)所占存储单元更大，因为二级索引的叶子节点包含了引用行的主键列。</li>
+<li>二级索引访问需要两次索引查找，而不是一次。即在非索引覆盖的前提下，先到二级索引查询到主键，然后再按主键去查询得到数据。</li>
+</ul>
+</li>
+</ul>
+<h3 id="主键与唯一索引的区别是什么？"><a href="#主键与唯一索引的区别是什么？" class="headerlink" title="主键与唯一索引的区别是什么？"></a>主键与唯一索引的区别是什么？</h3><table>
+<thead>
+<tr>
+<th>对比项</th>
+<th>主键</th>
+<th>唯一索引</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>功能</td>
+<td>不仅是索引，还是约束。</td>
+<td>是索引的一种</td>
+</tr>
+<tr>
+<td>包含性</td>
+<td>主键索引一定是唯一索引</td>
+<td>唯一索引不一定是主键索引</td>
+</tr>
+<tr>
+<td>空值</td>
+<td>主键列不允许<code>null</code></td>
+<td>允许为<code>null</code></td>
+</tr>
+<tr>
+<td>外键</td>
+<td>可以做外键</td>
+<td>不可以</td>
+</tr>
+<tr>
+<td>数量</td>
+<td>只有一个主键</td>
+<td>可以有多个唯一索引</td>
+</tr>
+<tr>
+<td>优先级</td>
+<td>执行计划优先级高于唯一索引</td>
+<td>执行计划优先级低于主键</td>
+</tr>
+<tr>
+<td>包含列</td>
+<td>主键可以包含多个列，作为联合主键。</td>
+<td>包含一列</td>
+</tr>
+</tbody></table>
+<h3 id="索引的数据结构"><a href="#索引的数据结构" class="headerlink" title="索引的数据结构"></a>索引的数据结构</h3><ul>
+<li>树结构：二叉排序树、红黑树、B-树、B+树、</li>
+<li>Hash结构：<code>BitMap</code> 位图索引是神器<ul>
+<li>缺点仅能满足 <code>=, in</code> 操作，不能使用范围查询</li>
+<li>无法被用来避免数据的排序操作</li>
+<li>不能利用部分索引键查询</li>
+<li>不能避免表扫描遇到大量 <code>Hash</code> 值相同的情况，此时性能并不一定比 <code>B-树</code> 高。</li>
+</ul>
+</li>
+</ul>
+<h2 id="来自灵魂的拷问"><a href="#来自灵魂的拷问" class="headerlink" title="来自灵魂的拷问"></a>来自灵魂的拷问</h2><p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1ghafktgxhbj30u01m2ndc.jpg" alt="数据库索引总结"></p>
+<h2 id="索引的最左匹配"><a href="#索引的最左匹配" class="headerlink" title="索引的最左匹配"></a>索引的最左匹配</h2><p>👩‍🏫：为什么索引是最左匹配，而不是最右匹配，不是中间匹配？</p>
+<p>👨‍🎓：$\dots$</p>
+<p><strong>最左前缀匹配原则</strong></p>
+<blockquote>
+<p>If the table has a multiple-column index, any leftmost prefix of the index can be used by the optimizer to look up rows. </p>
+<p>如果在一个索引中包含多个列，那么这个索引的任何最左前缀均可以被优化器用于查询行。</p>
+<p><span class="exturl" data-url="aHR0cHM6Ly9kZXYubXlzcWwuY29tL2RvYy9yZWZtYW4vNS43L2VuL211bHRpcGxlLWNvbHVtbi1pbmRleGVzLmh0bWw=">MySQL Documentation - Multiple-Column Indexes<i class="fa fa-external-link-alt"></i></span></p>
+<p>假如有联合索引 (a, b, c)，那么查询条件<strong>走索引</strong>的是 (a)、(a, b)、(a, b, c)。</p>
+<p><strong>特别注意：</strong>这里说的<strong>走索引</strong>其实是<strong>覆盖索引</strong>。</p>
+<p><strong>覆盖索引：</strong>如果一个索引包含（或者说覆盖）所有需要查询的字段的值，成为“覆盖索引”。</p>
+<p>在 <a href="https://raymond-zhao.top/2020/08/02/2020-08-02-MySQL-Explain-Cols/">EXPLAIN 命令</a>的 </p>
+<p>如果在 Extra 列中看到 “Using index“，说明 MySQL 正在使用<strong>覆盖索引</strong>。–《高性能 MySQL》 附录 D =&gt; Explain 中的列 =&gt; type 列 =&gt; index。（Page 728）</p>
+</blockquote>
+<ul>
+<li>MySQL会一直从左向右匹配直到遇到范围查询(<code>&gt;, &lt;, between, like</code>)就停止匹配，比如 <code>a=3 and b=4 and c&gt;5 and d=6</code> , 如果建立 <code>(a,b,c,d)</code> 顺序的索引，则 <code>d</code> 是用不到索引的，因为到 <code>c</code> 就已经停止了，如果建立 <code>a,b,d,c</code> 的索引则都可以用到， <code>a,b,d</code> 的顺序可以任意调整。</li>
+<li><code>=, in</code> 可以乱序，比如建立 <code>(a,b,c)</code> 索引，那么 <code>a=1 and b=2 and c=3</code> 与<code>a=1 and c=3 and b=2</code>都可以命中索引，<code>MySQL</code>的查询优化器会帮助优化成索引可以识别的形式。</li>
+</ul>
+<p>假如有如下这张表结构：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">create table &#96;student&#96; (</span><br><span class="line">    &#96;id&#96; int(11) not null auto_increment,</span><br><span class="line">    &#96;name&#96; varchar(32) default null,</span><br><span class="line">    &#96;cid&#96; int(11) default null,</span><br><span class="line">    primary key (&#96;id&#96;),</span><br><span class="line">    key &#96;name_cid_idx&#96; (&#96;name&#96;, &#96;cid&#96;)</span><br><span class="line">) engine &#x3D; InnoDB auto_increment&#x3D;8 default charset&#x3D;utf8;</span><br></pre></td></tr></table></figure>
+
+<p>插入五条数据后表为</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>cid</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>raymond</td>
+<td>2</td>
+</tr>
+<tr>
+<td>8</td>
+<td>raymond</td>
+<td>1</td>
+</tr>
+<tr>
+<td>9</td>
+<td>ramona</td>
+<td>3</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Bezos</td>
+<td>4</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Bill</td>
+<td>6</td>
+</tr>
+</tbody></table>
+<p>如果执行下面这条查询，可以看到用了联合索引<code>name_cid_idx</code>，这是没有什么疑问的。而且<code>rows = 1</code>，<code>filtered = 100</code>。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 查询 1</span><br><span class="line">explain select * from student where name &#x3D; &#39;raymond&#39; and cid &#x3D; 2;</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1ghb9ye1j2tj314z01fjrg.jpg" alt="image-20200801140354338"></p>
+<p>但是如果执行了下面两条查询呢？</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 查询 2</span><br><span class="line">explain select * from student where cid &#x3D; 2;</span><br><span class="line"></span><br><span class="line"># 查询 3</span><br><span class="line">explain select * from student where cid &#x3D; 2 and name &#x3D; &#39;raymond&#39;;</span><br></pre></td></tr></table></figure>
+
+<p>查询结果分别如下(列名与上面图片相同，只放结果。) 从中可以看到，上面的查询 $2$ 使用了索引扫描(<code>rows = 5</code>)；查询 $3$ 的结果与查询 $1$ 的结果完全相同，说明$MySQL$ 的查询优化器为我们做了调整。</p>
+<figure class="highlight angelscript"><table><tr><td class="code"><pre><span class="line"><span class="number">1</span>,SIMPLE,student,&lt;<span class="literal">null</span>&gt;,index,&lt;<span class="literal">null</span>&gt;,name_cid_idx,<span class="number">104</span>,&lt;<span class="literal">null</span>&gt;,<span class="number">5</span>,<span class="number">20</span>,Using where; Using index</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="number">1</span>,SIMPLE,student,,<span class="built_in">ref</span>,name_cid_idx,name_cid_idx,<span class="number">104</span>,<span class="string">"const,const"</span>,<span class="number">1</span>,<span class="number">100</span>,Using index</span><br></pre></td></tr></table></figure>
+
+<p>那么为什么要强调最左匹配时要进行等值查询，而遇到范围查询时就失效呢？</p>
+<p>$MySQL$ 创建符合索引的规则时首先会对符合索引的最左边的列，也就是第一个<code>name</code>字段的数据进行排序，在第一个排序的基础上再对第二个字段<code>cid</code>进行排序。其实就相当于进行了<code>order by name asc, cid asc</code>这样的排序。</p>
+<p>所以如果对上面表格中的几条数据按<code>name</code>进行排序的话就会变成下面图片中的样子，既然按<code>name</code>排序，那么<code>cid</code>不再有序。</p>
+<ul>
+<li>如果是<strong>等值</strong>的话，将是有序的。观察$4,5$列同名的<code>raymond</code>，可以看到<code>cid</code>便是有序的。</li>
+<li>如果<strong>非等值(区间或范围)</strong>的话，将是无序的。观察$1,2,3$ 列可以看到，假如查询名字首字母在<code>B-r</code>之间的人，<code>cid</code>已经乱序，而在使用索引时需要顺序查询，但是<code>cid</code>依次为<code>4,6,3</code>，不能再按序查询。</li>
+</ul>
+<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1ghbaq7xbq7j308r0470sp.jpg" alt="按name排序"></p>
+<p>所以，为什么$MySQL$默认是最左匹配而不是最右匹配，为还是没清楚。</p>
+<h2 id="密集索引与稀疏索引"><a href="#密集索引与稀疏索引" class="headerlink" title="密集索引与稀疏索引"></a>密集索引与稀疏索引</h2><p>密集索引文件中的每个搜索码值都对应一个索引值</p>
+<p>稀疏索引文件只为索引码的某些值建立索引项</p>
+<ul>
+<li>MyISAM</li>
+<li>InnoDB<ul>
+<li>若一个主键被定义，则该主键为密集索引</li>
+<li>若没有主键被定义，则该表的第一个唯一非空索引作为密集索引</li>
+<li>若不满足以上条件，InnoDB内部会生成一个隐藏主键(密集索引)</li>
+<li>非主键索引存储相关键位和其对应的主键值，包含两次查找</li>
+</ul>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>MySQL</category>
+      </categories>
+      <tags>
+        <tag>MySQL 索引</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>数据结构-图</title>
+    <url>/2020/07/21/2020-07-21-DS-Graph/</url>
+    <content><![CDATA[<h1 id="图的遍历与力扣中的一些题目"><a href="#图的遍历与力扣中的一些题目" class="headerlink" title="图的遍历与力扣中的一些题目"></a>图的遍历与力扣中的一些题目</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>每次说到”图”这个字，总是会想起一个名为 <span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvJUU1JTg1JUFEJUU1JUJBJUE2JUU1JTg4JTg2JUU5JTlBJTk0JUU3JTkwJTg2JUU4JUFFJUJB">六度分割<i class="fa fa-external-link-alt"></i></span> 的理论。</p>
+<blockquote>
+<p><strong>六度分隔理论</strong>（英语：Six Degrees of Separation）认为世界上任何互不相识的两人，只需要很少的中间人就能够建立起联系。</p>
+</blockquote>
+<h2 id="图的基本知识"><a href="#图的基本知识" class="headerlink" title="图的基本知识"></a>图的基本知识</h2><p>图是一种数据结构，现在应用的越来越广泛，如非关系型数据库<code>Neo4j</code>，但是目前图应用的最广泛的领域应该还是社交网络，被重多互联网公司用来分析用户间的关系，分析人际网络，朋友圈。</p>
+<p>图由顶点($vertex$) 和 边($edge$) 来表示，其中顶点用来表示实体，而边则用来表示关系。</p>
+<h3 id="图的分类"><a href="#图的分类" class="headerlink" title="图的分类"></a>图的分类</h3><p>图可以分为无向图，有向图($Directed\ Graph$)，以及加权图($Weighted\ Graph$)三类。</p>
+<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1ggubfgi87tj30qy08fdgd.jpg" alt="图的类型"></p>
+<ul>
+<li>无向图：边之间没有方向，可以假设他们现在没什么特殊的联系，也许就是在<code>Twitter</code>上看到了某人的<code>Tweet</code>。</li>
+<li>有向图：边之间有方向，可以假设他们在<code>Twitter</code>上谁谁关注了谁谁。</li>
+<li>加权图：边上有权重，可以假设为他们之间已经认识了多久的时间了。</li>
+</ul>
+<h3 id="图的表示方式"><a href="#图的表示方式" class="headerlink" title="图的表示方式"></a>图的表示方式</h3><p>依然记得本科的数据结构课本上提过图有两种表示方式，分别是邻接矩阵与邻接表。</p>
+<p><strong>邻接矩阵</strong></p>
+<p>邻接矩阵是一个正方形矩阵，其边长等于结点的个数。矩阵的元素通常为数值。在无向图中是关于主对角线对称的。在下图中，矩阵中的元素为 $1$ 则表示两人之间有关系，为 $0$ 则表示没有关系。</p>
+<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1ggubotwmzdj308c07p3yk.jpg" alt="img"></p>
+<p>用邻接矩阵的方式来表示图的查询效率很高，但是，空间利用率却很低，有时候会变成稀疏矩阵。</p>
+<p><strong>邻接表</strong></p>
+<p>邻接表是一个列表数组，数组的大小等于图中的顶点数。数组特定索引处的列表表示与该顶点相邻的所有顶点。</p>
+<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1ggubsokco1j308c07p74c.jpg" alt="img"></p>
+<p>用邻接矩阵的方式来表示图，比较难以创建，而且查询效率较低，但是空间利用率相对较高。</p>
+<h2 id="利用Java实现图"><a href="#利用Java实现图" class="headerlink" title="利用Java实现图"></a>利用Java实现图</h2><p>在 $Java$ 里是没有提供图这个数据结构的，通过上面几部分可以知道，图的组成要素为顶点和边，那就手动创建一下吧。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Vertex</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> String label;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Vertex</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Vertex</span><span class="params">(String label)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.label = label;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// equals() and hashCode() 需要重写</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面定义的顶点内部属性为 $String$ ，考虑通用性，是应该设置成泛型的。</p>
+<p>接下来就选择使用邻接表的方式来表示图。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Graph</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> Map&lt;Vertex, List&lt;Vertex&gt;&gt; adjVertices;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Graph</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Graph</span><span class="params">(Map&lt;Vertex, List&lt;Vertex&gt;&gt; adjVertices)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.adjVertices = adjVertices;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="添加-删除顶点"><a href="#添加-删除顶点" class="headerlink" title="添加/删除顶点"></a>添加/删除顶点</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 在顶点集合中增加结点。</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addVertex</span><span class="params">(String label)</span> </span>&#123;</span><br><span class="line">    adjVertices.putIfAbsent(<span class="keyword">new</span> Vertex(label), <span class="keyword">new</span> ArrayList&lt;&gt;());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 在顶点集合中删除结点。</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeVertex</span><span class="params">(String label)</span> </span>&#123;</span><br><span class="line">    Vertex v = <span class="keyword">new</span> Vertex(label);</span><br><span class="line">    adjVertices.values().stream().forEach(e -&gt; e.remove(v));</span><br><span class="line">    adjVertices.remove(<span class="keyword">new</span> Vertex(label));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="添加-删除边"><a href="#添加-删除边" class="headerlink" title="添加/删除边"></a>添加/删除边</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 创建一条新的边并更新相邻的顶点</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addEdge</span><span class="params">(String label1, String label2)</span> </span>&#123;</span><br><span class="line">    Vertex v1 = <span class="keyword">new</span> Vertex(label1);</span><br><span class="line">    Vertex v2 = <span class="keyword">new</span> Vertex(label2);</span><br><span class="line">    adjVertices.get(v1).add(v2);</span><br><span class="line">    adjVertices.get(v2).add(v1);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 删除边</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeEdge</span><span class="params">(String label1, String label2)</span> </span>&#123;</span><br><span class="line">    Vertex v1 = <span class="keyword">new</span> Vertex(label1);</span><br><span class="line">    Vertex v2 = <span class="keyword">new</span> Vertex(label2);</span><br><span class="line">    List&lt;Vertex&gt; eV1 = adjVertices.get(v1);</span><br><span class="line">    List&lt;Vertex&gt; eV2 = adjVertices.get(v2);</span><br><span class="line">    <span class="keyword">if</span> (eV1 != <span class="keyword">null</span>)</span><br><span class="line">        eV1.remove(v2);</span><br><span class="line">    <span class="keyword">if</span> (eV2 != <span class="keyword">null</span>)</span><br><span class="line">        eV2.remove(v1);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="构造图"><a href="#构造图" class="headerlink" title="构造图"></a>构造图</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Graph <span class="title">createGraph</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Graph graph = <span class="keyword">new</span> Graph();</span><br><span class="line">    graph.addVertex(<span class="string">"Bob"</span>);</span><br><span class="line">    graph.addVertex(<span class="string">"Alice"</span>);</span><br><span class="line">    graph.addVertex(<span class="string">"Mark"</span>);</span><br><span class="line">    graph.addVertex(<span class="string">"Rob"</span>);</span><br><span class="line">    graph.addVertex(<span class="string">"Maria"</span>);</span><br><span class="line">    graph.addEdge(<span class="string">"Bob"</span>, <span class="string">"Alice"</span>);</span><br><span class="line">    graph.addEdge(<span class="string">"Bob"</span>, <span class="string">"Rob"</span>);</span><br><span class="line">    graph.addEdge(<span class="string">"Alice"</span>, <span class="string">"Mark"</span>);</span><br><span class="line">    graph.addEdge(<span class="string">"Rob"</span>, <span class="string">"Mark"</span>);</span><br><span class="line">    graph.addEdge(<span class="string">"Alice"</span>, <span class="string">"Maria"</span>);</span><br><span class="line">    graph.addEdge(<span class="string">"Rob"</span>, <span class="string">"Maria"</span>);</span><br><span class="line">    <span class="keyword">return</span> graph;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="获取某个顶点的邻接点"><a href="#获取某个顶点的邻接点" class="headerlink" title="获取某个顶点的邻接点"></a>获取某个顶点的邻接点</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> List&lt;Vertex&gt; <span class="title">getAdjVertices</span><span class="params">(String label)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> adjVertices.get(<span class="keyword">new</span> Vertex(label));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="图的遍历"><a href="#图的遍历" class="headerlink" title="图的遍历"></a>图的遍历</h2><p>前面定义好了图的基本结构与方法，是时候开始真正的操作了。</p>
+<h3 id="DFS"><a href="#DFS" class="headerlink" title="DFS"></a>DFS</h3><p>深度优先遍历从任意根顶点开始，并<strong>沿每个分支探索尽可能深的顶点，然后再探索同一级别的顶点</strong>。</p>
+<p>涉及到深度的用栈，涉及到广度的用队列。这应该没什么疑问吧？</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 深度优先遍历</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Set&lt;String&gt; <span class="title">depthFirstTraversal</span><span class="params">(Graph graph, String root)</span> </span>&#123;</span><br><span class="line">    Set&lt;String&gt; visited = <span class="keyword">new</span> LinkedHashSet&lt;&gt;();</span><br><span class="line">    Stack&lt;String&gt; stack = <span class="keyword">new</span> Stack&lt;&gt;();</span><br><span class="line">    stack.push(root);</span><br><span class="line">    <span class="keyword">while</span> (!stack.isEmpty()) &#123;</span><br><span class="line">        String vertex = stack.pop();</span><br><span class="line">        <span class="keyword">if</span> (!visited.contains(vertex)) &#123;</span><br><span class="line">            visited.add(vertex);</span><br><span class="line">            <span class="keyword">for</span> (Vertex v : graph.getAdjVertices(vertex))</span><br><span class="line">                stack.push(v.label);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> visited;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="BFS"><a href="#BFS" class="headerlink" title="BFS"></a>BFS</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Set&lt;String&gt; <span class="title">breadthFirstTraversal</span><span class="params">(Graph graph, String root)</span> </span>&#123;</span><br><span class="line">    Set&lt;String&gt; visited = <span class="keyword">new</span> LinkedHashSet&lt;&gt;();</span><br><span class="line">    Queue&lt;String&gt; queue = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">    queue.add(root);</span><br><span class="line">    visited.add(root);</span><br><span class="line">    <span class="keyword">while</span> (!queue.isEmpty()) &#123;</span><br><span class="line">        String vertex = queue.poll();</span><br><span class="line">        <span class="keyword">for</span> (Vertex v : graph.getAdjVertices(vertex)) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!visited.contains(v.label)) &#123;</span><br><span class="line">                visited.add(v.label);</span><br><span class="line">                queue.add(v.label);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> visited;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="求图的强连通分量"><a href="#求图的强连通分量" class="headerlink" title="求图的强连通分量"></a>求图的强连通分量</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@AUTHOR</span>: raymond</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@DATETIME</span>: 2020/8/12  08:38</span></span><br><span class="line"><span class="comment"> * DESCRIPTION: 寻找图中的最大强连通分量</span></span><br><span class="line"><span class="comment"> * 采用邻接表表示</span></span><br><span class="line"><span class="comment"> * 算法思想：一个具有最大强连通分量的有向图的逆转图仍然具有相同的强连通分量</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">KosarajuGraph</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> V;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> LinkedList&lt;Integer&gt;[] adj;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">KosarajuGraph</span><span class="params">(<span class="keyword">int</span> V)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.V = V;</span><br><span class="line">        adj = <span class="keyword">new</span> LinkedList[V];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; V; ++i)</span><br><span class="line">            adj[i] = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 添加边 注意只有有向图才有强连通分量</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> s 起点</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> d 终点</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addEdge</span><span class="params">(<span class="keyword">int</span> s, <span class="keyword">int</span> d)</span> </span>&#123;</span><br><span class="line">        adj[s].add(d);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 深度优先遍历工具类</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> s 起点</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> visitedVertices 访问列表</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">DFSUtil</span><span class="params">(<span class="keyword">int</span> s, <span class="keyword">boolean</span>[] visitedVertices)</span> </span>&#123;</span><br><span class="line">        visitedVertices[s] = <span class="keyword">true</span>;</span><br><span class="line">        System.out.print(s + <span class="string">" "</span>);</span><br><span class="line">        <span class="keyword">int</span> n;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (Integer integer : adj[s]) &#123;</span><br><span class="line">            n = integer;</span><br><span class="line">            <span class="keyword">if</span> (!visitedVertices[n])</span><br><span class="line">                DFSUtil(n, visitedVertices);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 逆转图</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 方向调转之后的图</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> KosarajuGraph <span class="title">transpose</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        KosarajuGraph g = <span class="keyword">new</span> KosarajuGraph(V);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> s = <span class="number">0</span>; s &lt; V; s++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (Integer integer : adj[s])</span><br><span class="line">                g.adj[integer].add(s);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> g;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">fillOrder</span><span class="params">(<span class="keyword">int</span> s, <span class="keyword">boolean</span>[] visitedVertices, Deque&lt;Integer&gt; stack)</span> </span>&#123;</span><br><span class="line">        visitedVertices[s] = <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> n : adj[s]) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!visitedVertices[n])</span><br><span class="line">                fillOrder(n, visitedVertices, stack);</span><br><span class="line">        &#125;</span><br><span class="line">        stack.push(s);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">printSCC</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Deque&lt;Integer&gt; stack = <span class="keyword">new</span> ArrayDeque&lt;&gt;();</span><br><span class="line">        <span class="keyword">boolean</span>[] visitedVertices = <span class="keyword">new</span> <span class="keyword">boolean</span>[V];</span><br><span class="line">        <span class="comment">// 1. 初始化访问列表</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; V; i++)</span><br><span class="line">            visitedVertices[i] = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; V; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!visitedVertices[i])</span><br><span class="line">                fillOrder(i, visitedVertices, stack);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        KosarajuGraph graph = transpose();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; V; i++)</span><br><span class="line">            visitedVertices[i] = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (!stack.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">int</span> s = stack.pop();</span><br><span class="line">            <span class="keyword">if</span> (!visitedVertices[s]) &#123;</span><br><span class="line">                graph.DFSUtil(s, visitedVertices);</span><br><span class="line">                System.out.println();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String args[])</span> </span>&#123;</span><br><span class="line">        KosarajuGraph g = <span class="keyword">new</span> KosarajuGraph(<span class="number">8</span>);</span><br><span class="line">        g.addEdge(<span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line">        g.addEdge(<span class="number">1</span>, <span class="number">2</span>);</span><br><span class="line">        g.addEdge(<span class="number">2</span>, <span class="number">3</span>);</span><br><span class="line">        g.addEdge(<span class="number">2</span>, <span class="number">4</span>);</span><br><span class="line">        g.addEdge(<span class="number">3</span>, <span class="number">0</span>);</span><br><span class="line">        g.addEdge(<span class="number">4</span>, <span class="number">5</span>);</span><br><span class="line">        g.addEdge(<span class="number">5</span>, <span class="number">6</span>);</span><br><span class="line">        g.addEdge(<span class="number">6</span>, <span class="number">4</span>);</span><br><span class="line">        g.addEdge(<span class="number">6</span>, <span class="number">7</span>);</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">"Strongly Connected Components:"</span>);</span><br><span class="line">        g.printSCC();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Kruskal-MST"><a href="#Kruskal-MST" class="headerlink" title="Kruskal MST"></a>Kruskal MST</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@AUTHOR</span>: raymond</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@DATETIME</span>: 2020/8/12  09:08</span></span><br><span class="line"><span class="comment"> * DESCRIPTION: Kruskal 算法生成最小生成树 O(e*lge)</span></span><br><span class="line"><span class="comment"> * 1. Sort all the edges from low weight to high</span></span><br><span class="line"><span class="comment"> * 2. Take the edge with the lowest weight and add it to the spanning tree.</span></span><br><span class="line"><span class="comment"> *      If adding the edge created a cycle, then reject this edge.</span></span><br><span class="line"><span class="comment"> * 3. Keep adding edges until we reach all vertices.</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">KruskalGraph</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> vertices, edges;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Edge[] edge;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">KruskalGraph</span><span class="params">(<span class="keyword">int</span> v, <span class="keyword">int</span> e)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.vertices = v;</span><br><span class="line">        <span class="keyword">this</span>.edges = e;</span><br><span class="line">        <span class="keyword">this</span>.edge = <span class="keyword">new</span> Edge[edges];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; e; i++)</span><br><span class="line">            edge[i] = <span class="keyword">new</span> Edge();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">find</span><span class="params">(Subset[] subsets, <span class="keyword">int</span> i)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (subsets[i].parent != i)</span><br><span class="line">            subsets[i].parent = find(subsets, subsets[i].parent);</span><br><span class="line">        <span class="keyword">return</span> subsets[i].parent;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">union</span><span class="params">(Subset[] subsets, <span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> xRoot = find(subsets, x);</span><br><span class="line">        <span class="keyword">int</span> yRoot = find(subsets, x);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (subsets[xRoot].rank &lt; subsets[yRoot].rank)</span><br><span class="line">            subsets[xRoot].parent = yRoot;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (subsets[xRoot].rank &gt; subsets[yRoot].rank)</span><br><span class="line">            subsets[yRoot].parent = xRoot;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            subsets[yRoot].parent = xRoot;</span><br><span class="line">            subsets[xRoot].rank++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Kruskal 具体实现</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">kruskal</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Edge[] res = <span class="keyword">new</span> Edge[vertices];</span><br><span class="line">        <span class="keyword">int</span> e = <span class="number">0</span>, i = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; vertices; ++i)</span><br><span class="line">            res[i] = <span class="keyword">new</span> Edge();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 1. 排序</span></span><br><span class="line">        Arrays.sort(edge);</span><br><span class="line">        Subset[] subsets = <span class="keyword">new</span> Subset[vertices];</span><br><span class="line">        <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; vertices; ++i)</span><br><span class="line">            subsets[i] = <span class="keyword">new</span> Subset();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> v = <span class="number">0</span>; v &lt; vertices; ++v) &#123;</span><br><span class="line">            subsets[v].parent = v;</span><br><span class="line">            subsets[v].rank = <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        i = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span> (e &lt; vertices - <span class="number">1</span>) &#123;</span><br><span class="line">            Edge nextEdge = <span class="keyword">new</span> Edge();</span><br><span class="line">            nextEdge = edge[i++];</span><br><span class="line">            <span class="keyword">int</span> x = find(subsets, nextEdge.src);</span><br><span class="line">            <span class="keyword">int</span> y = find(subsets, nextEdge.dest);</span><br><span class="line">            <span class="keyword">if</span> (x != y) &#123;</span><br><span class="line">                res[e++] = nextEdge;</span><br><span class="line">                union(subsets, x, y);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; e; ++i)</span><br><span class="line">            System.out.println(<span class="string">"src-"</span> + res[i].src + <span class="string">" - "</span> + <span class="string">"dest-"</span> + res[i].dest + <span class="string">" - "</span> + <span class="string">"weight-"</span> + res[i].weight);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> vertices = <span class="number">6</span>; <span class="comment">// Number of vertices</span></span><br><span class="line">        <span class="keyword">int</span> edges = <span class="number">8</span>; <span class="comment">// Number of edges</span></span><br><span class="line">        KruskalGraph G = <span class="keyword">new</span> KruskalGraph(vertices, edges);</span><br><span class="line"></span><br><span class="line">        G.edge[<span class="number">0</span>].src = <span class="number">0</span>;</span><br><span class="line">        G.edge[<span class="number">0</span>].dest = <span class="number">1</span>;</span><br><span class="line">        G.edge[<span class="number">0</span>].weight = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line">        G.edge[<span class="number">1</span>].src = <span class="number">0</span>;</span><br><span class="line">        G.edge[<span class="number">1</span>].dest = <span class="number">2</span>;</span><br><span class="line">        G.edge[<span class="number">1</span>].weight = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line">        G.edge[<span class="number">2</span>].src = <span class="number">1</span>;</span><br><span class="line">        G.edge[<span class="number">2</span>].dest = <span class="number">2</span>;</span><br><span class="line">        G.edge[<span class="number">2</span>].weight = <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">        G.edge[<span class="number">3</span>].src = <span class="number">2</span>;</span><br><span class="line">        G.edge[<span class="number">3</span>].dest = <span class="number">3</span>;</span><br><span class="line">        G.edge[<span class="number">3</span>].weight = <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line">        G.edge[<span class="number">4</span>].src = <span class="number">2</span>;</span><br><span class="line">        G.edge[<span class="number">4</span>].dest = <span class="number">5</span>;</span><br><span class="line">        G.edge[<span class="number">4</span>].weight = <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">        G.edge[<span class="number">5</span>].src = <span class="number">2</span>;</span><br><span class="line">        G.edge[<span class="number">5</span>].dest = <span class="number">4</span>;</span><br><span class="line">        G.edge[<span class="number">5</span>].weight = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line">        G.edge[<span class="number">6</span>].src = <span class="number">3</span>;</span><br><span class="line">        G.edge[<span class="number">6</span>].dest = <span class="number">4</span>;</span><br><span class="line">        G.edge[<span class="number">6</span>].weight = <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line">        G.edge[<span class="number">7</span>].src = <span class="number">5</span>;</span><br><span class="line">        G.edge[<span class="number">7</span>].dest = <span class="number">4</span>;</span><br><span class="line">        G.edge[<span class="number">7</span>].weight = <span class="number">3</span>;</span><br><span class="line">        G.kruskal();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 需要比较边的权重大小</span></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Edge</span> <span class="keyword">implements</span> <span class="title">Comparable</span>&lt;<span class="title">Edge</span>&gt; </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> src, dest, weight;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compareTo</span><span class="params">(Edge o)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>.weight - o.weight;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Subset</span> </span>&#123; <span class="keyword">int</span> parent, rank; &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Prim-MST"><a href="#Prim-MST" class="headerlink" title="Prim MST"></a>Prim MST</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@AUTHOR</span>: raymond</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@DATETIME</span>: 2020/8/12  09:33</span></span><br><span class="line"><span class="comment"> * DESCRIPTION: Prim 算法生成最小生成树 O(ElgV)</span></span><br><span class="line"><span class="comment"> * 1. Initialize the minimum spanning tree with a vertex chosen at random.</span></span><br><span class="line"><span class="comment"> * 2. Find all the edges that connect the tree to new vertices, find the minimum and add it to the tree.</span></span><br><span class="line"><span class="comment"> * 3. Keep repeating step 2 until we get a minimum spanning tree.</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PrimGraph</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">prim</span><span class="params">(<span class="keyword">int</span> G[][], <span class="keyword">int</span> V)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> noEdge; <span class="comment">// number of edge</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 创建一个数组，用于跟踪已选择的边。已选为 true，否则为 false.</span></span><br><span class="line">        <span class="keyword">boolean</span>[] selected = <span class="keyword">new</span> <span class="keyword">boolean</span>[V];</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 初始化</span></span><br><span class="line">        Arrays.fill(selected, <span class="keyword">false</span>);</span><br><span class="line">        noEdge = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Step 1: 选择第 0 个结点</span></span><br><span class="line">        selected[<span class="number">0</span>] = <span class="keyword">true</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 打印边与权重表头</span></span><br><span class="line">        System.out.println(<span class="string">"Edge : Weight"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 最小生成树中的边的数量总是会小于 V - 1</span></span><br><span class="line">        <span class="keyword">while</span> (noEdge &lt; V - <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">int</span> min = Integer.MAX_VALUE;</span><br><span class="line">            <span class="keyword">int</span> x = <span class="number">0</span>; <span class="comment">// row number</span></span><br><span class="line">            <span class="keyword">int</span> y = <span class="number">0</span>; <span class="comment">// col number</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; V; i++) &#123;</span><br><span class="line">                <span class="comment">// 对于集合 S 中的每个顶点，找到这个顶点的所有邻接顶点，</span></span><br><span class="line">                <span class="keyword">if</span> (selected[i]) &#123;</span><br><span class="line">                    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; V; j++) &#123;</span><br><span class="line">                        <span class="comment">// 未被选择并且两点之间存在边</span></span><br><span class="line">                        <span class="keyword">if</span> (!selected[j] &amp;&amp; G[i][j] != <span class="number">0</span>) &#123;</span><br><span class="line">                            <span class="comment">// 比较 Step 1 中选择的顶点与其邻接点之间的距离</span></span><br><span class="line">                            <span class="keyword">if</span> (min &gt; G[i][j]) &#123;</span><br><span class="line">                                min = G[i][j];</span><br><span class="line">                                x = i;</span><br><span class="line">                                y = j;</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println(x + <span class="string">" - "</span> + y + <span class="string">" :  "</span> + G[x][y]);</span><br><span class="line">            <span class="comment">// 如果顶点已经在集合 S 中，丢弃。</span></span><br><span class="line">            <span class="comment">// 否则选择另一个与 Step 1 选出的顶点最近的顶点</span></span><br><span class="line">            selected[y] = <span class="keyword">true</span>;</span><br><span class="line">            noEdge++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        PrimGraph g = <span class="keyword">new</span> PrimGraph();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// number of vertices in graph</span></span><br><span class="line">        <span class="keyword">int</span> V = <span class="number">5</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 创建一个 5x5 大小的二维邻接矩阵</span></span><br><span class="line">        <span class="keyword">int</span>[][] G = &#123; &#123; <span class="number">0</span>, <span class="number">9</span>, <span class="number">75</span>, <span class="number">0</span>, <span class="number">0</span> &#125;,</span><br><span class="line">                      &#123; <span class="number">9</span>, <span class="number">0</span>, <span class="number">95</span>, <span class="number">19</span>, <span class="number">42</span> &#125;,</span><br><span class="line">                      &#123; <span class="number">75</span>, <span class="number">95</span>, <span class="number">0</span>, <span class="number">51</span>, <span class="number">66</span> &#125;,</span><br><span class="line">                      &#123; <span class="number">0</span>, <span class="number">19</span>, <span class="number">51</span>, <span class="number">0</span>, <span class="number">31</span> &#125;,</span><br><span class="line">                      &#123; <span class="number">0</span>, <span class="number">42</span>, <span class="number">66</span>, <span class="number">31</span>, <span class="number">0</span> &#125; &#125;;</span><br><span class="line"></span><br><span class="line">        g.prim(G, V);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="图的Java库"><a href="#图的Java库" class="headerlink" title="图的Java库"></a>图的Java库</h2><ul>
+<li><span class="exturl" data-url="aHR0cHM6Ly9qZ3JhcGh0Lm9yZy8=">JGraphT<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2dvb2dsZS9ndWF2YS93aWtpL0dyYXBoc0V4cGxhaW5lZA==">Google Guava<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9jb21tb25zLmFwYWNoZS5vcmcvc2FuZGJveC9jb21tb25zLWdyYXBoLw==">Apache Commons<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cDovL2p1bmcuc291cmNlZm9yZ2UubmV0Lw==">Java Universal Network / Graph（JUNG）<i class="fa fa-external-link-alt"></i></span></li>
+</ul>
+]]></content>
+      <categories>
+        <category>数据结构</category>
+      </categories>
+      <tags>
+        <tag>图</tag>
       </tags>
   </entry>
   <entry>
@@ -1900,75 +2728,6 @@
       </categories>
       <tags>
         <tag>线程与线程池</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>数据结构-图</title>
-    <url>/2020/07/17/2020-07-17-DS-Graph/</url>
-    <content><![CDATA[<h1 id="图的遍历与力扣中的一些题目"><a href="#图的遍历与力扣中的一些题目" class="headerlink" title="图的遍历与力扣中的一些题目"></a>图的遍历与力扣中的一些题目</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>每次说到”图”这个字，总是会想起一个名为 <span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvJUU1JTg1JUFEJUU1JUJBJUE2JUU1JTg4JTg2JUU5JTlBJTk0JUU3JTkwJTg2JUU4JUFFJUJB">六度分割<i class="fa fa-external-link-alt"></i></span> 的理论。</p>
-<blockquote>
-<p><strong>六度分隔理论</strong>（英语：Six Degrees of Separation）认为世界上任何互不相识的两人，只需要很少的中间人就能够建立起联系。</p>
-</blockquote>
-<h2 id="图的基本知识"><a href="#图的基本知识" class="headerlink" title="图的基本知识"></a>图的基本知识</h2><p>图是一种数据结构，现在应用的越来越广泛，如非关系型数据库<code>Neo4j</code>，但是目前图应用的最广泛的领域应该还是社交网络，被重多互联网公司用来分析用户间的关系，分析人际网络，朋友圈。</p>
-<p>图由顶点($vertex$) 和 边($edge$) 来表示，其中顶点用来表示实体，而边则用来表示关系。</p>
-<h3 id="图的分类"><a href="#图的分类" class="headerlink" title="图的分类"></a>图的分类</h3><p>图可以分为无向图，有向图($Directed\ Graph$)，以及加权图($Weighted\ Graph$)三类。</p>
-<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1ggubfgi87tj30qy08fdgd.jpg" alt="图的类型"></p>
-<ul>
-<li>无向图：边之间没有方向，可以假设他们现在没什么特殊的联系，也许就是在<code>Twitter</code>上看到了某人的<code>Tweet</code>。</li>
-<li>有向图：边之间有方向，可以假设他们在<code>Twitter</code>上谁谁关注了谁谁。</li>
-<li>加权图：边上有权重，可以假设为他们之间已经认识了多久的时间了。</li>
-</ul>
-<h3 id="图的表示方式"><a href="#图的表示方式" class="headerlink" title="图的表示方式"></a>图的表示方式</h3><p>依然记得本科的数据结构课本上提过图有两种表示方式，分别是邻接矩阵与邻接表。</p>
-<p><strong>邻接矩阵</strong></p>
-<p>邻接矩阵是一个正方形矩阵，其边长等于结点的个数。矩阵的元素通常为数值。在无向图中是关于主对角线对称的。在下图中，矩阵中的元素为 $1$ 则表示两人之间有关系，为 $0$ 则表示没有关系。</p>
-<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1ggubotwmzdj308c07p3yk.jpg" alt="img"></p>
-<p>用邻接矩阵的方式来表示图的查询效率很高，但是，空间利用率却很低，有时候会变成稀疏矩阵。</p>
-<p><strong>邻接表</strong></p>
-<p>邻接表是一个列表数组，数组的大小等于图中的顶点数。数组特定索引处的列表表示与该顶点相邻的所有顶点。</p>
-<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1ggubsokco1j308c07p74c.jpg" alt="img"></p>
-<p>用邻接矩阵的方式来表示图，比较难以创建，而且查询效率较低，但是空间利用率相对较高。</p>
-<h2 id="利用Java实现图"><a href="#利用Java实现图" class="headerlink" title="利用Java实现图"></a>利用Java实现图</h2><p>在 $Java$ 里是没有提供图这个数据结构的，通过上面几部分可以知道，图的组成要素为顶点和边，那就手动创建一下吧。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Vertex</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> String label;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Vertex</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Vertex</span><span class="params">(String label)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.label = label;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// equals() and hashCode() 需要重写</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>上面定义的顶点内部属性为 $String$ ，考虑通用性，是应该设置成泛型的。</p>
-<p>接下来就选择使用邻接表的方式来表示图。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Graph</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> Map&lt;Vertex, List&lt;Vertex&gt;&gt; adjVertices;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Graph</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Graph</span><span class="params">(Map&lt;Vertex, List&lt;Vertex&gt;&gt; adjVertices)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.adjVertices = adjVertices;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="添加-删除顶点"><a href="#添加-删除顶点" class="headerlink" title="添加/删除顶点"></a>添加/删除顶点</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 在顶点集合中增加结点。</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addVertex</span><span class="params">(String label)</span> </span>&#123;</span><br><span class="line">    adjVertices.putIfAbsent(<span class="keyword">new</span> Vertex(label), <span class="keyword">new</span> ArrayList&lt;&gt;());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 在顶点集合中删除结点。</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeVertex</span><span class="params">(String label)</span> </span>&#123;</span><br><span class="line">    Vertex v = <span class="keyword">new</span> Vertex(label);</span><br><span class="line">    adjVertices.values().stream().forEach(e -&gt; e.remove(v));</span><br><span class="line">    adjVertices.remove(<span class="keyword">new</span> Vertex(label));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="添加-删除边"><a href="#添加-删除边" class="headerlink" title="添加/删除边"></a>添加/删除边</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 创建一条新的边并更新相邻的顶点</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addEdge</span><span class="params">(String label1, String label2)</span> </span>&#123;</span><br><span class="line">    Vertex v1 = <span class="keyword">new</span> Vertex(label1);</span><br><span class="line">    Vertex v2 = <span class="keyword">new</span> Vertex(label2);</span><br><span class="line">    adjVertices.get(v1).add(v2);</span><br><span class="line">    adjVertices.get(v2).add(v1);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 删除边</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeEdge</span><span class="params">(String label1, String label2)</span> </span>&#123;</span><br><span class="line">    Vertex v1 = <span class="keyword">new</span> Vertex(label1);</span><br><span class="line">    Vertex v2 = <span class="keyword">new</span> Vertex(label2);</span><br><span class="line">    List&lt;Vertex&gt; eV1 = adjVertices.get(v1);</span><br><span class="line">    List&lt;Vertex&gt; eV2 = adjVertices.get(v2);</span><br><span class="line">    <span class="keyword">if</span> (eV1 != <span class="keyword">null</span>)</span><br><span class="line">        eV1.remove(v2);</span><br><span class="line">    <span class="keyword">if</span> (eV2 != <span class="keyword">null</span>)</span><br><span class="line">        eV2.remove(v1);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="构造图"><a href="#构造图" class="headerlink" title="构造图"></a>构造图</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Graph <span class="title">createGraph</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Graph graph = <span class="keyword">new</span> Graph();</span><br><span class="line">    graph.addVertex(<span class="string">"Bob"</span>);</span><br><span class="line">    graph.addVertex(<span class="string">"Alice"</span>);</span><br><span class="line">    graph.addVertex(<span class="string">"Mark"</span>);</span><br><span class="line">    graph.addVertex(<span class="string">"Rob"</span>);</span><br><span class="line">    graph.addVertex(<span class="string">"Maria"</span>);</span><br><span class="line">    graph.addEdge(<span class="string">"Bob"</span>, <span class="string">"Alice"</span>);</span><br><span class="line">    graph.addEdge(<span class="string">"Bob"</span>, <span class="string">"Rob"</span>);</span><br><span class="line">    graph.addEdge(<span class="string">"Alice"</span>, <span class="string">"Mark"</span>);</span><br><span class="line">    graph.addEdge(<span class="string">"Rob"</span>, <span class="string">"Mark"</span>);</span><br><span class="line">    graph.addEdge(<span class="string">"Alice"</span>, <span class="string">"Maria"</span>);</span><br><span class="line">    graph.addEdge(<span class="string">"Rob"</span>, <span class="string">"Maria"</span>);</span><br><span class="line">    <span class="keyword">return</span> graph;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="获取某个顶点的邻接点"><a href="#获取某个顶点的邻接点" class="headerlink" title="获取某个顶点的邻接点"></a>获取某个顶点的邻接点</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> List&lt;Vertex&gt; <span class="title">getAdjVertices</span><span class="params">(String label)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> adjVertices.get(<span class="keyword">new</span> Vertex(label));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="图的遍历"><a href="#图的遍历" class="headerlink" title="图的遍历"></a>图的遍历</h2><p>前面定义好了图的基本结构与方法，是时候开始真正的操作了。</p>
-<h3 id="DFS"><a href="#DFS" class="headerlink" title="DFS"></a>DFS</h3><p>深度优先遍历从任意根顶点开始，并<strong>沿每个分支探索尽可能深的顶点，然后再探索同一级别的顶点</strong>。</p>
-<p>涉及到深度的用栈，涉及到广度的用队列。这应该没什么疑问吧？</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 深度优先遍历</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Set&lt;String&gt; <span class="title">depthFirstTraversal</span><span class="params">(Graph graph, String root)</span> </span>&#123;</span><br><span class="line">    Set&lt;String&gt; visited = <span class="keyword">new</span> LinkedHashSet&lt;&gt;();</span><br><span class="line">    Stack&lt;String&gt; stack = <span class="keyword">new</span> Stack&lt;&gt;();</span><br><span class="line">    stack.push(root);</span><br><span class="line">    <span class="keyword">while</span> (!stack.isEmpty()) &#123;</span><br><span class="line">        String vertex = stack.pop();</span><br><span class="line">        <span class="keyword">if</span> (!visited.contains(vertex)) &#123;</span><br><span class="line">            visited.add(vertex);</span><br><span class="line">            <span class="keyword">for</span> (Vertex v : graph.getAdjVertices(vertex))</span><br><span class="line">                stack.push(v.label);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> visited;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="BFS"><a href="#BFS" class="headerlink" title="BFS"></a>BFS</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Set&lt;String&gt; <span class="title">breadthFirstTraversal</span><span class="params">(Graph graph, String root)</span> </span>&#123;</span><br><span class="line">    Set&lt;String&gt; visited = <span class="keyword">new</span> LinkedHashSet&lt;&gt;();</span><br><span class="line">    Queue&lt;String&gt; queue = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">    queue.add(root);</span><br><span class="line">    visited.add(root);</span><br><span class="line">    <span class="keyword">while</span> (!queue.isEmpty()) &#123;</span><br><span class="line">        String vertex = queue.poll();</span><br><span class="line">        <span class="keyword">for</span> (Vertex v : graph.getAdjVertices(vertex)) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!visited.contains(v.label)) &#123;</span><br><span class="line">                visited.add(v.label);</span><br><span class="line">                queue.add(v.label);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> visited;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="求图的强连通分量"><a href="#求图的强连通分量" class="headerlink" title="求图的强连通分量"></a>求图的强连通分量</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@AUTHOR</span>: raymond</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@DATETIME</span>: 2020/8/12  08:38</span></span><br><span class="line"><span class="comment"> * DESCRIPTION: 寻找图中的最大强连通分量</span></span><br><span class="line"><span class="comment"> * 采用邻接表表示</span></span><br><span class="line"><span class="comment"> * 算法思想：一个具有最大强连通分量的有向图的逆转图仍然具有相同的强连通分量</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">KosarajuGraph</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> V;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> LinkedList&lt;Integer&gt;[] adj;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">KosarajuGraph</span><span class="params">(<span class="keyword">int</span> V)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.V = V;</span><br><span class="line">        adj = <span class="keyword">new</span> LinkedList[V];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; V; ++i)</span><br><span class="line">            adj[i] = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 添加边 注意只有有向图才有强连通分量</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> s 起点</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> d 终点</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addEdge</span><span class="params">(<span class="keyword">int</span> s, <span class="keyword">int</span> d)</span> </span>&#123;</span><br><span class="line">        adj[s].add(d);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 深度优先遍历工具类</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> s 起点</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> visitedVertices 访问列表</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">DFSUtil</span><span class="params">(<span class="keyword">int</span> s, <span class="keyword">boolean</span>[] visitedVertices)</span> </span>&#123;</span><br><span class="line">        visitedVertices[s] = <span class="keyword">true</span>;</span><br><span class="line">        System.out.print(s + <span class="string">" "</span>);</span><br><span class="line">        <span class="keyword">int</span> n;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (Integer integer : adj[s]) &#123;</span><br><span class="line">            n = integer;</span><br><span class="line">            <span class="keyword">if</span> (!visitedVertices[n])</span><br><span class="line">                DFSUtil(n, visitedVertices);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 逆转图</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 方向调转之后的图</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> KosarajuGraph <span class="title">transpose</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        KosarajuGraph g = <span class="keyword">new</span> KosarajuGraph(V);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> s = <span class="number">0</span>; s &lt; V; s++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (Integer integer : adj[s])</span><br><span class="line">                g.adj[integer].add(s);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> g;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">fillOrder</span><span class="params">(<span class="keyword">int</span> s, <span class="keyword">boolean</span>[] visitedVertices, Deque&lt;Integer&gt; stack)</span> </span>&#123;</span><br><span class="line">        visitedVertices[s] = <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> n : adj[s]) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!visitedVertices[n])</span><br><span class="line">                fillOrder(n, visitedVertices, stack);</span><br><span class="line">        &#125;</span><br><span class="line">        stack.push(s);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">printSCC</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Deque&lt;Integer&gt; stack = <span class="keyword">new</span> ArrayDeque&lt;&gt;();</span><br><span class="line">        <span class="keyword">boolean</span>[] visitedVertices = <span class="keyword">new</span> <span class="keyword">boolean</span>[V];</span><br><span class="line">        <span class="comment">// 1. 初始化访问列表</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; V; i++)</span><br><span class="line">            visitedVertices[i] = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; V; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!visitedVertices[i])</span><br><span class="line">                fillOrder(i, visitedVertices, stack);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        KosarajuGraph graph = transpose();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; V; i++)</span><br><span class="line">            visitedVertices[i] = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (!stack.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">int</span> s = stack.pop();</span><br><span class="line">            <span class="keyword">if</span> (!visitedVertices[s]) &#123;</span><br><span class="line">                graph.DFSUtil(s, visitedVertices);</span><br><span class="line">                System.out.println();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String args[])</span> </span>&#123;</span><br><span class="line">        KosarajuGraph g = <span class="keyword">new</span> KosarajuGraph(<span class="number">8</span>);</span><br><span class="line">        g.addEdge(<span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line">        g.addEdge(<span class="number">1</span>, <span class="number">2</span>);</span><br><span class="line">        g.addEdge(<span class="number">2</span>, <span class="number">3</span>);</span><br><span class="line">        g.addEdge(<span class="number">2</span>, <span class="number">4</span>);</span><br><span class="line">        g.addEdge(<span class="number">3</span>, <span class="number">0</span>);</span><br><span class="line">        g.addEdge(<span class="number">4</span>, <span class="number">5</span>);</span><br><span class="line">        g.addEdge(<span class="number">5</span>, <span class="number">6</span>);</span><br><span class="line">        g.addEdge(<span class="number">6</span>, <span class="number">4</span>);</span><br><span class="line">        g.addEdge(<span class="number">6</span>, <span class="number">7</span>);</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">"Strongly Connected Components:"</span>);</span><br><span class="line">        g.printSCC();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="Kruskal-MST"><a href="#Kruskal-MST" class="headerlink" title="Kruskal MST"></a>Kruskal MST</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@AUTHOR</span>: raymond</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@DATETIME</span>: 2020/8/12  09:08</span></span><br><span class="line"><span class="comment"> * DESCRIPTION: Kruskal 算法生成最小生成树 O(e*lge)</span></span><br><span class="line"><span class="comment"> * 1. Sort all the edges from low weight to high</span></span><br><span class="line"><span class="comment"> * 2. Take the edge with the lowest weight and add it to the spanning tree.</span></span><br><span class="line"><span class="comment"> *      If adding the edge created a cycle, then reject this edge.</span></span><br><span class="line"><span class="comment"> * 3. Keep adding edges until we reach all vertices.</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">KruskalGraph</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> vertices, edges;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Edge[] edge;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">KruskalGraph</span><span class="params">(<span class="keyword">int</span> v, <span class="keyword">int</span> e)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.vertices = v;</span><br><span class="line">        <span class="keyword">this</span>.edges = e;</span><br><span class="line">        <span class="keyword">this</span>.edge = <span class="keyword">new</span> Edge[edges];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; e; i++)</span><br><span class="line">            edge[i] = <span class="keyword">new</span> Edge();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">find</span><span class="params">(Subset[] subsets, <span class="keyword">int</span> i)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (subsets[i].parent != i)</span><br><span class="line">            subsets[i].parent = find(subsets, subsets[i].parent);</span><br><span class="line">        <span class="keyword">return</span> subsets[i].parent;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">union</span><span class="params">(Subset[] subsets, <span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> xRoot = find(subsets, x);</span><br><span class="line">        <span class="keyword">int</span> yRoot = find(subsets, x);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (subsets[xRoot].rank &lt; subsets[yRoot].rank)</span><br><span class="line">            subsets[xRoot].parent = yRoot;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (subsets[xRoot].rank &gt; subsets[yRoot].rank)</span><br><span class="line">            subsets[yRoot].parent = xRoot;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            subsets[yRoot].parent = xRoot;</span><br><span class="line">            subsets[xRoot].rank++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Kruskal 具体实现</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">kruskal</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Edge[] res = <span class="keyword">new</span> Edge[vertices];</span><br><span class="line">        <span class="keyword">int</span> e = <span class="number">0</span>, i = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; vertices; ++i)</span><br><span class="line">            res[i] = <span class="keyword">new</span> Edge();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 1. 排序</span></span><br><span class="line">        Arrays.sort(edge);</span><br><span class="line">        Subset[] subsets = <span class="keyword">new</span> Subset[vertices];</span><br><span class="line">        <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; vertices; ++i)</span><br><span class="line">            subsets[i] = <span class="keyword">new</span> Subset();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> v = <span class="number">0</span>; v &lt; vertices; ++v) &#123;</span><br><span class="line">            subsets[v].parent = v;</span><br><span class="line">            subsets[v].rank = <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        i = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span> (e &lt; vertices - <span class="number">1</span>) &#123;</span><br><span class="line">            Edge nextEdge = <span class="keyword">new</span> Edge();</span><br><span class="line">            nextEdge = edge[i++];</span><br><span class="line">            <span class="keyword">int</span> x = find(subsets, nextEdge.src);</span><br><span class="line">            <span class="keyword">int</span> y = find(subsets, nextEdge.dest);</span><br><span class="line">            <span class="keyword">if</span> (x != y) &#123;</span><br><span class="line">                res[e++] = nextEdge;</span><br><span class="line">                union(subsets, x, y);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; e; ++i)</span><br><span class="line">            System.out.println(<span class="string">"src-"</span> + res[i].src + <span class="string">" - "</span> + <span class="string">"dest-"</span> + res[i].dest + <span class="string">" - "</span> + <span class="string">"weight-"</span> + res[i].weight);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> vertices = <span class="number">6</span>; <span class="comment">// Number of vertices</span></span><br><span class="line">        <span class="keyword">int</span> edges = <span class="number">8</span>; <span class="comment">// Number of edges</span></span><br><span class="line">        KruskalGraph G = <span class="keyword">new</span> KruskalGraph(vertices, edges);</span><br><span class="line"></span><br><span class="line">        G.edge[<span class="number">0</span>].src = <span class="number">0</span>;</span><br><span class="line">        G.edge[<span class="number">0</span>].dest = <span class="number">1</span>;</span><br><span class="line">        G.edge[<span class="number">0</span>].weight = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line">        G.edge[<span class="number">1</span>].src = <span class="number">0</span>;</span><br><span class="line">        G.edge[<span class="number">1</span>].dest = <span class="number">2</span>;</span><br><span class="line">        G.edge[<span class="number">1</span>].weight = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line">        G.edge[<span class="number">2</span>].src = <span class="number">1</span>;</span><br><span class="line">        G.edge[<span class="number">2</span>].dest = <span class="number">2</span>;</span><br><span class="line">        G.edge[<span class="number">2</span>].weight = <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">        G.edge[<span class="number">3</span>].src = <span class="number">2</span>;</span><br><span class="line">        G.edge[<span class="number">3</span>].dest = <span class="number">3</span>;</span><br><span class="line">        G.edge[<span class="number">3</span>].weight = <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line">        G.edge[<span class="number">4</span>].src = <span class="number">2</span>;</span><br><span class="line">        G.edge[<span class="number">4</span>].dest = <span class="number">5</span>;</span><br><span class="line">        G.edge[<span class="number">4</span>].weight = <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">        G.edge[<span class="number">5</span>].src = <span class="number">2</span>;</span><br><span class="line">        G.edge[<span class="number">5</span>].dest = <span class="number">4</span>;</span><br><span class="line">        G.edge[<span class="number">5</span>].weight = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line">        G.edge[<span class="number">6</span>].src = <span class="number">3</span>;</span><br><span class="line">        G.edge[<span class="number">6</span>].dest = <span class="number">4</span>;</span><br><span class="line">        G.edge[<span class="number">6</span>].weight = <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line">        G.edge[<span class="number">7</span>].src = <span class="number">5</span>;</span><br><span class="line">        G.edge[<span class="number">7</span>].dest = <span class="number">4</span>;</span><br><span class="line">        G.edge[<span class="number">7</span>].weight = <span class="number">3</span>;</span><br><span class="line">        G.kruskal();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 需要比较边的权重大小</span></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Edge</span> <span class="keyword">implements</span> <span class="title">Comparable</span>&lt;<span class="title">Edge</span>&gt; </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> src, dest, weight;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compareTo</span><span class="params">(Edge o)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>.weight - o.weight;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Subset</span> </span>&#123; <span class="keyword">int</span> parent, rank; &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="Prim-MST"><a href="#Prim-MST" class="headerlink" title="Prim MST"></a>Prim MST</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@AUTHOR</span>: raymond</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@DATETIME</span>: 2020/8/12  09:33</span></span><br><span class="line"><span class="comment"> * DESCRIPTION: Prim 算法生成最小生成树 O(ElgV)</span></span><br><span class="line"><span class="comment"> * 1. Initialize the minimum spanning tree with a vertex chosen at random.</span></span><br><span class="line"><span class="comment"> * 2. Find all the edges that connect the tree to new vertices, find the minimum and add it to the tree.</span></span><br><span class="line"><span class="comment"> * 3. Keep repeating step 2 until we get a minimum spanning tree.</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PrimGraph</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">prim</span><span class="params">(<span class="keyword">int</span> G[][], <span class="keyword">int</span> V)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> noEdge; <span class="comment">// number of edge</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 创建一个数组，用于跟踪已选择的边。已选为 true，否则为 false.</span></span><br><span class="line">        <span class="keyword">boolean</span>[] selected = <span class="keyword">new</span> <span class="keyword">boolean</span>[V];</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 初始化</span></span><br><span class="line">        Arrays.fill(selected, <span class="keyword">false</span>);</span><br><span class="line">        noEdge = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Step 1: 选择第 0 个结点</span></span><br><span class="line">        selected[<span class="number">0</span>] = <span class="keyword">true</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 打印边与权重表头</span></span><br><span class="line">        System.out.println(<span class="string">"Edge : Weight"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 最小生成树中的边的数量总是会小于 V - 1</span></span><br><span class="line">        <span class="keyword">while</span> (noEdge &lt; V - <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">int</span> min = Integer.MAX_VALUE;</span><br><span class="line">            <span class="keyword">int</span> x = <span class="number">0</span>; <span class="comment">// row number</span></span><br><span class="line">            <span class="keyword">int</span> y = <span class="number">0</span>; <span class="comment">// col number</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; V; i++) &#123;</span><br><span class="line">                <span class="comment">// 对于集合 S 中的每个顶点，找到这个顶点的所有邻接顶点，</span></span><br><span class="line">                <span class="keyword">if</span> (selected[i]) &#123;</span><br><span class="line">                    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; V; j++) &#123;</span><br><span class="line">                        <span class="comment">// 未被选择并且两点之间存在边</span></span><br><span class="line">                        <span class="keyword">if</span> (!selected[j] &amp;&amp; G[i][j] != <span class="number">0</span>) &#123;</span><br><span class="line">                            <span class="comment">// 比较 Step 1 中选择的顶点与其邻接点之间的距离</span></span><br><span class="line">                            <span class="keyword">if</span> (min &gt; G[i][j]) &#123;</span><br><span class="line">                                min = G[i][j];</span><br><span class="line">                                x = i;</span><br><span class="line">                                y = j;</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println(x + <span class="string">" - "</span> + y + <span class="string">" :  "</span> + G[x][y]);</span><br><span class="line">            <span class="comment">// 如果顶点已经在集合 S 中，丢弃。</span></span><br><span class="line">            <span class="comment">// 否则选择另一个与 Step 1 选出的顶点最近的顶点</span></span><br><span class="line">            selected[y] = <span class="keyword">true</span>;</span><br><span class="line">            noEdge++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        PrimGraph g = <span class="keyword">new</span> PrimGraph();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// number of vertices in graph</span></span><br><span class="line">        <span class="keyword">int</span> V = <span class="number">5</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 创建一个 5x5 大小的二维邻接矩阵</span></span><br><span class="line">        <span class="keyword">int</span>[][] G = &#123; &#123; <span class="number">0</span>, <span class="number">9</span>, <span class="number">75</span>, <span class="number">0</span>, <span class="number">0</span> &#125;,</span><br><span class="line">                      &#123; <span class="number">9</span>, <span class="number">0</span>, <span class="number">95</span>, <span class="number">19</span>, <span class="number">42</span> &#125;,</span><br><span class="line">                      &#123; <span class="number">75</span>, <span class="number">95</span>, <span class="number">0</span>, <span class="number">51</span>, <span class="number">66</span> &#125;,</span><br><span class="line">                      &#123; <span class="number">0</span>, <span class="number">19</span>, <span class="number">51</span>, <span class="number">0</span>, <span class="number">31</span> &#125;,</span><br><span class="line">                      &#123; <span class="number">0</span>, <span class="number">42</span>, <span class="number">66</span>, <span class="number">31</span>, <span class="number">0</span> &#125; &#125;;</span><br><span class="line"></span><br><span class="line">        g.prim(G, V);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="图的Java库"><a href="#图的Java库" class="headerlink" title="图的Java库"></a>图的Java库</h2><ul>
-<li><span class="exturl" data-url="aHR0cHM6Ly9qZ3JhcGh0Lm9yZy8=">JGraphT<i class="fa fa-external-link-alt"></i></span></li>
-<li><span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2dvb2dsZS9ndWF2YS93aWtpL0dyYXBoc0V4cGxhaW5lZA==">Google Guava<i class="fa fa-external-link-alt"></i></span></li>
-<li><span class="exturl" data-url="aHR0cHM6Ly9jb21tb25zLmFwYWNoZS5vcmcvc2FuZGJveC9jb21tb25zLWdyYXBoLw==">Apache Commons<i class="fa fa-external-link-alt"></i></span></li>
-<li><span class="exturl" data-url="aHR0cDovL2p1bmcuc291cmNlZm9yZ2UubmV0Lw==">Java Universal Network / Graph（JUNG）<i class="fa fa-external-link-alt"></i></span></li>
-</ul>
-]]></content>
-      <categories>
-        <category>数据结构</category>
-      </categories>
-      <tags>
-        <tag>数据结构-图</tag>
       </tags>
   </entry>
   <entry>
@@ -2917,10 +3676,10 @@
   <entry>
     <title>Redis内部数据结构</title>
     <url>/2020/06/19/2020-06-19-Redis-DataStructure/</url>
-    <content><![CDATA[<h1 id="内部数据结构"><a href="#内部数据结构" class="headerlink" title="内部数据结构"></a>内部数据结构</h1><p>Redis 和其他很多<code>key-value</code> 数据库的不同之处在于，Redis 不仅支持简单的字符串键值对，它还提供了一系列数据结构类型值，比如列表、哈希、集合和有序集，并在这些数据结构类型上 定义了一套强大的 API 。</p>
+    <content><![CDATA[<p>Redis 和其他很多<code>key-value</code> 数据库的不同之处在于，Redis 不仅支持简单的字符串键值对，它还提供了一系列数据结构类型值，比如列表、哈希、集合和有序集，并在这些数据结构类型上 定义了一套强大的 API 。</p>
 <p>通过对不同类型的值进行操作，Redis 可以很轻易地完成其他只支持字符串键值对的<code>key-value</code> 数据库很难(或者无法)完成的任务。</p>
 <p>在 Redis 的内部，数据结构类型值由高效的数据结构和算法进行支持，并且在 Redis 自身的构建当中，也大量用到了这些数据结构。</p>
-<h2 id="简单动态字符串"><a href="#简单动态字符串" class="headerlink" title="简单动态字符串"></a>简单动态字符串</h2><p>Sds (Simple Dynamic String，简单动态字符串)是 Redis 底层所使用的字符串表示，它被用在几乎所有的 Redis 模块中。</p>
+<h2 id="1-简单动态字符串"><a href="#1-简单动态字符串" class="headerlink" title="1 简单动态字符串"></a>1 简单动态字符串</h2><p>Sds (Simple Dynamic String，简单动态字符串)是 Redis 底层所使用的字符串表示，它被用在几乎所有的 Redis 模块中。</p>
 <h3 id="1-1-SDS的用途"><a href="#1-1-SDS的用途" class="headerlink" title="1.1 SDS的用途"></a>1.1 SDS的用途</h3><ul>
 <li>实现字符串对象(StringObject);</li>
 <li>在 Redis 程序内部用作 char* 类型的替代品。</li>
@@ -2958,10 +3717,11 @@
 <h3 id="2-1-双端链表的应用"><a href="#2-1-双端链表的应用" class="headerlink" title="2.1 双端链表的应用"></a>2.1 双端链表的应用</h3><p><strong><em>实现 Redis 的列表类型</em></strong></p>
 <p>双端链表还是 Redis 列表类型的底层实现之一，当对列表类型的键进行操作——比如执行 <code>RPUSH</code> 、<code>LPOP</code> 或 <code>LLEN</code> 等命令时，程序在底层操作的<code>可能</code>就是双端链表。</p>
 <blockquote>
-<p>Note: Redis 列表使用两种数据结构作为底层实现: </p>
+<p>Note: Redis 列表使用三种数据结构作为底层实现: </p>
 <ul>
 <li>双端链表</li>
 <li>压缩列表</li>
+<li>快表(Quick List, Redis 3.2 之后提供)</li>
 </ul>
 <p>因为双端链表占用的内存比压缩列表要多，所以当创建新的列表键时，列表会优先考虑使用压缩列表作为底层实现，并且在有需要的时候，才从压缩列表实现转换到双端链表实现。</p>
 </blockquote>
@@ -2998,7 +3758,7 @@
 <h3 id="2-4-小结"><a href="#2-4-小结" class="headerlink" title="2.4 小结"></a>2.4 小结</h3><ul>
 <li>Redis 实现了自己的双端链表结构</li>
 <li>双端链表主要有两个作用:<ul>
-<li>作为 Redis 列表类型的底层实现之一;</li>
+<li>作为 Redis <strong>列表类型的底层实现之一</strong>;</li>
 <li>作为通用数据结构，被其他功能模块所使用。</li>
 </ul>
 </li>
@@ -3012,11 +3772,11 @@
 <h2 id="3-字典"><a href="#3-字典" class="headerlink" title="3 字典"></a>3 字典</h2><p>字典(dictionary)，又名映射(map)或关联数组(associative array)， 它是一种抽象数据结构，由一集键值对(key-value pairs)组成，各个键值对的键各不相同，程序可以将新的键值对添加到字典中，或者基于键进行查找、更新或删除等操作。</p>
 <h3 id="3-1-字典的应用"><a href="#3-1-字典的应用" class="headerlink" title="3.1 字典的应用"></a>3.1 字典的应用</h3><p>字典在 Redis 中的应用广泛，使用频率可以说和 SDS 以及双端链表不相上下，基本上各个功能模块都有用到字典的地方。其中，字典的主要用途有以下两个:</p>
 <ul>
-<li>实现数据库键空间(key space)，这里指的是整个 Redis 中的键，包括字符串、列表、集合，哈希、有序集合中的所有键;</li>
-<li>用作 Hash 类型键的其中一种底层实现。</li>
+<li><strong>实现数据库键空间 (key space)</strong>，这里指的是整个 Redis 中的键，包括字符串、列表、集合，哈希、有序集合中的<strong>所有键</strong>;</li>
+<li><strong>用作 Hash 类型键的其中一种底层实现</strong>。</li>
 </ul>
 <p>🙋<strong><em>实现数据库键空间</em></strong></p>
-<p>Redis 是一个键值对数据库，数据库中的键值对就由字典保存:每个数据库都有一个与之相对 应的字典，这个字典被称之为键空间(key space)。</p>
+<p>Redis 是一个键值对数据库，数据库中的键值对就由字典保存：每个数据库都有一个与之相对应的字典，这个字典被称之为键空间(key space)。</p>
 <p>当用户添加一个<strong>键值</strong> $key-value$ 中的 $key$ 对到数据库时(不论键值对是什么类型)，程序就将该键值对添加到键空间;当用户从数据库中删除一个键值对时，程序就会将这个键值对从键空间中删除等等。</p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 清空键空间上的所有键值对数据:</span></span><br><span class="line"><span class="meta">redis&gt;</span><span class="bash"> FLUSHDB</span></span><br><span class="line">ok</span><br><span class="line"><span class="meta">#</span><span class="bash"> 返回键空间上现有的键值对:</span></span><br><span class="line"><span class="meta">redis&gt;</span><span class="bash"> DBSIZE</span></span><br><span class="line">(integer) 0</span><br></pre></td></tr></table></figure>
 
@@ -3024,15 +3784,15 @@
 <p>🙋<strong><em>用作 Hash 类型键的其中一种底层实现</em></strong></p>
 <p>Redis 的 Hash 类型键使用以下两种数据结构作为底层实现:</p>
 <ul>
-<li>字典</li>
-<li>压缩列表</li>
+<li><strong>字典</strong></li>
+<li><strong>压缩列表</strong></li>
 </ul>
 <p>因为压缩列表比字典更节省内存，所以程序在创建新 Hash 键时，默认使用<strong>压缩列表</strong>作为底层实现，当有需要时，程序才会将底层实现从<strong>压缩列表转换到字典</strong>。</p>
 <h3 id="3-2-字典的实现"><a href="#3-2-字典的实现" class="headerlink" title="3.2 字典的实现"></a>3.2 字典的实现</h3><p>实现字典的方法有很多种：</p>
 <ul>
-<li>最简单的就是使用链表或数组，但是这种方式只适用于元素个数不多的情况下;</li>
-<li>要兼顾高效和简单性，可以使用哈希表;</li>
-<li>如果追求更为稳定的性能特征，并且希望高效地实现排序操作的话，则可以使用更为复杂的平衡树。</li>
+<li>最简单的就是使用<strong>链表或数组</strong>，但是这种方式只适用于元素个数不多的情况下;</li>
+<li>要兼顾高效和简单性，可以使用<strong>哈希表</strong>;</li>
+<li>如果追求更为稳定的性能特征，并且希望高效地实现排序操作的话，则可以使用更为复杂的<strong>平衡树</strong>。</li>
 </ul>
 <p>在众多可能的实现中，Redis 选择了高效且实现简单的哈希表作为字典的底层实现。<code>dict.h/dict</code> 给出了这个<strong>字典的定义:</strong></p>
 <figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* 字典</span></span><br><span class="line"><span class="comment">*</span></span><br><span class="line"><span class="comment">* 每个字典使用两个哈希表，用于实现渐进式 rehash </span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dict</span> &#123;</span></span><br><span class="line">    <span class="comment">// 特定于类型的处理函数</span></span><br><span class="line">    dictType *type;</span><br><span class="line">    <span class="comment">// 类型处理函数的私有数据</span></span><br><span class="line">    <span class="keyword">void</span> *privdata;</span><br><span class="line">    <span class="comment">// 哈希表(2 个)</span></span><br><span class="line">    dictht ht[<span class="number">2</span>];</span><br><span class="line">    <span class="comment">// 记录 rehash 进度的标志，值为-1 表示 rehash 未进行</span></span><br><span class="line">    <span class="keyword">int</span> rehashidx;</span><br><span class="line">    <span class="comment">// 当前正在运作的安全迭代器数量</span></span><br><span class="line">	<span class="keyword">int</span> iterators;</span><br><span class="line">&#125; dict;</span><br></pre></td></tr></table></figure>
@@ -3087,7 +3847,7 @@
 <p>小为 <code>d-&gt;ht[0]-&gt;table</code> 分配空间。 字典空白时的样子如 <strong><em>3.3 创建新字典</em></strong> 图所示，以下是往空白字典添加了第一个键值对之后的样子:</p>
 <p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyj26xum5j312a0i0tb7.jpg" alt="First Entry"></p>
 <h3 id="3-6-添加新键值对时发生碰撞处理"><a href="#3-6-添加新键值对时发生碰撞处理" class="headerlink" title="3.6 添加新键值对时发生碰撞处理"></a>3.6 添加新键值对时发生碰撞处理</h3><p>在哈希表实现中，当两个不同的键拥有相同的哈希值时，我们称这两个键发生碰撞(collision)，而哈希表实现必须想办法对碰撞进行处理。</p>
-<p>字典哈希表所使用的碰撞解决方法被称之为链地址法:这种方法使用链表将多个哈希值相同的节点串连在一起，从而解决冲突问题。</p>
+<p>字典哈希表所使用的碰撞解决方法被称之为<strong>链地址法</strong>:这种方法使用链表将多个哈希值相同的节点串连在一起，从而解决冲突问题。</p>
 <p>假设现在有一个带有三个节点的哈希表，如下图:</p>
 <p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyj43ar33j31320omacm.jpg" alt="添加碰撞节点之前"></p>
 <p>对于一个新的键值对 <code>key4</code> 和 <code>value4</code> ，如果 <code>key4</code> 的哈希值和 <code>key1</code> 的哈希值相同，那么它们将在哈希表的 $0$ 号索引上发生碰撞。通过将 <code>key4-value4</code> 和 <code>key1-value1</code> 两个键值对用链表连接起来，就可以解决碰撞的问题:</p>
@@ -3105,7 +3865,7 @@
 <p><code>dictAdd</code> 在每次向字典添加新键值对之前，都会对哈希表 <code>ht[0]</code> 进行检查，对于 <code>ht[0]</code> 的 <code>size</code> 和 <code>used</code> 属性，如果它们之间的比率 $ratio = used / siz$e 满足以下任何一个条件的话， <code>rehash</code> 过程就会被激活:</p>
 <ul>
 <li>自然 $rehash :ratio \ge 1$ ，且变量 <code>dict_can_resize</code> 为真。</li>
-<li>强 制 $rehash : ratio$ 大 于 变 量 <code>dict_force_resize_ratio</code>（默认5） 。</li>
+<li>强制 $rehash : ratio$ 大 于 变 量 <code>dict_force_resize_ratio</code>（默认5） 。</li>
 </ul>
 <blockquote>
 <p>什么时候 <code>dict_can_resize</code> 会为假?</p>
@@ -3148,7 +3908,7 @@
 <p>对比字典 <code>rehash</code> 之前和 <code>rehash</code> 之后，新的 <code>ht[0]</code> 空间更大，并且字典原有的键值对也没有被修改或者删除。</p>
 <h3 id="3-9-渐进式-rehash"><a href="#3-9-渐进式-rehash" class="headerlink" title="3.9 渐进式 rehash"></a>3.9 渐进式 rehash</h3><p>假设这样一个场景:在一个有很多键值对的字典里，某个用户在添加新键值对时触发了 <code>rehash</code> 过程，如果这个 <code>rehash</code> 过程必须将所有键值对迁移完毕之后才将结果返回给用户，这样的处理方式谁能接受？另一方面，要求服务器必须阻塞直到 rehash 完成，这对于 Redis 服务器本身也是不能接受的。</p>
 <p>所以<code>rehash</code> 程序并不是在激活之后就马上执行直到完成的，而是分多次、渐进式地完成的。</p>
-<p>为了解决这个问题，Redis 使用了渐进式(<code>incremental</code>)的 <code>rehash</code> 方式:通过将 <code>rehash</code> 分散到多个步骤中进行，从而避免了集中式的计算。</p>
+<p>为了解决这个问题，Redis 使用了渐进式(<code>incremental</code>)的 <code>rehash</code> 方式：通过将 <code>rehash</code> 分散到多个步骤中进行，从而避免了集中式的计算。</p>
 <p>渐进式 <code>rehash</code> 主要由 <code>_dictRehashStep</code> 和 <code>dictRehashMilliseconds</code> 两个函数进行:</p>
 <ul>
 <li><code>_dictRehashStep</code> 用于对数据库字典、以及哈希键的字典进行被动 <code>rehash</code> ;</li>
@@ -3167,7 +3927,7 @@
 <li>因为在 <code>rehash</code> 时，字典会同时使用两个哈希表，所以在这期间的所有查找、删除等操作，除了在 <code>ht[0]</code> 上进行，还需要在<code>ht[1]</code>上进行。</li>
 <li>在执行添加操作时，新的节点会直接添加到<code>ht[1]</code>而不是<code>ht[0]</code>，这样保证<code>ht[0]</code>的节点数量在整个 <code>rehash</code> 过程中都只减不增。</li>
 </ul>
-<h3 id="3-10-字典收缩"><a href="#3-10-字典收缩" class="headerlink" title="3.10 字典收缩"></a>3.10 字典收缩</h3><p>上面关于 <code>rehash</code> 的章节描述了通过 <code>rehash</code> 对字典进行扩展(<code>expand</code>)的情况，如果哈希表的 可用节点数比已用节点数大很多的话，那么也可以通过对哈希表进行 <code>rehash</code> 来收缩(<code>shrink</code>) 字典。</p>
+<h3 id="3-10-字典收缩"><a href="#3-10-字典收缩" class="headerlink" title="3.10 字典收缩"></a>3.10 字典收缩</h3><p>上面关于 <code>rehash</code> 的章节描述了通过 <code>rehash</code> 对字典进行扩展(<code>expand</code>)的情况，如果哈希表的可用节点数比已用节点数大很多的话，那么也可以通过对哈希表进行 <code>rehash</code> 来收缩(<code>shrink</code>) 字典。</p>
 <p>收缩 <code>rehash</code> 和上面展示的扩展 <code>rehash</code> 的操作几乎一样，它执行以下步骤:</p>
 <ul>
 <li>创建一个比<code>ht[0]-&gt;table</code>小的<code>ht[1]-&gt;table</code>;</li>
@@ -3209,21 +3969,21 @@
 <li><code>rehash</code> 可以用于扩展或收缩哈希表。</li>
 <li>对哈希表的 <code>rehash</code> 是分多次、渐进式地进行的。</li>
 </ul>
-<h2 id="4-跳跃表"><a href="#4-跳跃表" class="headerlink" title="4 跳跃表"></a>4 跳跃表</h2><p>跳跃表(skiplist)是一种随机化的数据，由 $William Pugh$ 在论文《Skip lists: a probabilistic alternative to balanced trees》中提出，这种数据结构以有序的方式在层次化的链表中保存元素，它的效率可以和平衡树媲美——查找、删除、添加等操作都可以在对数期望时间下完成， 并且比起平衡树来说，跳跃表的实现要简单直观得多。</p>
+<h2 id="4-跳跃表"><a href="#4-跳跃表" class="headerlink" title="4 跳跃表"></a>4 跳跃表</h2><p>跳跃表(skiplist)是一种随机化的数据，由 $William Pugh$ 在论文《Skip lists: a probabilistic alternative to balanced trees》中提出，这种数据结构<strong>以有序的方式在层次化的链表中保存元素</strong>，它的效率可以和平衡树媲美——查找、删除、添加等操作都可以在对数<strong>期望时间</strong>下完成， 并且比起平衡树来说，跳跃表的实现要简单直观得多。</p>
 <p>以下是一个典型的跳跃表例子(图片来自<span class="exturl" data-url="aHR0cHM6Ly9lbi53aWtpcGVkaWEub3JnL3dpa2kvRmlsZTpTa2lwX2xpc3Quc3Zn">维基百科<i class="fa fa-external-link-alt"></i></span>):</p>
 <p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfymag1svpj30v607y0tu.jpg" alt="image-20200620115800909"></p>
 <p>从图中可以看到，跳跃表主要由以下部分构成:</p>
 <ul>
 <li>表头(<code>head</code>): 负责维护跳跃表的节点指针</li>
 <li>跳跃表节点: 保存着元素值，以及多个层</li>
-<li>层: 保存着指向其他元素的指针。高层的指针越过的元素数量大于等于低层的指针，为了提高查找的效率，程序总是从高层先开始访问，然后随着元素值范围的缩小，慢慢降低层次。</li>
+<li>层: 保存着指向其他元素的指针。<strong>高层的指针越过的元素数量大于等于低层的指针，为了提高查找的效率，程序总是从高层先开始访问，然后随着元素值范围的缩小，慢慢降低层次。</strong></li>
 <li>表尾:全部由NULL组成，表示跳跃表的末尾。</li>
 </ul>
 <h3 id="4-1-跳跃表的实现"><a href="#4-1-跳跃表的实现" class="headerlink" title="4.1 跳跃表的实现"></a>4.1 跳跃表的实现</h3><p>为了适应自身的功能需要，Redis 基于 William Pugh 论文中描述的跳跃表进行了以下修改:</p>
 <ul>
 <li>允许重复的<code>score</code>值:多个不同的<code>member</code>的<code>score</code>值可以相同。</li>
-<li>进行对比操作时，不仅要检查<code>score</code>值，还要检查<code>member</code>:当<code>score</code>值可以重复时， 单靠 <code>score</code> 值无法判断一个元素的身份，所以需要连 <code>member</code> 域都一并检查才行。</li>
-<li>每个节点都带有一个高度为 $1$ 层的后退指针，用于从表尾方向向表头方向迭代:当执行 ZREVRANGE 或 <code>ZREVRANGEBYSCORE</code> 这类以逆序处理有序集的命令时，就会用到这个属性。</li>
+<li>进行对比操作时，不仅要检查<code>score</code>值，还要检查<code>member</code>：当<code>score</code>值可以重复时， 单靠 <code>score</code> 值无法判断一个元素的身份，所以需要连 <code>member</code> 域都一并检查才行。</li>
+<li>每个节点都带有一个高度为 $1$ 层的<strong>后退指针</strong>，用于<strong>从表尾方向向表头方向迭代</strong>：当执行 <code>ZREVRANGE</code> 或 <code>ZREVRANGEBYSCORE</code> 这类以逆序处理有序集的命令时，就会用到这个属性。</li>
 </ul>
 <p>这个修改版的跳跃表由 <code>redis.h/zskiplist</code> 结构定义:</p>
 <figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">zskiplist</span> &#123;</span></span><br><span class="line">    <span class="comment">// 头节点、尾结点</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">zskiplistNode</span> *<span class="title">header</span>, *<span class="title">tail</span>;</span></span><br><span class="line">    <span class="comment">// 节点数量</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> length;</span><br><span class="line">    <span class="comment">// 目前表内节点的最大层数</span></span><br><span class="line">    <span class="keyword">int</span> level;</span><br><span class="line">&#125; zskiplist;</span><br></pre></td></tr></table></figure>
@@ -3240,7 +4000,7 @@
 <p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyrpunkgnj31360hc761.jpg" alt="image-20200620150546410"></p>
 <p>为了展示的方便，在图片中我们直接将 <code>member</code> 和 <code>score</code> 值包含在表节点中，但是在实际的定义中，因为跳跃表要和另一个实现有序集的结构(字典)分享 <code>member</code> 和 <code>score</code> 值，所以跳跃表只保存指向 <code>member</code> 和 <code>score</code> 的指针。</p>
 <h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><ul>
-<li>跳跃表是一种<strong>随机化(概率性)</strong>数据结构，它的查找、添加、删除操作都可以在对数期望时间下完成。</li>
+<li>跳跃表是一种<strong>随机化(概率性)</strong>数据结构，它的查找、添加、删除操作都可以在对数<strong>期望时间</strong>下完成。</li>
 <li>跳跃表目前在 Redis 的<strong>唯一作用</strong>就是作为有序集类型的底层数据结构(之一，另一个构成有序集的结构是字典)。</li>
 <li>为了适应自身的需求，Redis 基于 $William Pugh$ 论文中描述的跳跃表进行了修改，包括:<ul>
 <li><code>score</code> 值可重复</li>
@@ -8137,6 +8897,12 @@
 <li><span class="exturl" data-url="aHR0cHM6Ly9qaWFwLm1lL3R1dG9yaWFsL3Rlcm1pbmFsLXN0YXJ0Lw==">用命令行启动 Sublime 和 Typora<i class="fa fa-external-link-alt"></i></span></li>
 </ul>
 ]]></content>
+      <categories>
+        <category>hhe- Utils</category>
+      </categories>
+      <tags>
+        <tag>Mac</tag>
+      </tags>
   </entry>
   <entry>
     <title>Java面试里常见的比较</title>
@@ -9831,192 +10597,6 @@
       </tags>
   </entry>
   <entry>
-    <title>MySQL-索引与慢查询优化</title>
-    <url>/2020/03/29/2020-03-29-MySQL-Index/</url>
-    <content><![CDATA[<h1 id="闲聊几句"><a href="#闲聊几句" class="headerlink" title="闲聊几句"></a>闲聊几句</h1><h2 id="数据库范式"><a href="#数据库范式" class="headerlink" title="数据库范式"></a>数据库范式</h2><p>目前关系数据库有六种范式：第一范式$(1NF)$、第二范式$(2NF)$、第三范式$(3NF)$、巴斯-科德范式$(BCNF)$、第四范式$(4NF)$和第五范式$(5NF$，又称完美范式)。</p>
-<ol>
-<li>第一范式$(1NF)$：所有的域都应该是原子性的，即数据库表的每一列都是不可分割的原子数据项，而不能是集合，数组，记录等非原子数据项。</li>
-<li>第二范式$(2NF)$：在$1NF$的基础上，非码属性必须完全依赖于候选码(在$1NF$基础上<strong>消除非主属性对主码的部分函数依赖</strong>)。</li>
-<li>在$2NF$基础上，任何非主属性不依赖于其它非主属性(在$2NF$基础上<strong>消除传递依赖</strong>)。</li>
-<li>在$3NF$基础上，任何非主属性不能对主键子集依赖(在$3NF$基础上<strong>消除对主码子集的依赖</strong>)</li>
-</ol>
-<h2 id="如何设计一个关系型数据库？"><a href="#如何设计一个关系型数据库？" class="headerlink" title="如何设计一个关系型数据库？"></a>如何设计一个关系型数据库？</h2><p>首先应该考虑关系数据库管理系统($RDBMS$)，在 $RDBMS$ 中又包含两个重要组成部分，分别是：</p>
-<ul>
-<li>程序实例：其中又包括存储管理、缓存机制、$SQL$ 解析、日志管理、权限划分、容灾机制、<strong>索引管理</strong>、<strong>锁管理</strong></li>
-<li>存储(文件系统)：硬盘等。</li>
-</ul>
-<h1 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h1><h2 id="索引分类"><a href="#索引分类" class="headerlink" title="索引分类"></a>索引分类</h2><p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1ghae0rq9atj30qs0i3dhr.jpg" alt="MySQL索引分类"></p>
-<h3 id="聚簇索引与非聚簇索引"><a href="#聚簇索引与非聚簇索引" class="headerlink" title="聚簇索引与非聚簇索引"></a>聚簇索引与非聚簇索引</h3><ul>
-<li>聚簇索引：<ul>
-<li>表数据是和主键一起存储，主键索引的叶结点存储行数据(包含了主键值)，二级索引的叶结点存储行的主键值。</li>
-<li>使用$B+$树作为索引的存储结构，非叶子节点都是索引关键字，但非叶子节点中的关键字中<strong>不存储对应记录的具体内容或内容地址</strong>。叶子节点上的数据是主键与具体记录(数据内容)。</li>
-</ul>
-</li>
-<li>非聚簇索引：<ul>
-<li>表数据和索引是分成两部分存储的，主键索引和二级索引存储上没有任何区别。</li>
-<li>使用$B+$树作为索引的存储结构，所有的节点都是索引，叶子节点存储的是索引$+$索引对应的记录的地址。</li>
-</ul>
-</li>
-</ul>
-<p><strong>聚簇索引的优缺点</strong></p>
-<ul>
-<li>优点：<ul>
-<li>把相关数据保存在一起，减少$I/O$次数。例如实现电子邮箱时，可以根据用户ID来聚集数据，这样只需要从磁盘读取少数的数据页就能获取某个用户的全部邮件。如果没有聚簇索引，则每封邮件都可能多一次磁盘$I/O$。</li>
-<li>数据访问更快。聚簇索引将索引和数据保存在同一个$B+Tree$中，因此从聚簇索引中获取数据通常比在非聚簇索引中查找要快。</li>
-<li>使用覆盖索引扫描的查询可以直接使用页节点中的主键值。</li>
-</ul>
-</li>
-<li>缺点：<ul>
-<li>聚簇数据最大限度地提高了$I/O$密集型应用的性能，但如果数据全部放在内存中，则访问的顺序就没那么重要了，聚簇索引也就没什么优势了。</li>
-<li><strong>插入速度严重依赖于插入顺序。</strong>按照主键的顺序插入是加载数据到<strong>InnoDB</strong>表中速度最快的方式。但如果不是按照主键顺序加载数据，那么在加载完成后最好使用<code>optimize table</code>命令重新组织一下表。</li>
-<li><strong>更新聚簇索引列的代价很高</strong>，因为会强制$InnoDB$将每个被更新的行移动到新的位置。</li>
-<li><strong>基于聚簇索引的表插入新行，或者主键被更新导致需要移动行的时候，可能面临”页分裂（page split)“的问题。</strong>当行的主键值要求必须将这一行插入到某个已满的页中时，存储引擎会将该页分裂成两个页面来容纳该行，这就是一次分裂操作。页分裂会导致表占用更多的磁盘空间。</li>
-<li>聚簇索引可能导致全表扫描变慢，尤其是行比较稀疏，或者由于页分裂导致数据存储不连续的时候。</li>
-<li>二级索引(非聚簇索引)所占存储单元更大，因为二级索引的叶子节点包含了引用行的主键列。</li>
-<li>二级索引访问需要两次索引查找，而不是一次。即在非索引覆盖的前提下，先到二级索引查询到主键，然后再按主键去查询得到数据。</li>
-</ul>
-</li>
-</ul>
-<h3 id="主键与唯一索引的区别是什么？"><a href="#主键与唯一索引的区别是什么？" class="headerlink" title="主键与唯一索引的区别是什么？"></a>主键与唯一索引的区别是什么？</h3><table>
-<thead>
-<tr>
-<th>对比项</th>
-<th>主键</th>
-<th>唯一索引</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>功能</td>
-<td>不仅是索引，还是约束。</td>
-<td>是索引的一种</td>
-</tr>
-<tr>
-<td>包含性</td>
-<td>主键索引一定是唯一索引</td>
-<td>唯一索引不一定是主键索引</td>
-</tr>
-<tr>
-<td>空值</td>
-<td>主键列不允许<code>null</code></td>
-<td>允许为<code>null</code></td>
-</tr>
-<tr>
-<td>外键</td>
-<td>可以做外键</td>
-<td>不可以</td>
-</tr>
-<tr>
-<td>数量</td>
-<td>只有一个主键</td>
-<td>可以有多个唯一索引</td>
-</tr>
-<tr>
-<td>优先级</td>
-<td>执行计划优先级高于唯一索引</td>
-<td>执行计划优先级低于主键</td>
-</tr>
-<tr>
-<td>包含列</td>
-<td>主键可以包含多个列，作为联合主键。</td>
-<td>包含一列</td>
-</tr>
-</tbody></table>
-<h3 id="索引的数据结构"><a href="#索引的数据结构" class="headerlink" title="索引的数据结构"></a>索引的数据结构</h3><ul>
-<li>树结构：二叉排序树、红黑树、B-树、B+树、</li>
-<li>Hash结构：<code>BitMap</code> 位图索引是神器<ul>
-<li>缺点仅能满足 <code>=, in</code> 操作，不能使用范围查询</li>
-<li>无法被用来避免数据的排序操作</li>
-<li>不能利用部分索引键查询</li>
-<li>不能避免表扫描遇到大量 <code>Hash</code> 值相同的情况，此时性能并不一定比 <code>B-树</code> 高。</li>
-</ul>
-</li>
-</ul>
-<h2 id="来自灵魂的拷问"><a href="#来自灵魂的拷问" class="headerlink" title="来自灵魂的拷问"></a>来自灵魂的拷问</h2><p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1ghafktgxhbj30u01m2ndc.jpg" alt="数据库索引总结"></p>
-<h2 id="索引的最左匹配"><a href="#索引的最左匹配" class="headerlink" title="索引的最左匹配"></a>索引的最左匹配</h2><p>👩‍🏫：为什么索引是最左匹配，而不是最右匹配，不是中间匹配？</p>
-<p>👨‍🎓：$\dots$</p>
-<p><strong>最左前缀匹配原则</strong></p>
-<ul>
-<li>MySQL会一直从左向右匹配直到遇到范围查询(<code>&gt;, &lt;, between, like</code>)就停止匹配，比如 <code>a=3 and b=4 and c&gt;5 and d=6</code> , 如果建立 <code>(a,b,c,d)</code> 顺序的索引，则 <code>d</code> 是用不到索引的，因为到 <code>c</code> 就已经停止了，如果建立 <code>a,b,d,c</code> 的索引则都可以用到， <code>a,b,d</code> 的顺序可以任意调整。</li>
-<li><code>=, in</code> 可以乱序，比如建立 <code>(a,b,c)</code> 索引，那么 <code>a=1 and b=2 and c=3</code> 与<code>a=1 and c=3 and b=2</code>都可以命中索引，<code>MySQL</code>的查询优化器会帮助优化成索引可以识别的形式。</li>
-</ul>
-<p>假如有如下这张表结构：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">create table &#96;student&#96; (</span><br><span class="line">    &#96;id&#96; int(11) not null auto_increment,</span><br><span class="line">    &#96;name&#96; varchar(32) default null,</span><br><span class="line">    &#96;cid&#96; int(11) default null,</span><br><span class="line">    primary key (&#96;id&#96;),</span><br><span class="line">    key &#96;name_cid_idx&#96; (&#96;name&#96;, &#96;cid&#96;)</span><br><span class="line">) engine &#x3D; InnoDB auto_increment&#x3D;8 default charset&#x3D;utf8;</span><br></pre></td></tr></table></figure>
-
-<p>插入五条数据后表为</p>
-<table>
-<thead>
-<tr>
-<th>id</th>
-<th>name</th>
-<th>cid</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>1</td>
-<td>raymond</td>
-<td>2</td>
-</tr>
-<tr>
-<td>8</td>
-<td>raymond</td>
-<td>1</td>
-</tr>
-<tr>
-<td>9</td>
-<td>ramona</td>
-<td>3</td>
-</tr>
-<tr>
-<td>10</td>
-<td>Bezos</td>
-<td>4</td>
-</tr>
-<tr>
-<td>11</td>
-<td>Bill</td>
-<td>6</td>
-</tr>
-</tbody></table>
-<p>如果执行下面这条查询，可以看到用了联合索引<code>name_cid_idx</code>，这是没有什么疑问的。而且<code>rows = 1</code>，<code>filtered = 100</code>。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 查询 1</span><br><span class="line">explain select * from student where name &#x3D; &#39;raymond&#39; and cid &#x3D; 2;</span><br></pre></td></tr></table></figure>
-
-<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1ghb9ye1j2tj314z01fjrg.jpg" alt="image-20200801140354338"></p>
-<p>但是如果执行了下面两条查询呢？</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 查询 2</span><br><span class="line">explain select * from student where cid &#x3D; 2;</span><br><span class="line"></span><br><span class="line"># 查询 3</span><br><span class="line">explain select * from student where cid &#x3D; 2 and name &#x3D; &#39;raymond&#39;;</span><br></pre></td></tr></table></figure>
-
-<p>查询结果分别如下(列名与上面图片相同，只放结果。) 从中可以看到，上面的查询 $2$ 使用了索引扫描(<code>rows = 5</code>)；查询 $3$ 的结果与查询 $1$ 的结果完全相同，说明$MySQL$ 的查询优化器为我们做了调整。</p>
-<figure class="highlight angelscript"><table><tr><td class="code"><pre><span class="line"><span class="number">1</span>,SIMPLE,student,&lt;<span class="literal">null</span>&gt;,index,&lt;<span class="literal">null</span>&gt;,name_cid_idx,<span class="number">104</span>,&lt;<span class="literal">null</span>&gt;,<span class="number">5</span>,<span class="number">20</span>,Using where; Using index</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="number">1</span>,SIMPLE,student,,<span class="built_in">ref</span>,name_cid_idx,name_cid_idx,<span class="number">104</span>,<span class="string">"const,const"</span>,<span class="number">1</span>,<span class="number">100</span>,Using index</span><br></pre></td></tr></table></figure>
-
-<p>那么为什么要强调最左匹配时要进行等值查询，而遇到范围查询时就失效呢？</p>
-<p>$MySQL$ 创建符合索引的规则时首先会对符合索引的最左边的列，也就是第一个<code>name</code>字段的数据进行排序，在第一个排序的基础上再对第二个字段<code>cid</code>进行排序。其实就相当于进行了<code>order by name asc, cid asc</code>这样的排序。</p>
-<p>所以如果对上面表格中的几条数据按<code>name</code>进行排序的话就会变成下面图片中的样子，既然按<code>name</code>排序，那么<code>cid</code>不再有序。</p>
-<ul>
-<li>如果是<strong>等值</strong>的话，将是有序的。观察$4,5$列同名的<code>raymond</code>，可以看到<code>cid</code>便是有序的。</li>
-<li>如果<strong>非等值(区间或范围)</strong>的话，将是无序的。观察$1,2,3$ 列可以看到，假如查询名字首字母在<code>B-r</code>之间的人，<code>cid</code>已经乱序，而在使用索引时需要顺序查询，但是<code>cid</code>依次为<code>4,6,3</code>，不能再按序查询。</li>
-</ul>
-<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1ghbaq7xbq7j308r0470sp.jpg" alt="按name排序"></p>
-<p>所以，为什么$MySQL$默认是最左匹配而不是最右匹配，为还是没清楚。</p>
-<h2 id="密集索引与稀疏索引"><a href="#密集索引与稀疏索引" class="headerlink" title="密集索引与稀疏索引"></a>密集索引与稀疏索引</h2><p>密集索引文件中的每个搜索码值都对应一个索引值</p>
-<p>稀疏索引文件只为索引码的某些值建立索引项</p>
-<ul>
-<li>MyISAM</li>
-<li>InnoDB<ul>
-<li>若一个主键被定义，则该主键为密集索引</li>
-<li>若没有主键被定义，则该表的第一个唯一非空索引作为密集索引</li>
-<li>若不满足以上条件，InnoDB内部会生成一个隐藏主键(密集索引)</li>
-<li>非主键索引存储相关键位和其对应的主键值，包含两次查找</li>
-</ul>
-</li>
-</ul>
-]]></content>
-      <categories>
-        <category>MySQL</category>
-      </categories>
-      <tags>
-        <tag>MySQL</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Redis基础</title>
     <url>/2020/03/24/2020-03-24-Redis-RedisInAction/</url>
     <content><![CDATA[<h1 id="第一章-初始Redis"><a href="#第一章-初始Redis" class="headerlink" title="第一章 初始Redis"></a>第一章 初始Redis</h1><h2 id="1-1-Redis简介"><a href="#1-1-Redis简介" class="headerlink" title="1.1 Redis简介"></a>1.1 Redis简介</h2><p>Redis 是一个远程内存数据库，它不仅性能强劲，而且还具有复制特性以及为解决问题而生 的独一无二的数据模型。Redis 提供了 5 种不同类型的数据结构，各式各样的问题都可以很自然 地映射到这些数据结构上:Redis 的数据结构致力于帮助用户解决问题，而不会像其他数据库那 样，要求用户扭曲问题来适应数据库。除此之外，通过复制、持久化(persistence)和客户端分 片(client-side sharding)等特性，用户可以很方便地将 Redis 扩展成一个能够包含数百 GB 数据、 每秒处理上百万次请求的系统。</p>
@@ -11643,564 +12223,8 @@
         <category>算法</category>
       </categories>
       <tags>
-        <tag>Java</tag>
         <tag>算法</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>HTTP与HTTPS</title>
-    <url>/2020/03/18/2020-03-18-Network-HTTPSAndHTTP/</url>
-    <content><![CDATA[<h2 id="分层体系"><a href="#分层体系" class="headerlink" title="分层体系"></a>分层体系</h2><p>OSI 的七层协议体系结构的概念清楚，理论也较完整，但它既复杂又不实用。TCP/IP体系结构则不同，但它现在却得到了非常广泛的应用。</p>
-<p>TCP/IP是一个四层的体系结构，它包含应用层、运输层、网际层和网络接口层。</p>
-<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9qb100evj31f40ocdvs.jpg" alt="计算机网络体系结构"></p>
-<ul>
-<li><p>应用层(application layer)：应用层的任务是<strong>通过应用进程间的交互来完成特定网络应用</strong>。应用层协议定义的是<strong>应用进程间</strong>通信和交互的规则。在互联网中的应用层协议很多，如域名系统DNS，支持万维网应用的HTTP协议，支持电子邮件的SMTP协议等等。应用层交互的数据单元称为<strong>报文(message)</strong>。</p>
-</li>
-<li><p>运输层(transport layer)：运输层的任务就是负责<strong>向两台主机中进程之间的通信提供通用的数据传输服务</strong>。应用进程利用该服务传送应用层报文。所谓“通用的”，是指并不针对某个特定网络应用，而是多种应用可以使用同一个运输层服务。由于一台主机可同时运行多个进程，因此运输层有<strong>复用和分用</strong>的功能。复用就是多个应用层进程可同时使用下面运输层的服务，分用和复用相反，是运输层把收到的信息分别交付上面应用层中的相应进程。运输层主要使用以下两种协议:</p>
-<ul>
-<li>传输控制协议TCP(Transmission Control Protocol)—提供面向连接的、可靠的数据传输服务，其数据传输的单位是<strong>报文段(segment)</strong>。</li>
-<li>用户数据报协议UDP(User Datagram Protocol)—提供无连接的、尽最大努力(best-effort)的数据传输服务(不保证数据传输的可靠性)，其数据传输的单位是<strong>用户数据报</strong>。</li>
-</ul>
-</li>
-<li><p>网络层：网络层负责<strong>为分组交换网上的不同主机提供通信服务</strong>。在发送数据时，网络层把运输层产生的<strong>报文段或用户数据报封装成分组或包进行传送</strong>。在TCP/IP体系中，由于网络层使用IP协议，因此分组也叫做IP数据报，或简称为数据报。</p>
-<ul>
-<li>网络层的另一个任务就是要选择合适的路由，使源主机运输层所传下来的分组，能够通过网络中的路由器找到目的主机。</li>
-<li>不要将运输层的“用户数据报UDP”和网络层的“IP数据报”弄混。此外，无论在哪一层传送的数据单元，都可笼统地用“分组”来表示。</li>
-</ul>
-</li>
-<li><p>数据链路层(data link layer)：两台主机之间的数据传输，总是在一段一段的链路上传送的，这就需要使用专门的链路层的协议。在两个相邻结点之间传送数据时，数据链路层将网络层交下来的<strong>IP数据报组装成帧(framing)</strong>，在两个相邻结点间的链路上传送<strong>帧(frame)</strong>。每一帧包括数据和必要的控制信息(如同步信息、地址信息、差错控制等)。</p>
-<ul>
-<li>在接收数据时，控制信息使接收端能够知道一个帧从哪个比特开始和到哪个比特结束。</li>
-<li>控制信息还使接收端能够检测到所收到的帧中有无差错。</li>
-</ul>
-</li>
-<li><p>物理层(physical layer)：考虑的是怎样在传输媒体上<strong>透明地传输数据比特流</strong>，而不是指具体的传输媒体。物理层的作用是尽可能屏蔽传输媒体和通信手段的差异，使数据链路层感觉不到这些差异。</p>
-</li>
-</ul>
-<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gczcfmgbzjg30u016i0yk.gif" alt="计算机网络分层体系图"></p>
-<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gd9rqohwupj31ea0jgk38.jpg" alt="数据在各层之间的传递过程"></p>
-<h2 id="HTTP与HTTPS"><a href="#HTTP与HTTPS" class="headerlink" title="HTTP与HTTPS"></a>HTTP与HTTPS</h2><p>主要来源于<strong>维基百科</strong></p>
-<p><strong>超文本传输协议</strong>（英语：<strong>H</strong>yper<strong>T</strong>ext <strong>T</strong>ransfer <strong>P</strong>rotocol，缩写：<strong>HTTP</strong>）是一种用于分布式、协作式和<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv6LaF5aqS6auU">超媒体<i class="fa fa-external-link-alt"></i></span>信息系统的<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5bqU55So5bGC">应用层<i class="fa fa-external-link-alt"></i></span><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv572R57uc5Lyg6L6T5Y2P6K6u">协议<i class="fa fa-external-link-alt"></i></span><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv6LaF5paH5pys5Lyg6L6T5Y2P6K6uI2NpdGVfbm90ZS1pZXRmMjYxNi0x">[1]<i class="fa fa-external-link-alt"></i></span>。HTTP是<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5YWo55CD6LOH6KiK57ay">万维网<i class="fa fa-external-link-alt"></i></span>的数据通信的基础，无状态，明文传输。</p>
-<p><strong>超文本传输安全协议</strong>（英语：<strong>H</strong>yper<strong>T</strong>ext <strong>T</strong>ransfer <strong>P</strong>rotocol <strong>S</strong>ecure，缩写：<strong>HTTPS</strong>；常称为HTTP over TLS、HTTP over SSL或HTTP Secure）是一种通过<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv6KiI566X5qmf57ay57Wh">计算机网络<i class="fa fa-external-link-alt"></i></span>进行安全通信的<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv57ay6Lev5YKz6Ly45Y2U5a6a">传输协议<i class="fa fa-external-link-alt"></i></span>。HTTPS经由<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUA==">HTTP<i class="fa fa-external-link-alt"></i></span>进行通信，但利用<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5Lyg6L6T5bGC5a6J5YWo">SSL/TLS<i class="fa fa-external-link-alt"></i></span>来<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5Yqg5a+G">加密<i class="fa fa-external-link-alt"></i></span>数据包。HTTPS开发的主要目的，是提供对<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv57ay56uZ">网站<i class="fa fa-external-link-alt"></i></span>服务器的<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv6Lqr5Lu96aqM6K+B">身份认证<i class="fa fa-external-link-alt"></i></span>，保护交换数据的隐私与<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5a6M5pW05oCn">完整性<i class="fa fa-external-link-alt"></i></span>。</p>
-<p>HTTP是一个客户端（用户）和服务端（网站）之间请求和应答的标准，通常使用<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5Lyg6L6T5o6n5Yi25Y2P6K6u">TCP协议<i class="fa fa-external-link-alt"></i></span>。默认端口 80, HTTPS默认端口 443。</p>
-<p>HTTP协议和安全协议同属于应用层（<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvT1NJ5qih5Z6L">OSI模型<i class="fa fa-external-link-alt"></i></span>的最高层），具体来讲，安全协议工作在HTTP之下，传输层之上：安全协议向运行HTTP的进程提供一个类似于TCP的套接字，供进程向其中注入报文，安全协议将报文加密并注入运输层套接字；或是从运输层获取加密报文，解密后交给对应的进程。严格地讲，HTTPS并不是一个单独的协议，而是对工作在一加密连接（<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kv5Lyg6L6T5bGC5a6J5YWo">TLS<i class="fa fa-external-link-alt"></i></span>或SSL）上的常规HTTP协议的称呼。</p>
-<p>HTTP使用TCP三次握手建立连接，客户端和服务器需要交换3个包；HTTPS除了TCP的三个包，还要加上ssl握手需要的9个包，所以一共是12个包。</p>
-<h3 id="请求方法"><a href="#请求方法" class="headerlink" title="请求方法"></a>请求方法</h3><blockquote>
-<p>问题：POST 方法与 PUT 方法的区别?</p>
-</blockquote>
-<table>
-<thead>
-<tr>
-<th align="center">方法名</th>
-<th align="center">作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center"><code>GET</code></td>
-<td align="center">向指定的资源发出“显示”请求。</td>
-</tr>
-<tr>
-<td align="center"><code>PATCH</code></td>
-<td align="center">用于将局部修改应用到资源。</td>
-</tr>
-<tr>
-<td align="center"><code>POST</code></td>
-<td align="center">向指定资源提交数据，请求服务器进行处理。</td>
-</tr>
-<tr>
-<td align="center"><code>PUT</code></td>
-<td align="center">向指定资源位置上传其最新内容。</td>
-</tr>
-<tr>
-<td align="center"><code>DELETE</code></td>
-<td align="center">请求服务器删除Request-URI所标识的资源。</td>
-</tr>
-<tr>
-<td align="center"><code>HEAD</code></td>
-<td align="center">与GET方法一样，都是向服务器发出指定资源的请求。只不过服务器将不传回资源的本文部分。</td>
-</tr>
-<tr>
-<td align="center"><code>TRACE</code></td>
-<td align="center">回显服务器收到的请求，主要用于测试或诊断。</td>
-</tr>
-<tr>
-<td align="center"><code>OPTIONS</code></td>
-<td align="center">可使服务器传回该资源所支持的所有HTTP请求方法。</td>
-</tr>
-<tr>
-<td align="center"><code>CONNECT</code></td>
-<td align="center">通常用于SSL加密服务器的链接</td>
-</tr>
-</tbody></table>
-<h3 id="GET-与-POST的区别"><a href="#GET-与-POST的区别" class="headerlink" title="GET 与 POST的区别"></a>GET 与 POST的区别</h3><table>
-<thead>
-<tr>
-<th align="center">比较方面</th>
-<th align="center">GET</th>
-<th align="center">POST</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">请求主体(Body)</td>
-<td align="center">只有URL，无请求主体</td>
-<td align="center">有请求主体</td>
-</tr>
-<tr>
-<td align="center">响应主体</td>
-<td align="center">有</td>
-<td align="center">有</td>
-</tr>
-<tr>
-<td align="center">后退按钮/刷新</td>
-<td align="center">无副作用</td>
-<td align="center">数据会被重新提交</td>
-</tr>
-<tr>
-<td align="center">书签</td>
-<td align="center">可收藏为书签</td>
-<td align="center">不可收藏为书签</td>
-</tr>
-<tr>
-<td align="center">缓存</td>
-<td align="center">可被缓存</td>
-<td align="center">不能缓存</td>
-</tr>
-<tr>
-<td align="center">编码类型</td>
-<td align="center"><code>application/x-www-form-urlencoded</code></td>
-<td align="center"><code>application/x-www-form-urlencoded</code><br /><code>multipart/form-data</code><br /><code>text/plain</code></td>
-</tr>
-<tr>
-<td align="center">历史</td>
-<td align="center">参数保留在浏览器历史中</td>
-<td align="center">参数不会保存在浏览器历史中</td>
-</tr>
-<tr>
-<td align="center">URL长度</td>
-<td align="center">有限制，但不同浏览器限制又不同<br />常说的2KB其实是指IE8，Chrome和Apache为8KB</td>
-<td align="center">无限制(Post请求本身不限制长度，但是服务器是会限制的。)</td>
-</tr>
-<tr>
-<td align="center">对数据类型的限制</td>
-<td align="center">只允许 ASCII 字符</td>
-<td align="center">没有限制、也允许二进制数据，Percent Encoding编码</td>
-</tr>
-<tr>
-<td align="center">安全性</td>
-<td align="center">与 POST 相比，GET 的安全性较差，因为所发送的数据是 URL 的一部分。在发送密码或其他敏感信息时绝不要使用 GET</td>
-<td align="center">POST 比 GET 更安全，因为参数不会被保存在浏览器历史或 web 服务器日志中。</td>
-</tr>
-<tr>
-<td align="center">幂等性</td>
-<td align="center">支持</td>
-<td align="center">不支持</td>
-</tr>
-<tr>
-<td align="center">可见性</td>
-<td align="center">数据在 URL 中对所有人都是可见的</td>
-<td align="center">数据不会显示在 URL 中</td>
-</tr>
-</tbody></table>
-<h3 id="状态码"><a href="#状态码" class="headerlink" title="状态码"></a>状态码</h3><p>所有HTTP响应的第一行都是<strong>状态行</strong>，依次是当前HTTP版本号，3位数字组成的<span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggQ==">状态代码<i class="fa fa-external-link-alt"></i></span>，以及描述状态的短语，彼此由空格分隔。</p>
-<p>状态代码的第一个数字代表当前响应的类型：</p>
-<ul>
-<li><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSMxeHjmtojmga8=">1xx消息<i class="fa fa-external-link-alt"></i></span>——请求已被服务器接收，继续处理</li>
-<li><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSMyeHjmiJDlip8=">2xx成功<i class="fa fa-external-link-alt"></i></span>——请求已成功被服务器接收、理解、并接受<ul>
-<li>200: 正常返回信息</li>
-</ul>
-</li>
-<li><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSMzeHjph43lrprlkJE=">3xx重定向<i class="fa fa-external-link-alt"></i></span>——需要后续操作才能完成这一请求<ul>
-<li><strong>300 Multiple Choices</strong></li>
-<li>301 Moved Permanently: 资源已经被永久移动，通常会发送HTTP Location来重定向到正确的新位置。Google 认为这是将网站从HTTP迁移到HTTPS的最佳方法。</li>
-<li>302 Found: 临时重定向。</li>
-<li>304 Not Modified: 资源在请求头中指定版本之后未被修改过。</li>
-</ul>
-</li>
-<li><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSM0eHjor7fmsYLplJnor68=">4xx请求错误<i class="fa fa-external-link-alt"></i></span>——请求含有词法错误或者无法被执行<ul>
-<li>401 Unauthorized：请求未经授权，即用户没有权限执行这个请求。</li>
-<li>403 Forbidden：服务器收到请求，但是拒绝提供服务</li>
-<li>404 Not Found：请求资源不存在。最常见的就是URL错误</li>
-</ul>
-</li>
-<li><span class="exturl" data-url="aHR0cHM6Ly96aC53aWtpcGVkaWEub3JnL3dpa2kvSFRUUOeKtuaAgeeggSM1eHjmnI3liqHlmajplJnor68=">5xx服务器错误<i class="fa fa-external-link-alt"></i></span>——服务器在处理某个正确请求时发生错误<ul>
-<li>500 Internal Server Error：服务器发生不可预期的错误</li>
-<li>502 Bad Gateway：作为网关或者代理工作的服务器尝试执行请求时，从上游服务器接收到无效的响应。</li>
-<li>503 Service Unavailable：服务器当前不能处理客户端的请求，一段时间后可能恢复正常。</li>
-</ul>
-</li>
-</ul>
-<hr>
-<h3 id="HTTP的缺点"><a href="#HTTP的缺点" class="headerlink" title="HTTP的缺点"></a>HTTP的缺点</h3><ul>
-<li>通信使用明文(不加密)，内容可能会被窃听。</li>
-<li>不验证通信方的身份，因此有可能遭遇伪装。</li>
-<li>无法证明报文的完整性，所以有可能已遭篡改。</li>
-</ul>
-<h3 id="HTTP各版本区别"><a href="#HTTP各版本区别" class="headerlink" title="HTTP各版本区别"></a>HTTP各版本区别</h3><p><strong>HTTP1.0</strong></p>
-<ul>
-<li>短连接：每次发送请求都要重新建立 TCP 连接，即三次握手，数据发送完毕就要关闭连接。</li>
-<li>无 host 头域，也就是 http 请求头里的 host。</li>
-<li>不允许断点续传，而且不能只传输对象的一部分，要求传输整个对象。</li>
-</ul>
-<p><strong>HTTP1.1</strong></p>
-<ul>
-<li>引入了持久连接(persistent connectio)，又称长连接。客户端和服务器发现对方一段时间没有活动，可以主动关闭连接。</li>
-<li>引入了流水线机制(pipelining)，也就是在同一个TCP连接里面，客户端可以同时发送多个请求。</li>
-<li>采用”流模式”（stream）取代”缓存模式”（buffer），采用分块传输编码，产生一块数据，就发送一块。</li>
-<li>客户端请求的头信息新增了 <strong>Host 字段</strong>，用来指定服务器的域名。</li>
-<li>新增许多方法：PUT、PATCH、HEAD、 OPTIONS、DELETE。</li>
-<li>将 Content-length 字段的作用进行扩充，声明本次回应(Response)的数据长度。</li>
-</ul>
-<blockquote>
-<p>虽然 HTTP1.1 允许复用 TCP 连接，但是同一个 TCP 连接里面，所有的数据通信是按次序进行的。服务器只有处理完一个回应，才会进行下一个回应。要是前面的回应特别慢，后面就会有许多请求排队等着。这称为”队头堵塞”（Head-of-line blocking）。</p>
-<p>为了避免这个问题，只有两种方法：<strong>一是减少请求数，二是同时多开持久连接。</strong></p>
-<p>这产生了很多的网页优化技巧，比如合并脚本和样式表、将图片嵌入CSS代码、域名分片（domain sharding）等等。如果HTTP协议设计得更好一些，这些额外的工作是可以避免的。</p>
-</blockquote>
-<p><strong>HTTP1.x</strong>的缺点</p>
-<ol>
-<li>HTTP/1.0一次只允许在<strong>一个TCP连接上发起一个请求</strong>，HTTP/1.1 使用的流水线技术也只能<strong>部分处理请求并发</strong>，仍然会存在<strong>队列头阻塞</strong>问题，因此客户端在需要发起多次请求时，通常会采用建立<strong>多连接</strong>来减少延迟。</li>
-<li>单向请求，只能由客户端发起。</li>
-<li>请求报文与响应报文首部信息冗余量大。</li>
-<li>数据未压缩，导致数据的传输量大。</li>
-</ol>
-<p><strong>HTTP2.0</strong></p>
-<blockquote>
-<p>主要基于SPDY协议(Google开发的基于TCP协议的应用层协议)</p>
-<p>核心思想是尽量减少TCP连接数。</p>
-<p>目标是优化HTTP协议的性能，通过<strong>压缩、多路复用和优先级</strong>等技术，缩短网页的加载时间并提高安全性。</p>
-<p>在不改动HTTP语义、方法、状态码、URI及首部字段的情况下，大幅度提高了 Web 性能。</p>
-</blockquote>
-<ul>
-<li>改用<strong>二进制传输</strong>，HTTP1.x 使用文本传输。<ul>
-<li>在应用层与传输层之间增加一个<strong>二进制分帧层</strong>，在二进制分帧层上，HTTP2.0 会将所有传输的信息分为更小的消息和帧，并采用二进制格式编码。</li>
-<li>其中 HTTP1.x 的首部信息会被封装到 <strong>Headers帧</strong>，而Request Body则封装到 <strong>Data帧</strong>。</li>
-</ul>
-</li>
-<li><strong>头部(Header)压缩</strong>：<ul>
-<li>使用 HPACK (头部压缩算法)压缩格式对传输的 header 进行编码，减小了 header 的体积。</li>
-<li>在两端维护了索引表(Map)，用于记录出现过的header，后面在传输过程中就可以传输已经记录过的 header 的键名，对端收到数据后就可以通过键名找到对应的值。</li>
-</ul>
-</li>
-<li><strong>多路复用</strong>：使用多个流(stream)，每个流分帧传输，使得一个 TCP 连接能够处理多个 HTTP 请求，避免 HTTP1.x版本的队头阻塞问题。</li>
-<li><strong>服务器端推送</strong>Push：服务端可以在客户端某个请求后，主动推送其他资源。</li>
-<li>更安全：使用了 TLS 的 拓展ALPN 作为协议升级，除此之外，HTTP2.0 对 TLS 的安全性做了近一步加强，通过黑名单机制禁用了几百种不再安全的加密算法。</li>
-</ul>
-<p><strong>HTTP3.0</strong></p>
-<ul>
-<li>基于 Google 的 QUIC 协议，利用UDP实现可靠数据传输。</li>
-<li>减少了 TCP 三次握手时间，减少了 TLS 握手时间。</li>
-<li>解决了 HTTP 2.0 中前一个 stream 丢包导致后一个 stream 被阻塞的问题。</li>
-<li>优化了重传策略，重传包和原包的编号不同，降低后续重传计算的消耗。</li>
-<li>连接迁移，不再用 TCP 四元组确定一个连接，而是用一个 64 位随机数来确定这个连接。</li>
-<li>更合适的流量控制。</li>
-</ul>
-<h3 id="HTTP-与-FTP"><a href="#HTTP-与-FTP" class="headerlink" title="HTTP 与 FTP"></a>HTTP 与 FTP</h3><blockquote>
-<p>关于文件上传：</p>
-<ul>
-<li><span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpYW5nMTk4OTA4MjAvYXJ0aWNsZS9kZXRhaWxzLzUzMjE1MDg3">断点续传<i class="fa fa-external-link-alt"></i></span></li>
-</ul>
-</blockquote>
-<table>
-<thead>
-<tr>
-<th>Feature</th>
-<th>HTTP</th>
-<th>FTP</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>侧重点</td>
-<td>用来浏览网站、更多的是为终端用户提供文件传输，比如电影、图片、音乐。</td>
-<td>用来访问和传输文件，FTP 文件传输常见于批量上传和维护网站。</td>
-</tr>
-<tr>
-<td>客户端</td>
-<td>通常是浏览器</td>
-<td>命令行或特定的图形界面</td>
-</tr>
-<tr>
-<td>头部</td>
-<td>包含 meta-data，比如最后修改日期、编码方式、服务器名称等。</td>
-<td>不支持</td>
-</tr>
-<tr>
-<td>数据格式</td>
-<td>只支持二进制格式文件</td>
-<td>支持ASCII与二进制</td>
-</tr>
-<tr>
-<td>流水线</td>
-<td>支持流水线，这就意味着客户端可以在上一个请求处理完之前，发出下一个请求，其结果就是多次请求数据之前省掉了部分服务器客户端往返时延。</td>
-<td>不支持</td>
-</tr>
-<tr>
-<td>动态端口</td>
-<td>在双向传输中使用动态端口</td>
-<td>使用两个连接，第一个连接用来发送控制指令，当接收或者发送数据的时候，又打开第二个TCP连接。</td>
-</tr>
-<tr>
-<td>持久连接(长连接)</td>
-<td>可以维护一个单个的连接并使用它进行任意数量的数据传输。</td>
-<td>每次有数据的需要时都创建一个新的连接。</td>
-</tr>
-<tr>
-<td>压缩算法</td>
-<td>提供了在一些压缩算法中客户端和服务器共同协商选择的办法，比如 gzip。</td>
-<td>不存在这种算法</td>
-</tr>
-<tr>
-<td>对代理的支持</td>
-<td>支持代理，这种功能是构建在协议里。</td>
-<td>不支持</td>
-</tr>
-<tr>
-<td>面向的对象</td>
-<td>没有这个概念</td>
-<td>面向文件，ftp 可以通过命令列出远程服务器的目录列表。</td>
-</tr>
-<tr>
-<td>文件大小</td>
-<td>比较适合上传小文件</td>
-<td>比较适合上传大文件，不需要将文件全部载入内存中。</td>
-</tr>
-</tbody></table>
-<p><strong>什么使 FTP 服务更快</strong></p>
-<ul>
-<li>发送数据中没有<code>meta-data</code>，仅传输原始的二进制文件。</li>
-<li>没有过度的分块编码。</li>
-</ul>
-<p><strong>什么使HTTP服务更快？</strong></p>
-<ul>
-<li>重用已存在的持久连接，从而有更好的TCP表现。</li>
-<li>流水线的支持使得从同一个服务器上请求多个文件更快。</li>
-<li>自动的压缩机制使得传输的数据更少。</li>
-<li>没有命令/应答机制最大限度的减少了往返时延。</li>
-</ul>
-<h3 id="HTTPS的工作流程"><a href="#HTTPS的工作流程" class="headerlink" title="HTTPS的工作流程"></a>HTTPS的工作流程</h3><h4 id="证明公开密钥正确性的证书"><a href="#证明公开密钥正确性的证书" class="headerlink" title="证明公开密钥正确性的证书"></a>证明公开密钥正确性的证书</h4><p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0r9c0msvj30k60g0480.jpg" alt="证明公开密钥正确性的证书"></p>
-<h4 id="简易版的HTTPS工作流程"><a href="#简易版的HTTPS工作流程" class="headerlink" title="简易版的HTTPS工作流程"></a>简易版的HTTPS工作流程</h4><p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0rcx6t6hj30hw0fldjy.jpg" alt="简易版的HTTPS工作流程"></p>
-<ol>
-<li><p><strong>客户端发起HTTPS请求</strong></p>
-<p>用户在浏览器里输入一个https网址，然后连接到server的443端口。</p>
-</li>
-<li><p><strong>服务端的配置</strong></p>
-<p>参考上面的<strong>证明公开密钥正确性的证书</strong>部分。</p>
-</li>
-<li><p><strong>传送证书</strong></p>
-<p>将自己的数字证书的部分信息返回给客户端，其中包括公钥，以及支持的SSL版本等信息。</p>
-</li>
-<li><p><strong>客户端解析证书</strong></p>
-<p>客户端首先会验证公钥是否有效，如果发现异常，则弹出警告。否则那么就生成一个随机值，然后用公钥对该随机值进行加密。</p>
-</li>
-<li><p><strong>传送加密信息</strong></p>
-<p>传送的是用证书加密后的随机值，目的就是让服务端得到这个随机值，以后客户端和服务端的通信就可以通过这个随机值来进行加密解密了。</p>
-</li>
-<li><p><strong>服务段解密信息</strong></p>
-<p>服务端用私钥解密后，得到客户端传过来的随机值。从客户端生成随机值到服务器解密获取随机值这个过程称为<strong>非对称加密</strong>。</p>
-</li>
-<li><p><strong>传输加密后的信息</strong></p>
-<p>服务器用刚刚解密得到的随机值加密需要传输的内容，并将加密后的信息发送给客户端。</p>
-</li>
-<li><p><strong>客户端解密信息</strong></p>
-<p>客户端用之前生成的随机值解密服务器传过来的信息，获取实际传输的内容。这个过程称为<strong>对称加密</strong>。</p>
-</li>
-</ol>
-<h4 id="详细版HTTPS通信流程"><a href="#详细版HTTPS通信流程" class="headerlink" title="详细版HTTPS通信流程"></a>详细版HTTPS通信流程</h4><blockquote>
-<p>继续借用《图解HTTP》中的图文。</p>
-<p>HTTP连接需要交换3个包，而HTTPS连接需要交换 3(TCP) + 9 个包(SSL/TLS连接)。</p>
-<p>这里说的加密过程是指 SSL 的加密，至于 TLS 的加密…</p>
-</blockquote>
-<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0rrhm2boj30k30og13g.jpg" alt="HTTPS通信"></p>
-<ol>
-<li><strong>客户端</strong>发送 Client Hello 报文开始 SSL 通信。报文中包含客户端支持的 SSL 的指定版本、加密组件列表(所使用的加密算法及密钥长度等)。</li>
-<li><strong>服务器</strong>确定可进行 SSL 通信时，以 Server Hello 报文作为应答。报文中包含 SSL 版本以及加密组件(Cipher Suite)。服务器的加密组件内容是<strong>从接收到的客户端加密组件内筛选出来的。</strong></li>
-<li><strong>服务器</strong>继续发送 Certificate 报文。报文中包含公钥证书。</li>
-<li><strong>服务器</strong>继续发送 ServerHelloDone 报文。通知客户端第一阶段的 SSL 握手协商部分结束。</li>
-<li><strong>客户端</strong>发送 Client Key Exchange 报文作为回应。报文中包含通信加密中一种被称为 <code>Pre-master secret</code>的随机密码串。这个报文已用第 3 步中的公钥进行加密。</li>
-<li><strong>客户端</strong>继续发送 Change Cipher Spec 报文。该报文会提示服务器，在此报文之后的通信都将会采用 <code>Premaster secret</code>秘钥加密。</li>
-<li><strong>客户端</strong>发送 Finished 报文。该报文包含连接至今，全部报文的整体校验值。此次握手协商能否成功，取决于服务器能否正确解密该报文。</li>
-<li><strong>服务器</strong>同样发送 Change Cipher Spec 报文。</li>
-<li><strong>服务器</strong>继续发送 Finished 报文。</li>
-<li>服务器与客户端交换完 Finished 报文之后，SSL 连接建立成功，通信将会受到 SSL 的保护。从此处开始进行<strong>应用层协议</strong>的通信，即发送 HTTP 请求。</li>
-<li><strong>应用层协议</strong>通信，即发送 HTTP 响应。</li>
-<li>由<strong>客户端</strong>断开连接。发送 close_notify 报文，之后发送 TCP FIN 报文来关闭与 TCP 的通信。</li>
-</ol>
-<p>下面是对整个流程的图解。图中说明了从仅使用服务器端的公开密钥证书(服务器证书)建立 HTTPS 通信的整个过程。</p>
-<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0sk6p3nuj30jh0cb11y.jpg" alt="HTTPS 通信的整个过程"></p>
-<h3 id="SSL-与-TLS"><a href="#SSL-与-TLS" class="headerlink" title="SSL 与 TLS"></a>SSL 与 TLS</h3><ul>
-<li><span class="exturl" data-url="aHR0cHM6Ly9iYWlrZS5iYWlkdS5jb20vaXRlbS/lronlhajlpZfmjqXlsYI=">SSL(Secure Sockets Layer安全套接层)<i class="fa fa-external-link-alt"></i></span></li>
-<li><a href="https://zh.wikipedia.org/wiki/%E5%82%B3%E8%BC%B8%E5%B1%A4%E5%AE%89%E5%85%A8%E6%80%A7%E5%8D%94%E5%AE%9A" target="_blank" rel="noopener">TLS (<strong>T</strong>ransport <strong>L</strong>ayer <strong>S</strong>ecurity 传输层安全性协议)</a></li>
-</ul>
-<p>TLS 与  SSL 的差异</p>
-<ul>
-<li><p>版本号：TLS 记录格式与 SSL 记录格式相同，但版本号的值不同，TLS1.0 使用的版本号为 SSLv3.1。</p>
-</li>
-<li><p>报文鉴别码：SSLv3.0 和 TLS 的 MAC 算法及 MAC 计算的范围不同。TLS 使用 HMAC 算法。SSLv3.0使用了相似的算法，两者差别在于 SSLv3.0 中，填充字节与密钥之间采用的是<strong>连接运算</strong>，而 HMAC 算法采用的是<strong>异或运算</strong>。</p>
-</li>
-<li><p>伪随机函数：TLS 使用了称为 PRF 的伪随机函数来将密钥扩展成数据块。</p>
-</li>
-<li><p>报警代码：TLS 在支持几乎所有的SSLv3.0报警代码的基础上，补充定义了很多报警代码，如解密失败（decryption_failed）、记录溢出（record_overflow）、未知CA（unknown_ca）、拒绝访问（access_denied）等。</p>
-</li>
-<li><p>密文族和客户证书：SSLv3.0 和 TLS 存在少量差别，TLS 不支持 Fortezza 密钥交换、加密算法和客户证书。</p>
-</li>
-<li><p>certificate_verify 和 finished 消息：SSLv3.0 和 TLS 在用 certificate_verify 和 finished 消息计算 MD5 和 SHA-1 散列码时，计算的输入有少许差别，但安全性相当。</p>
-</li>
-<li><p>加密计算：TLS 与 SSLv3.0 在计算<strong>主密值(master secret)</strong>时采用的方式不同。</p>
-</li>
-<li><p>填充：用户数据加密之前需要增加的填充字节。</p>
-<ul>
-<li>在 SSL 中，填充后的数据长度要达到密文块长度的最小整数倍。</li>
-<li>在 TLS 中，填充后的数据长度可以是密文块长度的任意整数倍（但填充的最大长度为255字节），这种方式可以防止基于对报文长度进行分析的攻击。</li>
-</ul>
-</li>
-</ul>
-<h3 id="HTTP与HTTPS的区别"><a href="#HTTP与HTTPS的区别" class="headerlink" title="HTTP与HTTPS的区别"></a>HTTP与HTTPS的区别</h3><table>
-<thead>
-<tr>
-<th align="center">方面</th>
-<th align="center">HTTP</th>
-<th align="center">HTTPS</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">开发目的</td>
-<td align="center">发布和接收 HTML 页面<br />浏览器和网站服务器之间传递信息</td>
-<td align="center">提供对网站服务器的身份认证<br />保护交换数据的隐私与完整性。</td>
-</tr>
-<tr>
-<td align="center">连接端口</td>
-<td align="center">80</td>
-<td align="center">443</td>
-</tr>
-<tr>
-<td align="center">安全协议</td>
-<td align="center">无</td>
-<td align="center">SSL/TLS</td>
-</tr>
-<tr>
-<td align="center">加密方式</td>
-<td align="center">无</td>
-<td align="center">对称加密、非对称加密、哈希算法、数字签名</td>
-</tr>
-<tr>
-<td align="center">安全性</td>
-<td align="center">明文传输、相对较低</td>
-<td align="center">加密传输、相对较高</td>
-</tr>
-<tr>
-<td align="center">建立连接</td>
-<td align="center">TCP三次握手交换3个包</td>
-<td align="center">TCP3个包+SSL9个包</td>
-</tr>
-<tr>
-<td align="center">响应速度</td>
-<td align="center">相对较快</td>
-<td align="center">相对较慢(比HTTP慢2到100倍)</td>
-</tr>
-<tr>
-<td align="center">所需费用</td>
-<td align="center">免费</td>
-<td align="center">可能需要购买证书</td>
-</tr>
-</tbody></table>
-<hr>
-<h3 id="Cookie-与-Session"><a href="#Cookie-与-Session" class="headerlink" title="Cookie 与 Session"></a>Cookie 与 Session</h3><p>由于HTTP协议是无状态的协议，每一个 HTTP 请求都是互相独立的，服务器分辨不出两次请求是否来自同一个浏览器或同一位用户。</p>
-<p>所以服务端需要记录用户的状态时，就需要用某种机制来识具体的用户，这个机制就是Session。</p>
-<p><strong>Cookie 简介</strong></p>
-<ul>
-<li>浏览器第一次连接服务器时Cookie是不存在的</li>
-<li>服务器响应客户端时，会在 Header 中设置 Set-Cookie，服务器收到 Cookie 后存在本地。</li>
-<li>每一个 Cookie 都是 name-value 对</li>
-<li>此后浏览器再连接服务器，都会包含上 Cookie，服务器可以用它来关联特定的请求。</li>
-</ul>
-<p><strong>Cookie里有什么？</strong></p>
-<ul>
-<li>Name and data.<ul>
-<li>数据大小通常被浏览器所限定，一般小于 4KB</li>
-<li>一个服务器可以通过不同的 Name 定义多个 Cookie，但是浏览器限制了每一个服务器可以拥有的 Cookie 数量(50个左右)</li>
-</ul>
-</li>
-<li>当前 Cookie 的 Domain(作用域)信息：Server、port(可选)、URL 前缀(可选)。Cookie 只会被包含在匹配的作用域的请求之中。</li>
-<li>过期时间：浏览器可以删除老旧的 Cookies。</li>
-</ul>
-<p><strong>工作流程</strong></p>
-<ul>
-<li><p>由服务器发给客户端的特殊信息，以文本的形式存放在客户端</p>
-</li>
-<li><p>客户端再次请求的时候，会把 <code>Cookie</code> 回发</p>
-</li>
-<li><p>服务器收到后，会解析 <code>Cookie</code> 生成与客户端相对应的内容</p>
-</li>
-</ul>
-<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gda16yd3y9j30qi0d6gnh.jpg" alt="Cookie的设置与工作过程"></p>
-<p><strong>Session简介</strong></p>
-<ul>
-<li>Cookie 是服务器用来实现 Session 的一种方式</li>
-<li>Cookie 中包含了 Session 的表示，通常被称为 SessionID。</li>
-<li>Session的管理<ul>
-<li>可以储存在内存里</li>
-<li>或者储存在磁盘中的文件中</li>
-<li>或者存在数据库中</li>
-</ul>
-</li>
-</ul>
-<p><strong>简单工作流程</strong></p>
-<ul>
-<li>保存在服务器上的信息</li>
-<li>解析客户端请求并操作 <code>SessionId</code> ，按需保存状态信息。</li>
-<li>实现方式<ul>
-<li>使用 <code>Cookie</code> 来实现</li>
-<li>当客户端禁用 <code>Cookie</code> 时，可以使用 <code>URL</code> 回写来实现</li>
-</ul>
-</li>
-</ul>
-<p><img data-src="https://tva1.sinaimg.cn/large/00831rSTly1gda1a9ou70j30sq0bcjwe.jpg" alt="Session的工作方式"></p>
-<p> <code>Cookie</code> 和 <code>Session</code> 的区别</p>
-<table>
-<thead>
-<tr>
-<th>对比角度</th>
-<th>Cookie</th>
-<th>Session</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>存放位置</td>
-<td>位于客户端、包含用户信息</td>
-<td>位于服务器的文件，包含用户信息。如果是Tomcat的话，位于StandManager中。</td>
-</tr>
-<tr>
-<td>生存时间</td>
-<td>可以手动设定</td>
-<td>当关闭浏览器时就消失</td>
-</tr>
-<tr>
-<td>容量大小</td>
-<td>一般最大为 4KB</td>
-<td>理论上可以存储随意多的信息，唯一的限制是一个脚本一次最大能占用的内存，默认是128MB</td>
-</tr>
-<tr>
-<td>依赖性</td>
-<td>Cookie不依赖于Session，Cookie是Session的一种实现方式。</td>
-<td>Session依赖于Cookie</td>
-</tr>
-<tr>
-<td>安全性</td>
-<td>相对较低</td>
-<td>相对较高</td>
-</tr>
-</tbody></table>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
-<li>《计算机网络》第七版，谢希仁。</li>
-<li>《图解HTTP》上野 宣、于均良 译。</li>
-<li><span class="exturl" data-url="aHR0cHM6Ly9qdWVqaW4uaW0vcG9zdC82ODQ0OTAzNTc1Njg0OTA3MDE2">掘金 - Cookie 和 Session 关系和区别<i class="fa fa-external-link-alt"></i></span></li>
-<li><span class="exturl" data-url="aHR0cHM6Ly93d3cuamlhbnNodS5jb20vcC8yNTgwMjAyMWJlNjM=">简书 - 看完就彻底懂了session和cookie<i class="fa fa-external-link-alt"></i></span></li>
-<li><span class="exturl" data-url="aHR0cHM6Ly93ZWIuc3RhbmZvcmQuZWR1L35vdXN0ZXIvY2dpLWJpbi9jczE0Mi1mYWxsMTAvaW5kZXgucGhw">Stanford University - CS 142: Web Applications (Fall 2010)<i class="fa fa-external-link-alt"></i></span></li>
-</ul>
-]]></content>
-      <categories>
-        <category>计算机网络</category>
-      </categories>
-      <tags>
-        <tag>HTTPS</tag>
+        <tag>Java</tag>
       </tags>
   </entry>
   <entry>
