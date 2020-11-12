@@ -1,332 +1,523 @@
 <!DOCTYPE html>
 <html lang="zh-Hans">
-<head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.2.0">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.jpg">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/avatar.jpg">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/avatar.jpg">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
-
-<link rel="stylesheet" href="/css/main.css">
-
-<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
-<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/themes/blue/pace-theme-minimal.min.css">
-  <script src="//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.min.js"></script>
-
-<script id="hexo-configurations">
-    var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"raymond-zhao.top","root":"/","scheme":"Gemini","version":"7.8.0","exturl":true,"sidebar":{"position":"left","Pisces | Gemini":240,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":true,"lazyload":true,"pangu":true,"comments":{"style":"tabs","active":"valine","storage":true,"lazyload":true,"nav":null,"activeClass":"valine"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
-  </script>
-
-  <meta name="description" content="Redis 内部数据结构">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Redis内部数据结构">
-<meta property="og:url" content="http://raymond-zhao.top/2020/06/19/2020-06-19-Redis-DataStructure/index.html">
-<meta property="og:site_name" content="Raymond&#39;s Blog">
-<meta property="og:description" content="Redis 内部数据结构">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gfxzp1zn7qj318k0e6q4c.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyimck2zvj318i0liacn.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyins2x3mj317w0k6adc.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyisxm7sbj31bc0tmn0j.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyiy1ovqmj30u01170xf.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyj26xum5j312a0i0tb7.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyj43ar33j31320omacm.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyj64xo4gj312q0ikmza.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyje2zlpxj31560towgq.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyjetcw3ej312i0kkwgv.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyjubx4q8j30wj0u00xh.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyjxqw2baj310h0u043c.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyjznhrsnj30wc0u0dkl.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyk1q79xoj31320qewid.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyl3ba4gwj312o0nygny.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gfymag1svpj30v607y0tu.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyrpunkgnj31360hc761.jpg">
-<meta property="article:published_time" content="2020-06-19T14:16:12.000Z">
-<meta property="article:modified_time" content="2020-09-21T02:28:22.296Z">
-<meta property="article:author" content="Not Today.">
-<meta property="article:tag" content="Redis">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/007S8ZIlly1gfxzp1zn7qj318k0e6q4c.jpg">
-
-<link rel="canonical" href="http://raymond-zhao.top/2020/06/19/2020-06-19-Redis-DataStructure/">
-
-
-<script id="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome : false,
-    isPost : true,
-    lang   : 'zh-Hans'
-  };
-</script>
-
-  <title>Redis内部数据结构 | Raymond's Blog</title>
+<head hexo-theme='https://github.com/volantis-x/hexo-theme-volantis/tree/4.0.0'>
+  <meta charset="utf-8">
+  <!-- SEO相关 -->
   
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-153445863-1"></script>
-    <script data-pjax>
-      if (CONFIG.hostname === location.hostname) {
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'UA-153445863-1');
-      }
-    </script>
+    
+  
+  <!-- 渲染优化 -->
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
 
+  <!-- 页面元数据 -->
+  
+  <title>Redis内部数据结构 - Raymond&#39;s Blog</title>
+  
+    <meta name="keywords" content="Redis">
+  
 
-  <script data-pjax>
-    var _hmt = _hmt || [];
-    (function() {
-      var hm = document.createElement("script");
-      hm.src = "https://hm.baidu.com/hm.js?889b45174b1bfd8b974e0944a5c47850";
-      var s = document.getElementsByTagName("script")[0];
-      s.parentNode.insertBefore(hm, s);
-    })();
-  </script>
+  
+    <meta name="description" content="Redis 内部数据结构">
+  
 
+  <!-- feed -->
+  
 
+  <!-- import meta -->
+  
 
+  <!-- link -->
+  <link rel='dns-prefetch' href='https://cdn.jsdelivr.net'>
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14/css/all.min.css">
 
-  <noscript>
-  <style>
-  .use-motion .brand,
-  .use-motion .menu-item,
-  .sidebar-inner,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
+  
+  
 
-  .use-motion .site-title,
-  .use-motion .site-subtitle {
-    opacity: initial;
-    top: initial;
+  
+
+  
+
+  
+
+  
+
+  <!-- import link -->
+  
+
+  
+  
+    
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  <!-- 脚本懒加载函数 -->
+  <script>
+  function loadScript(src, cb) {
+    var HEAD = document.getElementsByTagName('head')[0] || document.documentElement;
+    var script = document.createElement('script');
+    script.setAttribute('type','text/javascript');
+    if (cb) script.onload = cb;
+    script.setAttribute('src', src);
+    HEAD.appendChild(script);
   }
-
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
-  </style>
-</noscript>
-
+  //https://github.com/filamentgroup/loadCSS
+  !function(c){"use strict";var e=function(e,t,n,r){var o,i=c.document,a=i.createElement("link");if(t)o=t;else{var d=(i.body||i.getElementsByTagName("head")[0]).childNodes;o=d[d.length-1]}var f=i.styleSheets;if(r)for(var l in r)r.hasOwnProperty(l)&&a.setAttribute(l,r[l]);a.rel="stylesheet",a.href=e,a.media="only x",function e(t){if(i.body)return t();setTimeout(function(){e(t)})}(function(){o.parentNode.insertBefore(a,t?o:o.nextSibling)});var s=function(e){for(var t=a.href,n=f.length;n--;)if(f[n].href===t)return e();setTimeout(function(){s(e)})};function u(){a.addEventListener&&a.removeEventListener("load",u),a.media=n||"all"}return a.addEventListener&&a.addEventListener("load",u),(a.onloadcssdefined=s)(u),a};"undefined"!=typeof exports?exports.loadCSS=e:c.loadCSS=e}("undefined"!=typeof global?global:this);
+  </script>
+  <script id="loadcss"></script>
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
-
-    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-container">
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
+<body>
+  <header class="l_header auto shadow blur " style='opacity: 0' >
+  <div class='container'>
+  <div class='wrapper'>
+    <div class='nav-sub'>
+      <p class="title"></p>
+      <ul class='switcher nav-list-h m-phone' id="pjax-header-nav-list">
+        <li><a class="s-comment fas fa-comments fa-fw" target="_self" href='javascript:void(0)'></a></li>
+        
+          <li><a class="s-toc fas fa-list fa-fw" target="_self" href='javascript:void(0)'></a></li>
+        
+      </ul>
     </div>
-  </div>
-
-  <div class="site-meta">
-
-    <a href="/" class="brand" rel="start">
-      <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">Raymond's Blog</h1>
-      <span class="logo-line-after"><i></i></span>
-    </a>
-      <p class="site-subtitle" itemprop="description">如果我的墓志铭需要一句话，我希望是: 我已尽我所能。</p>
-  </div>
-
-  <div class="site-nav-right">
-    <div class="toggle popup-trigger">
-        <i class="fa fa-search fa-fw fa-lg"></i>
-    </div>
-  </div>
-</div>
-
-
-
-
-<nav class="site-nav">
-  <ul id="menu" class="main-menu menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">29</span></a>
-
-  </li>
-        <li class="menu-item menu-item-categories">
-
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">16</span></a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">33</span></a>
-
-  </li>
-      <li class="menu-item menu-item-search">
-        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
-        </a>
-      </li>
-  </ul>
-</nav>
-
-
-
-  <div class="search-pop-overlay">
-    <div class="popup search-popup">
-        <div class="search-header">
-  <span class="search-icon">
-    <i class="fa fa-search"></i>
-  </span>
-  <div class="search-input-container">
-    <input autocomplete="off" autocapitalize="off"
-           placeholder="搜索..." spellcheck="false"
-           type="search" class="search-input">
-  </div>
-  <span class="popup-btn-close">
-    <i class="fa fa-times-circle"></i>
-  </span>
-</div>
-<div id="search-result">
-  <div id="no-result">
-    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
-  </div>
-</div>
-
-    </div>
-  </div>
-
-</div>
-    </header>
-
-    
-  <div class="back-to-top">
-    <i class="fa fa-arrow-up"></i>
-    <span>0%</span>
-  </div>
-  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
-
-  <span class="exturl github-corner" data-url="aHR0cHM6Ly9naXRodWIuY29tL3JheW1vbmQtemhhbw==" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></span>
-
-
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
-
-          <div class="content post posts-expand">
-            
-
-    
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="http://raymond-zhao.top/2020/06/19/2020-06-19-Redis-DataStructure/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Not Today.">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Raymond's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          Redis内部数据结构
-        </h1>
-
-        <div class="post-meta">
-
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-06-19 22:16:12" itemprop="dateCreated datePublished" datetime="2020-06-19T22:16:12+08:00">2020-06-19</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-09-21 10:28:22" itemprop="dateModified" datetime="2020-09-21T10:28:22+08:00">2020-09-21</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Redis/" itemprop="url" rel="index"><span itemprop="name">Redis</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span id="busuanzi_value_page_pv"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2020/06/19/2020-06-19-Redis-DataStructure/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2020/06/19/2020-06-19-Redis-DataStructure/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>13k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>11 分钟</span>
-            </span>
-            <div class="post-description">Redis 内部数据结构</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
+		<div class="nav-main">
       
-        <p>Redis 和其他很多<code>key-value</code> 数据库的不同之处在于，Redis 不仅支持简单的字符串键值对，它还提供了一系列数据结构类型值，比如列表、哈希、集合和有序集，并在这些数据结构类型上 定义了一套强大的 API 。</p>
+        
+        <a class="title flat-box" target="_self" href='/'>
+          
+            <img no-lazy class='logo' src='https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/blog/Logo-NavBar@3x.png'/>
+          
+          
+          
+        </a>
+      
+
+			<div class='menu navigation'>
+				<ul class='nav-list-h m-pc'>
+          
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/
+                  
+                  
+                  
+                    id="home"
+                  >
+                  <i class='fas fa-rss fa-fw'></i>博客
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/categories/
+                  
+                  
+                  
+                    id="categories"
+                  >
+                  <i class='fas fa-folder-open fa-fw'></i>分类
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/tags/
+                  
+                  
+                  
+                    id="tags"
+                  >
+                  <i class='fas fa-tags fa-fw'></i>标签
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/archives/
+                  
+                  
+                  
+                    id="archives"
+                  >
+                  <i class='fas fa-archive fa-fw'></i>归档
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/friends/
+                  
+                  
+                  
+                    id="friends"
+                  >
+                  <i class='fas fa-link fa-fw'></i>友链
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/about/
+                  
+                  
+                  
+                    id="about"
+                  >
+                  <i class='fas fa-info-circle fa-fw'></i>关于
+                </a>
+                
+              </li>
+            
+          
+          
+				</ul>
+			</div>
+
+      <div class="m_search">
+        <form name="searchform" class="form u-search-form">
+          <i class="icon fas fa-search fa-fw"></i>
+          <input type="text" class="input u-search-input" placeholder="Search..." />
+        </form>
+      </div>
+
+			<ul class='switcher nav-list-h m-phone'>
+				
+					<li><a class="s-search fas fa-search fa-fw" target="_self" href='javascript:void(0)'></a></li>
+				
+				<li>
+          <a class="s-menu fas fa-bars fa-fw" target="_self" href='javascript:void(0)'></a>
+          <ul class="menu-phone list-v navigation white-box">
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/
+                  
+                  
+                  
+                    id="home"
+                  >
+                  <i class='fas fa-rss fa-fw'></i>博客
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/categories/
+                  
+                  
+                  
+                    id="categories"
+                  >
+                  <i class='fas fa-folder-open fa-fw'></i>分类
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/tags/
+                  
+                  
+                  
+                    id="tags"
+                  >
+                  <i class='fas fa-tags fa-fw'></i>标签
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/archives/
+                  
+                  
+                  
+                    id="archives"
+                  >
+                  <i class='fas fa-archive fa-fw'></i>归档
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/friends/
+                  
+                  
+                  
+                    id="friends"
+                  >
+                  <i class='fas fa-link fa-fw'></i>友链
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/about/
+                  
+                  
+                  
+                    id="about"
+                  >
+                  <i class='fas fa-info-circle fa-fw'></i>关于
+                </a>
+                
+              </li>
+            
+          
+            
+          </ul>
+        </li>
+			</ul>
+		</div>
+	</div>
+  </div>
+</header>
+
+  <div class="l_body">
+    <div class="l_cover">
+  
+    
+    
+        <div class='cover-wrapper post search' style="display: none;">
+          
+            <div class='cover-bg lazyload placeholder' data-bg="https://cdn.jsdelivr.net/gh/volantis-x/cdn-wallpaper-minimalist/2020/033.jpg"></div>
+          
+          <div class='cover-body'>
+  <div class='top'>
+    
+    
+      <p class="title">人间草木</p>
+    
+    
+  </div>
+  <div class='bottom'>
+    
+      <div class="m_search">
+        <form name="searchform" class="form u-search-form">
+          <input type="text" class="input u-search-input" placeholder="Type and Search What U Need" />
+          <i class="icon fas fa-search fa-fw"></i>
+        </form>
+      </div>
+    
+    <div class='menu navigation'>
+      <div class='list-h'>
+        
+          
+            <a href="/v4/getting-started/"
+              
+              
+              id="v4getting-started">
+              <p>文档</p>
+            </a>
+          
+            <a href="/faqs/"
+              
+              
+              id="faqs">
+              <p>帮助</p>
+            </a>
+          
+            <a href="/examples/"
+              
+              
+              id="examples">
+              <p>示例</p>
+            </a>
+          
+            <a href="/contributors/"
+              
+              
+              id="contributors">
+              <p>社区</p>
+            </a>
+          
+            <a href="/archives/"
+              
+              
+              id="archives">
+              <p>博客</p>
+            </a>
+          
+            <a href="https://github.com/volantis-x/hexo-theme-volantis/"
+              
+              
+              id="https:githubcomvolantis-xhexo-theme-volantis">
+              <p>源码</p>
+            </a>
+          
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+          <div class="scroll-down" style="display: none;"><i class="fa fa-chevron-down scroll-down-effects"></i></div>
+        </div>
+    
+  
+  </div>
+  
+    <div class='safearea'>
+      <div class='body-wrapper' id="pjax-container">
+        
+          <!--此文件用来存放一些不方便取值的变量--> 
+<!--思路大概是将值藏到重加载的区域内--> 
+ 
+ 
+ 
+<div id="pjax-data" style="display: none"> 
+  <div id="pjax-ispage">true</div> 
+  <div id="pjax-pageTitle">Redis内部数据结构</div> 
+  <div id="pjax-enable-cover">true</div> 
+  <div id="pjax-comment-path"></div> 
+  <div id="pjax-comment-placeholder"></div> 
+</div> 
+ 
+ 
+<script> 
+  // 处理封面 此时 jquery 还没加载 
+  if ("none" == "none") { // 移除封面 
+    document.getElementsByClassName('cover-wrapper')[0].style.display = "none"; 
+    document.getElementsByClassName('l_header', 'cover-wrapper')[0].classList.add("show"); 
+  } else { 
+    if ("none" == "half") { // 半屏 
+      document.getElementsByClassName('cover-wrapper')[0].setAttribute('id', 'half'); 
+      document.getElementsByClassName('scroll-down')[0].style.display = "none"; 
+    } else if ("none" == "full") { // 全屏 
+      document.getElementsByClassName('cover-wrapper')[0].setAttribute('id', 'full'); 
+      document.getElementsByClassName('scroll-down')[0].style.display = ""; 
+    } 
+    document.getElementsByClassName('cover-wrapper')[0].style.display = ""; 
+    document.getElementsByClassName('l_header', 'cover-wrapper')[0].classList.remove("show"); 
+  } 
+</script> 
+ 
+
+        
+        
+
+<div class='l_main'>
+  <article class="article post white-box reveal md shadow article-type-post" id="post" itemscope itemprop="blogPost">
+  
+
+
+  
+  <div class="article-meta" id="top">
+    
+    
+    
+      <h1 class="title">
+        Redis内部数据结构
+      </h1>
+      <div class='new-meta-box'>
+        
+          
+            
+<div class='new-meta-item author'>
+  <a class='author' href="/" rel="nofollow">
+    <img no-lazy src="">
+    <p>人间草木</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  <div class='new-meta-item category'>
+    <a class='notlink'>
+      <i class="fas fa-folder-open fa-fw" aria-hidden="true"></i>
+      <a class="category-link" href="/categories/Redis/">Redis</a>
+    </a>
+  </div>
+
+
+          
+        
+          
+            <div class="new-meta-item date">
+  <a class='notlink'>
+    <i class="fas fa-calendar-alt fa-fw" aria-hidden="true"></i>
+    <p>发布于：Jun 19, 2020</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  <div class="new-meta-item browse leancloud">
+    <a class='notlink'>
+      
+      <div id="lc-pv" data-title="Redis内部数据结构" data-path="/2020/06/19/2020-06-19-Redis-DataStructure/">
+        <i class="fas fa-eye fa-fw" aria-hidden="true"></i>
+        <span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span>
+        次浏览
+      </div>
+    </a>
+  </div>
+
+
+          
+        
+      </div>
+    
+  </div>
+
+
+  
+  <p>Redis 和其他很多<code>key-value</code> 数据库的不同之处在于，Redis 不仅支持简单的字符串键值对，它还提供了一系列数据结构类型值，比如列表、哈希、集合和有序集，并在这些数据结构类型上 定义了一套强大的 API 。</p>
 <p>通过对不同类型的值进行操作，Redis 可以很轻易地完成其他只支持字符串键值对的<code>key-value</code> 数据库很难(或者无法)完成的任务。</p>
 <p>在 Redis 的内部，数据结构类型值由高效的数据结构和算法进行支持，并且在 Redis 自身的构建当中，也大量用到了这些数据结构。</p>
 <h2 id="1-简单动态字符串"><a href="#1-简单动态字符串" class="headerlink" title="1 简单动态字符串"></a>1 简单动态字符串</h2><p>Sds (Simple Dynamic String，简单动态字符串)是 Redis 底层所使用的字符串表示，它被用在几乎所有的 Redis 模块中。</p>
@@ -384,7 +575,7 @@
 <li>事件模块使用双端链表来保存时间事件(time event).</li>
 </ul>
 <h3 id="2-2-双端链表的实现"><a href="#2-2-双端链表的实现" class="headerlink" title="2.2 双端链表的实现"></a>2.2 双端链表的实现</h3><p>双端链表的实现由 <code>listNode</code> 和 <code>list</code> 两个数据结构构成，下图展示了由这两个结构组成的一 个双端链表实例:</p>
-<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfxzp1zn7qj318k0e6q4c.jpg" alt="双端列表"></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfxzp1zn7qj318k0e6q4c.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gfxzp1zn7qj318k0e6q4c.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="双端列表"></p>
 <p>其中，<code>listNode</code> 是双端链表的节点:</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">listNode</span> &#123;</span></span><br><span class="line">    <span class="comment">// 前驱节点</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">listNode</span> *<span class="title">prev</span>;</span></span><br><span class="line">    <span class="comment">// 后继节点</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">listNode</span> *<span class="title">next</span>;</span></span><br><span class="line">    <span class="comment">// 值</span></span><br><span class="line">    <span class="keyword">void</span> *value;</span><br><span class="line">&#125; listNode;</span><br></pre></td></tr></table></figure>
 
@@ -456,15 +647,15 @@
 
 <p><code>next</code> 属性指向另一个 <code>dictEntry</code> 结构，多个 <code>dictEntry</code> 可以通过 <code>next</code> 指针串连成链表，从这里可以看出，<code>dictht</code> 使用链地址法来处理键碰撞: 当多个不同的键拥有相同的哈希值时，哈希表用一个链表将这些键连接起来。</p>
 <p>下图展示了一个由 <code>dictht</code> 和数个 <code>dictEntry</code> 组成的哈希表例子:</p>
-<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyimck2zvj318i0liacn.jpg" alt="哈希表"></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyimck2zvj318i0liacn.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyimck2zvj318i0liacn.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="哈希表"></p>
 <p>如果再加上之前列出的 <code>dict</code> 类型，那么整个字典结构可以表示如下:</p>
-<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyins2x3mj317w0k6adc.jpg" alt="image-20200620095226978"></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyins2x3mj317w0k6adc.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyins2x3mj317w0k6adc.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="image-20200620095226978"></p>
 <p>在上图的字典示例中，字典虽然创建了两个哈希表，但正在使用的只有 $0$ 号哈希表，这说明字典未进行 <code>rehash</code> 状态。</p>
 <p>🙋<strong><em>哈希算法</em></strong></p>
 <p>Redis 目前使用两种不同的哈希算法:</p>
 <ul>
-<li>MurmurHash2 32 bit 算法:这种算法的分布率和速度都非常好，具体信息请参考 <span class="exturl" data-url="aHR0cDovL2NvZGUuZ29vZ2xlLmNvbS9wL3NtaGFzaGVyLw==">MurmurHash 的主页<i class="fa fa-external-link-alt"></i></span> 。</li>
-<li><span class="exturl" data-url="aHR0cDovL3d3dy5jc2UueW9ya3UuY2Evfm96L2hhc2guaHRtbA==">基于 djb 算法实现的一个大小写无关散列算法<i class="fa fa-external-link-alt"></i></span></li>
+<li>MurmurHash2 32 bit 算法:这种算法的分布率和速度都非常好，具体信息请参考 <a href="http://code.google.com/p/smhasher/" target="_blank" rel="noopener">MurmurHash 的主页</a> 。</li>
+<li><a href="http://www.cse.yorku.ca/~oz/hash.html" target="_blank" rel="noopener">基于 djb 算法实现的一个大小写无关散列算法</a></li>
 </ul>
 <p>使用哪种算法取决于具体应用所处理的数据:</p>
 <ul>
@@ -473,7 +664,7 @@
 </ul>
 <h3 id="3-3-创建新字典"><a href="#3-3-创建新字典" class="headerlink" title="3.3 创建新字典"></a>3.3 创建新字典</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// dictCreate 函数创建并返回一个新字典:</span></span><br><span class="line">dict *d = dictCreate(&amp;hash_type, <span class="literal">NULL</span>);</span><br><span class="line"><span class="comment">// d 的值可以用图片表示如下:</span></span><br></pre></td></tr></table></figure>
 
-<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyisxm7sbj31bc0tmn0j.jpg" alt="New Dict"></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyisxm7sbj31bc0tmn0j.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyisxm7sbj31bc0tmn0j.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="New Dict"></p>
 <p>新创建的两个哈希表都没有为 <code>table</code> 属性分配任何空间:</p>
 <ul>
 <li><code>ht[0]-&gt;table</code> 的空间分配将在第一次往字典添加键值对时进行;</li>
@@ -486,7 +677,7 @@
 <li>如果插入新元素使得字典满足了 <code>rehash</code> 条件，那么需要启动相应的 <code>rehash</code> 程序.</li>
 </ul>
 <p>当程序处理完以上三种情况之后，新的键值对才会被真正地添加到字典上，整个添加流程可以用下图表示：</p>
-<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyiy1ovqmj30u01170xf.jpg" alt="Add Entry"></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyiy1ovqmj30u01170xf.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyiy1ovqmj30u01170xf.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="Add Entry"></p>
 <p>在接下来的三节中，我们将分别看到添加操作如何在以下三种情况中执行: </p>
 <ul>
 <li>字典为空;</li>
@@ -495,22 +686,22 @@
 </ul>
 <h3 id="3-5-添加新元素到空白字典"><a href="#3-5-添加新元素到空白字典" class="headerlink" title="3.5 添加新元素到空白字典"></a>3.5 添加新元素到空白字典</h3><p>当第一次往空字典里添加键值对时，程序会根据 <code>dict.h/DICT_HT_INITIAL_SIZE</code> 里指定的大</p>
 <p>小为 <code>d-&gt;ht[0]-&gt;table</code> 分配空间。 字典空白时的样子如 <strong><em>3.3 创建新字典</em></strong> 图所示，以下是往空白字典添加了第一个键值对之后的样子:</p>
-<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyj26xum5j312a0i0tb7.jpg" alt="First Entry"></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyj26xum5j312a0i0tb7.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyj26xum5j312a0i0tb7.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="First Entry"></p>
 <h3 id="3-6-添加新键值对时发生碰撞处理"><a href="#3-6-添加新键值对时发生碰撞处理" class="headerlink" title="3.6 添加新键值对时发生碰撞处理"></a>3.6 添加新键值对时发生碰撞处理</h3><p>在哈希表实现中，当两个不同的键拥有相同的哈希值时，我们称这两个键发生碰撞(collision)，而哈希表实现必须想办法对碰撞进行处理。</p>
 <p>字典哈希表所使用的碰撞解决方法被称之为<strong>链地址法</strong>:这种方法使用链表将多个哈希值相同的节点串连在一起，从而解决冲突问题。</p>
 <p>假设现在有一个带有三个节点的哈希表，如下图:</p>
-<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyj43ar33j31320omacm.jpg" alt="添加碰撞节点之前"></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyj43ar33j31320omacm.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyj43ar33j31320omacm.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="添加碰撞节点之前"></p>
 <p>对于一个新的键值对 <code>key4</code> 和 <code>value4</code> ，如果 <code>key4</code> 的哈希值和 <code>key1</code> 的哈希值相同，那么它们将在哈希表的 $0$ 号索引上发生碰撞。通过将 <code>key4-value4</code> 和 <code>key1-value1</code> 两个键值对用链表连接起来，就可以解决碰撞的问题:</p>
-<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyj64xo4gj312q0ikmza.jpg" alt="添加碰撞节点之后"></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyj64xo4gj312q0ikmza.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyj64xo4gj312q0ikmza.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="添加碰撞节点之后"></p>
 <h3 id="3-7-添加新键值对时触发了-rehash-操作"><a href="#3-7-添加新键值对时触发了-rehash-操作" class="headerlink" title="3.7 添加新键值对时触发了 rehash 操作"></a>3.7 添加新键值对时触发了 rehash 操作</h3><p>对于使用链地址法来解决碰撞问题的哈希表 <code>dictht</code> 来说，哈希表的性能依赖于它的大小(<code>size</code>属性)和它所保存的节点的数量(<code>used</code> 属性)之间的比率:</p>
 <ul>
 <li>比率在 $1:1$ 时，哈希表的性能最好;</li>
 <li>如果节点数量比哈希表的大小要大很多的话，那么哈希表就会退化成多个链表，哈希表本身的性能优势就不再存在.</li>
 </ul>
 <p>举个例子，对于下面这个哈希表，平均每次失败查找只需要访问 $1$ 个节点(非空节点访问 $2$ 次，空节点访问 $1$ 次):</p>
-<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyje2zlpxj31560towgq.jpg" alt="image-20200620101743095"></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyje2zlpxj31560towgq.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyje2zlpxj31560towgq.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="image-20200620101743095"></p>
 <p>而对于下面这个哈希表，平均每次失败查找需要访问 $5$ 个节点:</p>
-<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyjetcw3ej312i0kkwgv.jpg" alt="image-20200620101825564"></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyjetcw3ej312i0kkwgv.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyjetcw3ej312i0kkwgv.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="image-20200620101825564"></p>
 <p>为了在字典的键值对不断增多的情况下保持良好的性能，字典需要对所使用的哈希表(<code>ht[0]</code>) 进行 <code>rehash</code> 操作:在不修改任何键值对的情况下，对哈希表进行扩容，尽量将比率维持在 $1:1$ 左右。</p>
 <p><code>dictAdd</code> 在每次向字典添加新键值对之前，都会对哈希表 <code>ht[0]</code> 进行检查，对于 <code>ht[0]</code> 的 <code>size</code> 和 <code>used</code> 属性，如果它们之间的比率 $ratio = used / siz$e 满足以下任何一个条件的话， <code>rehash</code> 过程就会被激活:</p>
 <ul>
@@ -537,14 +728,14 @@
 <li>为<code>ht[1]-&gt;table</code>分配空间，大小至少为<code>ht[0]-&gt;used</code>的两倍.</li>
 </ul>
 <p>这时的字典是这个样子:</p>
-<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyjubx4q8j30wj0u00xh.jpg" alt="image-20200620103319817"></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyjubx4q8j30wj0u00xh.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyjubx4q8j30wj0u00xh.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="image-20200620103319817"></p>
 <p><strong><em>2 Rehash 进行中</em></strong></p>
 <p>在这个阶段，<code>ht[0]-&gt;table</code> 的节点会被逐渐迁移到 <code>ht[1]-&gt;table</code> ，因为 <code>rehash</code> 是分多次进行的(细节在下一节解释)，字典的 <code>rehashidx</code> 变量会记录 <code>rehash</code> 进行到 <code>ht[0]</code> 的哪个索引。以下是 <code>rehashidx</code> 值为 2 时，字典的样子:</p>
-<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyjxqw2baj310h0u043c.jpg" alt="image-20200620103636396"></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyjxqw2baj310h0u043c.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyjxqw2baj310h0u043c.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="image-20200620103636396"></p>
 <p>注意除了节点的移动外，字典的 <code>rehashidx</code> 、<code>ht[0]-&gt;used</code> 和 <code>ht[1]-&gt;used</code> 三个属性也产生了变化。</p>
 <p><strong><em>3 节点迁移完毕</em></strong></p>
 <p>到了这个阶段，所有的节点都已经从 ht[0] 迁移到 ht[1] 了:</p>
-<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyjznhrsnj30wc0u0dkl.jpg" alt="image-20200620103827144"></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyjznhrsnj30wc0u0dkl.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyjznhrsnj30wc0u0dkl.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="image-20200620103827144"></p>
 <p><strong><em>4 rehash 完毕</em></strong></p>
 <p>在 <code>rehash</code> 的最后阶段，程序会执行以下工作:</p>
 <ul>
@@ -554,7 +745,7 @@
 <li>将字典的 <code>rehashidx</code> 属性设置为 <code>-1</code> ，标识 <code>rehash</code> 已停止;</li>
 </ul>
 <p>以下是字典 <code>rehash</code> 完毕之后的样子:</p>
-<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyk1q79xoj31320qewid.jpg" alt="image-20200620104026593"></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyk1q79xoj31320qewid.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyk1q79xoj31320qewid.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="image-20200620104026593"></p>
 <p>对比字典 <code>rehash</code> 之前和 <code>rehash</code> 之后，新的 <code>ht[0]</code> 空间更大，并且字典原有的键值对也没有被修改或者删除。</p>
 <h3 id="3-9-渐进式-rehash"><a href="#3-9-渐进式-rehash" class="headerlink" title="3.9 渐进式 rehash"></a>3.9 渐进式 rehash</h3><p>假设这样一个场景:在一个有很多键值对的字典里，某个用户在添加新键值对时触发了 <code>rehash</code> 过程，如果这个 <code>rehash</code> 过程必须将所有键值对迁移完毕之后才将结果返回给用户，这样的处理方式谁能接受？另一方面，要求服务器必须阻塞直到 rehash 完成，这对于 Redis 服务器本身也是不能接受的。</p>
 <p>所以<code>rehash</code> 程序并不是在激活之后就马上执行直到完成的，而是分多次、渐进式地完成的。</p>
@@ -567,7 +758,7 @@
 <p><strong><em>_dictRehashStep</em></strong></p>
 <p>每次执行 <code>_dictRehashStep</code> ，<code>ht[0]-&gt;table</code> 哈希表第一个不为空的索引上的所有节点就会全部迁移到 <code>ht[1]-&gt;table</code> .</p>
 <p>在 <code>rehash</code> 开始进行之后(<code>d-&gt;rehashidx</code> 不为 $-1$)，每次执行一次添加、查找、删除操作，<code>_dictRehashStep</code> 都会被执行一次:</p>
-<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyl3ba4gwj312o0nygny.jpg" alt="image-20200620111634392"></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyl3ba4gwj312o0nygny.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyl3ba4gwj312o0nygny.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="image-20200620111634392"></p>
 <p><strong><em>dictRehashMilliseconds</em></strong></p>
 <p><code>dictRehashMilliseconds</code> 可以在指定的毫秒数内，对字典进行 <code>rehash</code> 。</p>
 <p>当 Redis 的服务器常规任务执行时，<code>dictRehashMilliseconds</code> 会被执行，在规定的时间内， 尽可能地对数据库字典中那些需要 <code>rehash</code> 的字典进行 <code>rehash</code> ，从而加速数据库字典的 <code>rehash</code> 进程(progress)。</p>
@@ -620,8 +811,8 @@
 <li>对哈希表的 <code>rehash</code> 是分多次、渐进式地进行的。</li>
 </ul>
 <h2 id="4-跳跃表"><a href="#4-跳跃表" class="headerlink" title="4 跳跃表"></a>4 跳跃表</h2><p>跳跃表(skiplist)是一种随机化的数据，由 $William Pugh$ 在论文《Skip lists: a probabilistic alternative to balanced trees》中提出，这种数据结构<strong>以有序的方式在层次化的链表中保存元素</strong>，它的效率可以和平衡树媲美——查找、删除、添加等操作都可以在对数<strong>期望时间</strong>下完成， 并且比起平衡树来说，跳跃表的实现要简单直观得多。</p>
-<p>以下是一个典型的跳跃表例子(图片来自<span class="exturl" data-url="aHR0cHM6Ly9lbi53aWtpcGVkaWEub3JnL3dpa2kvRmlsZTpTa2lwX2xpc3Quc3Zn">维基百科<i class="fa fa-external-link-alt"></i></span>):</p>
-<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfymag1svpj30v607y0tu.jpg" alt="image-20200620115800909"></p>
+<p>以下是一个典型的跳跃表例子(图片来自<a href="https://en.wikipedia.org/wiki/File:Skip_list.svg" target="_blank" rel="noopener">维基百科</a>):</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfymag1svpj30v607y0tu.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gfymag1svpj30v607y0tu.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="image-20200620115800909"></p>
 <p>从图中可以看到，跳跃表主要由以下部分构成:</p>
 <ul>
 <li>表头(<code>head</code>): 负责维护跳跃表的节点指针</li>
@@ -647,7 +838,7 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; zadd s 6 x 10 y 15 z</span><br><span class="line">(integer) 3</span><br><span class="line">127.0.0.1:6379&gt; zrange s 0 -1 withscores</span><br><span class="line">1) "x"</span><br><span class="line">2) "6"</span><br><span class="line">3) "y"</span><br><span class="line">4) "10"</span><br><span class="line">5) "z"</span><br><span class="line">6) "15"</span><br></pre></td></tr></table></figure>
 
 <p>在底层实现中，Redis 为 x 、y 和 z 三个 <code>member</code> 分别创建了三个字符串，并为 6 、10 和 15分别创建三个 <code>double</code> 类型的值，然后用一个跳跃表将这些指针有序地保存起来，形成这样一个跳跃表：</p>
-<p><img data-src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyrpunkgnj31360hc761.jpg" alt="image-20200620150546410"></p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyrpunkgnj31360hc761.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gfyrpunkgnj31360hc761.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="image-20200620150546410"></p>
 <p>为了展示的方便，在图片中我们直接将 <code>member</code> 和 <code>score</code> 值包含在表节点中，但是在实际的定义中，因为跳跃表要和另一个实现有序集的结构(字典)分享 <code>member</code> 和 <code>score</code> 值，所以跳跃表只保存指向 <code>member</code> 和 <code>score</code> 的指针。</p>
 <h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><ul>
 <li>跳跃表是一种<strong>随机化(概率性)</strong>数据结构，它的查找、添加、删除操作都可以在对数<strong>期望时间</strong>下完成。</li>
@@ -660,465 +851,807 @@
 </li>
 </ul>
 
-    </div>
+  
+  
+    
+    <div class='footer'>
+      
+      
+      
+        <div class='copyright'>
+          <blockquote>
+            
+              
+                <p>博客内容遵循 署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0) 协议</p>
 
+              
+            
+              
+                <p>本文永久链接是：<a href=http://raymond-zhao.top/2020/06/19/2020-06-19-Redis-DataStructure/>http://raymond-zhao.top/2020/06/19/2020-06-19-Redis-DataStructure/</a></p>
+              
+            
+          </blockquote>
+        </div>
+      
+      
+    </div>
+  
+  
     
-    
+
+
+  <div class='article-meta' id="bottom">
+    <div class='new-meta-box'>
+      
+        
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2020-09-21T10:28:22+08:00">
+  <a class='notlink'>
+    <i class="fas fa-edit fa-fw" aria-hidden="true"></i>
+    <p>更新于：Sep 21, 2020</p>
+  </a>
+</div>
+
+        
+      
+        
+          
+  
+  <div class="new-meta-item meta-tags"><a class="tag" href="/tags/Redis/" rel="nofollow"><i class="fas fa-hashtag fa-fw" aria-hidden="true"></i><p>Redis</p></a></div>
+
+
+        
+      
+        
+          
+  <div class="new-meta-item share -mob-share-list">
+  <div class="-mob-share-list share-body">
     
       
-  <div class="popular-posts-header">相关文章</div>
-  <ul class="popular-posts">
-    <li class="popular-posts-item">
-      <div class="popular-posts-title"><a href="/2020/03/30/2020-03-30-Redis-Basic/" rel="bookmark">好好学 Redis</a></div>
-        <div class="popular-posts-excerpt"><p>后端开发工程师所需要掌握的 Redis 知识</p></div>
-    </li>
-    <li class="popular-posts-item">
-      <div class="popular-posts-title"><a href="/2020/03/24/2020-03-24-Redis-RedisInAction/" rel="bookmark">Redis基础</a></div>
-        <div class="popular-posts-excerpt"><p>学习《Redis实战》一书的笔记</p></div>
-    </li>
-  </ul>
-
-
-      <footer class="post-footer">
+        <a class="-mob-share-qq" title="" rel="external nofollow noopener noreferrer"
           
-          <div class="post-tags">
-              <a href="/tags/Redis/" rel="tag"><i class="fa fa-tag"></i> Redis</a>
-          </div>
-
-        
-
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2020/06/08/2020-06-08-Docker/" rel="prev" title="学学Docker">
-      <i class="fa fa-chevron-left"></i> 学学Docker
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2020/07/03/2020-07-03-Algo-LRU/" rel="next" title="Java LRU及Redis LRU">
-      Java LRU及Redis LRU <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
-      </footer>
+          href="http://connect.qq.com/widget/shareqq/index.html?url=http://raymond-zhao.top/2020/06/19/2020-06-19-Redis-DataStructure/&title=Redis内部数据结构 - Raymond's Blog&summary="
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qq.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qq.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=">
+          
+        </a>
+      
     
-  </article>
-  
-  
-  
-
-
-
-          </div>
+      
+        <a class="-mob-share-qzone" title="" rel="external nofollow noopener noreferrer"
           
-    <div class="comments" id="valine-comments"></div>
+          href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=http://raymond-zhao.top/2020/06/19/2020-06-19-Redis-DataStructure/&title=Redis内部数据结构 - Raymond's Blog&summary="
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qzone.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qzone.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-weibo" title="" rel="external nofollow noopener noreferrer"
+          
+          href="http://service.weibo.com/share/share.php?url=http://raymond-zhao.top/2020/06/19/2020-06-19-Redis-DataStructure/&title=Redis内部数据结构 - Raymond's Blog&summary="
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/weibo.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/weibo.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=">
+          
+        </a>
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
 
-<script>
-  window.addEventListener('tabs:register', () => {
-    let { activeClass } = CONFIG.comments;
-    if (CONFIG.comments.storage) {
-      activeClass = localStorage.getItem('comments_active') || activeClass;
-    }
-    if (activeClass) {
-      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
-      if (activeTab) {
-        activeTab.click();
-      }
-    }
-  });
-  if (CONFIG.comments.storage) {
-    window.addEventListener('tabs:click', event => {
-      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
-      let commentClass = event.target.classList[1];
-      localStorage.setItem('comments_active', commentClass);
-    });
-  }
-</script>
+
+
+        
+      
+    </div>
+  </div>
+
+
+  
+  
+
+  
+    <div class="prev-next">
+      
+        <a class='prev' href='/2020/07/03/2020-07-03-Algo-LRU/'>
+          <p class='title'><i class="fas fa-chevron-left" aria-hidden="true"></i>Java LRU及Redis LRU</p>
+          <p class='content'>LRU缓存LRU简介LRU 是 Least Recently Used 的缩写，即最不经常用、最长时间未使用，在操作系统中是一种常用的页面置换算法，选择最近最久未使用的页面予以淘汰。该算法赋予每...</p>
+        </a>
+      
+      
+        <a class='next' href='/2020/06/08/2020-06-08-Docker/'>
+          <p class='title'>学学Docker<i class="fas fa-chevron-right" aria-hidden="true"></i></p>
+          <p class='content'>Docker简介Docker 是一个开放源代码软件，是一个开放平台，用于开发应用、交付（shipping）应用、运行应用。 Docker允许用户将基础设施（Infrastructure）中的应用...</p>
+        </a>
+      
+    </div>
+  
+</article>
+
+
+  
+
+  <article class="post white-box reveal shadow" id="comments">
+    <p ct><i class='fas fa-comments'></i> 评论</p>
+    
+    <div id="valine_container" class="valine_thread">
+  <i class="fas fa-cog fa-spin fa-fw fa-2x"></i>
+</div>
+
+  </article>
+
+
+
+
+
+
+</div>
+<aside class='l_side'>
+  
+  
+    
+    
+
+
+
+  <section class="widget toc-wrapper shadow desktop mobile" id="toc-div" >
+    
+  <header>
+    
+      <i class="fas fa-list fa-fw" aria-hidden="true"></i><span class='name'>本文目录</span>
+    
+  </header>
+
+
+    <div class='content'>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-简单动态字符串"><span class="toc-text">1 简单动态字符串</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-SDS的用途"><span class="toc-text">1.1 SDS的用途</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-Redis中的字符串"><span class="toc-text">1.2 Redis中的字符串</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-优化追加操作"><span class="toc-text">1.3 优化追加操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4-小结"><span class="toc-text">1.4 小结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-双端链表"><span class="toc-text">2 双端链表</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-双端链表的应用"><span class="toc-text">2.1 双端链表的应用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-双端链表的实现"><span class="toc-text">2.2 双端链表的实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-迭代器"><span class="toc-text">2.3 迭代器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-小结"><span class="toc-text">2.4 小结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-字典"><span class="toc-text">3 字典</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-字典的应用"><span class="toc-text">3.1 字典的应用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-字典的实现"><span class="toc-text">3.2 字典的实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-创建新字典"><span class="toc-text">3.3 创建新字典</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-添加键值对到字典"><span class="toc-text">3.4 添加键值对到字典</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-5-添加新元素到空白字典"><span class="toc-text">3.5 添加新元素到空白字典</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-6-添加新键值对时发生碰撞处理"><span class="toc-text">3.6 添加新键值对时发生碰撞处理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-添加新键值对时触发了-rehash-操作"><span class="toc-text">3.7 添加新键值对时触发了 rehash 操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-8-Rehash执行过程"><span class="toc-text">3.8 Rehash执行过程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-9-渐进式-rehash"><span class="toc-text">3.9 渐进式 rehash</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-10-字典收缩"><span class="toc-text">3.10 字典收缩</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-11-字典的迭代"><span class="toc-text">3.11 字典的迭代</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-12-小结"><span class="toc-text">3.12 小结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-跳跃表"><span class="toc-text">4 跳跃表</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-跳跃表的实现"><span class="toc-text">4.1 跳跃表的实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-跳跃表的应用"><span class="toc-text">4.2 跳跃表的应用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#小结"><span class="toc-text">小结</span></a></li></ol></li></ol>
+    </div>
+  </section>
+
+
+  
+
+
+</aside>
+
+
+
+        
+      </div>
+      
+  
+  <footer class="footer clearfix">
+    <br><br>
+    
+      
+        <div class="aplayer-container">
+          
+
 
         </div>
-          
-  
-  <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
-  </div>
-
-  <aside class="sidebar">
-    <div class="sidebar-inner">
-
-      <ul class="sidebar-nav motion-element">
-        <li class="sidebar-nav-toc">
-          文章目录
-        </li>
-        <li class="sidebar-nav-overview">
-          站点概览
-        </li>
-      </ul>
-
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-简单动态字符串"><span class="nav-text">1 简单动态字符串</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-SDS的用途"><span class="nav-text">1.1 SDS的用途</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-Redis中的字符串"><span class="nav-text">1.2 Redis中的字符串</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-优化追加操作"><span class="nav-text">1.3 优化追加操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-小结"><span class="nav-text">1.4 小结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-双端链表"><span class="nav-text">2 双端链表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-双端链表的应用"><span class="nav-text">2.1 双端链表的应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-双端链表的实现"><span class="nav-text">2.2 双端链表的实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-迭代器"><span class="nav-text">2.3 迭代器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-小结"><span class="nav-text">2.4 小结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-字典"><span class="nav-text">3 字典</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-字典的应用"><span class="nav-text">3.1 字典的应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-字典的实现"><span class="nav-text">3.2 字典的实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-创建新字典"><span class="nav-text">3.3 创建新字典</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-添加键值对到字典"><span class="nav-text">3.4 添加键值对到字典</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-添加新元素到空白字典"><span class="nav-text">3.5 添加新元素到空白字典</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-6-添加新键值对时发生碰撞处理"><span class="nav-text">3.6 添加新键值对时发生碰撞处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-7-添加新键值对时触发了-rehash-操作"><span class="nav-text">3.7 添加新键值对时触发了 rehash 操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-8-Rehash执行过程"><span class="nav-text">3.8 Rehash执行过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-9-渐进式-rehash"><span class="nav-text">3.9 渐进式 rehash</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-10-字典收缩"><span class="nav-text">3.10 字典收缩</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-11-字典的迭代"><span class="nav-text">3.11 字典的迭代</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-12-小结"><span class="nav-text">3.12 小结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-跳跃表"><span class="nav-text">4 跳跃表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-跳跃表的实现"><span class="nav-text">4.1 跳跃表的实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-跳跃表的应用"><span class="nav-text">4.2 跳跃表的应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#小结"><span class="nav-text">小结</span></a></li></ol></li></ol></div>
-      </div>
-      <!--/noindex-->
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <img class="site-author-image" itemprop="image" alt="Not Today."
-      src="/images/avatar.jpg">
-  <p class="site-author-name" itemprop="name">Not Today.</p>
-  <div class="site-description" itemprop="description"></div>
-</div>
-<div class="site-state-wrap motion-element">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">33</span>
-          <span class="site-state-item-name">日志</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-categories">
-            <a href="/categories/">
-          
-        <span class="site-state-item-count">16</span>
-        <span class="site-state-item-name">分类</span></a>
-      </div>
-      <div class="site-state-item site-state-tags">
-            <a href="/tags/">
-          
-        <span class="site-state-item-count">29</span>
-        <span class="site-state-item-name">标签</span></a>
-      </div>
-  </nav>
-</div>
-  <div class="sidebar-button motion-element">
-    <a onclick="Chatra('openChat', true);">
+      
     
-  </a>
-  </div>
-  <div class="links-of-author motion-element">
-      <span class="links-of-author-item">
-        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL3JheW1vbmQtemhhbw==" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;raymond-zhao"><i class="github fa-fw"></i>GitHub</span>
-      </span>
-      <span class="links-of-author-item">
-        <span class="exturl" data-url="bWFpbHRvOnFxNzQwNTY3Mzk2QGdtYWlsLmNvbQ==" title="E-Mail → mailto:qq740567396@gmail.com"><i class="envelope fa-fw"></i>E-Mail</span>
-      </span>
-      <span class="links-of-author-item">
-        <span class="exturl" data-url="aHR0cHM6Ly93ZWliby5jb20vNTcwOTY3MTA3OA==" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;5709671078"><i class="weibo fa-fw"></i>Weibo</span>
-      </span>
-      <span class="links-of-author-item">
-        <span class="exturl" data-url="aHR0cHM6Ly90d2l0dGVyLmNvbS9SYXltb25kZ2FsYXh5" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;Raymondgalaxy"><i class="twitter fa-fw"></i>Twitter</span>
-      </span>
-      <span class="links-of-author-item">
-        <span class="exturl" data-url="aHR0cHM6Ly93d3cuZmFjZWJvb2suY29tL3JheS56aGFvLjU2OA==" title="Facebook → https:&#x2F;&#x2F;www.facebook.com&#x2F;ray.zhao.568"><i class="facebook fa-fw"></i>Facebook</span>
-      </span>
-      <span class="links-of-author-item">
-        <span class="exturl" data-url="aHR0cHM6Ly9pbnN0YWdyYW0uY29tL3JheW1vbmRfX3poYW8=" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;raymond__zhao"><i class="instagram fa-fw"></i>Instagram</span>
-      </span>
-  </div>
-
-
-  <div class="links-of-blogroll motion-element">
-    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
-      友情链接
-    </div>
-    <ul class="links-of-blogroll-list">
-        <li class="links-of-blogroll-item">
-          <span class="exturl" data-url="aHR0cHM6Ly9yYW1vbmEtY2hlbi50b3Av" title="https:&#x2F;&#x2F;ramona-chen.top&#x2F;">陈某人</span>
-        </li>
-        <li class="links-of-blogroll-item">
-          <span class="exturl" data-url="aHR0cHM6Ly9pbmtzcy5jbi8=" title="https:&#x2F;&#x2F;inkss.cn&#x2F;">SZYINK</span>
-        </li>
-        <li class="links-of-blogroll-item">
-          <span class="exturl" data-url="aHR0cHM6Ly9saXNpamlhbi5jbi8=" title="https:&#x2F;&#x2F;lisijian.cn&#x2F;">思建的NLP之旅</span>
-        </li>
-    </ul>
-  </div>
-
-      </div>
-
-    </div>
-  </aside>
-  <div id="sidebar-dimmer"></div>
-
-
-      </div>
-    </main>
-
-    <footer class="footer">
-      <div class="footer-inner">
-        
-
-        
-
-<div class="copyright">
-  
-  &copy; 
-  <span itemprop="copyrightYear">2020</span>
-  <span class="with-love">
-    <i class="fa fa-heart"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">Not Today.</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-chart-area"></i>
-    </span>
-    <span title="站点总字数">345k</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-coffee"></i>
-    </span>
-    <span title="站点阅读时长">5:13</span>
+      
+        <br>
+        <div class="social-wrapper">
+          
+            
+          
+            
+          
+            
+          
+        </div>
+      
+    
+      
+        <div><p>Blog content follows the <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener">Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0) License</a></p>
 </div>
-  <div class="powered-by">由 <span class="exturl theme-link" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl theme-link" data-url="aHR0cHM6Ly90aGVtZS1uZXh0Lm9yZw==">NexT.Gemini</span> 强力驱动
-  </div>
-
+      
+    
+      
         
-<div class="busuanzi-count">
-  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-user"></i>
-      </span>
-      <span class="site-uv" title="总访客量">
-        <span id="busuanzi_value_site_uv"></span>
-      </span>
-    </span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-eye"></i>
-      </span>
-      <span class="site-pv" title="总访问量">
-        <span id="busuanzi_value_site_pv"></span>
-      </span>
-    </span>
+          <div><p><span id="lc-sv">本站总访问量为 <span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span> 次</span> <span id="lc-uv">访客数为 <span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span> 人</span></p>
 </div>
+        
+      
+    
+      
+        Use
+        <a href="https://github.com/volantis-x/hexo-theme-volantis/tree/4.0.0" target="_blank" class="codename">Volantis</a>
+        as theme
+      
+    
+      
+        <div class='copyright'>
+        <p><a href="/">Copyright © 2017-2020 XXX</a></p>
+
+        </div>
+      
+    
+  </footer>
 
 
-
-
-
-
-
-
-      </div>
-    </footer>
+      <a class="s-top fas fa-arrow-up fa-fw" href='javascript:void(0)'></a>
+    </div>
   </div>
+  <div>
+    <!-- required -->
 
-  
-  <script src="//cdn.jsdelivr.net/npm/animejs@3.1.0/lib/anime.min.js"></script>
-  <script src="//cdn.jsdelivr.net/gh/theme-next/theme-next-pjax@0/pjax.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/medium-zoom@1/dist/medium-zoom.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/lozad.js/1.14.0/lozad.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/pangu/4.0.7/pangu.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/velocity/1.2.1/velocity.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/velocity/1.2.1/velocity.ui.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5/dist/jquery.min.js"></script>
 
-<script src="/js/utils.js"></script>
-
-<script src="/js/motion.js"></script>
-
-
-<script src="/js/schemes/pisces.js"></script>
-
-
-<script src="/js/next-boot.js"></script>
-
-<script src="/js/bookmark.js"></script>
-
-  <script>
-var pjax = new Pjax({
-  selectors: [
-    'head title',
-    '#page-configurations',
-    '.content-wrap',
-    '.post-toc-wrap',
-    '.languages',
-    '#pjax'
-  ],
-  switches: {
-    '.post-toc-wrap': Pjax.switches.innerHTML
-  },
-  analytics: false,
-  cacheBust: false,
-  scrollTo : !CONFIG.bookmark.enable
-});
-
-window.addEventListener('pjax:success', () => {
-  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
-    var code = element.text || element.textContent || element.innerHTML || '';
-    var parent = element.parentNode;
-    parent.removeChild(element);
-    var script = document.createElement('script');
-    if (element.id) {
-      script.id = element.id;
-    }
-    if (element.className) {
-      script.className = element.className;
-    }
-    if (element.type) {
-      script.type = element.type;
-    }
-    if (element.src) {
-      script.src = element.src;
-      // Force synchronous loading of peripheral JS.
-      script.async = false;
-    }
-    if (element.dataset.pjax !== undefined) {
-      script.dataset.pjax = '';
-    }
-    if (code !== '') {
-      script.appendChild(document.createTextNode(code));
-    }
-    parent.appendChild(script);
+<script>
+  function pjax_fancybox() {
+    $(".md .gallery").find("img").each(function () { //渲染 fancybox
+      var element = document.createElement("a"); // a 标签
+      $(element).attr("class", "fancybox");
+      $(element).attr("pjax-fancybox", "");  // 过滤 pjax
+      $(element).attr("href", $(this).attr("src"));
+      if ($(this).attr("data-original")) {
+        $(element).attr("href", $(this).attr("data-original"));
+      }
+      $(element).attr("data-fancybox", "images");
+      var caption = "";   // 描述信息
+      if ($(this).attr('alt')) {  // 判断当前页面是否存在描述信息
+        $(element).attr('data-caption', $(this).attr('alt'));
+        caption = $(this).attr('alt');
+      }
+      var div = document.createElement("div");
+      $(div).addClass("fancybox");
+      $(this).wrap(div); // 最外层套 div ，其实主要作用还是 class 样式
+      var span = document.createElement("span");
+      $(span).addClass("image-caption");
+      $(span).text(caption); // 加描述
+      $(this).after(span);  // 再套一层描述
+      $(this).wrap(element);  // 最后套 a 标签
+    })
+    $(".md .gallery").find("img").fancybox({
+      selector: '[data-fancybox="images"]',
+      hash: false,
+      loop: false,
+      closeClick: true,
+      helpers: {
+        overlay: {closeClick: true}
+      },
+      buttons: [
+        "zoom",
+        "close"
+      ]
+    });
+  };
+  function SCload_fancybox() {
+    if ($(".md .gallery").find("img").length == 0) return;
+    loadCSS("https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css", document.getElementById("loadcss"));
+    setTimeout(function() {
+      loadScript('https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js', pjax_fancybox)
+    }, 1);
+  };
+  $(function () {
+    SCload_fancybox();
   });
-  NexT.boot.refresh();
-  // Define Motion Sequence & Bootstrap Motion.
-  if (CONFIG.motion.enable) {
-    NexT.motion.integrator
-      .init()
-      .add(NexT.motion.middleWares.subMenu)
-      .add(NexT.motion.middleWares.postList)
-      .bootstrap();
-  }
-  NexT.utils.updateSidebarPosition();
-});
+</script>
+
+
+<!-- internal -->
+
+
+
+
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
 </script>
 
 
 
 
   
-  <script data-pjax>
-    (function(){
-      var bp = document.createElement('script');
-      var curProtocol = window.location.protocol.split(':')[0];
-      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
-      var s = document.getElementsByTagName("script")[0];
-      s.parentNode.insertBefore(bp, s);
-    })();
-  </script>
-
-
-
-
   
-<script src="/js/local-search.js"></script>
-
-
-
-
-  <script>
-    (function(d, w, c) {
-      w.ChatraID = 'WW9yp8QpPcAKpJMYy';
-      var s = d.createElement('script');
-      w[c] = w[c] || function() {
-        (w[c].q = w[c].q || []).push(arguments);
+    <script>
+      window.FPConfig = {
+        delay: 0,
+        ignoreKeywords: [],
+        maxRPS: 5,
+        hoverDelay: 25
       };
-      s.async = true;
-      s.src = 'https://call.chatra.io/chatra.js';
-      if (d.head) d.head.appendChild(s);
-    })(document, window, 'Chatra');
-  </script>
-
-
-
-
-
-
-
-
-
-    <div id="pjax">
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/gh/gijo-varghese/flying-pages@2.1.2/flying-pages.min.js"></script>
   
 
+
+
+
+
+
+
+
+
+
   
-      
+  
+<script src="/js/valine.js"></script>
+
 
 <script>
-  if (typeof MathJax === 'undefined') {
-    window.MathJax = {
-      loader: {
-        source: {
-          '[tex]/amsCd': '[tex]/amscd',
-          '[tex]/AMScd': '[tex]/amscd'
-        }
-      },
-      tex: {
-        inlineMath: {'[+]': [['$', '$']]},
-        tags: 'ams'
-      },
-      options: {
-        renderActions: {
-          findScript: [10, doc => {
-            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
-              const display = !!node.type.match(/; *mode=display/);
-              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
-              const text = document.createTextNode('');
-              node.parentNode.replaceChild(text, node);
-              math.start = {node: text, delim: '', n: 0};
-              math.end = {node: text, delim: '', n: 0};
-              doc.math.push(math);
-            });
-          }, '', false],
-          insertedScript: [200, () => {
-            document.querySelectorAll('mjx-container').forEach(node => {
-              let target = node.parentNode;
-              if (target.nodeName.toLowerCase() === 'li') {
-                target.parentNode.classList.add('has-jax');
-              }
-            });
-          }, '', false]
+  var GUEST_INFO = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link'.split(',').filter(function (item) {
+    return GUEST_INFO.indexOf(item) > -1
+  });
+  var REQUIRED_FIELDS = ['nick', 'mail', 'link'];
+  var requiredFields = 'nick,mail'.split(',').filter(function (item) {
+    return REQUIRED_FIELDS.indexOf(item) > -1
+  });
+
+  function emoji(path, idx, ext) {
+    return path + "/" + path + "-" + idx + "." + ext;
+  }
+
+  var emojiMaps = {};
+  for (var i = 1; i <= 54; i++) {
+    emojiMaps['tieba-' + i] = emoji('tieba', i, 'png');
+  }
+  for (var i = 1; i <= 101; i++) {
+    emojiMaps['qq-' + i] = emoji('qq', i, 'gif');
+  }
+  for (var i = 1; i <= 116; i++) {
+    emojiMaps['aru-' + i] = emoji('aru', i, 'gif');
+  }
+  for (var i = 1; i <= 125; i++) {
+    emojiMaps['twemoji-' + i] = emoji('twemoji', i, 'png');
+  }
+  for (var i = 1; i <= 4; i++) {
+    emojiMaps['weibo-' + i] = emoji('weibo', i, 'png');
+  }
+
+  function pjax_valine() {
+    if(!document.querySelectorAll("#valine_container")[0])return;
+
+    let pagePlaceholder = $.trim($('#pjax-comment-placeholder').text()) || "快来评论吧~";
+
+    let path = $.trim($('#pjax-comment-path').text());
+    if (path.length == 0) {
+      let defaultPath = '';
+      path = defaultPath || decodeURI(window.location.pathname);
+    }
+
+    var valine = new Valine();
+    valine.init({
+      el: '#valine_container',
+      meta: meta,
+      placeholder: pagePlaceholder,
+      path: path,
+      appId: "",
+      appKey: "",
+      pageSize: '10',
+      avatar: 'robohash',
+      lang: 'zh-cn',
+      visitor: 'true',
+      highlight: 'true',
+      mathJax: 'false',
+      enableQQ: 'true',
+      recordIP: 'false',
+      requiredFields: requiredFields,
+      emojiCDN: 'https://cdn.jsdelivr.net/gh/volantis-x/cdn-emoji/valine/',
+      emojiMaps: emojiMaps
+    })
+  }
+
+  $(function () {
+    pjax_valine();
+  });
+</script>
+
+
+
+
+
+
+
+  
+<script src="/js/app.js"></script>
+
+
+
+
+  
+    
+<script src="/js/search.js"></script>
+
+  
+
+
+<!-- optional -->
+
+  <script>
+const SearchServiceimagePath="https://cdn.jsdelivr.net/gh/volantis-x/cdn-volantis@master/img/";
+const ROOT =  ("/" || "/").endsWith('/') ? ("/" || "/") : ("//" || "/" );
+(function ($) {
+  
+    customSearch = new HexoSearch({
+      imagePath: SearchServiceimagePath
+    });
+  
+})(jQuery);
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  <script defer>
+
+  const LCCounter = {
+    app_id: 'u9j57bwJod4EDmXWdxrwuqQT-MdYXbMMI',
+    app_key: 'jfHtEKVE24j0IVCGHbvuFClp',
+    custom_api_server: '',
+
+    // 查询存储的记录
+    getRecord(Counter, url, title) {
+      return new Promise(function (resolve, reject) {
+        Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({url})))
+          .then(resp => resp.json())
+          .then(({results, code, error}) => {
+            if (code === 401) {
+              throw error;
+            }
+            if (results && results.length > 0) {
+              var record = results[0];
+              resolve(record);
+            } else {
+              Counter('post', '/classes/Counter', {url, title: title, times: 0})
+                .then(resp => resp.json())
+                .then((record, error) => {
+                  if (error) {
+                    throw error;
+                  }
+                  resolve(record);
+                }).catch(error => {
+                console.error('Failed to create', error);
+                reject(error);
+              });
+            }
+          }).catch((error) => {
+          console.error('LeanCloud Counter Error:', error);
+          reject(error);
+        });
+      })
+    },
+
+    // 发起自增请求
+    increment(Counter, incrArr) {
+      return new Promise(function (resolve, reject) {
+        Counter('post', '/batch', {
+          "requests": incrArr
+        }).then((res) => {
+          res = res.json();
+          if (res.error) {
+            throw res.error;
+          }
+          resolve(res);
+        }).catch((error) => {
+          console.error('Failed to save visitor count', error);
+          reject(error);
+        });
+      });
+    },
+
+    // 构建自增请求体
+    buildIncrement(objectId) {
+      return {
+        "method": "PUT",
+        "path": `/1.1/classes/Counter/${ objectId }`,
+        "body": {
+          "times": {
+            '__op': 'Increment',
+            'amount': 1
+          }
         }
       }
-    };
-    (function () {
-      var script = document.createElement('script');
-      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
-      script.defer = true;
-      document.head.appendChild(script);
-    })();
-  } else {
-    MathJax.startup.document.state(0);
-    MathJax.texReset();
-    MathJax.typeset();
-  }
+    },
+
+    // 校验是否为有效的 UV
+    validUV() {
+      var key = 'LeanCloudUVTimestamp';
+      var flag = localStorage.getItem(key);
+      if (flag) {
+        // 距离标记小于 24 小时则不计为 UV
+        if (new Date().getTime() - parseInt(flag) <= 86400000) {
+          return false;
+        }
+      }
+      localStorage.setItem(key, new Date().getTime().toString());
+      return true;
+    },
+
+    addCount(Counter) {
+      var enableIncr = '' === 'true' && window.location.hostname !== 'localhost';
+      enableIncr = true;
+      var getterArr = [];
+      var incrArr = [];
+      // 请求 PV 并自增
+      var pvCtn = document.querySelector('#lc-sv');
+      if (pvCtn || enableIncr) {
+        var pvGetter = this.getRecord(Counter, 'http://raymond-zhao.top' + '/#lc-sv', 'Visits').then((record) => {
+          incrArr.push(this.buildIncrement(record.objectId))
+          var eles = document.querySelectorAll('#lc-sv #number');
+          if (eles.length > 0) {
+            eles.forEach((el,index,array)=>{
+              el.innerText = record.times + 1;
+              if (pvCtn) {
+                pvCtn.style.display = 'inline';
+              }
+            })
+          }
+        });
+        getterArr.push(pvGetter);
+      }
+
+      // 请求 UV 并自增
+      var uvCtn = document.querySelector('#lc-uv');
+      if (uvCtn || enableIncr) {
+        var uvGetter = this.getRecord(Counter, 'http://raymond-zhao.top' + '/#lc-uv', 'Visitors').then((record) => {
+          var vuv = this.validUV();
+          vuv && incrArr.push(this.buildIncrement(record.objectId))
+          var eles = document.querySelectorAll('#lc-uv #number');
+          if (eles.length > 0) {
+            eles.forEach((el,index,array)=>{
+              el.innerText = record.times + (vuv ? 1 : 0);
+              if (uvCtn) {
+                uvCtn.style.display = 'inline';
+              }
+            })
+          }
+        });
+        getterArr.push(uvGetter);
+      }
+
+      // 请求文章的浏览数，如果是当前页面就自增
+      var allPV = document.querySelectorAll('#lc-pv');
+      if (allPV.length > 0 || enableIncr) {
+        for (i = 0; i < allPV.length; i++) {
+          let pv = allPV[i];
+          let title = pv.getAttribute('data-title');
+          var url = 'http://raymond-zhao.top' + pv.getAttribute('data-path');
+          if (url) {
+            var viewGetter = this.getRecord(Counter, url, title).then((record) => {
+              // 是当前页面就自增
+              let curPath = window.location.pathname;
+              if (curPath.includes('index.html')) {
+                curPath = curPath.substring(0, curPath.lastIndexOf('index.html'));
+              }
+              if (pv.getAttribute('data-path') == curPath) {
+                incrArr.push(this.buildIncrement(record.objectId));
+              }
+              if (pv) {
+                var ele = pv.querySelector('#lc-pv #number');
+                if (ele) {
+                  if (pv.getAttribute('data-path') == curPath) {
+                    ele.innerText = (record.times || 0) + 1;
+                  } else {
+                    ele.innerText = record.times || 0;
+                  }
+                  pv.style.display = 'inline';
+                }
+              }
+            });
+            getterArr.push(viewGetter);
+          }
+        }
+      }
+
+      // 如果启动计数自增，批量发起自增请求
+      if (enableIncr) {
+        Promise.all(getterArr).then(() => {
+          incrArr.length > 0 && this.increment(Counter, incrArr);
+        })
+      }
+
+    },
+
+
+    fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${ api_server }/1.1${ url }`, {
+          method,
+          headers: {
+            'X-LC-Id': this.app_id,
+            'X-LC-Key': this.app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      this.addCount(Counter);
+    },
+
+    refreshCounter() {
+      var api_server = this.app_id.slice(-9) !== '-MdYXbMMI' ? this.custom_api_server : `https://${ this.app_id.slice(0, 8).toLowerCase() }.api.lncldglobal.com`;
+      if (api_server) {
+        this.fetchData(api_server);
+      } else {
+        fetch('https://app-router.leancloud.cn/2/route?appId=' + this.app_id)
+          .then(resp => resp.json())
+          .then(({api_server}) => {
+            this.fetchData('https://' + api_server);
+          });
+      }
+    }
+
+  };
+
+  LCCounter.refreshCounter();
+
+  document.addEventListener('pjax:complete', function () {
+    LCCounter.refreshCounter();
+  });
+</script>
+
+
+
+<!-- more -->
+
+
+    
+      
+
+
+<script src="https://cdn.jsdelivr.net/npm/pjax@0.2.8/pjax.min.js"></script>
+
+<!-- 样式位于：source/css/_third-party/pjaxanimate.styl -->
+
+<div class="pjax-animate">
+  
+    <script src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script>
+    <div id="loading-bar-wrapper"><script>NProgress.configure({parent:"#loading-bar-wrapper",trickleSpeed: 100})</script></div>
+    <script>
+      window.ShowLoading = function() {
+        NProgress.start();
+      };
+      window.HideLoading = function() {
+        NProgress.done();
+      }
+    </script>
+  
+</div>
+
+<script>
+    var pjax;
+    document.addEventListener('DOMContentLoaded', function () {
+      pjax = new Pjax({
+        elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([pjax-fancybox])',
+        selectors: [
+          "title",
+          "#pjax-container",
+          "#pjax-header-nav-list"
+        ],
+        cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+        timeout: 5000
+      });
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+      window.stop(); // 相当于点击了浏览器的停止按钮
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      window.subData = null; // 移除标题（用于一二级导航栏切换处）
+      if (typeof $.fancybox != "undefined") {
+        $.fancybox.close();    // 关闭弹窗
+      }
+      $('.l_header .switcher .s-search').removeClass('active'); // 关闭移动端激活的搜索框
+      $('.l_header').removeClass('z_search-open'); // 关闭移动端激活的搜索框
+      $('.wrapper').removeClass('sub'); // 跳转页面时关闭二级导航
+
+      // 解绑事件 避免重复监听
+      $('.s-top').unbind('click');
+      $('.menu a').unbind('click');
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+      window.ShowLoading();
+    });
+
+    document.addEventListener('pjax:complete', function () {
+      // 关于百度统计对 SPA 页面的处理：
+      // 方案一：百度统计>管理>单页应用设置中，打开开启按钮即可对SPA进行统计。 https://tongji.baidu.com/web/help/article?id=324
+      // 方案二：取消注释下列代码。 https://tongji.baidu.com/web/help/article?id=235
+      // 
+
+      // 关于谷歌统计对 SPA 页面的处理：
+      // 当应用以动态方式加载内容并更新地址栏中的网址时，也应该更新通过 gtag.js 存储的网页网址。
+      // https://developers.google.cn/analytics/devguides/collection/gtagjs/single-page-applications?hl=zh-cn
+      
+
+      $('.nav-main').find('.list-v').not('.menu-phone').removeAttr("style",""); // 移除小尾巴的移除
+      $('.menu-phone.list-v').removeAttr("style",""); // 移除小尾巴的移除
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+      try{
+          if (typeof $.fancybox == "undefined") {
+            SCload_fancybox();
+          } else {
+            pjax_fancybox();
+          }
+        
+        
+        
+        
+        
+        
+          pjax_valine();
+        
+        
+        
+        
+        
+      } catch (e) {
+        console.log(e);
+      }
+      window.HideLoading();
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+      window.HideLoading();
+      window.location.href = e.triggerElement.href;
+    });
 </script>
 
     
-
-  
-
-
-<script>
-NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
-  NexT.utils.getScript('//cdnjs.cloudflare.com/ajax/libs/valine/1.3.10/Valine.min.js', () => {
-    var GUEST = ['nick', 'mail', 'link'];
-    var guest = 'nick,mail,link';
-    guest = guest.split(',').filter(item => {
-      return GUEST.includes(item);
-    });
-    new Valine({
-      el         : '#valine-comments',
-      verify     : false,
-      notify     : false,
-      appId      : 'v6cb35sRa1lfGq6EOtTQHHyf-gzGzoHsz',
-      appKey     : '2ulfq63r4brxg2l9QfXp0cTM',
-      placeholder: "快来评论吧",
-      avatar     : 'mm',
-      meta       : guest,
-      pageSize   : '10' || 10,
-      visitor    : false,
-      lang       : '' || 'zh-cn',
-      path       : location.pathname,
-      recordIP   : true,
-      serverURLs : ''
-    });
-  }, window.Valine);
-});
-</script>
-
-    </div>
+  </div>
 </body>
 </html>
