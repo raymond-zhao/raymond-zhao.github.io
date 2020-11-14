@@ -329,7 +329,7 @@
     
         <div class='cover-wrapper friends search' style="display: none;">
           
-            <div class='cover-bg lazyload placeholder' data-bg="https://cdn.jsdelivr.net/gh/volantis-x/cdn-wallpaper-minimalist/2020/033.jpg"></div>
+            <div class='cover-bg lazyload placeholder' data-bg="/images/cover-2.jpg"></div>
           
           <div class='cover-body'>
   <div class='top'>
@@ -508,36 +508,6 @@
 
 
     
-    
-      
-        <div class='friends-group'>
-          <br>
-          <h2 class='friend-header'>
-            我的朋友
-          </h2>
-          
-          
-            <div class='site-card-group'>
-              
-                
-                  <a class="site-card" target="_blank" rel="external nofollow noopener noreferrer" href="https://ramona-chen.top/">
-                    <div class="img">
-                      
-                        <img src="/images/avatar.jpg" class="lazyload" data-srcset="/images/avatar.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII="/>
-                      
-                    </div>
-                    <div class="info">
-                      <img src="/images/avatar.jpg" class="lazyload" data-srcset="/images/avatar.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII="/>
-                      <span class="title">陈某人</span>
-                      <span class="desc">前端工程师</span>
-                    </div>
-                  </a>
-                
-              
-            </div>
-          
-        </div>
-      
     
     <br><br>
     
@@ -835,7 +805,7 @@
     return GUEST_INFO.indexOf(item) > -1
   });
   var REQUIRED_FIELDS = ['nick', 'mail', 'link'];
-  var requiredFields = 'nick,mail'.split(',').filter(function (item) {
+  var requiredFields = ''.split(',').filter(function (item) {
     return REQUIRED_FIELDS.indexOf(item) > -1
   });
 
@@ -886,7 +856,7 @@
       highlight: 'true',
       mathJax: 'true',
       enableQQ: 'true',
-      recordIP: 'false',
+      recordIP: 'true',
       requiredFields: requiredFields,
       emojiCDN: 'https://cdn.jsdelivr.net/gh/volantis-x/cdn-emoji/valine/',
       emojiMaps: emojiMaps
