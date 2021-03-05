@@ -502,7 +502,7 @@
   <div class="new-meta-item browse leancloud">
     <a class='notlink'>
       
-      <div id="lc-pv" data-title="TCP的运输连接管理" data-path="/2020/08/26/2020-08-26-Network-TCPAndUDP/">
+      <div id="lc-pv" data-title="TCP的运输连接管理" data-path="/2020/08/26/2020-08-26-Network-TCPANDUDP/">
         <i class="fas fa-eye fa-fw" aria-hidden="true"></i>
         <span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span>
         次浏览
@@ -653,7 +653,7 @@
               
             
               
-                <p>本文永久链接是：<a href=http://raymond-zhao.top/2020/08/26/2020-08-26-Network-TCPAndUDP/>http://raymond-zhao.top/2020/08/26/2020-08-26-Network-TCPAndUDP/</a></p>
+                <p>本文永久链接是：<a href=http://raymond-zhao.top/2020/08/26/2020-08-26-Network-TCPANDUDP/>http://raymond-zhao.top/2020/08/26/2020-08-26-Network-TCPANDUDP/</a></p>
               
             
           </blockquote>
@@ -670,10 +670,10 @@
     <div class='new-meta-box'>
       
         
-          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2020-10-08T15:40:27+08:00">
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-03-02T12:35:14+08:00">
   <a class='notlink'>
     <i class="fas fa-edit fa-fw" aria-hidden="true"></i>
-    <p>更新于：Oct 8, 2020</p>
+    <p>更新于：Mar 2, 2021</p>
   </a>
 </div>
 
@@ -695,7 +695,7 @@
       
         <a class="-mob-share-qq" title="" rel="external nofollow noopener noreferrer"
           
-          href="http://connect.qq.com/widget/shareqq/index.html?url=http://raymond-zhao.top/2020/08/26/2020-08-26-Network-TCPAndUDP/&title=TCP的运输连接管理 - 吹梦到西洲&summary="
+          href="http://connect.qq.com/widget/shareqq/index.html?url=http://raymond-zhao.top/2020/08/26/2020-08-26-Network-TCPANDUDP/&title=TCP的运输连接管理 - 吹梦到西洲&summary="
           
           >
           
@@ -707,7 +707,7 @@
       
         <a class="-mob-share-qzone" title="" rel="external nofollow noopener noreferrer"
           
-          href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=http://raymond-zhao.top/2020/08/26/2020-08-26-Network-TCPAndUDP/&title=TCP的运输连接管理 - 吹梦到西洲&summary="
+          href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=http://raymond-zhao.top/2020/08/26/2020-08-26-Network-TCPANDUDP/&title=TCP的运输连接管理 - 吹梦到西洲&summary="
           
           >
           
@@ -719,7 +719,7 @@
       
         <a class="-mob-share-weibo" title="" rel="external nofollow noopener noreferrer"
           
-          href="http://service.weibo.com/share/share.php?url=http://raymond-zhao.top/2020/08/26/2020-08-26-Network-TCPAndUDP/&title=TCP的运输连接管理 - 吹梦到西洲&summary="
+          href="http://service.weibo.com/share/share.php?url=http://raymond-zhao.top/2020/08/26/2020-08-26-Network-TCPANDUDP/&title=TCP的运输连接管理 - 吹梦到西洲&summary="
           
           >
           
@@ -749,6 +749,11 @@
   
     <div class="prev-next">
       
+        <a class='prev' href='/2021/01/29/2021-01-29-Java8InActionPart1/'>
+          <p class='title'><i class="fas fa-chevron-left" aria-hidden="true"></i>《Java8实战》基础知识</p>
+          <p class='content'>1.为什么要关心 Java 8Java 8 不但对软件有影响，对硬件也有影响：平常用的 CPU 都是多核的—笔记本电脑或台式机上的处理器可能有四个 CPU 甚至更多内核。但是，绝大多数现有的 J...</p>
+        </a>
+      
       
         <a class='next' href='/2020/08/26/2020-08-26-Network-WhyTCPReliable/'>
           <p class='title'>TCP传输为什么是可靠的？<i class="fas fa-chevron-right" aria-hidden="true"></i></p>
@@ -773,6 +778,59 @@
 
 
 
+
+
+  <script>
+  // https://github.com/theme-next/hexo-theme-next/blob/master/layout/_third-party/math/mathjax.swig
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3.0/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    // 文章章节标题不能为 “MathJax” ，否则会报错。
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
 
 
 
@@ -836,7 +894,7 @@
       
     
       
-        <div><p>博客內容遵循 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW" target="_blank" rel="noopener">姓名標示-非商業性-相同方式分享 4.0 國際 (CC BY-NC-SA 4.0) 協議</a></p>
+        <div><p>Blog content follows the <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener">Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0) License</a></p>
 </div>
       
     
@@ -848,9 +906,9 @@
       
     
       
-        本站使用
+        Use
         <a href="https://github.com/volantis-x/hexo-theme-volantis/tree/4.0.0" target="_blank" class="codename">Volantis</a>
-        作為主題
+        as theme
       
     
       

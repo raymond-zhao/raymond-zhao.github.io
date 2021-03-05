@@ -1,8 +1,1072 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>《Kafka权威指南》-安装Kafka</title>
+    <url>/2021/03/02/2021-02-07-KafkaChapter2/</url>
+    <content><![CDATA[<h2 id="2-1-安装Kafka与Zookeeper"><a href="#2-1-安装Kafka与Zookeeper" class="headerlink" title="2.1 安装Kafka与Zookeeper"></a>2.1 安装Kafka与Zookeeper</h2><blockquote>
+<p>在安装 Zookeeper 和 Kafka 之前，需要先安装 Java 环境。</p>
+</blockquote>
+<p>在 MacOS 环境下安装，使用 <code>Homebrew</code> 只需一条命令即可，在安装 Kafka 时 Homebrew 会自动下载相应的依赖，自然也包括 Zookeeper、OpenJDK。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> brew install kafka</span></span><br></pre></td></tr></table></figure>
+
+<p>Homebrew 会将 Kafka 安装到 <code>/usr/local/Cellar</code> 目录，不过文件会被链接到其他目录。</p>
+<ul>
+<li>二进制文件和脚本文件在 <code>/usr/local/bin</code> 目录下。</li>
+<li>Kafka 配置文件在 <code>/usr/local/etc/kafka</code> 目录下。</li>
+<li>Zookeeper 配置文件在 <code>/usr/local/etc/zookeeper</code> 目录下。</li>
+<li><code>log.dirs</code> （Kafka 的数据目录）被设置为 <code>/usr/local/var/lib/kafka-logs</code>。</li>
+</ul>
+<p>安装完毕后，就可以启动 Zookeeper 和 Kafka了。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> zookeeper-server-start /usr/<span class="built_in">local</span>/etc/kafka/zookeeper.properties &amp; kafka-server-start /usr/<span class="built_in">local</span>/etc/kafka/server.properties</span></span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>消息中间件</category>
+      </categories>
+      <tags>
+        <tag>Kafka</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>《Kafka权威指南》-初识Kafka</title>
+    <url>/2021/02/07/2021-02-07-KafkaChapter1/</url>
+    <content><![CDATA[<h2 id="1-1-发布与订阅消息系统"><a href="#1-1-发布与订阅消息系统" class="headerlink" title="1.1 发布与订阅消息系统"></a>1.1 发布与订阅消息系统</h2><p><strong>数据（消息）的发送者（发布者）不会直接把消息发送给接收者</strong>，这是发布与订阅消息系统的一个特点。发布者以某种方式对消息进行分类，接收者（订阅者）订阅它们，以便接收特定类型的消息。发布与订阅系统一般会有一个 <code>broker</code>，也就是发布消息的中心点。</p>
+<h3 id="1-1-1-如何开始"><a href="#1-1-1-如何开始" class="headerlink" title="1.1.1 如何开始"></a>1.1.1 如何开始</h3><p>发布与订阅消息系统的大部分应用场景都是从一个简单的消息队列或一个进程间通道开始的。</p>
+<p>但是这样容易出现一种情况：公司因此要为数据队列维护多个系统，每个系统又有各自的缺陷和不足。而且，接下来可能会有更多的场景需要用到消息系统。此时真正需要的是一个单一的集中式系统，它可以用来发布通用类型的数据，它的规模可以随着公司业务的增长而增长。</p>
+<h2 id="1-2-Kafka-登场"><a href="#1-2-Kafka-登场" class="headerlink" title="1.2 Kafka 登场"></a>1.2 Kafka 登场</h2><p>Apache Kafka，一般被称为“分布式提交日志”或者“分布式流平台”。文件系统或数据库提交日志用来提供所有事务的持久记录，通过重放这些日志可以重建系统状态。同样地，Kafka 的数据是按照一定顺序持久化保存的，可以按需读取。此外，Kafka 的数据分布在整个系统里，具备数据<strong>故障保护</strong>和<strong>性能伸缩</strong>能力。</p>
+<h3 id="1-2-1-消息和批次"><a href="#1-2-1-消息和批次" class="headerlink" title="1.2.1 消息和批次"></a>1.2.1 消息和批次</h3><ul>
+<li>Kafka 的数据单元被称为<strong>消息</strong>。类似于数据库中的一个“数据行”或一条“记录”。</li>
+<li><strong>消息</strong>由<strong>字节数组</strong>组成。</li>
+<li><strong>消息</strong>可以有一个可选的<strong>元数据</strong>，又成为“键”。键也是一个字节数组，与消息一样。当消息以一种可控的方式写入不同的分区时，会用到键。</li>
+<li>为了提高效率，消息被分批次写入 Kafka。<strong>批次</strong>是指一组“消息”，这些消息属于同一个主题和分区。可以减少网络开销，但是会影响时间时间延迟和吞吐量。</li>
+</ul>
+<h3 id="1-2-2-模式（Schema）"><a href="#1-2-2-模式（Schema）" class="headerlink" title="1.2.2 模式（Schema）"></a>1.2.2 模式（Schema）</h3><p>对于 Kafka 来说，消息不过是晦涩难懂的字节数组。为了便于理解及支持强类型处理，产生了一些额外的数据结构。</p>
+<p>Apache Avro 提供了一种紧凑的序列化格式，模式和消息体分开，当模式发生变化时，不需要重新生成代码;它还支持强类型和模式进化，其版本既向前兼容，也向后兼容。</p>
+<p>数据格式的一致性消除了消息读写操作之间的耦合性。</p>
+<h3 id="1-2-3-主题和分区"><a href="#1-2-3-主题和分区" class="headerlink" title="1.2.3 主题和分区"></a>1.2.3 主题和分区</h3><ul>
+<li>Kafka 的消息通过<strong>主题</strong>进行分类。主题（Topic）类似于数据中的表（Table），或者文件系统中的文件夹（Directory）。</li>
+<li>主题可以被分为若干个分区，一个分区就是一个提交日志。消息以追加方式写入，按<strong>先入先出（FIFO）</strong>顺序读取。</li>
+<li>由于一个<strong>主题</strong>一般包含几个<strong>分区</strong>，因此无法在整个主题范围内保证消息的顺序，但可以保证消息在单个分区内的顺序。</li>
+<li>一个主题可以横跨多个服务器，提供强大性能。</li>
+<li><strong>流（Stream）</strong>是一组从生产者移动到消费者的数据。</li>
+<li>Kafka Streams、Apache Samza 和 Storm 以实时方式处理消息，即<strong>流式处理</strong>。Hadoop 被用于离线处理。</li>
+</ul>
+<p>![包含多个分区的主题表示](/Users/raymond/Library/Application Support/typora-user-images/image-20210207134551097.png)</p>
+<h3 id="1-2-4-生产者和消费者"><a href="#1-2-4-生产者和消费者" class="headerlink" title="1.2.4 生产者和消费者"></a>1.2.4 生产者和消费者</h3><p>Kafka 的客户端就是 Kafka 系统的用户，分为<strong>生产者</strong>与<strong>消费者</strong>，另有高级客户端，用于数据集成的 Kafka Connect API 和用于流式处理的 Kafka Streams。</p>
+<ul>
+<li><strong>生产者</strong><ul>
+<li>生产者创建消息。一般一条消息会被发布到一个特定的主题。生产者在默认情况下把消息均衡地分布到主题的所有分区上。在某些情况下，生产者会把消息直接写到指定的分区。这通常是通过<strong>消息键</strong>和<strong>分区器</strong>来实现的。</li>
+<li>分区器为键生成一个散列值，并将其映射到指定的分区上。这样可以保证包含同一个键的消息会被写到同一个分区上。</li>
+</ul>
+</li>
+<li><strong>消费者</strong><ul>
+<li>消费者订阅一个或多个主题，并按照消息生成的顺序读取它们。</li>
+<li>消费者通过检查消息的偏移量来区分已经读取过的消息。偏移量是另一种元数据，它是一个不断递增的整数值，在创建消息时，Kafka 会把它添加到消息里。</li>
+<li>消费者把每个分区最后读取的消息偏移量保存在 Zookeeper 或 Kafka 上，如果消费者关闭或重启，它的读取状态不会丢失。</li>
+<li>消费者是消费者群组的一部分，也就是说，会有一个或多个消费者共同读取一个主题。群组保证每个分区只能被一个消费者使用。</li>
+<li>消费者与分区之间的映射通常被称为消费者对分区的所有权关系。</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnexf5xo2cj30vi0dmtbn.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/008eGmZEly1gnexf5xo2cj30vi0dmtbn.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="消费者群组从主题读取消息"></p>
+<h3 id="1-2-5-broker和集群"><a href="#1-2-5-broker和集群" class="headerlink" title="1.2.5 broker和集群"></a>1.2.5 broker和集群</h3><ul>
+<li>一个独立的 Kafka 服务器被称为 broker。</li>
+<li>broker 接收来自生产者的消息，为消息设置偏移量，并提交消息到磁盘保存。</li>
+<li>broker 为消费者提供服务，对读取分区的请求作出响应，返回已经提交到磁盘上的消息。根据特定的硬件及其性能特征，单个 broker 可以轻松处理数 千个分区以及每秒百万级的消息量。</li>
+<li>broker 是集群的组成部分。每个集群都有一个 broker 同时充当了集群控制器的角色（自动从集群的活跃成员中选举出来）。</li>
+<li>控制器负责管理工作，包括将分区分配给 broker 和监控 broker。</li>
+<li>在集群中，一个分区从属于一个 broker，该 broker 被称为分区的<strong>首领（Leader）</strong>。</li>
+<li>一个分区可以分配给多个 broker，这个时候会发生<strong>分区复制</strong>。如下图</li>
+</ul>
+<p><img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnexjwt6wdj30vo0hi76n.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/008eGmZEly1gnexjwt6wdj30vo0hi76n.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="集群里的分区复制"></p>
+<ul>
+<li>复制机制为分区提供了消息冗余，如果有一个 broker 失效，其他 broker 可以接管领导权。但是相关的消费者和生产者都要重新连接到新的首领（Leader）。</li>
+<li>保留消息（在一定期限内）是 Kafka 的一个重要特性。</li>
+<li>旧消息就会过期并被删除，可以自定义配置。Kafka broker 默认的消息保留策略：<ul>
+<li>要么保留一段时间（比如 7 天）；</li>
+<li>要么保留到消息达到一定大小的字节数（比如 1GB）。</li>
+</ul>
+</li>
+</ul>
+<h3 id="1-2-6-多集群"><a href="#1-2-6-多集群" class="headerlink" title="1.2.6 多集群"></a>1.2.6 多集群</h3><p>多集群的好处：</p>
+<ul>
+<li>数据类型隔离</li>
+<li>安全需求隔离</li>
+<li>多数据中心（灾难恢复）</li>
+</ul>
+<p>Kafka 的消息复制机制只能在单个集群里进行，不能在多个集群之间进行。Kafka 提供了一个叫作 MirrorMaker 的工具，可以用它来实现集群间的消息复制。</p>
+<ul>
+<li>MirrorMaker 的核心组件包含了一个生产者和一个消费者，两者之间通过一个队列相连。</li>
+<li>消费者从一个集群读取消息，生产者把消息发送到另一个集群上。</li>
+</ul>
+<p>下图展示了一个使用 MirrorMaker 的例子，两个“本地”集群的消息被聚集到一个“聚合”集群上，然后将该集群复制到其他数据中心。</p>
+<p><img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnexq758gnj30vk0jq78r.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/008eGmZEly1gnexq758gnj30vk0jq78r.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="多数据中心架构"></p>
+<h2 id="1-3-为什么选择Kafka"><a href="#1-3-为什么选择Kafka" class="headerlink" title="1.3 为什么选择Kafka"></a>1.3 为什么选择Kafka</h2><ul>
+<li>多个生产者：Kafka 可以无缝地支持多个生产者。</li>
+<li>多个消费者：Kafka 支持多个消费者从一个单独的消息流上读取数据。</li>
+<li>基于磁盘的数据存储。</li>
+<li>伸缩性。</li>
+<li>高性能。通过横向扩展生产者、消费者和 broker，Kafka 可以轻松处理巨大的消息流。在处理大量数据的同时，它还能保证亚秒级的消息延迟。</li>
+</ul>
+<h2 id="1-4-数据生态系统"><a href="#1-4-数据生态系统" class="headerlink" title="1.4 数据生态系统"></a>1.4 数据生态系统</h2><p>Kafka 为数据生态系统带来了循环系统，如下图所示。它在基础设施的各个组件之间传递消息，为所有客户端提供一致的接口。</p>
+<p><img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnexuptcp9j30vm0f8jtb.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/008eGmZEly1gnexuptcp9j30vm0f8jtb.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="大数据生态系统"></p>
+<p>使用场景：</p>
+<ul>
+<li>活动跟踪：页面访问次数、点击量、添加用户资料。</li>
+<li>传递消息：向用户发送通知、邮件等。</li>
+<li>度量指标和日志记录。</li>
+<li>提交日志。</li>
+<li>流处理。</li>
+</ul>
+<h2 id="1-5-起源"><a href="#1-5-起源" class="headerlink" title="1.5 起源"></a>1.5 起源</h2><p>起源于 LinkedIn。</p>
+]]></content>
+      <categories>
+        <category>消息中间件</category>
+      </categories>
+      <tags>
+        <tag>Kafka</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>《Java8实战》高效Java 8编程</title>
+    <url>/2021/02/02/2021-02-02-Java8InActionPart3/</url>
+    <content><![CDATA[<h1 id="11-CompletableFuture-组合式异步编程"><a href="#11-CompletableFuture-组合式异步编程" class="headerlink" title="11 CompletableFuture: 组合式异步编程"></a>11 <strong>CompletableFuture</strong>: 组合式异步编程</h1><h1 id="12-新的日期和时间API"><a href="#12-新的日期和时间API" class="headerlink" title="12 新的日期和时间API"></a>12 新的日期和时间API</h1><ul>
+<li>Date 和 Calendar这两个类增加了程序员的困惑，到底该使用哪一个类？此外，有的特性只在某一个类有提供，比如用于以语言无关方式格式化和解析日期或时间的 DateFormat 方法就只在 Date 类里有。</li>
+<li>DateFormat 不是线程安全的。这意味着两个线程如果尝试使用同一个 formatter 解析日期，可能会得到无法预期的结果。</li>
+<li>Date 和 Calendar 类都是可以变的。这种设计会将难以维护。</li>
+<li>为了解决这些问题，Oracle 决定在原生的 Java API 中提供高质量的日期和时间支持。Java 8 在 <code>java.time</code> 包中整合了很多 <code>Joda-Time</code> 的特性。</li>
+</ul>
+<h2 id="12-1-主要类"><a href="#12-1-主要类" class="headerlink" title="12.1 主要类"></a>12.1 主要类</h2><blockquote>
+<p><strong>LocalDate</strong>、<strong>LocalTime</strong>、<strong>Instant</strong>、<strong>Duration *<em>以及 *</em>Period</strong></p>
+</blockquote>
+<h3 id="12-1-1-使用LocalDate和LocalTime"><a href="#12-1-1-使用LocalDate和LocalTime" class="headerlink" title="12.1.1 使用LocalDate和LocalTime"></a>12.1.1 使用<strong>LocalDate</strong>和<strong>LocalTime</strong></h3><p>创建一个 LocalDate 对象并读取其值。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">LocalDate date = LocalDate.of(<span class="number">2021</span>, <span class="number">2</span>, <span class="number">5</span>);</span><br><span class="line"><span class="keyword">int</span> year = date.getYear();</span><br><span class="line">Month month = date.getMonth();</span><br><span class="line"><span class="keyword">int</span> dayOfMonth = date.getDayOfMonth();</span><br><span class="line">DayOfWeek dayOfWeek = date.getDayOfWeek();</span><br><span class="line"><span class="keyword">int</span> lengthOfMonth = date.lengthOfMonth();</span><br><span class="line"><span class="keyword">boolean</span> leapYear = date.isLeapYear();</span><br><span class="line">System.out.println(<span class="string">"LocalDate.now() = "</span> + LocalDate.now());</span><br></pre></td></tr></table></figure>
+
+<p>也可以通过传递一个 <code>TemporalField</code> 参数给 <code>get</code> 方法拿到同样的信息。<code>ChronoField</code> 枚举实现了 <code>TemporalField</code>接口。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> year1 = date.get(ChronoField.YEAR);</span><br><span class="line"><span class="keyword">int</span> month1 = date.get(ChronoField.MONTH_OF_YEAR);</span><br></pre></td></tr></table></figure>
+
+<p>类似地，一天中的时间，比如 13:45:20，可以使用 <code>LocalTime</code> 类表示。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">LocalTime time = LocalTime.of(<span class="number">13</span>, <span class="number">45</span>, <span class="number">20</span>);</span><br><span class="line">LocalTime now = LocalTime.now();</span><br><span class="line"><span class="keyword">int</span> hour = now.getHour();</span><br><span class="line"><span class="keyword">int</span> nano = now.getNano();</span><br></pre></td></tr></table></figure>
+
+<p><code>LocalDate</code> 和 <code>LocalTime</code> 都可以通过静态方法 <code>parse</code> 解析代表字符串创建。可以向 <code>parse</code> 方法传递一个 <code>DateTimeFormatter</code>。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">LocalDate date = LocalDate.parse(<span class="string">"2014-03-18"</span>);</span><br><span class="line">LocalTime time = LocalTime.parse(<span class="string">"13:45:20"</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="12-1-2-合并日期和时间"><a href="#12-1-2-合并日期和时间" class="headerlink" title="12.1.2 合并日期和时间"></a>12.1.2 合并日期和时间</h3><p>LocalDateTime，是 LocalDate 和 LocalTime 的合体，不带有时区信息，可以直接创建，也可以通过合并日期和时间对象创建。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">LocalDateTime dt1 = LocalDateTime.of(<span class="number">2021</span>, Month.FEBRUARY, <span class="number">5</span>, <span class="number">17</span>, <span class="number">21</span>, <span class="number">20</span>);</span><br><span class="line">LocalDateTime dt2 = LocalDateTime.of(date, time);</span><br><span class="line">LocalDateTime dt3 = date.atTime(<span class="number">13</span>, <span class="number">45</span>, <span class="number">20</span>);</span><br><span class="line">LocalDateTime dt4 = date.atTime(time);</span><br><span class="line">LocalDateTime dt5 = time.atDate(date);</span><br><span class="line"></span><br><span class="line">LocalDate date1 = dt1.toLocalDate();</span><br><span class="line">LocalTime time1 = dt1.toLocalTime();</span><br></pre></td></tr></table></figure>
+
+<h3 id="12-1-3-机器日期和时间"><a href="#12-1-3-机器日期和时间" class="headerlink" title="12.1.3 机器日期和时间"></a>12.1.3 机器日期和时间</h3><p>可以通过向静态工厂方法 <code>ofEpochSecond</code> 传递一个代表秒数的值创建一个该类的实例。 <code>ofEpochSecond</code> 的重载版本，接收第二个以纳秒为单位的参数值，对传入作为秒数的参数进行调整。重载的版本会调整<strong>纳秒参数</strong>，确保保存的纳秒分片在 0 到 999 999 999 之间。下面几个方法都会返回几乎同样的 <code>Instant</code> 对象。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Instant.ofEpochSecond(<span class="number">3</span>);</span><br><span class="line">Instant.ofEpochSecond(<span class="number">3</span>, <span class="number">0</span>);</span><br><span class="line">Instant.ofEpochSecond(<span class="number">2</span>, <span class="number">1_000_000_000</span>);</span><br><span class="line">Instant.ofEpochSecond(<span class="number">4</span>, -<span class="number">1_000_000_000</span>);</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>Instant 设计初衷是便于机器使用。它包含的是由秒及纳秒所构成的数字。所以，它无法处理常见的的时间单位，日月年等。</p>
+</blockquote>
+<h3 id="12-1-4-定义Duration或Period"><a href="#12-1-4-定义Duration或Period" class="headerlink" title="12.1.4 定义Duration或Period"></a>12.1.4 定义<strong>Duration</strong>或<strong>Period</strong></h3><p>在本节之前出现的所有类都实现了 <code>Temporal</code> 接口。<code>Duration</code> 类的静态工厂方法 <code>between</code> 可以创建两个 <code>Temporal</code> 对象之间的间隔。</p>
+<p>如果需要以年、月或者日的方式对多个时间单位建模，可以使用 <code>Period</code> 类。使用该类的工厂方法 <code>between</code>，可以使用得到两个 <code>LocalDate</code> 之间的时间间隔。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Period tenDays = Period.between(LocalDate.of(<span class="number">2021</span>, <span class="number">2</span>, <span class="number">5</span>), LocalDate.of(<span class="number">2021</span>, <span class="number">2</span>, <span class="number">15</span>));</span><br><span class="line"></span><br><span class="line">Duration threeMinutes = Duration.ofMinutes(<span class="number">3</span>);</span><br><span class="line">Duration threeMinutes = Duration.of(<span class="number">3</span>, ChronoUnit.MINUTES);</span><br><span class="line"></span><br><span class="line">Period tenDays = Period.ofDays(<span class="number">10</span>);</span><br><span class="line">Period threeWeeks = Period.ofWeeks(<span class="number">3</span>);</span><br><span class="line">Period twoYearsSixMonthsOneDay = Period.of(<span class="number">2</span>, <span class="number">6</span>, <span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+<p>Duration 与 Period 类有许多的共享方法，如果用到的话当然还是去看源码，在这列表格也没什么用。</p>
+<p>上面的这些日期和时间对象都是不可修改的，这是为了更好地支持函数式编 程，确保线程安全。</p>
+<h2 id="12-2-操纵、解析和格式化日期"><a href="#12-2-操纵、解析和格式化日期" class="headerlink" title="12.2 操纵、解析和格式化日期"></a>12.2 操纵、解析和格式化日期</h2><p><code>withAttribute</code> 方法会创建对象的一个副本，并按照需要修改它的属性。下面的代码都返回一个修改了属性的对象，它们都不会修改原来的对象。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">LocalDate date1 = LocalDate.of(<span class="number">2021</span>, <span class="number">2</span>, <span class="number">5</span>);</span><br><span class="line">LocalDate date2 = date1.withYear(<span class="number">2021</span>);</span><br><span class="line">LocalDate date3 = date2.withDayOfMonth(<span class="number">5</span>);</span><br><span class="line"><span class="comment">// 第一个参数是一个 TemporalField 对象</span></span><br><span class="line">LocalDate date4 = date3.with(ChronoField.MONTH_OF_YEAR, <span class="number">9</span>);</span><br></pre></td></tr></table></figure>
+
+<p>使用 <code>get</code> 和 <code>with</code> 方法，可以将 <code>Temporal</code> 对象值的读取和修改区分开。还能以声明的方式操纵LocalDate对象。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">LocalDate date1 = LocalDate.of(<span class="number">2021</span>, <span class="number">2</span>, <span class="number">5</span>);</span><br><span class="line">LocalDate date2 = date1.plusWeeks(<span class="number">1</span>);</span><br><span class="line">LocalDate date3 = date2.minusYear(<span class="number">3</span>);</span><br><span class="line">LocalDate date4 = date3.plus(<span class="number">6</span>, ChronoUnit.MONTHS);</span><br></pre></td></tr></table></figure>
+
+<p>表示时间点的日期-时间类的通用方法，用到的时候当然还是 <code>Ctrl + Click</code>。</p>
+<p><img src="https://tva1.sinaimg.cn/large/008eGmZEly1gncx3vymz9j30w40g8n14.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/008eGmZEly1gncx3vymz9j30w40g8n14.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="表示时间点的日期-时间类的通用方法"></p>
+<h3 id="12-2-1-使用TemporalAdjuster"><a href="#12-2-1-使用TemporalAdjuster" class="headerlink" title="12.2.1 使用TemporalAdjuster"></a>12.2.1 使用<strong>TemporalAdjuster</strong></h3><p>有时候需要进行一些复杂操作，比如，将日期调整到下个周日、下个工作日，或者是本月的最后一天。可以使用重载版本的 <code>with</code> 方法，向其传递一个提供了更多定制化选择的 <code>TemporalAdjuster</code> 对象。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 周五</span></span><br><span class="line">LocalDate date1 = LocalDate.of(<span class="number">2021</span>, <span class="number">2</span>, <span class="number">5</span>);</span><br><span class="line"><span class="comment">// 周日，date2 = 2021-02-07</span></span><br><span class="line">LocalDate date2 = date1.with(nextOrSame(DayOfWeek.SUNDAY)); </span><br><span class="line"><span class="comment">// 这个月的最后一天，date3 = 2021-02-28</span></span><br><span class="line">LocalDate date3 = date2.with(lastDayOfMonth());</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://tva1.sinaimg.cn/large/008eGmZEly1gncx959k07j30wg0ioq80.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/008eGmZEly1gncx959k07j30wg0ioq80.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="TemporalAdjuster类中的工厂方法"></p>
+<p>容易发现 <code>TemporalAdjuster</code> 是一个函数式接口。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">TemporalAdjuster</span> </span>&#123;</span><br><span class="line">    <span class="function">Temporal <span class="title">adjustInto</span><span class="params">(Temporal temporal)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这意味着 <code>TemporalAdjuster</code> 接口的实现需要定义如何将一个 <code>Temporal</code> 对象转换为另一 个 <code>Temporal</code> 对象。可以看成一个 <code>UnaryOperator&lt;Temporal&gt;</code>。</p>
+<blockquote>
+<p>设计一个 <code>NextWorkingDay</code> 类，该类实现了 <code>TemporalAdjuster</code> 接口，能够计算明天的日期，同时过滤掉周六和周日这些节假日。</p>
+</blockquote>
+<h3 id="12-2-2-打印输出及解析日期-时间对象"><a href="#12-2-2-打印输出及解析日期-时间对象" class="headerlink" title="12.2.2 打印输出及解析日期-时间对象"></a>12.2.2 打印输出及解析日期-时间对象</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line">LocalDate date = LocalDate.of(<span class="number">2021</span>, <span class="number">2</span>, <span class="number">5</span>);</span><br><span class="line"><span class="comment">// s1 = 20210205</span></span><br><span class="line">String s1 = date.format(DateTimeFormatter.BASIC_ISO_DATE);</span><br><span class="line"><span class="comment">// s2 = 2021-02-05</span></span><br><span class="line">String s2 = date.format(DateTimeFormatter.ISO_LOCAL_DATE);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 当然也可以反向解析, parse = 2021-02-05</span></span><br><span class="line">LocalDate parse = LocalDate.parse(<span class="string">"20210205"</span>, DateTimeFormatter.BASIC_ISO_DATE);</span><br></pre></td></tr></table></figure>
+
+<p>按照某个格式创建 <code>DateTimeFormatter</code>。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">DateTimeFormatter formatter = DateTimeFormatter.ofPattern(<span class="string">"dd/MM/yyyy"</span>);</span><br><span class="line">LocalDate date6 = LocalDate.of(<span class="number">2021</span>, <span class="number">2</span>, <span class="number">5</span>);</span><br><span class="line"><span class="comment">// format = 05/02/2021</span></span><br><span class="line">String format = date6.format(formatter);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建本地化的  `DateTimeFormatter`。</span></span><br><span class="line">DateTimeFormatter formatter = DateTimeFormatter.ofPattern(<span class="string">"yyyy MMMM dd"</span>, Locale.CHINA);</span><br><span class="line"><span class="comment">// format1 = 2021 二月 05</span></span><br><span class="line">String format1 = date6.format(formatter);</span><br></pre></td></tr></table></figure>
+
+<h2 id="12-3-处理不同的时区和历法"><a href="#12-3-处理不同的时区和历法" class="headerlink" title="12.3 处理不同的时区和历法"></a>12.3 处理不同的时区和历法</h2><blockquote>
+<p>没什么重要的内容</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
+      <tags>
+        <tag>Java8</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>《Java8实战》函数式数据处理</title>
+    <url>/2021/01/29/2021-01-29-Java8InActionPart2/</url>
+    <content><![CDATA[<h1 id="4-引入流"><a href="#4-引入流" class="headerlink" title="4 引入流"></a>4 引入流</h1><p>集合是Java中使用最多的API。几乎每个Java应用程序都会制造和处理集合。集合对于很多编程任务来说都是非常基本的：它们可以把数据分组并加以处 理。尽管集合对于几乎任何一个Java应用都是不可或缺的，但集合操作却远远算不上完美。</p>
+<ul>
+<li>很多业务逻辑都涉及类似于数据库的操作。</li>
+<li>在处理大量元素时为了提高性能，需要并行处理，并利用多核架构。 但写并行代码比用迭代器还要复杂，而且调试复杂。</li>
+</ul>
+<h2 id="4-1-流是什么？"><a href="#4-1-流是什么？" class="headerlink" title="4.1 流是什么？"></a>4.1 流是什么？</h2><p>流是 Java API 的新成员，它允许以声明性方式处理数据集合(通过查询语句来表达，而不是临时编写一个实现)。可以把它们看成遍历数据集的高级迭代器。此外，流还可以透明地并行处理。</p>
+<p>下面两段代码都是用来返回低热量的菜肴名称的， 并按照卡路里排序。分别使用 Java 7 和 Java 8。</p>
+<p>Java 7</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;Dish&gt; lowCaloricDishes = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"><span class="keyword">for</span> (Dish d : menu) &#123;</span><br><span class="line">    <span class="keyword">if</span> (d.getCalories() &lt; <span class="number">400</span>) &#123;</span><br><span class="line">        lowCaloricDishes.add(d);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Collections.sort(lowCaloricDishes, <span class="keyword">new</span> Comparator&lt;Dish&gt;() &#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compare</span><span class="params">(Dish d1, Dish d2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> Integer.compare(d1.getCalories(), d2.getCalories());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">List&lt;String&gt; lowCaloricDishesName = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"><span class="keyword">for</span>(Dish d: lowCaloricDishes) &#123;</span><br><span class="line">    lowCaloricDishesName.add(d.getName());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上面的代码中，用了一个“垃圾变量” <code>lowCaloricDishes</code>。它唯一的作用就是作为一次性的中间容器。在 Java 8 中，实现的细节被放在它本该归属的库里了。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;String&gt; lowCaloricDishesName = menu.stream()</span><br><span class="line">    .filter(d -&gt; d.getCalories() &lt; <span class="number">400</span>)</span><br><span class="line">    .sorted(comparing(Dish::getCalories))</span><br><span class="line">    .map(Dish::getName)</span><br><span class="line">    .collect(toList());</span><br></pre></td></tr></table></figure>
+
+<p>为了利用多核架构并行执行这段代码，只需要把 stream() 换成 parallelStream()。</p>
+<p>在调用 parallelStream 方法的时候到底发生了什么。用了多少个线程？对性能有多大提升？这些会在第 7 章详细讨论，目前看来上面的代码至少有以下几点好处。</p>
+<ul>
+<li>代码是以声明性方式写的。</li>
+<li>可以把几个基础操作链接起来，来表达复杂的数据处理流水线，同时保持代码清晰可读。</li>
+</ul>
+<p>因为 filter、sorted、map 和 collect 等操作是与具体线程模型无关的高层次构件，所以它们的内部实现可以是单线程的，也可能透明地充分利用多核架构。这意味着用不着为了让某些数据处理任务并行而去操心线程和锁了，Stream API 都做好了！</p>
+<p>新的 Stream API 表达能力非常强。在读完第4、5、6章之后，应该就可以写出像下面这样的代码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Map&lt;Dish.Type, List&lt;Dish&gt; dishesByType&gt; = menu.stream().collect(groupingBy(Dish::getType));</span><br></pre></td></tr></table></figure>
+
+<p>简单来说就是，按照 Map 里面的类别对菜肴进行分组。比如，Map 可能包含下列结果：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">&#123;FISH=[prawns, salmon],</span><br><span class="line">     OTHER=[french fries, rice, season fruit, pizza],</span><br><span class="line">     MEAT=[pork, beef, chicken]&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>其他库：Guava、Apache和lambdaj</p>
+<p>为了给Java程序员提供更好的库操作集合，前人已经做过了很多尝试。比如，Guava就是谷歌创建的一个很流行的库。它提供了multimaps和multisets等额外的容器类。Apache Commons Collections库也提供了类似的功能。最后，本书作者Mario Fusco编写的lambdaj受到函数式编程的启发，也提供了很多声明性操作集合的工具。</p>
+</blockquote>
+<p>在本章剩下的部分和下一章中，会使用这样一个例子：一个 menu，它只是一张菜肴列表。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Dish</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String name;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">boolean</span> vegetarian;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> calories;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Type type;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> List&lt;Dish&gt; menu =</span><br><span class="line">            Arrays.asList( <span class="keyword">new</span> Dish(<span class="string">"pork"</span>, <span class="keyword">false</span>, <span class="number">800</span>, Dish.Type.MEAT),</span><br><span class="line">                           <span class="keyword">new</span> Dish(<span class="string">"beef"</span>, <span class="keyword">false</span>, <span class="number">700</span>, Dish.Type.MEAT),</span><br><span class="line">                           <span class="keyword">new</span> Dish(<span class="string">"chicken"</span>, <span class="keyword">false</span>, <span class="number">400</span>, Dish.Type.MEAT),</span><br><span class="line">                           <span class="keyword">new</span> Dish(<span class="string">"french fries"</span>, <span class="keyword">true</span>, <span class="number">530</span>, Dish.Type.OTHER),</span><br><span class="line">                           <span class="keyword">new</span> Dish(<span class="string">"rice"</span>, <span class="keyword">true</span>, <span class="number">350</span>, Dish.Type.OTHER),</span><br><span class="line">                           <span class="keyword">new</span> Dish(<span class="string">"season fruit"</span>, <span class="keyword">true</span>, <span class="number">120</span>, Dish.Type.OTHER),</span><br><span class="line">                           <span class="keyword">new</span> Dish(<span class="string">"pizza"</span>, <span class="keyword">true</span>, <span class="number">550</span>, Dish.Type.OTHER),</span><br><span class="line">                           <span class="keyword">new</span> Dish(<span class="string">"prawns"</span>, <span class="keyword">false</span>, <span class="number">400</span>, Dish.Type.FISH),</span><br><span class="line">                           <span class="keyword">new</span> Dish(<span class="string">"salmon"</span>, <span class="keyword">false</span>, <span class="number">450</span>, Dish.Type.FISH));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-2-流简介"><a href="#4-2-流简介" class="headerlink" title="4.2 流简介"></a>4.2 流简介</h2><p>Java 8 中的集合支持一个新的 stream 方法，它会返回一个流。那么，流到底是什么呢？简短的定义就是“从支持数据处理操作的源生成的元素序列”。</p>
+<ul>
+<li>元素序列—就像集合一样，流也提供了一个接口，可以访问特定元素类型的一组有序值。因为集合是数据结构，所以它的主要目的是以特定的时间/空间复杂度存储和访问元素(如ArrayList 与 LinkedList)。但流的目的在于表达计算，比如你前面见到的 filter、sorted 和 map。<strong>集合讲的是数据，流讲的是计算</strong>。</li>
+<li>源—流会使用一个提供数据的源，如集合、数组或输入/输出资源。从有序集合生成流时会保留原有的顺序。由列表生成的流，其元素顺序与列表一致。</li>
+<li>数据处理操作—流的数据处理功能支持类似于数据库的操作，以及函数式编程语言中的常用操作，如 filter、map、reduce、find、match、sort等。流操作可以顺序执行，也可并行执行。</li>
+</ul>
+<p>此外，流操作有两个重要的特点。</p>
+<ul>
+<li>流水线：很多流操作本身会返回一个流，这样多个操作就可以链接起来，形成一个大的流水线。流水线的操作可以看做是对数据源进行数据库式查询。</li>
+<li>内部迭代：与使用迭代器显式迭代的集合不同，流的迭代操作是在背后进行的。</li>
+</ul>
+<p>先来看一个能体现所有这些概念的代码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;String&gt; threeHighCaloricDishName = menu.stream() <span class="comment">// 获得 流</span></span><br><span class="line">    .filter(d -&gt; d.getCalories() &gt; <span class="number">300</span>) <span class="comment">// 建立操作流水线，首先选出高热量的菜肴。</span></span><br><span class="line">    .map(Dish::getName) <span class="comment">// 获取菜名</span></span><br><span class="line">    .limit(<span class="number">3</span>) <span class="comment">// 只选择前三条</span></span><br><span class="line">    .collect(toList()); <span class="comment">// 将结果收集为 List。</span></span><br></pre></td></tr></table></figure>
+
+<p>除 collect 之外，所有操作都会返回另一个流，它们接成一条流水线，于是就可以看作对源的一个查询。最后，collect 操作开始处理流水线，并返回结果。在调用 collect 之前，没有任何结果产生，实际上根本就没有从 menu 里选择元素。可以这么理解：链中的方法调用都在排队等待，直到调用 collect。</p>
+<h2 id="4-3-流与集合"><a href="#4-3-流与集合" class="headerlink" title="4.3 流与集合"></a>4.3 流与集合</h2><p>粗略地说，集合与流之间的差异就在于什么时候进行计算。集合是一个内存中的数据结构， 它包含数据结构中目前所有的值—集合中的每个元素都得先算出来才能添加到集合中。</p>
+<p>相比之下，流则是在概念上固定的数据结构（不能添加或删除元素），其元素则是按需计算的。从另一个角度来说，流就像是一个延迟创建的集合：只有在消费者要求的时候才会计算值。与此相反，集合则是急切创建的。</p>
+<h3 id="4-3-1-只能遍历一次"><a href="#4-3-1-只能遍历一次" class="headerlink" title="4.3.1 只能遍历一次"></a>4.3.1 只能遍历一次</h3><p>和迭代器类似，流只能遍历一次。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;String&gt; title = Arrays.asList(<span class="string">"Java8"</span>, <span class="string">"In"</span>, <span class="string">"Action"</span>);</span><br><span class="line">Stream&lt;String&gt; s = title.stream();</span><br><span class="line">s.forEach(System.out::println);</span><br><span class="line">s.forEach(System.out::println); <span class="comment">// java.lang.IllegalStateException：流已被操作或关闭</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="4-3-2-外部迭代与内部迭代"><a href="#4-3-2-外部迭代与内部迭代" class="headerlink" title="4.3.2 外部迭代与内部迭代"></a>4.3.2 外部迭代与内部迭代</h3><p>使用 Collection 接口需要用户去做迭代（比如用 for-each），这称为外部迭代。 相反， Streams 库使用内部迭代—它帮你把迭代做了，还把得到的流值存在了某个地方，你只要给出 一个函数说要干什么就可以了。</p>
+<h2 id="4-4-流操作"><a href="#4-4-流操作" class="headerlink" title="4.4 流操作"></a>4.4 流操作</h2><p><code>java.util.stream.Stream</code> 中的 Stream 接口定义了许多操作。可以分为两大类：</p>
+<ul>
+<li>filter、map 和 limit 可以连成一条流水线；</li>
+<li>collect 触发流水线执行并关闭它。</li>
+</ul>
+<p>可以连接起来的流操作称为中间操作，关闭流的操作称为终端操作。</p>
+<h3 id="4-4-1-中间操作"><a href="#4-4-1-中间操作" class="headerlink" title="4.4.1 中间操作"></a>4.4.1 中间操作</h3><p>除非流水线上触发一个终端操作，否则中间操作不会执行任何处理。这是因为中间操作一般都可以合并起来，在终端操作时一次性全部处理。</p>
+<p>在 4.2 节的代码中，有好几种优化利用了流的延迟性质。</p>
+<ul>
+<li>第一，尽管很多菜的热量都高于 300 卡路里，但只选出了前三个。这是因为 limit 操作和一种称为短路的技巧。</li>
+<li>第二，尽管 filter 和 map 是两个独立的操作，但它们合并到同一次遍历中了（循环合并）。</li>
+</ul>
+<h3 id="4-4-2-终端操作"><a href="#4-4-2-终端操作" class="headerlink" title="4.4.2 终端操作"></a>4.4.2 终端操作</h3><p>终端操作会从流的流水线生成结果。其结果是任何不是流的值，比如 List、Integer，甚至 void。例如，在下面的流水线中，forEach 是一个返回 void 的终端操作，它会对源中的每道菜应用一个 Lambda。把 <code>System.out.println</code> 传递给 forEach，并要求它打印出由 menu 生成的流中的每一个 Dish。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">menu.stream().forEach(System.out::println);</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-4-3-使用流"><a href="#4-4-3-使用流" class="headerlink" title="4.4.3 使用流"></a>4.4.3 使用流</h3><p>使用流一般包括三件事：</p>
+<ul>
+<li>一个数据源（如集合）来执行一个查询；</li>
+<li>一个中间操作链，形成一条流的流水线；</li>
+<li>一个终端操作，执行流水线，并能生成结果。</li>
+</ul>
+<p>流的流水线背后的理念类似于<strong>构建器模式</strong>。在构建器模式中有一个调用链用来设置一套配置(对流来说这就是一个中间操作链)，接着是调用 built 方法(对流来说就是终端操作)。</p>
+<p>部分中间操作方法。</p>
+<table>
+<thead>
+<tr>
+<th align="center">操作</th>
+<th align="center">返回类型</th>
+<th align="center">操作参数</th>
+<th align="center">函数描述符</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">filter</td>
+<td align="center">Stream<T></td>
+<td align="center">Predicate<T></td>
+<td align="center">T -&gt; boolean</td>
+</tr>
+<tr>
+<td align="center">map</td>
+<td align="center">Stream<R></td>
+<td align="center">Function&lt;T, R&gt;</td>
+<td align="center">T -&gt; R</td>
+</tr>
+<tr>
+<td align="center">limit</td>
+<td align="center">Stream<T></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">sorted</td>
+<td align="center">Stream<T></td>
+<td align="center">Comparator<T></td>
+<td align="center">(T, T) -&gt; int</td>
+</tr>
+<tr>
+<td align="center">distinct</td>
+<td align="center">Stream<T></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+</tbody></table>
+<p>终端操作部分方法</p>
+<table>
+<thead>
+<tr>
+<th align="center">操作</th>
+<th align="center">目的</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">forEach</td>
+<td align="center">消费流中的每个元素并对其应用 Lambda。这一操作返回 void。</td>
+</tr>
+<tr>
+<td align="center">count</td>
+<td align="center">返回流中元素的个数。这一操作返回 long。</td>
+</tr>
+<tr>
+<td align="center">collect</td>
+<td align="center">把流归约成一个集合，比如 List、Map 甚至是 Integer。</td>
+</tr>
+</tbody></table>
+<h2 id="4-5-小结"><a href="#4-5-小结" class="headerlink" title="4.5 小结"></a>4.5 小结</h2><ul>
+<li>流是“从支持数据处理操作的源生成的一系列元素”。</li>
+<li>流利用内部迭代:迭代通过 filter、map、sorted 等操作被抽象掉了。</li>
+<li>流操作有两类:中间操作和终端操作。</li>
+<li>filter 和 map 等中间操作会返回一个流，并可以链接在一起。可以用它们来设置一条流水线，但并不会生成任何结果。</li>
+<li>forEach 和 count 等终端操作会返回一个非流的值，并处理流水线以返回结果。</li>
+<li>流中的元素是按需计算的。</li>
+</ul>
+<h1 id="5-使用流"><a href="#5-使用流" class="headerlink" title="5 使用流"></a>5 使用流</h1><p>在接下来将会看到 <code>Stream API</code> 支持的许多操作。这些操作能快速完成复杂的数据查询，如筛选、切片、映射、查找、匹配和归约。还有一些特殊的流数值流、来 自文件和数组等多种来源的流，最后是无限流。</p>
+<h2 id="5-1-筛选和切片"><a href="#5-1-筛选和切片" class="headerlink" title="5.1 筛选和切片"></a>5.1 筛选和切片</h2><p>在本节中，将看到如何选择流中的元素：用谓词筛选，筛选出各不相同的元素，忽略流中的头几个元素，或将流截短至指定长度。</p>
+<h3 id="5-1-1-用谓词筛选-filter"><a href="#5-1-1-用谓词筛选-filter" class="headerlink" title="5.1.1 用谓词筛选 filter"></a>5.1.1 用谓词筛选 filter</h3><p>Streams 接口支持 filter 方法。该操作会接受一个谓词(一个返回 boolean 的函数)作为参数，并返回一个包括所有符合谓词的元素的流。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;Dish&gt; vegetarianMenu = menu.stream().filter(Dish::isVegetarian).collect(toList());</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-1-2-筛选各异的元素-distinct"><a href="#5-1-2-筛选各异的元素-distinct" class="headerlink" title="5.1.2 筛选各异的元素 distinct"></a>5.1.2 筛选各异的元素 distinct</h3><p><code>distinct</code> 方法，它会返回一个元素各异（根据流所生成元素的 hashCode 和 equals 方法实现）的流。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;Integer&gt; numbers = Arrays.asList(<span class="number">1</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">4</span>);</span><br><span class="line">numbers.stream().filter(i -&gt; i % <span class="number">2</span> == <span class="number">0</span>)</span><br><span class="line">    .distinct()</span><br><span class="line">    .forEach(System.out::println);</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-1-3-截短流-limit"><a href="#5-1-3-截短流-limit" class="headerlink" title="5.1.3 截短流 limit"></a>5.1.3 截短流 limit</h3><p>流支持 <code>limit(n)</code> 方法，该方法会返回一个不超过给定长度的流。所需的长度作为参数传递给 <code>limit</code>。如果流是有序的，则最多会返回前 n 个元素。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;Dish&gt; dishes = menu.stream()</span><br><span class="line">    .filter(d -&gt; d.getCalories() &gt; <span class="number">300</span>)</span><br><span class="line">    .limit(<span class="number">3</span>)</span><br><span class="line">    .collect(toList());</span><br></pre></td></tr></table></figure>
+
+<p><code>limit</code> 也可以用在无序流上，比如源是一个 Set 。这种情况下，<code>limit</code> 的结果不会以任何顺序排列。</p>
+<h3 id="5-1-4-跳过元素-skip"><a href="#5-1-4-跳过元素-skip" class="headerlink" title="5.1.4 跳过元素 skip"></a>5.1.4 跳过元素 skip</h3><p><code>skip(n)</code> 方法，返回一个扔掉了前 n 个元素的流。如果流中元素不足 n 个，则返回一个空流。<code>limit(n)</code> 和 <code>skip(n)</code> 是互补的。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;Dish&gt; dishes = menu.stream()</span><br><span class="line">    .filter(d -&gt; d.getCalories() &gt; <span class="number">300</span>)</span><br><span class="line">    .skip(<span class="number">2</span>)</span><br><span class="line">    .collect(toList());</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-2-映射-map"><a href="#5-2-映射-map" class="headerlink" title="5.2 映射 map"></a>5.2 映射 map</h2><p>一个非常常见的数据处理套路就是从某些对象中选择信息。比如在 SQL 里，可以从表中选择一列。<code>Stream API</code> 也通过 <code>map</code> 和 <code>flatMap</code> 方法提供了类似的工具。</p>
+<h3 id="5-2-1-对流中每一个元素应用函数"><a href="#5-2-1-对流中每一个元素应用函数" class="headerlink" title="5.2.1 对流中每一个元素应用函数"></a>5.2.1 对流中每一个元素应用函数</h3><p>流支持 <code>map</code> 方法，它接受一个函数作为参数。这个函数会被应用到每个元素上，并将其映射成一个新的元素。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;String&gt; dishNames = menu.stream()</span><br><span class="line">    .map(Dish::getName) <span class="comment">// 提取每个元素的菜名</span></span><br><span class="line">    .collect(toList());</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-2-2-流的扁平化-flatMap"><a href="#5-2-2-流的扁平化-flatMap" class="headerlink" title="5.2.2 流的扁平化 flatMap"></a>5.2.2 流的扁平化 flatMap</h3><blockquote>
+<p>对于一张单词表，如何返回一张列表，列出里面各不相同的字符？例如，给定单词列表 [“Hello”,”World”]，返回列表[“H”,”e”,”l”, “o”,”W”,”r”,”d”]。</p>
+</blockquote>
+<p>可以把每个单词映射成一张字符表，然后调用 <code>distinct</code> 来过滤重复的字符。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">words.stream()</span><br><span class="line">     .map(word -&gt; word.split(<span class="string">""</span>))</span><br><span class="line">     .distinct()</span><br><span class="line">     .collect(toList());</span><br></pre></td></tr></table></figure>
+
+<p>这个方法的问题在于，传递给 map 方法的 Lambda 为每个单词返回了一个 <code>String[]</code>。因此，map 返回的流实际上是 <code>Stream&lt;String[]&gt;</code> 类型的。而目标结果是用 <code>Stream&lt;String&gt;</code> 来表示一个字符流。</p>
+<p>可以用 <code>flatMap</code> 来解决这个问题。</p>
+<ol>
+<li>尝试使用 <strong>map</strong> 和 <strong>Arrays.stream()</strong></li>
+</ol>
+<p>有一个叫作 <code>Arrays.stream()</code> 的方法可以接受一个数组并产生一个流。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">words.stream().map(word -&gt; word.split(<span class="string">""</span>)) <span class="comment">// 将每个单词转换为由其字母构成的数组</span></span><br><span class="line">    .map(Arrays::stream) <span class="comment">// 让每个数组变成一个单独的流</span></span><br><span class="line">    .distinct()</span><br><span class="line">    .collect(toList());</span><br></pre></td></tr></table></figure>
+
+<p>现在得到的是一个流的列表（更准确地说是 <code>Stream&lt;String&gt;</code>）。先是把每个单词转换成一个字母数组，然后把每个数组变成了一 个独立的流。</p>
+<ol start="2">
+<li>使用 flatMap </li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">words.stream().map(word -&gt; word.split(<span class="string">""</span>)) <span class="comment">// 将每个单词转换为由其字母构成的数组</span></span><br><span class="line">    .flapMap(Arrays::stream) <span class="comment">// 让各个生成流扁平化为单个流</span></span><br><span class="line">    .distinct()</span><br><span class="line">    .collect(toList());</span><br></pre></td></tr></table></figure>
+
+<p>使用 flatMap 方法的效果是，各个数组并不是分别映射成一个流，而是映射成流的内容。所有使用 <code>map(Arrays::stream)</code> 时生成的单个流都被合并起来，即扁平化为一个流。</p>
+<p>一言以蔽之，<code>flapMap</code> 方法把一个流中的每个值都换成另一个流，然后把所有的流连接起来成为一个流。</p>
+<h2 id="5-3-查找和匹配"><a href="#5-3-查找和匹配" class="headerlink" title="5.3 查找和匹配"></a>5.3 查找和匹配</h2><p>另一个常见的数据处理套路是看看数据集中的某些元素是否匹配一个给定的属性。<code>Stream API</code> 通过 <code>allMatch、anyMatch、noneMatch、findFirst</code> 和 <code>findAny</code> 方法提供了这样的工具。</p>
+<h3 id="5-3-1-检查谓词是否至少匹配一个元素"><a href="#5-3-1-检查谓词是否至少匹配一个元素" class="headerlink" title="5.3.1 检查谓词是否至少匹配一个元素"></a>5.3.1 检查谓词是否至少匹配一个元素</h3><p><code>anyMatch</code> 方法可以回答“流中是否有一个元素能匹配给定的谓词”。<code>anyMatch</code>方法返回一个 <code>boolean</code>，因此 是一个终端操作。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (menu.stream().anyMatch(Dish::isVegetarian)) &#123;</span><br><span class="line">	System.out.println(<span class="string">"The menu is (somewhat) vegetarian friendly!!"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-3-2-检查谓词是否匹配所有元素"><a href="#5-3-2-检查谓词是否匹配所有元素" class="headerlink" title="5.3.2 检查谓词是否匹配所有元素"></a>5.3.2 检查谓词是否匹配所有元素</h3><p><code>allMatch</code>与<code>noneMatch</code>正好相反。</p>
+<p><code>anyMatch、allMatch</code> 和 <code>noneMatch</code> 这三个操作都用到了<strong>短路</strong>，这就是Java中 <code>&amp;&amp;</code> 和 <code>||</code> 运算符短路在流中的版本。</p>
+<h3 id="5-3-3-查找元素"><a href="#5-3-3-查找元素" class="headerlink" title="5.3.3 查找元素"></a>5.3.3 查找元素</h3><p><code>findAny</code> 方法将返回当前流中的任意元素。流水线将在后台进行优化使其只需走一遍，并在利用短路找到结果时立即结束。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Optional&lt;Dish&gt; dish = menu.stream().filter(Dish::isVegetarian)</span><br><span class="line">    .findAny();</span><br></pre></td></tr></table></figure>
+
+<p><code>Optional&lt;T&gt;</code> 类 <code>java.util.Optional</code> 是一个容器类，代表一个值存在或不存在。下面是 <code>Optional</code> 里面几种可以迫使显式地检查值是否存在或处理值不存在的情形的方法。</p>
+<ul>
+<li><code>isPresent()</code> 将在 Optional 包含值的时候返回 true, 否则返回 false。</li>
+<li><code>ifPresent(Consumer&lt;T&gt; block)</code> 会在值存在的时候执行给定的代码块。接收 T 类型参数，并返回 void 的 Lambda 表达式。</li>
+<li><code>T get()</code> 会在值存在时返回值，否则抛出一个 <code>NoSuchElement</code> 异常。</li>
+<li><code>T orElse(T other)</code> 会在值存在时返回值，否则返回一个默认值。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">menu.stream().filter(Dish::isVegetarian)</span><br><span class="line">    .findAny() <span class="comment">// 返回一个 Optional&lt;Dish&gt;</span></span><br><span class="line">    .ifPresent(d -&gt; System.out.println(d.getName())); <span class="comment">// 如果包含一个值就打印，否则什么都不做。</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="5-3-4-查找第一个元素"><a href="#5-3-4-查找第一个元素" class="headerlink" title="5.3.4 查找第一个元素"></a>5.3.4 查找第一个元素</h3><p><code>findFirst</code> 工作方式类似于 <code>findAny</code>。</p>
+<blockquote>
+<p>何时使用<strong>findFirst</strong>和<strong>findAny</strong>？</p>
+<p>并行。找到第一个元素在并行上限制更多。如果不关心返回的元素是哪个，使用 findAny，因为它在使用并行流时限制较少。</p>
+</blockquote>
+<h2 id="5-4-归约"><a href="#5-4-归约" class="headerlink" title="5.4 归约"></a>5.4 归约</h2><p>在此之前见到的终端操作都是返回一个 boolean(allMatch之类的)、void (forEach) 或 Optional 对象(findAny等)。或者是使用 collect 来将流中的所有元素组合成一个 List。</p>
+<p>所谓归约，在这里就是指使用 reduce 操作来表达更复杂的查询。此类查询需要将流中所有元素反复结合起来，得到一个值，比如一个 Integer。</p>
+<h3 id="5-4-1-元素求和"><a href="#5-4-1-元素求和" class="headerlink" title="5.4.1 元素求和"></a>5.4.1 元素求和</h3><p>没什么好说的，写几个例子算了。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// v1</span></span><br><span class="line"><span class="keyword">int</span> sum = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> x : numbers) &#123;</span><br><span class="line">    sum += x;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// v2</span></span><br><span class="line"><span class="keyword">int</span> sum = numbers.stream().reduce(<span class="number">0</span>, (a, b) -&gt; a + b);</span><br><span class="line"><span class="comment">// v3</span></span><br><span class="line"><span class="keyword">int</span> sum = numbers.stream().reduce(<span class="number">0</span>, Integer::sum);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 无初始值的求和，会返回一个 Optional 对象。</span></span><br><span class="line">Optional&lt;Integer&gt; sum = numbers.stream().reduce((a, b) -&gt; (a + b));</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-4-2-最大值和最小值"><a href="#5-4-2-最大值和最小值" class="headerlink" title="5.4.2 最大值和最小值"></a>5.4.2 最大值和最小值</h3><p>reduce 接受两个参数：</p>
+<ul>
+<li>一个初始值；</li>
+<li>一个 Lambda 来把两个流元素结合起来并产生一个新值。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 求最大值</span></span><br><span class="line">Optional&lt;Integer&gt; max = numbers.stream().reduce(Integer::max);</span><br><span class="line"><span class="comment">// 求最小值，也可以写成 (x, y) -&gt; x &lt; y ? x : y</span></span><br><span class="line">Optional&lt;Integer&gt; min = numbers.stream().reduce(Integer::min);</span><br></pre></td></tr></table></figure>
+
+<p>怎样用 map 和 reduce 方法数一数流中有多少个菜？</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> count = menu.stream().map(d -&gt; <span class="number">1</span>).reduce(<span class="number">0</span>, (a, b) -&gt; a + b);</span><br></pre></td></tr></table></figure>
+
+<p>map 和 reduce 的连接通常成为 <code>map-reduce</code> 模式，因 Google 用它来进行网络搜索而出名， 因为它很容易并行化。</p>
+<blockquote>
+<p>传递给 reduce 的 Lambda 不能更改状态（如实例变量），而且操作必须<strong>满足结合律</strong>才可以按任意顺序执行。</p>
+</blockquote>
+<p>![中间操作和终端操作](/Users/raymond/Library/Application Support/typora-user-images/image-20210130133213822.png)</p>
+<h2 id="5-5-付诸实践"><a href="#5-5-付诸实践" class="headerlink" title="5.5 付诸实践"></a>5.5 付诸实践</h2><h3 id="5-5-1-领域-交易员和交易"><a href="#5-5-1-领域-交易员和交易" class="headerlink" title="5.5.1 领域:交易员和交易"></a>5.5.1 领域:交易员和交易</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="keyword">public</span>  <span class="class"><span class="keyword">class</span> <span class="title">Trader</span></span>&#123;</span><br><span class="line">	<span class="keyword">private</span> String name;</span><br><span class="line">	<span class="keyword">private</span> String city;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Transaction</span></span>&#123;</span><br><span class="line">	<span class="keyword">private</span> Trader trader;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> year;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> value;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Trader raoul = <span class="keyword">new</span> Trader(<span class="string">"Raoul"</span>, <span class="string">"Cambridge"</span>);</span><br><span class="line">Trader mario = <span class="keyword">new</span> Trader(<span class="string">"Mario"</span>,<span class="string">"Milan"</span>);</span><br><span class="line">Trader alan = <span class="keyword">new</span> Trader(<span class="string">"Alan"</span>,<span class="string">"Cambridge"</span>);</span><br><span class="line">Trader brian = <span class="keyword">new</span> Trader(<span class="string">"Brian"</span>,<span class="string">"Cambridge"</span>);</span><br><span class="line">List&lt;Transaction&gt; transactions = Arrays.asList(</span><br><span class="line">    <span class="keyword">new</span> Transaction(brian, <span class="number">2011</span>, <span class="number">300</span>), </span><br><span class="line">    <span class="keyword">new</span> Transaction(raoul, <span class="number">2012</span>, <span class="number">1000</span>),</span><br><span class="line">    <span class="keyword">new</span> Transaction(raoul, <span class="number">2011</span>, <span class="number">400</span>),</span><br><span class="line">    <span class="keyword">new</span> Transaction(mario, <span class="number">2012</span>, <span class="number">710</span>),	</span><br><span class="line">    <span class="keyword">new</span> Transaction(mario, <span class="number">2012</span>, <span class="number">700</span>),</span><br><span class="line">    <span class="keyword">new</span> Transaction(alan, <span class="number">2012</span>, <span class="number">950</span>)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>找出2011年发生的所有交易，并按交易额排序(从低到高)。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;Transaction&gt; tr2011 = transactions.stream()</span><br><span class="line">    .filter(transaction -&gt; transaction.getYear() == <span class="number">2011</span>)</span><br><span class="line">    .sorted(comparing(Transaction::getValue))</span><br><span class="line">    .collect(toList());</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>交易员都在哪些不同的城市工作过？</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;String&gt; cities = transactions.stream()</span><br><span class="line">    .map(transaction -&gt; transaction.getTrader().getCity())</span><br><span class="line">    .distinct()</span><br><span class="line">    .collect(toList());</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>查找所有来自于剑桥的交易员，并按姓名排序。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Set&lt;String&gt; cities = transactions.stream()</span><br><span class="line">    .map(Transaction::getTrader)</span><br><span class="line">    .filter(trader -&gt; trader.getCity().equals(<span class="string">"Cambridge"</span>))</span><br><span class="line">    .distinct()</span><br><span class="line">    .sorted(comparing(Trader::getName))</span><br><span class="line">    .collect(toList());</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>返回所有交易员的姓名字符串，按字母顺序排序。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">String traderStr = transactions.stream()</span><br><span class="line">    .map(transaction -&gt; transaction.getTrader().getName())</span><br><span class="line">    .distinct()</span><br><span class="line">    .sorted()</span><br><span class="line">    .reduce(<span class="string">""</span>, (n1, n2) -&gt; n1 + n2);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>有没有交易员是在米兰工作的?</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">boolean</span> milanBased = transactions.stream()</span><br><span class="line">    .anyMatch(transaction -&gt; transaction.getTrader().getCity().equals(<span class="string">"Milan"</span>));</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>打印生活在剑桥的交易员的所有交易额。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">transactions.stream()</span><br><span class="line">    .filter(t -&gt; <span class="string">"Cambridge"</span>.equals(t.getTrader().getCity()))</span><br><span class="line">    .map(Transaction::getValue)</span><br><span class="line">    .forEach(System.out::println);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>所有交易中，最高的交易额是多少？</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Optional&lt;Integer&gt; highestValue = transactions.stream()</span><br><span class="line">    .map(Transaction::getValue)</span><br><span class="line">    .reduce(Integer::max);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>找到交易额最小的交易。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Optional&lt;Transaction&gt; smallestTransaction = transactions.stream()</span><br><span class="line">    .reduce((t1, t2) -&gt; t1.getValue() &lt; t2.getValue() ? t1 : t2);</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-6-数值流"><a href="#5-6-数值流" class="headerlink" title="5.6 数值流"></a>5.6 数值流</h2><p>使用 reduce 计算菜单的热量：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> calories = menu.stream().map(Dish::getCalories)</span><br><span class="line">    .reduce(<span class="number">0</span>, Integer::sum);</span><br></pre></td></tr></table></figure>
+
+<p>上面这段代码的问题是，它有一个暗含的装箱成本。每个 Integer 都必须拆箱成一个原始类型，再进行求和。 <code>Stream API</code> 提供了原始类型流特化，专门支持处理数值流的方法。</p>
+<h3 id="5-6-1-原始类型流特化"><a href="#5-6-1-原始类型流特化" class="headerlink" title="5.6.1 原始类型流特化"></a>5.6.1 原始类型流特化</h3><p>Java 8 引入了三个原始类型特化流接口来解决这个问题：IntStream、DoubleStream 和 LongStream，分别将流中的元素特化为 int、long 和 double，从而避免了暗含的装箱成本。每个接口都带来了进行常用数值归约的新方法，比如对数值流求和的 sum，找到最大元素的 max。 此外还有在必要时再把它们转换回对象流的方法。</p>
+<blockquote>
+<p>特化的原因并不在于流的复杂性，而是装箱造成的复杂性—即类似 int 和 Integer 之间的效率差异。</p>
+</blockquote>
+<ol>
+<li><strong>映射到数值流</strong></li>
+</ol>
+<p>将流转换为特化版本的常用方法是 mapToInt、mapToDouble 和 mapToLong。这些方法和前面说的 map 方法的工作方式一样，只是它们返回的是一个特化流，而不是 <code>Stream&lt;T&gt;</code>。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> calories = menu.stream().mapToInt(Dish::getCalories)</span><br><span class="line">    .sum();</span><br></pre></td></tr></table></figure>
+
+<p>这里，mapToInt 会从每道菜中提取热量（用一个 Integer 表示），并返回一个 IntStream (而不是一个 <code>Stream&lt;Integer&gt;</code>)。接下来就可以调用 IntStream 接口中定义的 sum 方法。如果流是空的，sum 默认返回 0。IntStream 还支持其他的方便方法，如 max、min、average 等。</p>
+<ol start="2">
+<li><strong>转换会对象流</strong></li>
+</ol>
+<p>IntStream 上的操作只能产生原始整数：IntStream 的 map 操作接受的 Lambda 必须接受 int 并返回 int。但如果想利用 int 生成 Dish 对象呢？要把原始流转换成一般流（每个 int 都会装箱成一个 Integer），可以使用 boxed 方法，如下所示：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">IntStream intStream = menu.stream().mapToInt(Dish::getCalories);</span><br><span class="line">Stream&lt;Integer&gt; stream = intStream.boxed();</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>默认值 <strong>OptionalInt</strong></li>
+</ol>
+<p>对于三种原始流特化，也分别有一个 Optional 原始类型特化版本：OptionalInt、OptionalDouble 和 OptionalLong。</p>
+<p>要找到 IntStream 中的最大元素，可以调用 max 方法，它会返回一个 OptionalInt：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">OptionalInt maxCalories = menu.stream()</span><br><span class="line">    .mapToInt(Dish::getCalories)</span><br><span class="line">    .max();</span><br></pre></td></tr></table></figure>
+
+<p>如果没有最大值，可以显式处理 OptionalInt 去定义一个默认值：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> max = maxCalories.orElse(<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-6-2-数值范围"><a href="#5-6-2-数值范围" class="headerlink" title="5.6.2 数值范围"></a>5.6.2 数值范围</h3><p>Java 8 引入了两个可以用于 IntStream 和 LongStream 的静态方法，帮助生成范围或者区间内的所有数值：  range 和 rangeClosed。这两个方法都是第一个参数接受起始值，第二个参数接受结束值。但 range 是不包含结束值的，而 rangeClosed 则包含结束值。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">IntStream evenNumbers = IntStream.rangeClosed(<span class="number">1</span>, <span class="number">100</span>) .filter(n -&gt; n % <span class="number">2</span> == <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-6-3-生成勾股数流"><a href="#5-6-3-生成勾股数流" class="headerlink" title="5.6.3 生成勾股数流"></a>5.6.3 生成勾股数流</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;<span class="keyword">double</span>[]&gt; pythagoreanTriples = IntStream().rangeClosed(<span class="number">1</span>, <span class="number">100</span>).boxed()</span><br><span class="line">    .flatMap(a -&gt; IntStream().rangeClosed(a, <span class="number">100</span>)</span><br><span class="line">            .mapToObj(b -&gt; <span class="keyword">new</span> <span class="keyword">double</span>[]&#123;a, b, Math.sqrt(a * a + b * b)&#125;)</span><br><span class="line">            .filter(t -&gt; t[<span class="number">2</span>] % <span class="number">1</span> == <span class="number">0</span>));</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-7-构建流"><a href="#5-7-构建流" class="headerlink" title="5.7 构建流"></a>5.7 构建流</h2><p>介绍如何从值序列、数组、文件来创建流，甚至由生成函数来创建无限流！</p>
+<h3 id="5-7-1-由值创建流"><a href="#5-7-1-由值创建流" class="headerlink" title="5.7.1 由值创建流"></a>5.7.1 由值创建流</h3><p>可以使用静态方法 <code>Stream.of</code>，通过显式值创建一个流。它可以接受任意数量的参数。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream&lt;String&gt; stream = Stream.of(<span class="string">"Java 8 "</span>, <span class="string">"Lambdas "</span>, <span class="string">"In "</span>, <span class="string">"Action"</span>);</span><br><span class="line"><span class="comment">// 使用 empty 得到一个空流</span></span><br><span class="line">Stream&lt;String&gt; emptyStream = Stream.empty();</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-7-2-由数组创建流"><a href="#5-7-2-由数组创建流" class="headerlink" title="5.7.2 由数组创建流"></a>5.7.2 由数组创建流</h3><p>使用静态方法 <code>Arrays.stream</code> 从数组创建一个流。它接受一个数组作为参数。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span>[] numbers = &#123;<span class="number">2</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">11</span>, <span class="number">13</span>&#125;;</span><br><span class="line"><span class="keyword">int</span> sum = Arrays.stream(numbers).sum();</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-7-3-由文件生成流"><a href="#5-7-3-由文件生成流" class="headerlink" title="5.7.3 由文件生成流"></a>5.7.3 由文件生成流</h3><p>Java 中用于处理文件等 I/O 操作的 NIO API（非阻塞 I/O）已更新，以便利用 Stream API。<code>java.nio.file.Files</code> 中的很多静态方法都会返回一个流。例如，方法 Files.lines，它会返回一个由指定文件中的各行构成的字符串流。</p>
+<h3 id="5-7-4-由函数生成流-创建无限流"><a href="#5-7-4-由函数生成流-创建无限流" class="headerlink" title="5.7.4 由函数生成流:创建无限流"></a>5.7.4 由函数生成流:创建无限流</h3><p>Stream API 提供了两个静态方法来从函数生成流：<code>Stream.iterate</code> 和 <code>Stream.generate</code>。 这两个操作可以创建无限流：不像从固定集合创建的流那样有固定大小的流。由 iterate 和 generate 产生的流会用给定的函数按需创建值，因此可以无穷无尽地计算下去！一般来说， 应该使用 <code>limit(n)</code> 来对这种流加以限制。</p>
+<ol>
+<li>迭代，生成斐波那契数列前 20 个值。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream.iterate(<span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">0</span>, <span class="number">1</span>&#125;, t -&gt; <span class="keyword">new</span> <span class="keyword">int</span>[]&#123; t[<span class="number">1</span>], t[<span class="number">0</span>] + t[<span class="number">1</span>]&#125;)</span><br><span class="line">    .limit(<span class="number">20</span>)</span><br><span class="line">    .forEach(t -&gt; System.out.println(<span class="string">"("</span> + t[<span class="number">0</span>] + <span class="string">","</span> + t[<span class="number">1</span>] +<span class="string">")"</span>));</span><br></pre></td></tr></table></figure>
+
+<p>一般来说，在需要依次生成一系列值的时候应该使用 <code>iterate</code>。</p>
+<ol start="2">
+<li>生成，generate 不是依次对每个新生成的值应用函数的。它接受一个 <code>Supplier&lt;T&gt;</code> 类型的 <code>Lambda</code> 提供新的值。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream.generate(Math::random).limit(<span class="number">5</span>)</span><br><span class="line">    .forEach(System.out::println);</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-8-小结"><a href="#5-8-小结" class="headerlink" title="5.8 小结"></a>5.8 小结</h2><ul>
+<li>Streams API 可以表达复杂的数据处理查询。</li>
+<li>可以使用 filter、distinct、skip 和 limit 对流做筛选和切片。</li>
+<li>可以使用 map 和 flatMap 提取或转换流中的元素。</li>
+<li>可以使用 findFirst 和 findAny 方法查找流中的元素。</li>
+<li>可以使用 allMatch、noneMatch 和 anyMatch 方法让流匹配给定的谓词。</li>
+<li>这些方法都利用了短路：找到结果就立即停止计算；没有必要处理整个流。</li>
+<li>可以利用 reduce 方法将流中所有的元素迭代合并成一个结果，例如求和或查找最大元素。</li>
+<li>filter 和 map 等操作是无状态的，它们并不存储任何状态。reduce 等操作要存储状态才能计算出一个值。 sorted 和 distinct 等操作也要存储状态，因为它们需要把流中的所有元素缓存起来才能返回一个新的流。这种操作称为有状态操作。</li>
+<li>流有三种基本的原始类型特化：IntStream、DoubleStream 和 LongStream。它们的操作也有相应的特化</li>
+<li>流不仅可以从集合创建，也可从值、数组、文件以及 iterate 与 generate 等特定方法创建。</li>
+<li>无限流是没有固定大小的流。</li>
+</ul>
+<h1 id="6-用流收集数据"><a href="#6-用流收集数据" class="headerlink" title="6 用流收集数据"></a>6 用流收集数据</h1><p>Java 8 的流支持两种类型的操作：中间操作(如 filter 或 map)和终端操作(如count、findFirst、forEach和reduce)。</p>
+<ul>
+<li>中间操作可以链接起来，将一个流转换为另一个流。这些操作不会消耗流，其目的是建立一个流水线。</li>
+<li>与此相反，终端操作会消耗流，以产生一个最终结果，例如返回流中的最大元素。它们通常可以通过优化流水线来缩短计算时间。</li>
+</ul>
+<h2 id="6-1-收集器简介"><a href="#6-1-收集器简介" class="headerlink" title="6.1 收集器简介"></a>6.1 收集器简介</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Map&lt;Currency, List&lt;Transaction&gt;&gt; transactionsByCurrencies = transactions.stream().collect(groupingBy(Transaction::getCurrency));</span><br></pre></td></tr></table></figure>
+
+<p>groupingBy 说的是“生成一个 Map，它的键是(货币)桶，值则是桶中那些元素的列表”。</p>
+<h3 id="6-1-1-收集器用作高级归约"><a href="#6-1-1-收集器用作高级归约" class="headerlink" title="6.1.1 收集器用作高级归约"></a>6.1.1 收集器用作高级归约</h3><p>对流调用 collect 方法将对流中的元素触发一个归约操作（由Collector来参数化）。</p>
+<p>般来说，Collector 会对元素应用一个转换函数（很多时候是不体现任何效果的恒等转换， 例如toList），并将结果累积在一个数据结构中，从而产生这一过程的最终输出。</p>
+<p>Collectors 实用类提供了很多静态工厂方法， 可以方便地创建常见收集器的实例。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;Transaction&gt; transactions = transactionStream.collect(Collectors.toList());</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-1-2-预定义收集器"><a href="#6-1-2-预定义收集器" class="headerlink" title="6.1.2 预定义收集器"></a>6.1.2 预定义收集器</h3><p>系统中预定义的收集器主要提供三大功能：</p>
+<ul>
+<li>将流元素归约和汇总为一个值</li>
+<li>元素分组</li>
+<li>元素分区</li>
+</ul>
+<h2 id="6-2-归约和汇总"><a href="#6-2-归约和汇总" class="headerlink" title="6.2 归约和汇总"></a>6.2 归约和汇总</h2><h3 id="6-2-1-查找流中的最大值和最小值"><a href="#6-2-1-查找流中的最大值和最小值" class="headerlink" title="6.2.1 查找流中的最大值和最小值"></a>6.2.1 查找流中的最大值和最小值</h3><p><code>Collectors.maxBy</code> 和 <code>Collectors.minBy</code>。</p>
+<h3 id="6-2-2-汇总"><a href="#6-2-2-汇总" class="headerlink" title="6.2.2 汇总"></a>6.2.2 汇总</h3><p>Collectors 类专门为汇总提供了一个工厂方法：<code>Collectors.summingInt</code>。它可接受一个把对象映射为求和所需 int 的函数，并返回一个收集；该收集器在传递给普通的 collect 方法后即执行所需要的汇总操作。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> totalCalories = menu.stream().collect(summingInt(Dish::getCalories));</span><br></pre></td></tr></table></figure>
+
+<p><code>Collectors.summingLong</code> 和 <code>Collectors.summingDouble</code> 方法的作用完全一样，可以用 于求和字段为 long 或 double 的情况。</p>
+<p>但汇总不仅仅是求和；还有 <code>Collectors.averagingInt</code>，连同对应 的<code>averagingLong</code> 和 <code>averagingDouble</code> 可以计算数值的平均数。</p>
+<blockquote>
+<p>很多时候，可能想要得到两个或更多这样的结果，而且希望只需一次操作就可以完成。在这种情况下，可以使用 <code>summarizingInt</code> 工厂方法返回的收集器。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">IntSummaryStatistics menuStatistics = menu.stream().collect(summarizingInt(Dish::getCalories));</span><br></pre></td></tr></table></figure>
+
+<p>这个收集器会把所有这些信息收集到一个叫作 <code>IntSummaryStatistics</code> 的类里，它提供了方便的取值（getter）方法来访问结果。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">IntSummaryStatistics &#123;count=<span class="number">9</span>, sum=<span class="number">4300</span>, min=<span class="number">120</span>, average=<span class="number">477.777778</span>, max=<span class="number">800</span>&#125;</span><br></pre></td></tr></table></figure>
+
+<p>同样，相应的 <code>summarizingLong</code> 和 <code>summarizingDouble</code> 工厂方法有相关的 <code>LongSummaryStatistics</code> 和 <code>DoubleSummaryStatistics</code> 类型，适用于收集的属性是原始类型 <code>long</code> 或 <code>double</code> 的情况。</p>
+<h3 id="6-2-3-连接字符串"><a href="#6-2-3-连接字符串" class="headerlink" title="6.2.3 连接字符串"></a>6.2.3 连接字符串</h3><p><code>joining</code> 工厂方法返回的收集器会把对流中每一个对象应用 <code>toString</code> 方法得到的所有字符串连接成一个字符串。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">String shortMenu = menu.stream().map(Dish::getName).collect(joining());</span><br></pre></td></tr></table></figure>
+
+<p><code>joining</code> 在内部使用了 <code>StringBuilder</code> 来把生成的字符串逐个追加起来。如果 <code>Dish</code> 类有一个 <code>toString</code> 方法来返回菜肴的名称，无需用提取每一道菜名称的函数来对原流做映射就能够得到相同的结果:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">String shortMenu = menu.stream().collect(joining());</span><br></pre></td></tr></table></figure>
+
+<p><code>joining</code> 工厂方法有一个重载版本可以接受元素之间的分界符。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">String shortMenu = menu.stream().map(Dish::getName).collect(joining(<span class="string">", "</span>));</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-2-4-广义归约汇总"><a href="#6-2-4-广义归约汇总" class="headerlink" title="6.2.4 广义归约汇总"></a>6.2.4 广义归约汇总</h3><p>之前讨论的所有收集器，都是一个可以用 <code>reducing</code> 工厂方法定义的归约过程 的特殊情况。<code>Collectors.reducing</code> 工厂方法是所有这些特殊情况的一般化。</p>
+<blockquote>
+<p><code>reduce</code> 方法旨在把两个值结合起来生成一个新值，它是一个不可变的归约。与此相反，<code>collect</code> 方法的设计就是要改变容器，从而累积要输出的结果。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> totalCalories = menu.stream().collect(reducing(<span class="number">0</span>, Dish::getCalories, Integer::sum));</span><br></pre></td></tr></table></figure>
+
+<p><code>reducing</code> 三个参数：初始值、转换函数、累积函数。</p>
+<h2 id="6-3-分组"><a href="#6-3-分组" class="headerlink" title="6.3 分组"></a>6.3 分组</h2><p>一个常见的数据库操作是根据一个或多个属性对集合中的项目进行分组。</p>
+<p>假设要把菜单中的菜按照类型进行分类， 有肉的放一组，有鱼的放一组，其他的都放另一组。用 <code>Collectors.groupingBy</code> 工厂方法返回的收集器可以轻松地完成这项任务。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Map&lt;Dish.Type, List&lt;Dish&gt;&gt; dishesByType = menu.stream().collect(groupingBy(Dish::getType));</span><br></pre></td></tr></table></figure>
+
+<p>分组操作的结果是一个 <code>Map</code>，把分组函数返回的值作为映射的键，把流中所有具有这个分类值的项目的列表作为对应的映射值。</p>
+<h3 id="6-3-1-多级分组"><a href="#6-3-1-多级分组" class="headerlink" title="6.3.1 多级分组"></a>6.3.1 多级分组</h3><p>要实现多级分组，可以使用一个由双参数版本的 <code>Collectors.groupingBy</code> 工厂方法创建的收集器，它除了普通的分类函数之外，还可以接受 <code>collector</code> 类型的第二个参数。要进行二级分组的话，可以把一个内层 <code>groupingBy</code> 传递给外层 <code>groupingBy</code>，并定义一个为流中项目分类的二级标准。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Map&lt;Dish.Type, Map&lt;CaloricLevel, List&lt;Dish&gt;&gt;&gt; dishesByTypeCaloricLevel = menu.stream().collect(groupingBy(Dish::getType, </span><br><span class="line">	groupingBy(dish -&gt; &#123;</span><br><span class="line">        <span class="keyword">if</span> (dish.getCalories() &lt;= <span class="number">400</span>) <span class="keyword">return</span> CaloricLevel.DIET;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (dish.getCalories() &lt;= <span class="number">700</span>) <span class="keyword">return</span> CaloricLevel.NORMAL;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">return</span> CaloricLevel.FAT;</span><br><span class="line">    &#125;)                                                                                                         ));</span><br></pre></td></tr></table></figure>
+
+<p>二级分组结果如下</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    MEAT=&#123;DIET=[chicken], NORMAL=[beef], FAT=[pork]&#125;, </span><br><span class="line"> 	FISH=&#123;DIET=[prawns], NORMAL=[salmon]&#125;,</span><br><span class="line">	OTHER=&#123;DIET=[rice, seasonal fruit], NORMAL=[french fries, pizza]&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>一般来说，把 <code>groupingBy</code> 看作“桶”比较容易明白。第一个 <code>groupingBy</code> 给每个键建立 一个桶。然后再用下游的收集器去收集每个桶中的元素，以此得到 n 级分组。</p>
+<p><img src="https://tva1.sinaimg.cn/large/008eGmZEly1gn6119svyej30uq0gcju5.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/008eGmZEly1gn6119svyej30uq0gcju5.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="n层嵌套映射和n维分类表之间的等价关系"></p>
+<h3 id="6-3-2-按子组收集数据"><a href="#6-3-2-按子组收集数据" class="headerlink" title="6.3.2 按子组收集数据"></a>6.3.2 按子组收集数据</h3><p>从上一节例子得知，可以把第二个 <code>groupingBy</code> 收集器传递给外层收集器来实现多级分组。但进一步说，传递给第一个 <code>groupingBy</code> 的第二个收集器可以是任何类型，而不一定是另一个 <code>groupingBy</code>。例如，要数一数菜单中每类菜有多少个，可以传递 <code>counting</code> 收集器作为 <code>groupingBy</code> 收集器的第二个参数。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Map&lt;Dish.Type, Long&gt; typesCount = menu.stream().collect(groupingBy(Dish::getType, counting()));</span><br></pre></td></tr></table></figure>
+
+<p>普通的单参数 <code>groupingBy(f)</code>实际上是 <code>groupingBy(f, toList())</code> 的简便写法。</p>
+<ol>
+<li><strong>把收集器的结果转换为另一种类型（<code>Collectors.collectingAndThen</code>）</strong></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Map&lt;Dish.Type, Dish&gt; mostCalorcByType = menu.stream().collect(groupingBy(Dish::getType, collectingAndThen(maxBy(comparingInt(Dish::getCalories)), Optional::get)));</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>Optional::get 操作在这里是安全的，因为 reducing 收集器永远都不会返回 Optional.empty()。</p>
+</blockquote>
+<ol start="2">
+<li>与 <strong>groupingBy</strong> 联合使用的其他收集器的例子</li>
+</ol>
+<p>一般来说，通过 <code>groupingBy</code> 工厂方法的第二个参数传递的收集器将会对分到同一组中的所有流元素执行进一步归约操作。</p>
+<p>常常和 <code>groupingBy</code> 联合使用的另一个收集器是 <code>mapping</code> 方法生成的。这个方法接受两个参数：一个函数对流中的元素做变换，另一个则将变换的结果对象收集起来。其目的是在累加之前对每个输入元素应用一个映射函数，这样就可以让接受特定类型元素的收集器适应不同类型的对象。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Map&lt;Dish.Type, Set&lt;CaloricLevel&gt;&gt; caloricLevelByType = menu.stream().collect(</span><br><span class="line">    groupingBy(Dish::getType, mapping(</span><br><span class="line">    	dish -&gt; &#123;</span><br><span class="line">            <span class="keyword">if</span> (dish.getCalories() &lt;= <span class="number">400</span>)</span><br><span class="line">                <span class="keyword">return</span> CaloricLevel.DIET;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (dish.getCalories() &lt;= <span class="number">700</span>)</span><br><span class="line">                <span class="keyword">return</span> CaloricLevel.NORMAL;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">return</span> CaloricLevel.FAT;</span><br><span class="line">        &#125;, toSet()</span><br><span class="line">    ))</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<h2 id="6-4-分区"><a href="#6-4-分区" class="headerlink" title="6.4 分区"></a>6.4 分区</h2><p>分区是分组的特殊情况：由一个谓词作为分类函数，它称分区函数。分区函数返回一个布尔值，这意味着得到的分组 <code>Map</code> 的键类型是 <code>Boolean</code>，于是它最多可以分为两组—<code>true</code> 是一组，<code>false</code> 是一组。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 将菜单按是否是素食分开</span></span><br><span class="line">Map&lt;Boolean, List&lt;Dish&gt;&gt; partitiondMenu = menu.stream()</span><br><span class="line">    .collect(partitioningBy(Dish::isVegetarian));</span><br><span class="line"><span class="comment">// &#123;false=[pork, beef, chicken, prawns, salmon],</span></span><br><span class="line"><span class="comment">// true=[french fries, rice, season fruit, pizza]&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="6-4-1-分区的优势"><a href="#6-4-1-分区的优势" class="headerlink" title="6.4.1 分区的优势"></a>6.4.1 分区的优势</h3><p>分区的好处在于保留了分区函数返回 <code>true</code> 或 <code>false</code> 的两套流元素列表，而避免使用两次 <code>filter</code> 进行筛选。<code>partitioningBy</code> 工厂方法有一个重载版本，可以传递第二个收集器：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Map&lt;Boolean, Map&lt;Dish.Type, List&lt;Dish&gt;&gt;&gt; vegetarianByType = menu.stream()</span><br><span class="line">    .collect(partitioningBy(Dish::isVegetarian, groupingBy(Dish::getType)));</span><br><span class="line"><span class="comment">// &#123;false=&#123;FISH=[prawns, salmon], MEAT=[pork, beef, chicken]&#125;,</span></span><br><span class="line"><span class="comment">// true=&#123;OTHER=[french fries, rice, season fruit, pizza]&#125;&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="6-4-2-Collectors类的静态工厂方法"><a href="#6-4-2-Collectors类的静态工厂方法" class="headerlink" title="6.4.2 Collectors类的静态工厂方法"></a>6.4.2 <strong>Collectors</strong>类的静态工厂方法</h3><table>
+<thead>
+<tr>
+<th>工厂方法</th>
+<th>返回类型</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>toList</td>
+<td>List<T></td>
+<td>把流中所有项目收集到一个 List</td>
+</tr>
+<tr>
+<td>toSet</td>
+<td>Set<T></td>
+<td>把流中所有项目收集到一个 Set，删除重复项</td>
+</tr>
+<tr>
+<td>toCollection</td>
+<td>Collection<T></td>
+<td>把流中所有项目收集到给定的供应源创建的集合</td>
+</tr>
+<tr>
+<td>counting</td>
+<td>Long</td>
+<td>计算流中元素的个数</td>
+</tr>
+<tr>
+<td>summingInt</td>
+<td>Integer</td>
+<td>对流中项目的一个整数属性求和</td>
+</tr>
+<tr>
+<td>averagingInt</td>
+<td>Double</td>
+<td>计算流中项目 Integer 属性的平均值</td>
+</tr>
+<tr>
+<td>summarizingInt</td>
+<td>IntSummaryStatistics</td>
+<td>收集关于流中项目 Integer 属性的统计值，例如最大、最小、总和与平均值</td>
+</tr>
+<tr>
+<td>joining</td>
+<td>String</td>
+<td>连接对流中每个项目调用 toString 方法所生成的字符串</td>
+</tr>
+<tr>
+<td>maxBy</td>
+<td>Optionnal<T></td>
+<td>一个包裹了流中按照给定比较器选出的最大元素的 Optional，或如果流为空则为 Optional.empty()</td>
+</tr>
+<tr>
+<td>minBy</td>
+<td>Optional<T></td>
+<td>一个包裹了流中按照给定比较器选出的最小元素的 Optional，或如果流为空则为 Optional.empty()</td>
+</tr>
+<tr>
+<td>reducing</td>
+<td>归约操作产生的类型</td>
+<td>从一个作为累加器的初始值开始，利用 BinaryOperator 与流 中的元素逐个结合，从而将流归约为单个值</td>
+</tr>
+<tr>
+<td>collectingAndThen</td>
+<td>转换函数返回类型</td>
+<td>包裹另一个收集器，对其结果应用转换函数</td>
+</tr>
+<tr>
+<td>groupingBy</td>
+<td>Map&lt;K, List<T>&gt;</td>
+<td>根据项目的一个属性的值对流中的项目作问组，并将属性值作 为结果 Map 的键</td>
+</tr>
+<tr>
+<td>partitioningBy</td>
+<td>Map&lt;Boolean, List<T>&gt;</td>
+<td>根据对流中每个项目应用谓词的结果来对项目进行分区</td>
+</tr>
+</tbody></table>
+<h2 id="6-5-收集器接口"><a href="#6-5-收集器接口" class="headerlink" title="6.5 收集器接口"></a>6.5 收集器接口</h2><p><code>Collector</code> 接口的定义，它列出了接口的签名以及声明的五个方法。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// T 是流中要收集的项目的泛型</span></span><br><span class="line"><span class="comment">// A 是累加器的类型，累加器是在收集过程中用于累积部分结果的对象。</span></span><br><span class="line"><span class="comment">// R 是收集操作得到的对象(通常但并不一定是集合)的类型。</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Collector</span>&lt;<span class="title">T</span>, <span class="title">A</span>, <span class="title">R</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function">Supplier&lt;A&gt; <span class="title">supplier</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function">BiConsumer&lt;A, T&gt; <span class="title">accumulator</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function">Function&lt;A, R&gt; <span class="title">finisher</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function">BinaryOperator&lt;A&gt; <span class="title">combiner</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function">Set&lt;Characteristics&gt; <span class="title">characteristics</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果要实现一个 <code>ToListCollector&lt;T&gt;</code> 类，将 <code>Stream&lt;T&gt;</code> 中的所有元素收集到一个 <code>List&lt;T&gt;</code> 里，它的签名应该是：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ToListCollector</span>&lt;<span class="title">T</span>&gt; <span class="keyword">implements</span> <span class="title">Collector</span>&lt;<span class="title">T</span>, <span class="title">List</span>&lt;<span class="title">T</span>&gt;, <span class="title">List</span>&lt;<span class="title">T</span>&gt;&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="6-5-1-理解Collector接口声明的方法"><a href="#6-5-1-理解Collector接口声明的方法" class="headerlink" title="6.5.1 理解Collector接口声明的方法"></a>6.5.1 理解<strong>Collector</strong>接口声明的方法</h3><p>一个个分析 <code>Collector</code> 接口声明的五个方法。</p>
+<h3 id="6-5-2-全部融合到一起"><a href="#6-5-2-全部融合到一起" class="headerlink" title="6.5.2 全部融合到一起"></a>6.5.2 全部融合到一起</h3><h2 id="6-6-开发自定义收集器改善性能"><a href="#6-6-开发自定义收集器改善性能" class="headerlink" title="6.6 开发自定义收集器改善性能"></a>6.6 开发自定义收集器改善性能</h2><h2 id="6-7-小结"><a href="#6-7-小结" class="headerlink" title="6.7 小结"></a>6.7 小结</h2><ul>
+<li><code>collect</code> 是一个终端操作，它接受的参数是将流中元素累积到汇总结果的各种方式(称为收集器)。</li>
+<li>预定义收集器包括将流元素归约和汇总到一个值，例如计算最小值、最大值或平均值。</li>
+<li>预定义收集器可以用 <code>groupingBy</code> 对流中元素进行分组，或用 <code>partitioningBy</code> 进行分区。</li>
+<li>收集器可以进行高效复合，进行多级分组、分区和归约。</li>
+<li>可以实现 <code>Collector</code> 接口中自定义收集器。</li>
+</ul>
+<h1 id="7-并行数据处理与性能"><a href="#7-并行数据处理与性能" class="headerlink" title="7 并行数据处理与性能"></a>7 并行数据处理与性能</h1><p>在 Java 7 之前，并行处理数据集合非常麻烦。</p>
+<ul>
+<li>第一，需要明确地把包含数据的数据结分成若干子部分。</li>
+<li>第二，要给每个子部分分配一个独立的线程。</li>
+<li>第三，需要在恰当的时候对它们进行同步来避免不希望出现的竞争条件，等待所有线程完成，最后把这些部分结果合并起来。</li>
+</ul>
+<p>Java 7 引入了一个叫作 <strong>分支/合并</strong> 的框架，Stream 则在幕后利用到了 <code>Fork/Join</code> 框架。</p>
+<h2 id="7-1-并行流"><a href="#7-1-并行流" class="headerlink" title="7.1 并行流"></a>7.1 并行流</h2><p>并行流就是一个把内容分成多个数据块，并用不同的线程分别处理每个数据块的流，自动把给定操作的工作负荷分配给多核处理器的所有内核。</p>
+<h3 id="7-1-1-将顺序流转换为并行流"><a href="#7-1-1-将顺序流转换为并行流" class="headerlink" title="7.1.1 将顺序流转换为并行流"></a>7.1.1 将顺序流转换为并行流</h3><p>对顺序流调用 <code>parallel</code> 方法：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 求 1 ~ n 之和</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">long</span> <span class="title">parallelSum</span><span class="params">(<span class="keyword">long</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> Stream.iterate(<span class="number">1L</span>, i -&gt; i + <span class="number">1</span>)</span><br><span class="line">        .limit(n)</span><br><span class="line">        .parallel()</span><br><span class="line">        .reduce(<span class="number">0L</span>, Long::sum);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>同一个归纳操作会将各个子流的部分归纳结果合并起来，得到整个原始流的归纳结果。</p>
+<p>![并行归纳操作](/Users/raymond/Library/Application Support/typora-user-images/image-20210202153937167.png)</p>
+<p>对顺序流调用 <code>parallel</code> 方法并不意味着流本身有任何实际的变化。它在内部实际上就是设了一个 <code>boolean</code> 标志，表示想让调用 <code>parallel</code> 之后进行的所有操作都并行执行。只需要对并行流调用 <code>sequential</code> 方法就可以把它变成顺序流。</p>
+<blockquote>
+<p><strong>配置并行流使用的线程池</strong></p>
+<p>并行流内部使用了默认的 <code>ForkJoinPool</code>，它默认的线程数量就是处理器数量，这个值可以由 <code>Runtime.getRuntime().availableProcessors()</code> 得到的。</p>
+<p>可 以 通 过 系 统 属 性  <code>java.util.concurrent.ForkJoinPool.common. parallelism</code> 来改变线程池大小。</p>
+<p>这是全局设置，因此将影响代码中所有的并行流。目前还无法专为某个并行流指定这个值。一般而言，让 <code>ForkJoinPool</code> 的大小等于处理器数量。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">System.setProperty(<span class="string">"java.util.concurrent.ForkJoinPool.common.parallelism"</span>, <span class="string">"12"</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="7-1-2-测量流性能"><a href="#7-1-2-测量流性能" class="headerlink" title="7.1.2 测量流性能"></a>7.1.2 测量流性能</h3><p>软件工程可不是靠猜靠想靠说的学科，在优化性能时，应该始终遵循三个黄金规则：测量，测量，再测量。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 测量对前 n 个自然数求和的函数的性能</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">long</span> <span class="title">measureSumPerf</span><span class="params">(Function&lt;Long, Long&gt; adder, <span class="keyword">long</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">long</span> fastest = Long.MAX_VALUE;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">        <span class="keyword">long</span> start = System.nanoTime();</span><br><span class="line">        <span class="keyword">long</span> sum = adder.apply(n);</span><br><span class="line">        <span class="keyword">long</span> duration = (System.nanoTime() - start) / <span class="number">1000000</span>;</span><br><span class="line">        System.out.println(<span class="string">"result: "</span> + sum);</span><br><span class="line">        <span class="keyword">if</span> (duration &lt; fastest)</span><br><span class="line">            fastest = duration;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> fastest;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>iterate</code> 生成的流不易分块，并且生成的是装箱的对象，必须拆箱成数字才能求和，所以效果是反直觉的。高效的求和方法：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">long</span> <span class="title">parallelRangedSum</span><span class="params">(<span class="keyword">long</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> LongStream.rangeClosed(<span class="number">1</span>, n)</span><br><span class="line">        .parallel()</span><br><span class="line">        .reduce(<span class="number">0L</span>, Long::sum);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>并行化并不是没有代价的。并行化过程本身需要对流做递归划分，把每个子流的归纳操作分配到不同的线程，然后把这些操作的结果合并成一个值。但在多个内核之间移动数据的代价也可能很大，<strong>所以要保证在内核中并行执行工作的时间比在内核之间传输数据的时间长。</strong></p>
+<h3 id="7-1-3-正确使用并行流"><a href="#7-1-3-正确使用并行流" class="headerlink" title="7.1.3 正确使用并行流"></a>7.1.3 正确使用并行流</h3><p>错用并行流而产生错误的首要原因，就是使用的算法改变了某些共享状态。一些在本质上就是顺序执行的代码使用 <code>parallel</code> 是没有意义的。</p>
+<h3 id="7-1-4-高效使用并行流"><a href="#7-1-4-高效使用并行流" class="headerlink" title="7.1.4 高效使用并行流"></a>7.1.4 高效使用并行流</h3><ul>
+<li>并行流并不总是比顺序流快，在考虑选择顺序流还是并行流时，最重要的考虑就是用适当的基准来检查其性能。</li>
+<li>留意装箱。</li>
+<li>有些操作本身在并行流上的性能就比顺序流差。特别是 <code>limit</code> 和 <code>findFirst</code> 等依赖于元素顺序的操作，它们在并行流上执行的代价非常大。</li>
+<li>要考虑流的操作流水线的总计算成本。</li>
+<li>对于较小的数据量，选择并行流几乎从来都不是一个好的决定。并行处理少数几个元素的好处还抵不上并行化造成的额外开销。</li>
+<li>要考虑流背后的数据结构是否易于分解。<code>ArrayList</code> 的拆分效率比 <code>LinkedList</code> 高得多，用 <code>range</code> 工厂方法创建的原始类型流也可以快速分解。</li>
+<li>流自身的特点，以及流水线中的中间操作修改流的方式，都可能会改变分解过程的性能。</li>
+<li>要考虑终端操作中合并步骤的代价是大是小。</li>
+</ul>
+<h2 id="7-2-分支-合并框架"><a href="#7-2-分支-合并框架" class="headerlink" title="7.2 分支/合并框架"></a>7.2 分支/合并框架</h2><p>分支/合并框架的目的是<strong>以递归方式将可以并行的任务拆分成更小的任务，然后将每个子任务的结果合并起来生成整体结果。</strong>它是 <code>ExecutorService</code> 接口的一个实现，它把子任务分配给线程池（称为 <code>ForkJoinPool</code>）中的工作线程。</p>
+<h3 id="7-2-1-使用RecursiveTask"><a href="#7-2-1-使用RecursiveTask" class="headerlink" title="7.2.1 使用RecursiveTask"></a>7.2.1 使用<strong>RecursiveTask</strong></h3><p>要把任务提交到这个池，必须创建 <code>RecursiveTask&lt;R&gt;</code> 的一个子类，其中 <code>R</code> 是并行化任务（以及所有子任务）产生的结果类型，或者如果任务不返回结果，则是 <code>RecursiveAction</code> 类型。要定义 <code>RecursiveTask</code>，需实现抽象方法  <code>compute</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">abstract</span> R <span class="title">compute</span><span class="params">()</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>这个方法同时定义了将任务拆分成子任务的逻辑，以及无法再拆分或不方便再拆分时，生成单个子任务结果的逻辑。伪代码类似于：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (任务足够小或不可分) &#123; </span><br><span class="line">    顺序计算该任务</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">     将任务分成两个子任务</span><br><span class="line">     递归调用本方法，拆分每个子任务，等待所有子任务完成</span><br><span class="line">     合并每个子任务的结果</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接下来使用 <code>RecursiveTask</code> 实现并行对前 n 个自然数求和加法计算器。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ForkJoinSumCalculator</span> <span class="keyword">extends</span> <span class="title">RecursiveTask</span>&lt;<span class="title">Long</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">// 要求和的数组</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">long</span>[] numbers;</span><br><span class="line">    <span class="comment">// 子任务处理的数组的起始和终止位置</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> start, end;</span><br><span class="line">    <span class="comment">// 不再将任务分解为子任务的数组大小</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> THRESHOLD = <span class="number">1_0000</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">ForkJoinSumCalculator</span><span class="params">(<span class="keyword">long</span>[] numbers)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>(numbers, <span class="number">0</span>, numbers.length);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ForkJoinSumCalculator</span><span class="params">(<span class="keyword">long</span>[] numbers, <span class="keyword">int</span> start, <span class="keyword">int</span> end)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.numbers = numbers;</span><br><span class="line">        <span class="keyword">this</span>.start = start;</span><br><span class="line">        <span class="keyword">this</span>.end = end;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> Long <span class="title">compute</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> length = end - start;</span><br><span class="line">        <span class="keyword">if</span> (length &lt; THRESHOLD)</span><br><span class="line">            <span class="keyword">return</span> computeSequentially();</span><br><span class="line">        ForkJoinSumCalculator leftTask = <span class="keyword">new</span> ForkJoinSumCalculator(numbers, start, start + length / <span class="number">2</span>);</span><br><span class="line">        leftTask.fork();</span><br><span class="line">        ForkJoinSumCalculator rightTask = <span class="keyword">new</span> ForkJoinSumCalculator(numbers, start + length / <span class="number">2</span>, end);</span><br><span class="line">        Long rightResult = rightTask.compute();</span><br><span class="line">        Long leftResult = leftTask.join();</span><br><span class="line">        <span class="keyword">return</span> leftResult + rightResult;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">long</span> <span class="title">computeSequentially</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">long</span> sum = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = start; i &lt; end; i++)</span><br><span class="line">            sum += numbers[i];</span><br><span class="line">        <span class="keyword">return</span> sum;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">long</span> <span class="title">forkJoinSum</span><span class="params">(<span class="keyword">long</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">long</span>[] numbers = LongStream.rangeClosed(<span class="number">1</span>, n).toArray();</span><br><span class="line">        ForkJoinSumCalculator task = <span class="keyword">new</span> ForkJoinSumCalculator(numbers);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ForkJoinPool().invoke(task);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在实际应用时，使用多个 <code>ForkJoinPool</code> 是没有什么意义的。一般来说把它实例化一次，然后把实例保存在静态字段中，使之成为单例，这样就可以在软件中任何部分方便地重用。</p>
+<h3 id="7-2-2-使用分支-合并框架的最佳做法"><a href="#7-2-2-使用分支-合并框架的最佳做法" class="headerlink" title="7.2.2 使用分支/合并框架的最佳做法"></a>7.2.2 使用分支/合并框架的最佳做法</h3><ul>
+<li>对一个任务调用 <code>join</code> 方法会阻塞调用方，直到该任务做出结果。因此，有必要在<strong>两个子任务的计算都开始之后</strong>再调用它。</li>
+<li>不应该在 <code>RecursiveTask</code> 内部使用 <code>ForkJoinPool</code> 的 <code>invoke</code> 方法。应该始终直接调用 <code>compute</code> 或 <code>fork</code> 方法，只有顺序代码才应该用 <code>invoke</code> 来启动并行计算。</li>
+<li>对子任务调用 <code>fork</code> 方法可以把它排进 <code>ForkJoinPool</code> 。</li>
+<li>调试使用分支/合并框架的并行计算可能有点棘手。因为调用 <code>compute</code> 的线程并不是概念上的调用方，后者是调用 <code>fork</code> 的那个。</li>
+<li>和并行流一样，不应理所当然地认为在多核处理器上使用分支/合并框架就比顺序计算快。一个惯用方法是把输入/输出放在一个子任务里，计算放在另一个子任务里。</li>
+</ul>
+<h3 id="7-2-3-工作窃取"><a href="#7-2-3-工作窃取" class="headerlink" title="7.2.3 工作窃取"></a>7.2.3 工作窃取</h3><p>理想情况下，划分并行任务时， 应该让每个任务都用完全相同的时间完成，让所有的 CPU 内核都同样繁忙。实际中每个子任务所花的时间可能天差地别。</p>
+<p>分支/合并框架工程用一种称为工作窃取（<code>work stealing</code>）的技术来解决这个问题。在实际应用中，这些任务差不多被平均分配到 <code>ForkJoinPool</code> 中的所有线程上。每个线程都为分配给它的任务保存一个双向链式队列，每完成一个任务，就会从队列头上取出下一个任务开始执行。</p>
+<p>因为某个线程可能早早完成了分配给它的所有任务，也就是它的队列已经空了，而其他的线程还很忙。这个线程不用闲下来，而是随机选一个别的线程，从队 列的尾巴上“偷走”一个任务。这个过程一直继续下去，直到所有的任务都执行完毕，所有的队列都清空。<strong>这就是为什么要划成许多小任务而不是少数几个大任务，这有助于更好地在工作线程之间平衡负载。用于在池中的工作线程之间重新分配和平衡任务。</strong></p>
+<h2 id="7-3-Spliterator"><a href="#7-3-Spliterator" class="headerlink" title="7.3 Spliterator"></a>7.3 <strong>Spliterator</strong></h2><p><code>Spliterator</code> 是 <code>Java 8</code> 中加入的另一个新接口；这个名字代表“可分迭代器”（splitable iterator）。和 <code>Iterator</code> 一样，<code>Spliterator</code> 也用于遍历数据源中的元素，但它是为了并行执行而设计的。在实践中基本上用不到自己开发 <code>Spliterator</code>。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Spliterator</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">tryAdvance</span><span class="params">(Consumer&lt;? <span class="keyword">super</span> T&gt; action)</span></span>;</span><br><span class="line">    <span class="function">Spliterator&lt;T&gt; <span class="title">trySplit</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">long</span> <span class="title">estimatedSize</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">characteristics</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
+      <tags>
+        <tag>Java8</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>《Java8实战》基础知识</title>
+    <url>/2021/01/29/2021-01-29-Java8InActionPart1/</url>
+    <content><![CDATA[<h1 id="1-为什么要关心-Java-8"><a href="#1-为什么要关心-Java-8" class="headerlink" title="1.为什么要关心 Java 8"></a>1.为什么要关心 Java 8</h1><p>Java 8 不但对软件有影响，对硬件也有影响：平常用的 CPU 都是多核的—笔记本电脑或台式机上的处理器可能有四个 CPU 甚至更多内核。但是，绝大多数现有的 Java 程序都只使用其中一个内核， 其他三个都闲着，或只是用一小部分的处理能力来运行操作系统或杀毒程序。</p>
+<p>在Java 8之前，专家们可能会说必须利用线程才能使用多个内核。但是线程用起来不容易。</p>
+<p>Java 8 特点：</p>
+<ul>
+<li>Stream API</li>
+<li>向方法传递代码的技巧</li>
+<li>接口中的默认方法</li>
+</ul>
+<p>Java 8 提供了一个新的 API(称为“流”，Stream)，它支持许多处理数据的并行操作，其思路和在数据库查询语言中的思路类似—用更高级的方式表达想要的东西，而由“实现”(在这里是Streams库)来选择最佳低级执行机制。可以避免用 synchronized 编写代码，且效率更高。</p>
+<p>Java 8 中的主要变化反映了它开始远离常侧重于改变现有值的经典面向对象思想，而向<strong>函数式编程</strong>领域转变，在大面上考虑做什么被认为是头等大事，并和如何实现区分开来。</p>
+<p>编程语言的整个目的就在于操作值，要是按照历史 上编程语言的传统，这些值因此被称为一等值。编程语言中的其他结构也许有助于我们表示值的结构，但在程序执行期间不能传递，因而是二等公民。人们发现，在运行时传递方法能将方法变成一等公民。</p>
+<p>谓词(predicate) 在数学上常常用来代表一个类似函数的东西，它接受一个参数值，并返回true或false。</p>
+<p>for-each 循环一个个去迭代元素，然后再处理元素。我们把这种 数据迭代的方法称为<strong>外部迭代</strong>。相反，有了Stream API，你根本用不着操心循环的事情。数据处理完全是在库内部进行的。我们把这种思想叫作<strong>内部迭代</strong>。</p>
+<h1 id="2-通过行为参数化传递代码"><a href="#2-通过行为参数化传递代码" class="headerlink" title="2.通过行为参数化传递代码"></a>2.通过行为参数化传递代码</h1><p>行为参数化就是可以帮助你处理频繁变更的需求的一种软件开发模式。一言以蔽之，它意味着拿出一个代码块，把它准备好却不去执行它。这个代码块以后可以被程序的其他部分调用，这意味可以推迟这块代码的执行。</p>
+<h2 id="2-1-方法参数化"><a href="#2-1-方法参数化" class="headerlink" title="2.1 方法参数化"></a>2.1 方法参数化</h2><blockquote>
+<p>功能需求：根据传入的 Apple 属性，对 List<Apple> inventory 进行筛选，完成收集后的 List。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Apple</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> weight = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">private</span> String color = <span class="string">""</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-2-阶段-1"><a href="#2-2-阶段-1" class="headerlink" title="2.2 阶段 1"></a>2.2 阶段 1</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> List&lt;Apple&gt; <span class="title">filterGreenApples</span><span class="params">(List&lt;Apple&gt; inventory)</span></span>&#123;</span><br><span class="line">    List&lt;Apple&gt; result = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span> (Apple apple: inventory)&#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="string">"green"</span>.equals(apple.getColor())) &#123;</span><br><span class="line">            result.add(apple);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> List&lt;Apple&gt; <span class="title">filterHeavyApples</span><span class="params">(List&lt;Apple&gt; inventory)</span></span>&#123;</span><br><span class="line">    List&lt;Apple&gt; result = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span> (Apple apple: inventory)&#123;</span><br><span class="line">        <span class="keyword">if</span> (apple.getWeight() &gt; <span class="number">150</span>) &#123;</span><br><span class="line">            result.add(apple);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> List&lt;Apple&gt; <span class="title">filterApplesByParams</span><span class="params">(List&lt;Apple&gt; inventory, String param)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="string">"color"</span>.equals(param)) &#123;</span><br><span class="line">        <span class="keyword">return</span> filterGreenApples(inventory);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">"weight"</span>.equals(param)) &#123;</span><br><span class="line">    	<span class="keyword">return</span> filterHeavyApples(inventory);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>如果想改变过滤条件，比如把过滤颜色从 “green” 变成 “red” 该怎么办？重新添加一个方法，但是改动的代码只有一两行吗？</p>
+</blockquote>
+<h2 id="2-3-阶段-2"><a href="#2-3-阶段-2" class="headerlink" title="2.3 阶段 2"></a>2.3 阶段 2</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">ApplePredicate</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">test</span><span class="params">(Apple a)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">AppleWeightPredicate</span> <span class="keyword">implements</span> <span class="title">ApplePredicate</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">test</span><span class="params">(Apple apple)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> apple.getWeight() &gt; <span class="number">150</span>; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">AppleColorPredicate</span> <span class="keyword">implements</span> <span class="title">ApplePredicate</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">test</span><span class="params">(Apple apple)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"green"</span>.equals(apple.getColor());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">AppleRedAndHeavyPredicate</span> <span class="keyword">implements</span> <span class="title">ApplePredicate</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">test</span><span class="params">(Apple apple)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"red"</span>.equals(apple.getColor()) </span><br><span class="line">            &amp;&amp; apple.getWeight() &gt; <span class="number">150</span>; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> List&lt;Apple&gt; <span class="title">filter</span><span class="params">(List&lt;Apple&gt; inventory, ApplePredicate p)</span></span>&#123;</span><br><span class="line">    List&lt;Apple&gt; result = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span>(Apple apple : inventory)&#123;</span><br><span class="line">        <span class="keyword">if</span>(p.test(apple))&#123;</span><br><span class="line">            result.add(apple);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> List&lt;Apple&gt; <span class="title">filterGreenApples</span><span class="params">(List&lt;Apple&gt; inventory)</span></span>&#123;</span><br><span class="line">    List&lt;Apple&gt; result = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span>(Apple apple: inventory)&#123;</span><br><span class="line">        <span class="keyword">if</span>(<span class="string">"green"</span>.equals(apple.getColor()))&#123;</span><br><span class="line">            result.add(apple);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> List&lt;Apple&gt; <span class="title">filterApplesByColor</span><span class="params">(List&lt;Apple&gt; inventory, String color)</span></span>&#123;</span><br><span class="line">    List&lt;Apple&gt; result = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span>(Apple apple: inventory)&#123;</span><br><span class="line">        <span class="keyword">if</span>(apple.getColor().equals(color))&#123;</span><br><span class="line">            result.add(apple);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> List&lt;Apple&gt; <span class="title">filterApplesByWeight</span><span class="params">(List&lt;Apple&gt; inventory, <span class="keyword">int</span> weight)</span></span>&#123;</span><br><span class="line">    List&lt;Apple&gt; result = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span>(Apple apple: inventory)&#123;</span><br><span class="line">        <span class="keyword">if</span>(apple.getWeight() &gt; weight)&#123;</span><br><span class="line">            result.add(apple);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String... args)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	List&lt;Apple&gt; inventory = Arrays.asList(<span class="keyword">new</span> Apple(<span class="number">80</span>,<span class="string">"green"</span>), <span class="keyword">new</span> Apple(<span class="number">155</span>, <span class="string">"green"</span>), <span class="keyword">new</span> Apple(<span class="number">120</span>, <span class="string">"red"</span>));	</span><br><span class="line"></span><br><span class="line">    <span class="comment">// [Apple&#123;color='green', weight=80&#125;, Apple&#123;color='green', weight=155&#125;]</span></span><br><span class="line">    List&lt;Apple&gt; greenApples = filterApplesByColor(inventory, <span class="string">"green"</span>);</span><br><span class="line">    System.out.println(greenApples);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// [Apple&#123;color='red', weight=120&#125;]</span></span><br><span class="line">    List&lt;Apple&gt; redApples = filterApplesByColor(inventory, <span class="string">"red"</span>);</span><br><span class="line">    System.out.println(redApples);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// [Apple&#123;color='green', weight=80&#125;, Apple&#123;color='green', weight=155&#125;]</span></span><br><span class="line">    List&lt;Apple&gt; greenApples2 = filter(inventory, <span class="keyword">new</span> AppleColorPredicate());</span><br><span class="line">    System.out.println(greenApples2);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// [Apple&#123;color='green', weight=155&#125;]</span></span><br><span class="line">    List&lt;Apple&gt; heavyApples = filter(inventory, <span class="keyword">new</span> AppleWeightPredicate());</span><br><span class="line">    System.out.println(heavyApples);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// []</span></span><br><span class="line">    List&lt;Apple&gt; redAndHeavyApples = filter(inventory, <span class="keyword">new</span> AppleRedAndHeavyPredicate());</span><br><span class="line">    System.out.println(redAndHeavyApples);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// [Apple&#123;color='red', weight=120&#125;]</span></span><br><span class="line">    List&lt;Apple&gt; redApples2 = filter(inventory, <span class="keyword">new</span> ApplePredicate() &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">test</span><span class="params">(Apple a)</span></span>&#123;</span><br><span class="line">            <span class="keyword">return</span> a.getColor().equals(<span class="string">"red"</span>); </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    System.out.println(redApples2);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-4-阶段-3"><a href="#2-4-阶段-3" class="headerlink" title="2.4 阶段 3"></a>2.4 阶段 3</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">isGreenApple</span><span class="params">(Apple apple)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"green"</span>.equals(apple.getColor()); </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">isHeavyApple</span><span class="params">(Apple apple)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> apple.getWeight() &gt; <span class="number">150</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> List&lt;Apple&gt; <span class="title">filterApples</span><span class="params">(List&lt;Apple&gt; inventory, Predicate&lt;Apple&gt; p)</span> </span>&#123;</span><br><span class="line">    List&lt;Apple&gt; result = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span>(Apple apple : inventory)&#123;</span><br><span class="line">        <span class="keyword">if</span>(p.test(apple))&#123;</span><br><span class="line">            result.add(apple);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String... args)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    List&lt;Apple&gt; inventory = Arrays.asList(<span class="keyword">new</span> Apple(<span class="number">80</span>,<span class="string">"green"</span>),</span><br><span class="line">                                          <span class="keyword">new</span> Apple(<span class="number">155</span>, <span class="string">"green"</span>),</span><br><span class="line">                                          <span class="keyword">new</span> Apple(<span class="number">120</span>, <span class="string">"red"</span>));	</span><br><span class="line"></span><br><span class="line">    <span class="comment">// [Apple&#123;color='green', weight=80&#125;, Apple&#123;color='green', weight=155&#125;]</span></span><br><span class="line">    List&lt;Apple&gt; greenApples = filterApples(inventory, FilteringApples::isGreenApple);</span><br><span class="line">    System.out.println(greenApples);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// [Apple&#123;color='green', weight=155&#125;]</span></span><br><span class="line">    List&lt;Apple&gt; heavyApples = filterApples(inventory, FilteringApples::isHeavyApple);</span><br><span class="line">    System.out.println(heavyApples);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// [Apple&#123;color='green', weight=80&#125;, Apple&#123;color='green', weight=155&#125;]</span></span><br><span class="line">    List&lt;Apple&gt; greenApples2 = filterApples(inventory, (Apple a) -&gt; <span class="string">"green"</span>.equals(a.getColor()));</span><br><span class="line">    System.out.println(greenApples2);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// [Apple&#123;color='green', weight=155&#125;]</span></span><br><span class="line">    List&lt;Apple&gt; heavyApples2 = filterApples(inventory, (Apple a) -&gt; a.getWeight() &gt; <span class="number">150</span>);</span><br><span class="line">    System.out.println(heavyApples2);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// []</span></span><br><span class="line">    List&lt;Apple&gt; weirdApples = filterApples(inventory, (Apple a) -&gt; a.getWeight() &lt; <span class="number">80</span> || </span><br><span class="line">                                           <span class="string">"brown"</span>.equals(a.getColor()));</span><br><span class="line">    System.out.println(weirdApples);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="3-Lambda-表达式"><a href="#3-Lambda-表达式" class="headerlink" title="3.Lambda 表达式"></a>3.Lambda 表达式</h1><h2 id="3-1-Lambda-管中窥豹"><a href="#3-1-Lambda-管中窥豹" class="headerlink" title="3.1 Lambda 管中窥豹"></a>3.1 Lambda 管中窥豹</h2><p>可以把 Lambda 表达式理解为<strong>简洁地表示可传递的匿名函数的一种方式</strong>：它没有名称，但有参数列表、函数主体、返回类型，可能还有一个可以抛出的异常列表。</p>
+<ul>
+<li>匿名：它不像普通方法那样有一个确切的名称。</li>
+<li>函数： Lambda  函数不像方法（Method）那样属于某个特定的类。但和方法一样， Lambda  有参数列表、函数主体、返回类型，还可能有可以抛出的异常列表。</li>
+<li>传递： Lambda  表达式可以作为参数传递给方法或存储在变量中。</li>
+<li>简洁：无需像匿名类那样写很多模板代码。</li>
+</ul>
+<p>普通方法：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 等号右边的就是 匿名函数类。</span></span><br><span class="line">Comparator&lt;Apple&gt; byWeight = <span class="keyword">new</span> Comparator&lt;Apple&gt;() &#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compareTo</span><span class="params">(Apple a1, Apple a2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> a1.getWeight().compareTo(a2.getWeight());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> Lambda  函数</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Comparator&lt;Apple&gt; byWeight = (Apple a1, Apple a2) -&gt; a.getWeight().compareTo(a2.getWeight());</span><br></pre></td></tr></table></figure>
+
+<p>需要注意的是 <code>Comparator&lt;T&gt;</code> 是一个接口。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Comparator</span>&lt;<span class="title">T</span>&gt; </span>&#123; ... &#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> Lambda  表达式有三个部分：参数列表（可以为空，即无参）、箭头、 Lambda  主体（可以无返回值，即 <code>void</code>）。</p>
+</blockquote>
+<p>一些 <code>Lambda</code> 示例</p>
+<table>
+<thead>
+<tr>
+<th align="center">使用案例</th>
+<th align="center">Lambda  示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">布尔表达式</td>
+<td align="center"><code>(List&lt;String&gt; list) -&gt; list.isEmpty();</code></td>
+</tr>
+<tr>
+<td align="center">创建对象</td>
+<td align="center"><code>() -&gt; new Apple(10);</code></td>
+</tr>
+<tr>
+<td align="center">消费一个对象</td>
+<td align="center"><code>(Apple a) -&gt; { System.out.println(a.getWeight()) };</code></td>
+</tr>
+<tr>
+<td align="center">从一个对象中选择/抽取</td>
+<td align="center"><code>(String s) -&gt; s.length();</code></td>
+</tr>
+<tr>
+<td align="center">组合两个值</td>
+<td align="center"><code>(int a, int b) -&gt; a * b;</code></td>
+</tr>
+<tr>
+<td align="center">比较两个对象</td>
+<td align="center"><code>(Apple a1, Apple a2) -&gt; a1.getWeight().compareTo(a2.getWeight())</code></td>
+</tr>
+</tbody></table>
+<h2 id="3-2-Lambda-使用场景"><a href="#3-2-Lambda-使用场景" class="headerlink" title="3.2 Lambda 使用场景"></a>3.2 Lambda 使用场景</h2><p>在<strong>函数式接口</strong>上使用 Lambda 表达式。</p>
+<h3 id="3-2-1-函数式接口"><a href="#3-2-1-函数式接口" class="headerlink" title="3.2.1 函数式接口"></a>3.2.1 函数式接口</h3><p>一言以蔽之，<strong>函数式接口</strong>就是只定义一个抽象方法的接口。比如常见的 <code>Comparator&lt;T&gt;、Runnable、Callable</code>。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// java.util.Comparator</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Comparator</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">compare</span><span class="params">(T o1, T o2)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// java.lang.Runnable</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// java.util.concurrent.Callable</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Callable</span>&lt;<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function">V <span class="title">call</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>另外，在 Java 8 中已经允许接口中有方法的默认实现，也就是接口可以拥有<strong>默认方法（即在类没有对方法进行实现时， 其主体为方法提供默认实现的方法）</strong>。即使一个接口有很多默认方法，但是只要接口只定义了一个<strong>抽象方法</strong>，它就仍然是一个<strong>函数式接口</strong>。</p>
+<h3 id="3-2-2-函数描述符"><a href="#3-2-2-函数描述符" class="headerlink" title="3.2.2 函数描述符"></a>3.2.2 函数描述符</h3><p>函数式接口的抽象方法的签名基本上就是 Lambda 表达式的签名。这种抽象方法叫作<strong>函数描述符</strong>。例如，Runnable 接口可以看作一个什么也不接受什么也不返回(void)的函数的签名，因为它只有一个叫作 run 的抽象方法，这个方法什么也不接受，什么也不返回(void)。</p>
+<p> Lambda  表达式可以被赋给一个变量，或传递给一个接受函数式接口作为参数的方法，但是这个 Lambda 表达式的签名要和函数式接口的抽象方法一样。</p>
+<blockquote>
+<p>@<strong>FunctionalInterface</strong> 是怎么回事?</p>
+<p>如果查看新的 Java API，会发现函数式接口带有 @FunctionalInterface 的标注，这个标注用于表示该接口会设计成 一个函数式接口。不是必需的，但对于为此设计的接口而言，使用它是比较推荐的，就像是 @Override 标注表示方法被重写了。</p>
+</blockquote>
+<h2 id="3-3-环绕执行模式"><a href="#3-3-环绕执行模式" class="headerlink" title="3.3 环绕执行模式"></a>3.3 环绕执行模式</h2><p>资源处理（例如处理文件或数据库）时一个常见的模式就是打开一个资源，做一些处理， 然后关闭资源。这个设置和清理阶段总是很类似，并且会围绕着执行处理的那些重要代码。这就是所谓的环绕执行(execute around)模式。</p>
+<p>在以下代码中，是从一个文件中读取一行所需的模板代码。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">processFile</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> (BufferedReader br = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> FileReader(<span class="string">"data.json"</span>))) &#123;</span><br><span class="line">        <span class="keyword">return</span> br.readLine();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-3-1-行为参数化"><a href="#3-3-1-行为参数化" class="headerlink" title="3.3.1 行为参数化"></a>3.3.1 行为参数化</h3><p>上面那段代码是有局限的。只能读文件的第一行，如果想要返回头两行，甚至是返回使用最频繁的词，该怎么办？理想情况下，要重用执行设置和清理的代码，并告诉 <code>processFile</code>方法对文件执行不同的操作。也就是需要把 <code>processFile</code> 的行为参数化。需要一种方法把行为传递给 <code>processFile</code>，以便它可以利用 <code>BufferedReader</code> 执行不同的行为。</p>
+<p>需要一个接收 <code>BufferedReader</code> 并返回 <code>String</code> 的 <code>Lambda</code>，下面就是从 <code>BufferedReader</code> 中打印两行的写法：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">String result = processFile((BufferedReader br) -&gt; br.readLine() + br.readLine());</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-3-2-使用函数式接口来传递行为"><a href="#3-3-2-使用函数式接口来传递行为" class="headerlink" title="3.3.2 使用函数式接口来传递行为"></a>3.3.2 使用函数式接口来传递行为</h3><p>前面提到过， Lambda  仅可用于上下文是函数式接口的情况。因此需要创建一个能匹配 <code>BufferedReader -&gt; String</code>，还可以抛出 <code>IOException</code> 异常的接口。暂且称此接口为 <code>BufferedReaderProcessor</code>。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">BufferedReaderProcessor</span> </span>&#123;</span><br><span class="line">    <span class="function">String <span class="title">process</span><span class="params">(BufferedReader b)</span> <span class="keyword">throws</span> IOException</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接下来就可以把这个接口作为新的 <code>processFile</code> 方法的参数了：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">processFile</span><span class="params">(BufferedReaderProcessor p)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-3-3-执行一个行为"><a href="#3-3-3-执行一个行为" class="headerlink" title="3.3.3 执行一个行为"></a>3.3.3 执行一个行为</h3><p>任何 <code>BufferedReader -&gt; String</code> 形式的 <code>Lambda</code> 都可以作为参数来传递，因为它们符合 <code>BufferedReaderProcessor</code> 接口中定义的 <code>process</code> 方法的签名。</p>
+<p> Lambda  表达式允许直接内联，为函数式接口的抽象方法提供实现，并且将整个表达式作为函数式接口的一个实例。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">processFile</span><span class="params">(BufferedReaderProcessor p)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> (BufferedReader br = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> FileReader(<span class="string">"data.json"</span>))) &#123;</span><br><span class="line">        <span class="keyword">return</span> p.process(br);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-3-4-传递-Lambda"><a href="#3-3-4-传递-Lambda" class="headerlink" title="3.3.4 传递  Lambda"></a>3.3.4 传递  Lambda</h3><p>接下来就可以通过传递不同的 <code>Lambda</code> 重用 <code>processFile</code> 方法，并以不同的方式处理文件了。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 处理一行</span></span><br><span class="line">String oneLine = processFile((BufferedReader br) -&gt; br.readLine());</span><br><span class="line"><span class="comment">// 处理两行</span></span><br><span class="line">String twoLines = processFile((BufferedReader br) -&gt; br.readLine() + br.readLine());</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-4-使用函数式接口"><a href="#3-4-使用函数式接口" class="headerlink" title="3.4 使用函数式接口"></a>3.4 使用函数式接口</h2><p>函数式接口定义且只定义了一个抽象方法。函数式接口很有用，因为抽象方法的签名可以描述 Lambda 表达式的签名。函数式接口的抽象方法的签名称为<strong>函数描述符</strong>。</p>
+<h3 id="3-4-1-Predicate"><a href="#3-4-1-Predicate" class="headerlink" title="3.4.1 Predicate"></a>3.4.1 <strong>Predicate</strong></h3><p><code>java.util.function.Predicate&lt;T&gt;</code> 接口定义了一个名叫 test 的抽象方法，它接受泛型 T 对象，并返回一个 boolean。在需要表示一个涉及类型 T 的布尔表达式时，就可以使用这个接口。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Predicate</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">test</span><span class="params">(T t)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> &lt;T&gt; <span class="function">List&lt;T&gt; <span class="title">filter</span><span class="params">(List&lt;T&gt; list, Predicate&lt;T&gt; predicate)</span> </span>&#123;</span><br><span class="line">    List&lt;T&gt; res = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span> (T t : list) &#123;</span><br><span class="line">        <span class="keyword">if</span> (predicate.test(t))</span><br><span class="line">            res.add(t);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Predicate&lt;String&gt; nonEmptyStringPredicate = (String s) -&gt; !s.isEmpty();</span><br><span class="line">List&lt;String&gt; nonEmpty = filter(listOfStrings, nonEmptyStringPredicate);</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-4-2-Consumer"><a href="#3-4-2-Consumer" class="headerlink" title="3.4.2 Consumer"></a>3.4.2 <strong>Consumer</strong></h3><p><code>java.util.function.Consumer&lt;T&gt;</code> 定义了一个名叫 accept 的抽象方法，它接受泛型 T 的对象，没有返回(void)。如果需要访问类型 T 的对象，并对其执行某些操作，可以使用这个接口。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Consumer</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">accept</span><span class="params">(T t)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> &lt;T&gt; <span class="function"><span class="keyword">void</span> <span class="title">forEach</span><span class="params">(List&lt;T&gt; list, Consumer&lt;T&gt; consumer)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (T t : list) &#123;</span><br><span class="line">        c.accept(t);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">forEach(Arrays.asList(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>), (Integer i) -&gt; System.out.println(i));</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-4-3-Function"><a href="#3-4-3-Function" class="headerlink" title="3.4.3 Function"></a>3.4.3 <strong>Function</strong></h3><p><code>java.util.function.Function&lt;T, R&gt;</code> 接口定义了一个叫作 apply 的方法，它接受一个泛型 T 的对象，并返回一个泛型 R 的对象。如果需要定义一个 Lambda ，将输入对象的信息映射到输出，可以使用这个接口。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Function</span>&lt;<span class="title">T</span>, <span class="title">R</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function">R <span class="title">apply</span><span class="params">(T t)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> &lt;T, R&gt; <span class="function">List&lt;R&gt; <span class="title">map</span><span class="params">(List&lt;T&gt; list, Function&lt;T, R&gt; function)</span> </span>&#123;</span><br><span class="line">    List&lt;R&gt; res = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span> (T t : list) &#123;</span><br><span class="line">        res.add(function.apply(t));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">List&lt;Integer&gt; res = map(Arrays.asList(<span class="string">" Lambda s"</span>,<span class="string">"in"</span>,<span class="string">"action"</span>), (String s) -&gt; s.length());</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-4-4-原始类型特化"><a href="#3-4-4-原始类型特化" class="headerlink" title="3.4.4 原始类型特化"></a>3.4.4 原始类型特化</h3><p>Java 类型要么是引用类型(比如 Byte、Integer、Object、List)，要么是原始类型(比如 int、double、byte、char)。但是泛型(比如 <code>Consumer&lt;T&gt;</code> 中的 T)只能绑定到引用类型。这是由泛型内部的实现方式造成的。</p>
+<ul>
+<li>自动装箱：将原始类型转换为对应的引用类型。</li>
+<li>自动拆箱：将引用类型转换为对应的原始类型。</li>
+</ul>
+<p>但这在性能方面是要付出代价的。装箱后的值本质上就是把原始类型包裹起来，并保存在堆（Heap）里。因此，装箱后的值需要更多的内存，并需要额外的内存搜索来获取被包裹的原始值。</p>
+<p>Java 8 为前面所说的函数式接口带来了一个专门的版本，以便在输入和输出都是原始类型时避免自动装箱的操作。</p>
+<p>比如，在下面的代码中，使用 IntPredicate 就避免了对值 1000 进行装箱操作，但要是用 <code>Predicate&lt;Integer&gt;</code> 就会把参数 1000 装箱到一个 Integer 对象中：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IntPredicate</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">test</span><span class="params">(<span class="keyword">int</span> t)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">IntPredicate evenNumbers = (<span class="keyword">int</span> i) -&gt; i % <span class="number">2</span> == <span class="number">0</span>;</span><br><span class="line">evenNumbers.test(<span class="number">1000</span>); <span class="comment">// true，无装箱操作。</span></span><br><span class="line"></span><br><span class="line">Predicate&lt;Integer&gt; oddNumbers = (Integer i) -&gt; i % <span class="number">2</span> == <span class="number">1</span>;</span><br><span class="line">oddNumbers.test(<span class="number">1000</span>); <span class="comment">// false, 装箱。</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>一般来说，针对专门的输入参数类型的函数式接口的名称都要加上对应的原始类型前缀，比如 DoublePredicate、IntConsumer、LongBinaryOperator、IntFunction等。Function 接口还有针对输出参数类型的变种：ToIntFunction<T>、IntToDoubleFunction等。</p>
+</blockquote>
+<p>Java 8 中常用的函数式接口。</p>
+<table>
+<thead>
+<tr>
+<th align="center">函数式接口</th>
+<th align="center">函数描述符</th>
+<th align="center">原始类型特化</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">占位</td>
+<td align="center">占位</td>
+<td align="center">占位</td>
+</tr>
+</tbody></table>
+<p>任何函数式接口都不允许抛出受检异常(checked exception)。如果需要 Lambda 表达式来抛出异常，有两种办法：</p>
+<ul>
+<li>定义一个自己的函数式接口，并声明受检异常。</li>
+<li>或者把 Lambda 包在一个 <code>try/catch</code> 块中。</li>
+</ul>
+<h2 id="3-5-类型检查、类型推断以及限制"><a href="#3-5-类型检查、类型推断以及限制" class="headerlink" title="3.5 类型检查、类型推断以及限制"></a>3.5 类型检查、类型推断以及限制</h2><p> Lambda 表达式时，说它可以为函数式接口生成一个实例。然而， Lambda  表达式本身并不包含它在实现哪个函数式接口的信息。为了全面了解 Lambda 表达式，你应该知 道 Lambda 的实际类型是什么。</p>
+<h3 id="3-5-1-类型检查"><a href="#3-5-1-类型检查" class="headerlink" title="3.5.1 类型检查"></a>3.5.1 类型检查</h3><p> Lambda  的类型是从使用 Lambda 的上下文推断出来的。上下文中 Lambda 表达式需要的类型称为<strong>目标类型</strong>。下图概述了下列代码的类型检查过程。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;Apple&gt; heavierThan150g = filter(inventory, (Apple a) -&gt; a.getWeight() &gt; <span class="number">150</span>);</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://tva1.sinaimg.cn/large/008eGmZEly1gn4op78nrdj314j0u0jx6.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/008eGmZEly1gn4op78nrdj314j0u0jx6.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="类型检查"></p>
+<h3 id="3-5-2-相同-Lambda-，不同函数式接口。"><a href="#3-5-2-相同-Lambda-，不同函数式接口。" class="headerlink" title="3.5.2 相同  Lambda ，不同函数式接口。"></a>3.5.2 相同  Lambda ，不同函数式接口。</h3><p>有了目标类型的概念，同一个 Lambda 表达式就可以与不同的函数式接口联系起来，只要它们的抽象方法签名能够兼容。比如，</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Callable&lt;Integer&gt; c = () -&gt; <span class="number">42</span>;</span><br><span class="line">PrivilegedAction&lt;Integer&gt; p = () -&gt; <span class="number">42</span>;</span><br></pre></td></tr></table></figure>
+
+<p>它们都代表着什么也不接受且返回一个泛型 T 的函数。</p>
+<blockquote>
+<p>特殊的 void 兼容规则</p>
+<p>如果一个 Lambda 的主体是一个语句表达式， 它就和一个返回 void 的函数描述符兼容(当然需要参数列表也兼容)。</p>
+</blockquote>
+<h3 id="3-5-3-类型推断"><a href="#3-5-3-类型推断" class="headerlink" title="3.5.3 类型推断"></a>3.5.3 类型推断</h3><p>Java 编译器会从上下文（目标类型）推断出用什么函数式接口来配合 Lambda 表达式，这意味着它也可以推断出适合 Lambda 的签名，因为<strong>函数描述符</strong>可以通过目标类型来得到。这样做的好处在于，编译器可以了解 Lambda 表达式的参数类型，这样就可以在 Lambda 语法中省去标注参数类型。比如：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 显示参数类型</span></span><br><span class="line">Comparator&lt;Apple&gt; c = (Apple a1, Apple a2) -&gt; a1.getWeight().compareTo(a2.getWeight());</span><br><span class="line"><span class="comment">// 类型推断，从 Comparator 的泛型类型推断出 a1, a2 的类型。</span></span><br><span class="line">Comparator&lt;Apple&gt; c = (a1, a2) -&gt; a1.getWeight().compareTo(a2.getWeight());</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-5-4-使用局部变量"><a href="#3-5-4-使用局部变量" class="headerlink" title="3.5.4 使用局部变量"></a>3.5.4 使用局部变量</h3><p>迄今为止所介绍的所有 Lambda 表达式都只用到了其主体里面的参数。但 Lambda 表达式也允许使用自由变量(不是参数，而是在外层作用域中定义的变量)，就像匿名类一样。 它们被称作捕获 Lambda 。比如：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> portNumber = <span class="number">1337</span>;</span><br><span class="line">Runnable r = () -&gt; System.out.println(portNumber);</span><br></pre></td></tr></table></figure>
+
+<p> Lambda 可以没有限制地捕获实例变量和静态变量。但局部变量必须显式声明为 final， 或事实上是 final。换句话说， Lambda 表达式只能捕获指派给它们的局部变量一次。(注:捕获实例变量可以被看作捕获最终局部变量 this。)</p>
+<p>实例变量都存储在堆中，而局部变量则保存在栈上。</p>
+<blockquote>
+<p>闭包</p>
+<p>闭包就是一个函数的实例，且它可以无限制地访问那个函数的非本地变量。闭包可以作为参数传递给另一个函数。它也可以访问和修改其作用域之外的变量。现在，Java 8 的 Lambda 和匿名类可以做类似于闭包的事情：它们可以作为参数传递给方法，并且可以访问其作用域之外的变量。但有一个限制：它们不能修改定义 Lambda 的方法的局部变量的内容。这些变量必须是隐式最终的。可以认为 Lambda 是对值封闭，而不是对变量封闭。</p>
+</blockquote>
+<h2 id="3-6-方法引用"><a href="#3-6-方法引用" class="headerlink" title="3.6 方法引用"></a>3.6 方法引用</h2><p>方法引用允许重复使用现有的方法定义，并像 Lambda 一样传递它们。在一些情况下， 比起使用 Lambda 表达式，它们更易读，也更自然。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//  Lambda </span></span><br><span class="line">inventory.sort((Apple a1, Apple a2) -&gt; a1.getWeight().compareTo(a2.getWeight()));</span><br><span class="line"><span class="comment">// Method Reference</span></span><br><span class="line">inventory.sort(comparing(Apple::getWeight));</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-6-1-管中窥豹"><a href="#3-6-1-管中窥豹" class="headerlink" title="3.6.1 管中窥豹"></a>3.6.1 管中窥豹</h3><p>方法引用可以被看作仅仅调用特定方法的 Lambda 的一种快捷写法。它的基本思想是，如果一个 Lambda 代表的只是“直接调用这个方法”，那最好还是用名称来调用它，而不是去描述如何调用它。事实上，方法引用就是根据已有的方法实现来创建  Lambda 表达式。但是，显式地指明方法的名称，代码的可读性会更好。</p>
+<p>当需要使用方法引用时，目标引用放在分隔符 <code>::</code> 前，方法名称放在后面（不需要括号，因为并没有实际调用这个方法）。可以把方法引用看作针对仅仅涉及单一方法的 Lambda 的语法糖。</p>
+<p> Lambda 及其等效方法引用的例子。</p>
+<table>
+<thead>
+<tr>
+<th align="center">Lambda</th>
+<th align="center">等效的方法引用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>(Apple a) -&gt; a.getWeight()</code></td>
+<td align="center"><code>Apple::getWeight</code></td>
+</tr>
+<tr>
+<td align="center"><code>() -&gt; Thread.currentThread().dumpStack()</code></td>
+<td align="center"><code>Thread.currentThread()::dumpStack</code></td>
+</tr>
+<tr>
+<td align="center"><code>(str, i) -&gt; str.substring(i)</code></td>
+<td align="center"><code>String::substring</code></td>
+</tr>
+<tr>
+<td align="center"><code>(String s) -&gt; System.out.println(s)</code></td>
+<td align="center"><code>System.out::println</code></td>
+</tr>
+</tbody></table>
+<p>方法引用主要有三类。</p>
+<ul>
+<li>指向静态方法的方法引用(例如 Integer 的 parseInt 方法，写作 <code>Integer::parseInt</code>)。</li>
+<li>指向任意类型实例方法的方法引用(例如 String 的 length 方法，写作 <code>String::length</code>)。</li>
+<li>指向现有对象的实例方法的方法引用(假设有一个局部变量 expensiveTransaction 用于存放 Transaction 类型的对象，它支持实例方法 getValue，那么可以写 <code>expensiveTransaction::getValue</code>)。</li>
+</ul>
+<p>依照一些简单的方法，可以将 Lambda 表达式重构为等价的方法引用。</p>
+<p><img src="https://tva1.sinaimg.cn/large/008eGmZEly1gn4q71ugmgj31320o841q.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/008eGmZEly1gn4q71ugmgj31320o841q.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="image-20210129180852801"></p>
+<h3 id="3-6-2-构造函数引用"><a href="#3-6-2-构造函数引用" class="headerlink" title="3.6.2 构造函数引用"></a>3.6.2 构造函数引用</h3><p>对于一个现有构造函数，可以利用它的名称和关键字 <code>new</code> 来创建它的一个引用：<code>ClassName::new</code>。它的功能与指向静态方法的引用类似。例如，假设有一个构造函数没有参数。 它适合 Supplier 的签名 <code>() -&gt; Apple</code>。可以这样做：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 构造函数引用指向默认的 Apple() 构造函数</span></span><br><span class="line">Supplier&lt;Apple&gt; c1 = Apple::<span class="keyword">new</span>; <span class="comment">// 等价于 Supplier&lt;Apple&gt; c1 = () -&gt; new Apple();</span></span><br><span class="line"><span class="comment">// 调用 Supplier 的 get 方法 将产生一个新的 Apple。</span></span><br><span class="line">Apple a1 = c1.get();</span><br></pre></td></tr></table></figure>
+
+<p>如果构造函数的签名是 <code>Apple(Integer weight)</code>，那么它就适合 Function 接口的签名，于是可以这样写：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 等价于 Function&lt;Integer, Apple&gt; c2 = (weight) -&gt; new Apple(weight);</span></span><br><span class="line">Function&lt;Integer, Apple&gt; c2 = Apple::<span class="keyword">new</span>;</span><br><span class="line">Apple a2 = c2.apply(<span class="number">110</span>);</span><br></pre></td></tr></table></figure>
+
+<p>如果构造函数具有两个参数，签名是 <code>Apple(String color, Integer weight)</code>，它适合 BiFunction 接口的签名，于是可以这样写：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 等价于 BiFunction&lt;String, Integer, Apple&gt; c3 = (color, weight) -&gt; new Apple(color, weight);</span></span><br><span class="line">BiFunction&lt;String, Integer, Apple&gt; c3 = Apple::<span class="keyword">new</span>;</span><br><span class="line">Apple c3 = c3.apply(<span class="string">"green"</span>, <span class="number">110</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-7-Lambda-和方法引用实战"><a href="#3-7-Lambda-和方法引用实战" class="headerlink" title="3.7 Lambda 和方法引用实战"></a>3.7 Lambda 和方法引用实战</h2><blockquote>
+<p>用不同的排序策略给一个 Apple 列表排序，并需要展示如何把一个原始粗暴的解决方案转变得更为简明。</p>
+</blockquote>
+<p>最后结果：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">inventory.sort(comparing(Apple::getWeight));</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-8-复合方法"><a href="#3-8-复合方法" class="headerlink" title="3.8 复合方法"></a>3.8 复合方法</h2><p>可以把多个简单的 Lambda 复合成复杂的表达式。可以让两个谓词之间做一个 or 操作，组合成一个更大的谓词，还可以让一个函数的结果成为另一个函数的输入。</p>
+<h3 id="3-8-1-比较器复合"><a href="#3-8-1-比较器复合" class="headerlink" title="3.8.1 比较器复合"></a>3.8.1 比较器复合</h3><p>可以使用静态方法 <code>Comparator.comparing</code>，根据提取用于比较的键值的 Function 来返回一个 Comparator，如下所示：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 原始</span></span><br><span class="line">Comparator&lt;Apple&gt; c = Comparator.comparing(Apple::getWeight);</span><br><span class="line"><span class="comment">// 逆序</span></span><br><span class="line">inventory.sort(comparing(Apple::getWeight).reversed());</span><br><span class="line"><span class="comment">// 比较器链。在按重量比较两个苹果之后，按原产国排序。</span></span><br><span class="line">inventory.sort(comparing(Apple::getWeight).reversed().thenComparing(Apple::getCountry));</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-8-2-谓词复合"><a href="#3-8-2-谓词复合" class="headerlink" title="3.8.2 谓词复合"></a>3.8.2 谓词复合</h3><p>谓词接口包括三个方法：negate、and 和 or，可以重用已有的 Predicate 来创建更杂的谓词。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Predicate&lt;Apple&gt; notRedApple = redApple.negate(); <span class="comment">// 苹果不是红的</span></span><br><span class="line"><span class="comment">// 链接两个谓词来生成另一个 Predicate 对象</span></span><br><span class="line">Predicate&lt;Apple&gt; redAndHeavyApple = redApple.and(a -&gt; a.getWeight() &gt; <span class="number">150</span>);</span><br><span class="line"><span class="comment">// </span></span><br><span class="line">Predicate&lt;Apple&gt; redAndHeavyAppleOrGreen = redApple.and(a -&gt; a.getWeight() &gt; <span class="number">150</span>).or(a -&gt; <span class="string">"green"</span>.equals(a.getColor()));</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-8-3-函数复合"><a href="#3-8-3-函数复合" class="headerlink" title="3.8.3 函数复合"></a>3.8.3 函数复合</h3><p>可以把 Function 接口所代表的 Lambda 表达式复合起来。Function 接口为此配了 andThen 和 compose 两个默认方法，它们都会返回 Function 的一个实例。</p>
+<ul>
+<li><code>andThen</code>：先对输入应用一个给定函数，再对输出应用另一个函数。意味着 <code>g(f(x))</code>。</li>
+<li><code>compose</code>：先把给定的函数用作 compose 的参数里面给的那个函数，然后再把函数本身用于结果。意味着 <code>f(g(x))</code>。</li>
+</ul>
+<h2 id="3-9-数学中的类似思想"><a href="#3-9-数学中的类似思想" class="headerlink" title="3.9 数学中的类似思想"></a>3.9 数学中的类似思想</h2><h2 id="3-10-小结"><a href="#3-10-小结" class="headerlink" title="3.10 小结"></a>3.10 小结</h2><ul>
+<li>Lambda 表达式可以理解为一种匿名函数:它没有名称，但有参数列表、函数主体、返回类型，可能还有一个可以抛出的异常的列表。</li>
+<li>Lambda 表达式可以简洁地传递代码。</li>
+<li>函数式接口就是仅仅声明了一个抽象方法的接口。</li>
+<li>只有在接受函数式接口的地方才可以使用 Lambda 表达式。</li>
+<li>Lambda 表达式允许直接内联，为函数式接口的抽象方法提供实现，并且将整个表达式作为函数式接口的一个实例。</li>
+<li>Java 8 自带一些常用的函数式接口，放在 <code>java.util.function</code> 包里。</li>
+<li>为了避免装箱操作，对 <code>Predicate&lt;T&gt;</code> 和 <code>Function&lt;T, R&gt;</code> 等通用函数式接口的原始类型特化。</li>
+<li>Lambda 表达式所需要代表的类型称为目标类型。</li>
+<li>方法引用可以重复使用现有的方法实现并直接传递它们。</li>
+<li>Comparator、Predicate 和 Function 等函数式接口都有几个可以用来结合 Lambda 表达式的默认方法。</li>
+</ul>
+]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
+      <tags>
+        <tag>Java8</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>TCP的运输连接管理</title>
-    <url>/2020/08/26/2020-08-26-Network-TCPAndUDP/</url>
+    <url>/2020/08/26/2020-08-26-Network-TCPANDUDP/</url>
     <content><![CDATA[<h2 id="TCP的运输连接管理"><a href="#TCP的运输连接管理" class="headerlink" title="TCP的运输连接管理"></a>TCP的运输连接管理</h2><p>TCP 是面向连接的协议，运输连接是用来传送 TCP 报文的。TCP 运输连接的建立和释放是每一次面向连接的通信中必不可少的过程。因此，运输连接就有三个阶段，即：连接建立、数据传送和连接释放。运输连接的管理就是使运输连接的建立和释放都能正常地进行。</p>
 <p>在TCP连接建立过程中要解决以下三个问题:</p>
 <ul>
@@ -2844,7 +3908,6 @@
     <title>AQS源码笔记</title>
     <url>/2020/07/10/2020-07-10-Java-AQS/</url>
     <content><![CDATA[<h1 id="AQS源码笔记"><a href="#AQS源码笔记" class="headerlink" title="AQS源码笔记"></a>AQS源码笔记</h1><p><code>AQS</code>全称是 <code>AbstractQueuedSynchronizer</code>，顾名思义，是一个用来构建锁和同步器的框架，它底层用了 <code>CAS</code>来保证操作的原子性，同时利用 <code>FIFO</code>队列实现线程间的锁竞争，将基础的同步相关抽象细节放在 <code>AQS</code>，这也是 <code>ReentrantLock</code>、<code>CountDownLatch</code>以及其他众多同步工具实现同步的底层实现机制。</p>
-<p><img src="https://i.loli.net/2020/07/11/GAxf3VBR86khFZM.png" class="lazyload" data-srcset="https://i.loli.net/2020/07/11/GAxf3VBR86khFZM.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="AQS继承关系图"></p>
 <p><code>AQS</code>是抽象类，并不能直接实例化，当需要使用<code>AQS</code>的时候需要继承<code>AQS</code>抽象类并且重写指定的方法，这些重写方法包括<strong>线程获取资源和释放资源的方式</strong>(如<code>ReentractLock</code>通过分别重写线程获取和释放资源的方式实现了<strong>公平锁</strong>和<strong>非公平锁</strong>)，<strong>同时子类还需要负责共享变量<code>state</code>的维护，如当<code>state = 0</code>时表示该锁没有被占，大于 $0$ 时候代表该锁被一个或多个线程占领(重入锁)</strong>，而队列的维护(获取资源失败入队、线程唤醒、线程的状态等)不需要我们考虑，<code>AQS</code>已经帮我们实现好了。<code>AQS</code>的这种设计模式采用的正是<strong>模板方法模式</strong>。</p>
 <p>继承了<code>AQS</code>的子类的主要任务包括：</p>
 <ul>
@@ -4356,7 +5419,7 @@
 <h2 id="致谢"><a href="#致谢" class="headerlink" title="致谢"></a>致谢</h2><blockquote>
 <p>Credits are <a href="https://leetcode-cn.com/u/jyd/" target="_blank" rel="noopener">Krahets</a> ‘s!</p>
 </blockquote>
-<p>此中题解大部分出自 <a href="https://leetcode-cn.com/u/jyd/" target="_blank" rel="noopener">LeetCode-Krahets</a>，大佬博客 <a href="https://krahets.gitee.io" target="_blank" rel="noopener">Krahets’s Blog</a>。</p>
+<p>此中题解大部分出自 <a href="https://leetcode-cn.com/u/jyd/" target="_blank" rel="noopener">$LeetCode-Krahets$</a>，大佬博客 <a href="https://krahets.gitee.io" target="_blank" rel="noopener">$Krahets’s Blog$</a>。</p>
 <p>第一次看到大佬的题解时就有一种赏心悦目的感觉，排版精良，一丝不苟，哪怕只是一个再寻常不过的数字 $0$ 都会用 $LaTex$ 所修饰。毕竟，态度决定高度，细节决定成败。</p>
 <p>本文中仍然存在很多问题，包括但不限于排版风格尚未完全统一、中英文标点符号不恰当、汉字错误、部分数学内容没有被 $LaTex$ 所渲染，以后将会逐渐完善。</p>
 <p>可以说，如果不是这位大佬严谨细致题解，我很难坚持把 $LeetCode$ 上《剑指 $Offer$》系列题目看一遍。每当有题目没有头绪时，习惯性地在题解中寻找大佬的头像，阅读完后总有一种醍醐灌顶的感觉，感慨：山重水复疑无路，柳暗花明又一村。</p>
@@ -4421,7 +5484,7 @@
 <li>时间复杂度: $O(rows+cols)$。</li>
 <li>空间复杂度: $O(1)$。</li>
 </ul>
-<h2 id="5-替换空格"><a href="#5-替换空格" class="headerlink" title="5. 替换空格"></a><a href="https://leetcode-cn.com/problems/ti-huan-kong-ge-lcof/" target="_blank" rel="noopener">5. 替换空格</a></h2><h3 id="题目描述-2"><a href="#题目描述-2" class="headerlink" title="题目描述"></a>题目描述</h3><p>将一个字符串中的空格替换成 “%20”。</p>
+<h2 id="5-替换空格"><a href="#5-替换空格" class="headerlink" title="5. 替换空格"></a><a href="https://leetcode-cn.com/problems/ti-huan-kong-ge-lcof/" target="_blank" rel="noopener">5. 替换空格</a></h2><h3 id="题目描述-2"><a href="#题目描述-2" class="headerlink" title="题目描述"></a>题目描述</h3><p>将一个字符串中的空格替换成 <code>&quot;%20&quot;</code>。</p>
 <figure class="highlight avrasm"><table><tr><td class="code"><pre><span class="line"><span class="symbol">Input:</span></span><br><span class="line"><span class="string">"A B"</span></span><br><span class="line"></span><br><span class="line"><span class="symbol">Output:</span></span><br><span class="line"><span class="string">"A%20B"</span></span><br></pre></td></tr></table></figure>
 
 <h3 id="Solution-1-“倒排索引”"><a href="#Solution-1-“倒排索引”" class="headerlink" title="Solution 1 - “倒排索引”"></a>Solution 1 - “倒排索引”</h3><p>① 在字符串尾部填充任意字符，使得字符串的长度等于替换之后的长度。因为一个空格要替换成三个字符（<code>%20</code>），所以当遍历到一个空格时，需要在尾部填充两个任意字符。</p>
@@ -4878,10 +5941,11 @@
 <li>时间复杂度：$O(\log_2 M)$，其中 $M$ 代表输入数字 $n$ 中最高位 $1$ 的位置，例如输入 $16$，则 $16_{10}=1111_2$，那么 $M = log_2 16 = 4$。</li>
 <li>空间复杂度： $O(1)$。</li>
 </ul>
-<h3 id="Solution-3-JDK"><a href="#Solution-3-JDK" class="headerlink" title="Solution 3 - JDK"></a>Solution 3 - JDK</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">NumberOf1</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> Integer.bitCount(n);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Solution-3-JDK"><a href="#Solution-3-JDK" class="headerlink" title="Solution 3 - JDK"></a>Solution 3 - JDK</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hammingWeight</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> Integer.bitCount(n);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id="16-数值的整数次方"><a href="#16-数值的整数次方" class="headerlink" title="16. 数值的整数次方"></a><a href="https://leetcode-cn.com/problems/shu-zhi-de-zheng-shu-ci-fang-lcof/" target="_blank" rel="noopener">16. 数值的整数次方</a></h2><h3 id="题目描述-15"><a href="#题目描述-15" class="headerlink" title="题目描述"></a>题目描述</h3><p>给定一个 $double$ 类型的浮点数 $base$ 和 $int$ 类型的整数 $exponent$。求 $base$ 的 $exponent$ 次方。保证 $base$ 和 $exponent$ 不同时为 $0$。不得使用库函数，同时不需要考虑大数问题。</p>
-<h3 id="Solution-1-快速幂"><a href="#Solution-1-快速幂" class="headerlink" title="Solution 1 - 快速幂"></a>Solution 1 - 快速幂</h3><p><strong>二进制角度</strong></p>
+<h3 id="Solution-快速幂"><a href="#Solution-快速幂" class="headerlink" title="Solution - 快速幂"></a>Solution - 快速幂</h3><p><strong>二进制角度</strong></p>
+<p>设 $x=base, n=exponent$。</p>
 <ul>
 <li>十进制整数 $n$ 可以表示为二进制的 $b_m\dots b_3b_2b_1$ ，则有<ul>
 <li><strong>二进制转十进制：</strong> $n=1b_1+2b_2+4b_3+\cdots+2^{m-1}b_m$</li>
@@ -4889,8 +5953,8 @@
 </ul>
 </li>
 <li>因此，根据以上操作，可在循环中计算 $x^{2^0b_1},x^{2^1b_2},\dots,x^{2^{m-1}b_m}$ 的值，并将所有 $x^{2^{i-1}b_i}$ 累积相乘即可。<ul>
-<li>当 $b_i=0$ 时， $x^{2{i-1}}b_i=1$</li>
-<li>当 $b_i=1$ 时， $x^{2{i-1}}b_i=x^{2^{i-1}}$</li>
+<li>当 $b_i=0$ 时， $x^{2{i-1}}b_i=1$。</li>
+<li>当 $b_i=1$ 时， $x^{2{i-1}}b_i=x^{2^{i-1}}$。</li>
 </ul>
 </li>
 </ul>
@@ -4914,16 +5978,6 @@
 <li>时间复杂度：$O(\log_2n)$，二分的时间复杂度为对数级别。</li>
 <li>时间复杂度：$O(1)$，有限个变量。</li>
 </ul>
-<h3 id="Solution-2-二分法"><a href="#Solution-2-二分法" class="headerlink" title="Solution 2 - 二分法"></a>Solution 2 - 二分法</h3><p>设 $x=base, n=exponent$.<br>$$<br>x^n=<br>\begin{cases}<br>x^{\frac{n}{2}}·x^{\frac{n}{2}}, &amp; n%2=0\<br>x·x^{\frac{n}{2}}·x^{\frac{n}{2}}, &amp; n%2=1<br>\end{cases}<br>$$<br>既然有数学上的<strong>递推式</strong>，那么在算法上就可以采用<strong>递归</strong>的形式。</p>
-<ul>
-<li>底数为 $0$ ：指数只能为正数，且结果均为 $0$。</li>
-<li>指数为 $0$：结果均为 $1$。</li>
-<li>底数不为 $0$：指数可以为任意正整数，$0$，或者负整数，且如果底数相同，指数互为相反数，则所得的结果互为倒数。</li>
-<li>如果指数为偶数的话，最后结果一定是非负数，如果指数为奇数的话，最后的正负性由多余的 $x$ 决定。</li>
-<li>还要注意正数与负数在计算机中 $/2$， $1/2=0, -1/2=-1$。</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 牛客通过,力扣失败,说明此算法是错误的.</span></span><br><span class="line"><span class="comment">* 待修改</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">double</span> <span class="title">myPow</span><span class="params">(<span class="keyword">double</span> base, <span class="keyword">int</span> exponent)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (base == <span class="number">0</span> &amp;&amp; exponent &gt; <span class="number">0</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    <span class="comment">// 底数为 0， 指数为负数的话会出现 除数为 0</span></span><br><span class="line">    <span class="keyword">if</span> (base == <span class="number">1</span>) <span class="keyword">return</span> base;</span><br><span class="line">    <span class="keyword">if</span> (exponent == <span class="number">0</span>) <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">int</span> absExponent = Math.abs(exponent);</span><br><span class="line">    <span class="keyword">double</span> result = myPow(base * base, absExponent / <span class="number">2</span>);</span><br><span class="line">    <span class="comment">// 不能用 exponent % 2 == 1来判断，因为还存在取余为 -1 的情况</span></span><br><span class="line">    <span class="keyword">if</span> (exponent % <span class="number">2</span> != <span class="number">0</span>) result = base * result;</span><br><span class="line">    <span class="keyword">return</span> exponent &gt;= <span class="number">0</span> ? result : <span class="number">1</span> / result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <h2 id="17-打印从1到最大的n位数"><a href="#17-打印从1到最大的n位数" class="headerlink" title="17. 打印从1到最大的n位数"></a><a href="https://leetcode-cn.com/problems/da-yin-cong-1dao-zui-da-de-nwei-shu-lcof/" target="_blank" rel="noopener">17. 打印从1到最大的n位数</a></h2><h3 id="题目描述-16"><a href="#题目描述-16" class="headerlink" title="题目描述"></a>题目描述</h3><p>输入数字 $n$，按顺序打印出从 $1$ 到最大的 $n$ 位十进制数。比如输入 $3$，则打印出 $1、2、3$ 一直到最大的 $3$ 位数 $999$ 。</p>
 <h3 id="Solution-分治算法"><a href="#Solution-分治算法" class="headerlink" title="Solution-分治算法"></a><a href="https://leetcode-cn.com/problems/da-yin-cong-1dao-zui-da-de-nwei-shu-lcof/solution/mian-shi-ti-17-da-yin-cong-1-dao-zui-da-de-n-wei-2/" target="_blank" rel="noopener">Solution-分治算法</a></h3><p>根据题目要求，需要考虑两个问题：</p>
 <ul>
@@ -9411,437 +10465,640 @@
   <entry>
     <title>好看又精良的美剧以及图书</title>
     <url>/2020/03/21/2020-03-21-Life-BooksAndMovies/</url>
-    <content><![CDATA[<h3 id="休闲一刻"><a href="#休闲一刻" class="headerlink" title="休闲一刻"></a>休闲一刻</h3><p>从高二起看过的美剧，最初的目的是因为追剧太多，记不清哪部剧看到哪一集，所以用表格记录一下。</p>
-<p>其中诸如《$The \ Bigbang \ Theory$》、《$Game \ of \ Thrones$》以及《$Breaking \ Bad$》、《$House \ of \ Cards$》和许多其他作品已经都看过多遍，经典无法复制。</p>
-<p>电影忘记记录了。</p>
-<table>
+    <content><![CDATA[<h3 id="休闲一刻"><a href="#休闲一刻" class="headerlink" title="休闲一刻"></a>休闲一刻</h3><table>
 <thead>
 <tr>
-<th align="center">中文译名</th>
-<th align="center">Original Name</th>
-<th align="center">Season</th>
-<th align="center">Episode</th>
+<th align="left">中文译名</th>
+<th align="left">英文原名</th>
+<th align="left">Season</th>
+<th align="left">剧集详情</th>
+<th align="left">总剧集</th>
+<th align="left">单集时长(分)</th>
 </tr>
 </thead>
 <tbody><tr>
-<td align="center">《吸血鬼日记》</td>
-<td align="center">《The Vampire Diaries 》</td>
-<td align="center">8</td>
-<td align="center">22$\times$7+16=170</td>
+<td align="left">《吸血鬼日记》</td>
+<td align="left">《The Vampire Diaries》</td>
+<td align="left">八季</td>
+<td align="left">22*7+16</td>
+<td align="left">170</td>
+<td align="left">40</td>
+</tr>
+<tr>
+<td align="left">《初代吸血鬼》</td>
+<td align="left">《The Originals》</td>
+<td align="left">五季</td>
+<td align="left">22*3+13*2</td>
+<td align="left">92</td>
+<td align="left">40</td>
+</tr>
+<tr>
+<td align="left">《吸血鬼后裔》</td>
+<td align="left">《Legacies》</td>
+<td align="left">一季</td>
+<td align="left">13</td>
+<td align="left">13</td>
+<td align="left">40</td>
+</tr>
+<tr>
+<td align="left">《绝命毒师》</td>
+<td align="left">《Breaking Bad》</td>
+<td align="left">五季</td>
+<td align="left">7+13+13+13+16</td>
+<td align="left">62</td>
+<td align="left">60</td>
+</tr>
+<tr>
+<td align="left">《唐顿庄园》</td>
+<td align="left">《Downton Abbey》</td>
+<td align="left">六季</td>
+<td align="left">8*6</td>
+<td align="left">48</td>
+<td align="left">60</td>
+</tr>
+<tr>
+<td align="left">《权力的游戏》</td>
+<td align="left">《Game of Thrones》</td>
+<td align="left">八季</td>
+<td align="left">10*6+7+6</td>
+<td align="left">73</td>
+<td align="left">60</td>
+</tr>
+<tr>
+<td align="left">《夜班经理》</td>
+<td align="left">《The Night Manager》</td>
+<td align="left">一季</td>
+<td align="left">6</td>
+<td align="left">6</td>
+<td align="left">40</td>
+</tr>
+<tr>
+<td align="left">《杀戮一代》</td>
+<td align="left">《Generation Kill》</td>
+<td align="left">一季</td>
+<td align="left">7</td>
+<td align="left">7</td>
+<td align="left">40</td>
+</tr>
+<tr>
+<td align="left">《纸牌屋》</td>
+<td align="left">《House of Cards》</td>
+<td align="left">六季</td>
+<td align="left">13*5+8</td>
+<td align="left">73</td>
+<td align="left">50</td>
+</tr>
+<tr>
+<td align="left">《斯巴达克斯》</td>
+<td align="left">《Spartacus》</td>
+<td align="left">三季</td>
+<td align="left">10*3</td>
+<td align="left">30</td>
+<td align="left">50</td>
+</tr>
+<tr>
+<td align="left">《太平洋战争》</td>
+<td align="left">《The Pacific》</td>
+<td align="left">一季</td>
+<td align="left">10</td>
+<td align="left">10</td>
+<td align="left">50</td>
+</tr>
+<tr>
+<td align="left">《汉尼拔》</td>
+<td align="left">《Hannibal》</td>
+<td align="left">三季</td>
+<td align="left">13*3</td>
+<td align="left">39</td>
+<td align="left">40</td>
+</tr>
+<tr>
+<td align="left">《越狱》</td>
+<td align="left">《Prison Break》</td>
+<td align="left">五季</td>
+<td align="left">22+22+13+22+9</td>
+<td align="left">88</td>
+<td align="left">50</td>
 </tr>
 <tr>
-<td align="center">《初代吸血鬼》</td>
-<td align="center">《The Originals》</td>
-<td align="center">5</td>
-<td align="center">22$\times$3+13$\times$2=92</td>
+<td align="left">《大西洋帝国》</td>
+<td align="left">《The Atlantic City》</td>
+<td align="left">五季</td>
+<td align="left">12*4+8</td>
+<td align="left">56</td>
+<td align="left">40</td>
 </tr>
 <tr>
-<td align="center">《吸血鬼后裔》</td>
-<td align="center">《Legacies》</td>
-<td align="center">1</td>
-<td align="center">13</td>
+<td align="left">《朋友也上床》</td>
+<td align="left">《Friends with Benefits》</td>
+<td align="left">一季</td>
+<td align="left">12</td>
+<td align="left">12</td>
+<td align="left">20</td>
 </tr>
 <tr>
-<td align="center">《权力的游戏》</td>
-<td align="center">《Game of Thrones》</td>
-<td align="center">8</td>
-<td align="center">10$\times$6+7+6=73</td>
+<td align="left">《国土安全》</td>
+<td align="left">《Homeland》</td>
+<td align="left">七季</td>
+<td align="left">12*7</td>
+<td align="left">84</td>
+<td align="left">50</td>
 </tr>
 <tr>
-<td align="center">《猎魔人》</td>
-<td align="center">《The Witcher》</td>
-<td align="center">1</td>
-<td align="center">8</td>
+<td align="left">《神探夏洛克》</td>
+<td align="left">《Sherlock》</td>
+<td align="left">四季</td>
+<td align="left">3*4</td>
+<td align="left">12</td>
+<td align="left">90</td>
 </tr>
 <tr>
-<td align="center">《西部世界》</td>
-<td align="center">《Westworld》</td>
-<td align="center">3</td>
-<td align="center">10$\times$2 + 8</td>
+<td align="left">《狼厅》</td>
+<td align="left">《Wolf Hall》</td>
+<td align="left">一季</td>
+<td align="left">6</td>
+<td align="left">6</td>
+<td align="left">60</td>
 </tr>
 <tr>
-<td align="center">《绝命毒师》</td>
-<td align="center">《Breaking Bad》</td>
-<td align="center">5</td>
-<td align="center">7+13$\times$3+16=62</td>
+<td align="left">《真实的人类》</td>
+<td align="left">《Humans》</td>
+<td align="left">三季</td>
+<td align="left">8*3</td>
+<td align="left">24</td>
+<td align="left">40</td>
 </tr>
 <tr>
-<td align="center">《风骚律师》</td>
-<td align="center">《Better Call Saul》</td>
-<td align="center">5</td>
-<td align="center">10$\times$5</td>
+<td align="left">《清道夫》</td>
+<td align="left">《Ray Donovan》</td>
+<td align="left">五季</td>
+<td align="left">12*5</td>
+<td align="left">60</td>
+<td align="left">40</td>
 </tr>
 <tr>
-<td align="center">《唐顿庄园》</td>
-<td align="center">《Downton Abbey》</td>
-<td align="center">6</td>
-<td align="center">8$\times$6=48</td>
+<td align="left">《王冠》</td>
+<td align="left">《The Crown》</td>
+<td align="left">四季</td>
+<td align="left">10*4</td>
+<td align="left">40</td>
+<td align="left">60</td>
 </tr>
 <tr>
-<td align="center">《夜班经理》</td>
-<td align="center">《The Night Manager》</td>
-<td align="center">1</td>
-<td align="center">6</td>
+<td align="left">《美国犯罪故事》</td>
+<td align="left">《American Crime Story》</td>
+<td align="left">两季</td>
+<td align="left">10+9</td>
+<td align="left">19</td>
+<td align="left">50</td>
 </tr>
 <tr>
-<td align="center">《神探夏洛克》</td>
-<td align="center">《Sherlock》</td>
-<td align="center">4</td>
-<td align="center">3$\times$4=12</td>
+<td align="left">《破产姐妹》</td>
+<td align="left">《2 Broke Girls》</td>
+<td align="left">六季</td>
+<td align="left">22*6</td>
+<td align="left">132</td>
+<td align="left">20</td>
 </tr>
 <tr>
-<td align="center">《狼厅》</td>
-<td align="center">《Wolf Hall》</td>
-<td align="center">1</td>
-<td align="center">6</td>
+<td align="left">《黑镜》</td>
+<td align="left">《Black Mirror》</td>
+<td align="left">五季</td>
+<td align="left">3+4+6+6+3</td>
+<td align="left">22</td>
+<td align="left">60</td>
 </tr>
 <tr>
-<td align="center">《王冠》</td>
-<td align="center">《The Crown》</td>
-<td align="center">2</td>
-<td align="center">10$\times$2</td>
+<td align="left">《明日传奇》</td>
+<td align="left">《Legends of Tomorrow》</td>
+<td align="left">两季</td>
+<td align="left">16+17</td>
+<td align="left">33</td>
+<td align="left">40</td>
 </tr>
 <tr>
-<td align="center">《梅尔罗斯》</td>
-<td align="center">《Melrose》</td>
-<td align="center">1</td>
-<td align="center">5</td>
+<td align="left">《超女》</td>
+<td align="left">《Supergirl》</td>
+<td align="left">两季</td>
+<td align="left">22*2</td>
+<td align="left">44</td>
+<td align="left">40</td>
 </tr>
 <tr>
-<td align="center">《名姝》</td>
-<td align="center">《Harlots》</td>
-<td align="center">2</td>
-<td align="center">8$\times$2</td>
+<td align="left">《侍女的故事》</td>
+<td align="left">《The Handmaid’s Tale》</td>
+<td align="left">两季</td>
+<td align="left">10+13</td>
+<td align="left">23</td>
+<td align="left">60</td>
 </tr>
 <tr>
-<td align="center">《杀戮一代》</td>
-<td align="center">《Generation Kill》</td>
-<td align="center">1</td>
-<td align="center">7</td>
+<td align="left">《特工卡特》</td>
+<td align="left">《Agent Carter》</td>
+<td align="left">两季</td>
+<td align="left">8+10</td>
+<td align="left">18</td>
+<td align="left">40</td>
 </tr>
 <tr>
-<td align="center">《太平洋战争》</td>
-<td align="center">《The Pacific》</td>
-<td align="center">1</td>
-<td align="center">10</td>
+<td align="left">《穹顶之下》</td>
+<td align="left">《Under The Dome》</td>
+<td align="left">三季</td>
+<td align="left">13*3</td>
+<td align="left">39</td>
+<td align="left">40</td>
 </tr>
 <tr>
-<td align="center">《斯巴达克斯》</td>
-<td align="center">《Spartacus》</td>
-<td align="center">3</td>
-<td align="center">10$\times$3=3</td>
+<td align="left">《黑名单》</td>
+<td align="left">《The Blacklist》</td>
+<td align="left">一季</td>
+<td align="left">22</td>
+<td align="left">22</td>
+<td align="left">40</td>
 </tr>
 <tr>
-<td align="center">《国土安全》</td>
-<td align="center">《Homeland》</td>
-<td align="center">8</td>
-<td align="center">12$\times$7(Updating)</td>
+<td align="left">《蛇蝎美人》</td>
+<td align="left">《Femme Fatales》</td>
+<td align="left">一季</td>
+<td align="left">13</td>
+<td align="left">13</td>
+<td align="left">20</td>
 </tr>
 <tr>
-<td align="center">《纸牌屋》</td>
-<td align="center">《House of Cards》</td>
-<td align="center">6</td>
-<td align="center">13$\times$5+8=73</td>
+<td align="left">《亿万》</td>
+<td align="left">《Billions》</td>
+<td align="left">五季</td>
+<td align="left">10+12*3+7</td>
+<td align="left">53</td>
+<td align="left">50</td>
 </tr>
 <tr>
-<td align="center">《指定幸存者》</td>
-<td align="center">《Designated Survivor》</td>
-<td align="center">3</td>
-<td align="center">21+22+10</td>
+<td align="left">《绿箭侠》</td>
+<td align="left">《The Arrow》</td>
+<td align="left">七季</td>
+<td align="left">23*7</td>
+<td align="left">161</td>
+<td align="left">40</td>
 </tr>
 <tr>
-<td align="center">《侍女的故事》</td>
-<td align="center">《The Handmaid’s Tale》</td>
-<td align="center">2</td>
-<td align="center">10+13</td>
+<td align="left">《闪电侠》</td>
+<td align="left">《The Flash》</td>
+<td align="left">五季</td>
+<td align="left">23*5</td>
+<td align="left">115</td>
+<td align="left">40</td>
 </tr>
 <tr>
-<td align="center">《真实的人类》</td>
-<td align="center">《Humans》</td>
-<td align="center">3</td>
-<td align="center">8$\times$3</td>
+<td align="left">《神盾局特工》</td>
+<td align="left">《Agents of S.H.I.L.E.D》</td>
+<td align="left">七季</td>
+<td align="left">22*5+13+4</td>
+<td align="left">127</td>
+<td align="left">40</td>
 </tr>
 <tr>
-<td align="center">《黑镜》</td>
-<td align="center">《Black Mirror》</td>
-<td align="center">5</td>
-<td align="center">3+4+6+6+3</td>
+<td align="left">《生活大爆炸》</td>
+<td align="left">《The BigBang Theory》</td>
+<td align="left">十二季</td>
+<td align="left">24*12</td>
+<td align="left">288</td>
+<td align="left">20</td>
 </tr>
 <tr>
-<td align="center">《太空无垠》</td>
-<td align="center">《The Expanse》</td>
-<td align="center">3</td>
-<td align="center">13$\times$3</td>
+<td align="left">《太空无垠》</td>
+<td align="left">《The Expanse》</td>
+<td align="left">五季</td>
+<td align="left">13*3+10+8</td>
+<td align="left">57</td>
+<td align="left">50</td>
 </tr>
 <tr>
-<td align="center">《外星生命》</td>
-<td align="center">《Another Life》</td>
-<td align="center">2</td>
-<td align="center">10$\times$2</td>
+<td align="left">《小谢尔顿》</td>
+<td align="left">《Young Sheldon》</td>
+<td align="left">四季</td>
+<td align="left">22*2+18+5</td>
+<td align="left">67</td>
+<td align="left">20</td>
 </tr>
 <tr>
-<td align="center">《迷失太空》</td>
-<td align="center">《Lost in Space》</td>
-<td align="center">1</td>
-<td align="center">10</td>
+<td align="left">《西部世界》</td>
+<td align="left">《Westworld》</td>
+<td align="left">三季</td>
+<td align="left">10*2+8</td>
+<td align="left">28</td>
+<td align="left">60</td>
 </tr>
 <tr>
-<td align="center">《穹顶之下》</td>
-<td align="center">《Under The Dome》</td>
-<td align="center">3</td>
-<td align="center">13$\times$3</td>
+<td align="left">《天才》</td>
+<td align="left">《Genius》</td>
+<td align="left">两季</td>
+<td align="left">10*2</td>
+<td align="left">20</td>
+<td align="left">50</td>
 </tr>
 <tr>
-<td align="center">《大西洋帝国》</td>
-<td align="center">《The Atlantic City》</td>
-<td align="center">5</td>
-<td align="center">12$\times$4+8=56</td>
+<td align="left">《梅尔罗斯》</td>
+<td align="left">《Melrose》</td>
+<td align="left">一季</td>
+<td align="left">5</td>
+<td align="left">5</td>
+<td align="left">50</td>
 </tr>
 <tr>
-<td align="center">《汉尼拔》</td>
-<td align="center">《Hannibal》</td>
-<td align="center">3</td>
-<td align="center">13$\times$3=39</td>
+<td align="left">《名姝》</td>
+<td align="left">《Harlots》</td>
+<td align="left">两季</td>
+<td align="left">8*2</td>
+<td align="left">16</td>
+<td align="left">40</td>
 </tr>
 <tr>
-<td align="center">《越狱》</td>
-<td align="center">《Prison Break》</td>
-<td align="center">5</td>
-<td align="center">22$\times$2+13+22+9=88</td>
+<td align="left">《广告狂人》</td>
+<td align="left">《Mad Men》</td>
+<td align="left">五季</td>
+<td align="left">13*5</td>
+<td align="left">65</td>
+<td align="left">40</td>
 </tr>
 <tr>
-<td align="center">《逍遥法外》</td>
-<td align="center">《How To Get Away With Murder》</td>
-<td align="center">5</td>
-<td align="center">15$\times$5</td>
+<td align="left">《我们这一天》</td>
+<td align="left">《This Is Us》</td>
+<td align="left">五季</td>
+<td align="left">18*4+6</td>
+<td align="left">78</td>
+<td align="left">40</td>
 </tr>
 <tr>
-<td align="center">《黑名单》</td>
-<td align="center">《The Blacklist》</td>
-<td align="center">1</td>
-<td align="center">22</td>
+<td align="left">《马男波杰克》</td>
+<td align="left">《BoJack Horseman》</td>
+<td align="left">五季</td>
+<td align="left">12*5</td>
+<td align="left">60</td>
+<td align="left">20</td>
 </tr>
 <tr>
-<td align="center">《清道夫》</td>
-<td align="center">《Ray Donovan》</td>
-<td align="center">5</td>
-<td align="center">12$\times$5</td>
+<td align="left">《边境》</td>
+<td align="left">《Frontier》</td>
+<td align="left">三季</td>
+<td align="left">6*3</td>
+<td align="left">18</td>
+<td align="left">40</td>
 </tr>
 <tr>
-<td align="center">《蛇蝎美人》</td>
-<td align="center">《Femme Fatales》</td>
-<td align="center">1</td>
-<td align="center">13</td>
+<td align="left">《命运航班》</td>
+<td align="left">《Manifest》</td>
+<td align="left">一季</td>
+<td align="left">16</td>
+<td align="left">16</td>
+<td align="left">40</td>
 </tr>
 <tr>
-<td align="center">《杰西卡琼斯》</td>
-<td align="center">《Jessica Jones》</td>
-<td align="center">1</td>
-<td align="center">4</td>
+<td align="left">《硅谷》</td>
+<td align="left">《Silicon Vally》</td>
+<td align="left">五季</td>
+<td align="left">8*2+10*3</td>
+<td align="left">46</td>
+<td align="left">40</td>
 </tr>
 <tr>
-<td align="center">《神盾局特工》</td>
-<td align="center">《Agents of S.H.I.L.E.D》</td>
-<td align="center">7</td>
-<td align="center">22$\times$5+13+4</td>
+<td align="left">《性爱自修室》</td>
+<td align="left">《Sex Education》</td>
+<td align="left">两季</td>
+<td align="left">8*2</td>
+<td align="left">16</td>
+<td align="left">40</td>
 </tr>
 <tr>
-<td align="center">《特工卡特》</td>
-<td align="center">《Agent Carter》</td>
-<td align="center">2</td>
-<td align="center">8+10</td>
+<td align="left">《龙战士》</td>
+<td align="left">《Warrior》</td>
+<td align="left">两季</td>
+<td align="left">10*2</td>
+<td align="left">20</td>
+<td align="left">60</td>
 </tr>
 <tr>
-<td align="center">《绿箭侠》</td>
-<td align="center">《The Arrow》</td>
-<td align="center">7</td>
-<td align="center">23$\times$7</td>
+<td align="left">《迷失太空》</td>
+<td align="left">《Lost in Space》</td>
+<td align="left">两季</td>
+<td align="left">10*2</td>
+<td align="left">20</td>
+<td align="left">40</td>
 </tr>
 <tr>
-<td align="center">《闪电侠》</td>
-<td align="center">《The Flash》</td>
-<td align="center">5</td>
-<td align="center">23$\times$5</td>
+<td align="left">《指定幸存者》</td>
+<td align="left">《Designated Survivor》</td>
+<td align="left">三季</td>
+<td align="left">21+22+10</td>
+<td align="left">53</td>
+<td align="left">40</td>
 </tr>
 <tr>
-<td align="center">《超女》</td>
-<td align="center">《Supergirl》</td>
-<td align="center">2</td>
-<td align="center">22$\times$2</td>
+<td align="left">《杰西卡琼斯》</td>
+<td align="left">《Jessica Jones》</td>
+<td align="left">一季</td>
+<td align="left">4</td>
+<td align="left">4</td>
+<td align="left">40</td>
 </tr>
 <tr>
-<td align="center">《明日传奇》</td>
-<td align="center">《Legends of Tomorrow》</td>
-<td align="center">2</td>
-<td align="center">16+17</td>
+<td align="left">《外星生命》</td>
+<td align="left">《Another Life》</td>
+<td align="left">两季</td>
+<td align="left">10*2</td>
+<td align="left">20</td>
+<td align="left">40</td>
 </tr>
 <tr>
-<td align="center">《生活大爆炸》</td>
-<td align="center">《The BigBang Theory》</td>
-<td align="center">12</td>
-<td align="center">24$\times$12</td>
+<td align="left">《老友记》</td>
+<td align="left">《Friends》</td>
+<td align="left">十季</td>
+<td align="left">236</td>
+<td align="left">236</td>
+<td align="left">20</td>
 </tr>
 <tr>
-<td align="center">《小谢尔顿》</td>
-<td align="center">《Young Sheldon</td>
-<td align="center">3</td>
-<td align="center">22$\times$2+18</td>
+<td align="left">《这样不OK》</td>
+<td align="left">《I‘m Not Okay With This》</td>
+<td align="left">一季</td>
+<td align="left">7</td>
+<td align="left">7</td>
+<td align="left">40</td>
 </tr>
 <tr>
-<td align="center">《老友记》</td>
-<td align="center">《Friends》</td>
-<td align="center">10</td>
-<td align="center">236</td>
+<td align="left">《血疫》</td>
+<td align="left">《The Hot Zone》</td>
+<td align="left">一季</td>
+<td align="left">6</td>
+<td align="left">6</td>
+<td align="left">40</td>
 </tr>
 <tr>
-<td align="center">《极品老妈》</td>
-<td align="center">《Mom》</td>
-<td align="center">6</td>
-<td align="center">22*6</td>
+<td align="left">《我的天才女友》</td>
+<td align="left">《My Brilliant Girlfriend》</td>
+<td align="left">两季</td>
+<td align="left">8*2</td>
+<td align="left">16</td>
+<td align="left">50</td>
 </tr>
 <tr>
-<td align="center">《破产姐妹》</td>
-<td align="center">《2 Broke Girls》</td>
-<td align="center">6</td>
-<td align="center">22$\times$6</td>
+<td align="left">《中央公园五人案》</td>
+<td align="left">《When They See US》</td>
+<td align="left">一季</td>
+<td align="left">1</td>
+<td align="left">1</td>
+<td align="left">40</td>
 </tr>
 <tr>
-<td align="center">《太空部队》</td>
-<td align="center">《Space Force》</td>
-<td align="center">1</td>
-<td align="center">10</td>
+<td align="left">《逍遥法外》</td>
+<td align="left">《How To Get Away With Murder》</td>
+<td align="left">五季</td>
+<td align="left">15*5</td>
+<td align="left">75</td>
+<td align="left">40</td>
 </tr>
 <tr>
-<td align="center">《硅谷》</td>
-<td align="center">《Silicon Vally》</td>
-<td align="center">5</td>
-<td align="center">8$\times$2+10$\times$3=46</td>
+<td align="left">《末代沙皇》</td>
+<td align="left">《Last Casar》</td>
+<td align="left">一季</td>
+<td align="left">6</td>
+<td align="left">6</td>
+<td align="left">50</td>
 </tr>
 <tr>
-<td align="center">《朋友也上床》</td>
-<td align="center">《Friends with Benefits》</td>
-<td align="center">1</td>
-<td align="center">12</td>
+<td align="left">《猎魔人》</td>
+<td align="left">《The Witcher》</td>
+<td align="left">一季</td>
+<td align="left">8</td>
+<td align="left">8</td>
+<td align="left">60</td>
 </tr>
 <tr>
-<td align="center">《亿万》</td>
-<td align="center">《Billions》</td>
-<td align="center">4</td>
-<td align="center">10+12$\times$3</td>
+<td align="left">《毒枭-哥伦比亚》</td>
+<td align="left">《Narcos》</td>
+<td align="left">三季</td>
+<td align="left">10*3</td>
+<td align="left">30</td>
+<td align="left">40</td>
 </tr>
 <tr>
-<td align="center">《广告狂人》</td>
-<td align="center">《Mad Men》</td>
-<td align="center">5</td>
-<td align="center">13$\times$5</td>
+<td align="left">《毒枭-墨西哥》</td>
+<td align="left">《Narcos-Mexico》</td>
+<td align="left">一季</td>
+<td align="left">3</td>
+<td align="left">3</td>
+<td align="left">40</td>
 </tr>
 <tr>
-<td align="center">《我们这一天》</td>
-<td align="center">《This Is Us》</td>
-<td align="center">5</td>
-<td align="center">18$\times$4+14(Updating)</td>
+<td align="left">《风骚律师》</td>
+<td align="left">《Better Call Saul》</td>
+<td align="left">五季</td>
+<td align="left">10*5</td>
+<td align="left">50</td>
+<td align="left">40</td>
 </tr>
 <tr>
-<td align="center">《马男波杰克》</td>
-<td align="center">《BoJack Horseman》</td>
-<td align="center">5</td>
-<td align="center">12$\times$5</td>
-</tr>
-<tr>
-<td align="center">《边境》</td>
-<td align="center">《Frontier》</td>
-<td align="center">3</td>
-<td align="center">6$\times$3</td>
-</tr>
-<tr>
-<td align="center">《命运航班》</td>
-<td align="center">《Manifest》</td>
-<td align="center">1</td>
-<td align="center">16</td>
-</tr>
-<tr>
-<td align="center">《性爱自修室》</td>
-<td align="center">《Sex Education》</td>
-<td align="center">2</td>
-<td align="center">8$\times$2</td>
-</tr>
-<tr>
-<td align="center">《性爱解密》</td>
-<td align="center">《Sex, Explained》</td>
-<td align="center">1</td>
-<td align="center">5</td>
-</tr>
-<tr>
-<td align="center">《头脑解密》</td>
-<td align="center">《The Mind, Explained》</td>
-<td align="center">1</td>
-<td align="center">5</td>
-</tr>
-<tr>
-<td align="center">《龙战士》</td>
-<td align="center">《Warrior》</td>
-<td align="center">1</td>
-<td align="center">10</td>
-</tr>
-<tr>
-<td align="center">《这样不OK》</td>
-<td align="center">《I‘m Not Okay With This》</td>
-<td align="center">1</td>
-<td align="center">7</td>
-</tr>
-<tr>
-<td align="center">《我的天才女友》</td>
-<td align="center">《My Brilliant Girlfriend》</td>
-<td align="center">2</td>
-<td align="center">8$\times$2</td>
-</tr>
-<tr>
-<td align="center">《有色眼镜》</td>
-<td align="center">《When They See Us》</td>
-<td align="center">1</td>
-<td align="center">4</td>
-</tr>
-<tr>
-<td align="center">《血疫》</td>
-<td align="center">《The Hot Zone》</td>
-<td align="center">1</td>
-<td align="center">6</td>
-</tr>
-<tr>
-<td align="center">《末代沙皇》</td>
-<td align="center">《The Last Czars》</td>
-<td align="center">1</td>
-<td align="center">6</td>
-</tr>
-<tr>
-<td align="center">《美国犯罪故事》</td>
-<td align="center">《American Crime Story》</td>
-<td align="center">2</td>
-<td align="center">10+9</td>
-</tr>
-<tr>
-<td align="center">《毒枭-哥伦比亚》</td>
-<td align="center">《Narcos》</td>
-<td align="center">3</td>
-<td align="center">10$\times$3</td>
-</tr>
-<tr>
-<td align="center">《毒枭-墨西哥》</td>
-<td align="center">《Narcos-Mexico》</td>
-<td align="center">1</td>
-<td align="center">3</td>
-</tr>
-<tr>
-<td align="center">《天才》</td>
-<td align="center">《Genius》</td>
-<td align="center">2</td>
-<td align="center">10$\times$2</td>
-</tr>
-<tr>
-<td align="center">总计</td>
-<td align="center">3230</td>
-<td align="center"></td>
-<td align="center"></td>
+<td align="left">《太空部队》</td>
+<td align="left">《Space Force》</td>
+<td align="left">一季</td>
+<td align="left">10</td>
+<td align="left">10</td>
+<td align="left">20</td>
+</tr>
+<tr>
+<td align="left">《极品老妈》</td>
+<td align="left">《Mom》</td>
+<td align="left">八季</td>
+<td align="left">22*6+20+5</td>
+<td align="left">157</td>
+<td align="left">20</td>
+</tr>
+<tr>
+<td align="left">《再造淑女》</td>
+<td align="left">《Selfie》</td>
+<td align="left">一季</td>
+<td align="left">14</td>
+<td align="left">14</td>
+<td align="left">20</td>
+</tr>
+<tr>
+<td align="left">《曼达洛人》</td>
+<td align="left">《The Mandalorian》</td>
+<td align="left">两季</td>
+<td align="left">8*2</td>
+<td align="left">16</td>
+<td align="left">50</td>
+</tr>
+<tr>
+<td align="left">《空乘危机》</td>
+<td align="left">《The Flight Attendant》</td>
+<td align="left">一季</td>
+<td align="left">8</td>
+<td align="left">8</td>
+<td align="left">40</td>
+</tr>
+<tr>
+<td align="left">《法官大人》</td>
+<td align="left">《Your Honor》</td>
+<td align="left">一季</td>
+<td align="left">7</td>
+<td align="left">7</td>
+<td align="left">50</td>
+</tr>
+<tr>
+<td align="left">《摩登情爱》</td>
+<td align="left">《Modern Love》</td>
+<td align="left">一季</td>
+<td align="left">4</td>
+<td align="left">4</td>
+<td align="left">30</td>
+</tr>
+<tr>
+<td align="left">《女王的棋局》</td>
+<td align="left">《Queen’s Gambit》</td>
+<td align="left">一季</td>
+<td align="left">7</td>
+<td align="left">7</td>
+<td align="left">50</td>
+</tr>
+<tr>
+<td align="left">《黄石》</td>
+<td align="left">《Yellowstone》</td>
+<td align="left">三季</td>
+<td align="left">10*3</td>
+<td align="left">30</td>
+<td align="left">40</td>
+</tr>
+<tr>
+<td align="left">《初来乍到》</td>
+<td align="left">《Fresh Off The Boat》</td>
+<td align="left">一季</td>
+<td align="left">10</td>
+<td align="left">10</td>
+<td align="left">20</td>
+</tr>
+<tr>
+<td align="left">《路西法》</td>
+<td align="left">《Lucifer》</td>
+<td align="left">五季</td>
+<td align="left">18+18+26+10+8</td>
+<td align="left">80</td>
+<td align="left">50</td>
+</tr>
+<tr>
+<td align="left">《传教士》</td>
+<td align="left">《Priest》</td>
+<td align="left">一季</td>
+<td align="left">1</td>
+<td align="left">1</td>
+<td align="left">40</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">总: 3505</td>
+<td align="left">总: 3505</td>
+<td align="left"></td>
 </tr>
 </tbody></table>
 <h3 id="缤纷思想"><a href="#缤纷思想" class="headerlink" title="缤纷思想"></a>缤纷思想</h3><p>大二大三期间的书单，研究生入学后就真的没时间读书了。</p>
