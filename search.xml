@@ -7893,15 +7893,17 @@
 </blockquote>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">export</span> JAVA_HOME=$(/usr/libexec/java_home -v 1.8)</span><br><span class="line"><span class="built_in">export</span> JAVA_HOME=$(/usr/libexec/java_home -v 11)</span><br><span class="line"><span class="built_in">export</span> JAVA_HOME=$(/usr/libexec/java_home -v 13)</span><br></pre></td></tr></table></figure>
 
-<h2 id="Python3"><a href="#Python3" class="headerlink" title="Python3"></a>Python3</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Setting PATH for Python 3.7</span></span><br><span class="line"><span class="comment"># The original version is saved in .bash_profile.pysave</span></span><br><span class="line"><span class="built_in">export</span> PATH=<span class="string">"/Library/Frameworks/Python.framework/Versions/3.7/bin:<span class="variable">$&#123;PATH&#125;</span>"</span></span><br></pre></td></tr></table></figure>
+<h2 id="Python3"><a href="#Python3" class="headerlink" title="Python3"></a>Python3</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 通过 Homebrew 安装的 Python3.8</span></span><br><span class="line"><span class="built_in">export</span> PATH=<span class="string">"/usr/local/opt/python@3.8/bin:<span class="variable">$PATH</span>"</span></span><br></pre></td></tr></table></figure>
 
-<h2 id="MySQL"><a href="#MySQL" class="headerlink" title="MySQL"></a>MySQL</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Setting PATH for MySQL 5.7</span></span><br><span class="line"><span class="built_in">export</span> PATH=/usr/<span class="built_in">local</span>/bin:<span class="variable">$PATH</span></span><br><span class="line"><span class="built_in">export</span> PATH=<span class="variable">$&#123;PATH&#125;</span>:/usr/<span class="built_in">local</span>/mysql/bin</span><br></pre></td></tr></table></figure>
+<h2 id="MySQL"><a href="#MySQL" class="headerlink" title="MySQL"></a>MySQL</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Set PATH for MySQL@5.7</span></span><br><span class="line"><span class="built_in">export</span> PATH=<span class="string">"/usr/local/opt/mysql@5.7/bin:<span class="variable">$PATH</span>"</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Node-js"><a href="#Node-js" class="headerlink" title="Node.js"></a>Node.js</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> Set PATH <span class="keyword">for</span> Node.js@12</span></span><br><span class="line">export PATH="/usr/local/opt/node@12/bin:$PATH"</span><br></pre></td></tr></table></figure>
 
 <h2 id="命令重命名"><a href="#命令重命名" class="headerlink" title="命令重命名"></a>命令重命名</h2><ul>
-<li>觉得终端内容太多，想清空的时候<code>clear</code>命令有点长？</li>
+<li>觉得终端内容太多，想清空的时候 <code>clear</code> 命令有点长？</li>
 <li>其他命令重命名也类似</li>
 </ul>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Self Defined Clear Screen</span></span><br><span class="line"><span class="built_in">alias</span> cls=<span class="string">"clear"</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Self Defined Clear Screen</span></span><br><span class="line"><span class="built_in">alias</span> cls=<span class="string">"clear"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Self Defined Commands</span></span><br><span class="line"><span class="built_in">alias</span> ll=<span class="string">'colorls -l --sd --gs --group-directories-first'</span></span><br><span class="line"><span class="built_in">alias</span> ls=<span class="string">'colorls --group-directories-first'</span></span><br><span class="line"><span class="built_in">alias</span> tree=<span class="string">"find . -print | sed -e 's;[^/]*/;|____;g;s;____|; |;g'"</span></span><br><span class="line"><span class="built_in">alias</span> doc=<span class="string">"docsify"</span></span><br></pre></td></tr></table></figure>
 
 <h1 id="iTerm2命令"><a href="#iTerm2命令" class="headerlink" title="iTerm2命令"></a>iTerm2命令</h1><h2 id="标签页"><a href="#标签页" class="headerlink" title="标签页"></a>标签页</h2><ul>
 <li>新建标签页：<code>command + T</code></li>
@@ -7944,7 +7946,7 @@
 <li>配置传送门：<a href="https://blog.biezhi.me/2018/11/build-a-beautiful-mac-terminal-environment.html" target="_blank" rel="noopener">编程和酒</a></li>
 </ul>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge8skdl3qij30vo0kykfp.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1ge8skdl3qij30vo0kykfp.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="终端美化后的界面"></p>
-<h1 id="Vim命令"><a href="#Vim命令" class="headerlink" title="Vim命令"></a>Vim命令</h1><p>在这颗蔚蓝色的星球上，有一群程序员，在这一群程序员中有两个广为流传的工具，一个是编辑器之神<code>Vim</code>，一个是神之编辑器<code>emacs</code>.</p>
+<h1 id="Vim-命令"><a href="#Vim-命令" class="headerlink" title="Vim 命令"></a>Vim 命令</h1><p>在这颗蔚蓝色的星球上，有一群程序员，在这一群程序员中有两个广为流传的工具，一个是编辑器之神 <code>Vim</code>，一个是神之编辑器 <code>emacs</code>.</p>
 <h2 id="插入模式"><a href="#插入模式" class="headerlink" title="插入模式"></a>插入模式</h2><table>
 <thead>
 <tr>
@@ -11592,7 +11594,7 @@
 <blockquote>
 <p>无论选择何种方式实现 partition，一定要确保在 pivot 左边的 &lt;= pivot，pivot 右边的 &gt; pivot。</p>
 </blockquote>
-<h3 id="2-2-3分析与具体证明"><a href="#2-2-3分析与具体证明" class="headerlink" title="2.2.3分析与具体证明"></a>2.2.3分析与具体证明</h3><p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gd4pruvzrvj317m0s442c.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/00831rSTly1gd4pruvzrvj317m0s442c.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="9:1划分"></p>
+<h3 id="2-2-3-分析与具体证明"><a href="#2-2-3-分析与具体证明" class="headerlink" title="2.2.3 分析与具体证明"></a>2.2.3 分析与具体证明</h3><p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gd4pruvzrvj317m0s442c.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/00831rSTly1gd4pruvzrvj317m0s442c.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="9:1划分"></p>
 <p>如上图所示，我们假设在每次划分时按 $9:1$ 的比例划分两个子数组，生成的递归树如上图所示，运行时间递归式为<br>$$<br>T(n)\le T(9n/10)+T(n/10)+cn<br>$$<br>收敛速度更快的是 $\log_{10}n$ ，因为每次都减小为上一次的 $\frac{1}{10}$ ，但是为了让全部的子数组都收敛到 $1$ ，收敛时间则取决于 $\log_{10/9}n = \Theta(n)$ ,而把每一水平行加起来的结果都小于等于 $cn$ ，再乘以树的高度 $\Theta(n)$ ，得到总的运行时间为 $O(n\lg n)$ ，这与划分长度是每次在正中间的效果是一样的。</p>
 <p>事实上，即使是按照 $99:1、999:1、9999:1、 \dots$ 这种常数比例进行的划分都会产生深度为 $\Theta(n)$ 的递归树，其中每一层的代价为 $O(n)$，那么总的运行时间也就是 $O(n\lg n)$ 了。伪代码中每次选取子数组中最右边的元素作为 $pivot$ 也是以此为依据的。</p>
 <h1 id="3-选择类排序"><a href="#3-选择类排序" class="headerlink" title="3. 选择类排序"></a>3. 选择类排序</h1><h2 id="3-1-简单选择排序"><a href="#3-1-简单选择排序" class="headerlink" title="3.1 简单选择排序"></a>3.1 简单选择排序</h2><p><strong>选择排序</strong>（Selection sort）是一种简单直观的<a href="https://zh.wikipedia.org/wiki/排序算法" target="_blank" rel="noopener">排序算法</a>。它的工作原理如下。首先在未排序序列中找到最小（大）元素，存放到排序序列的起始位置，然后，再从剩余未排序元素中继续寻找最小（大）元素，然后放到已排序序列的末尾。以此类推，直到所有元素均排序完毕。</p>
@@ -11721,8 +11723,8 @@
         <category>算法</category>
       </categories>
       <tags>
-        <tag>算法</tag>
         <tag>Java</tag>
+        <tag>算法</tag>
       </tags>
   </entry>
   <entry>
