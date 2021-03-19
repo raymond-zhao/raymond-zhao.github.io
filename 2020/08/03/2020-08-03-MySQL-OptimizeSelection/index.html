@@ -533,12 +533,12 @@
 <li>确认应用程序是否在检索大量<strong>超过需要</strong>的数据。这通常意味着访向了太多的行，但有时候也可能是访问了太多的列。</li>
 <li>确认 MySQL 服务器层是否在分析大量<strong>超过需要</strong>的数据行。</li>
 </ol>
-<h3 id="6-2-1-是否向数据库请求了不需要的数据"><a href="#6-2-1-是否向数据库请求了不需要的数据" class="headerlink" title="6.2.1 是否向数据库请求了不需要的数据"></a>6.2.1 是否向数据库请求了不需要的数据</h3><p>有些查询会请求超过实际需要的数据，然后又丢弃掉。这样会给 MySQL 服务器带来负担，增加网络开销，消耗服务器的 CPU 和内存资源。</p>
+<h3 id="是否向数据库请求了不需要的数据"><a href="#是否向数据库请求了不需要的数据" class="headerlink" title="是否向数据库请求了不需要的数据"></a>是否向数据库请求了不需要的数据</h3><p>有些查询会请求超过实际需要的数据，然后又丢弃掉。这样会给 MySQL 服务器带来负担，增加网络开销，消耗服务器的 CPU 和内存资源。</p>
 <p>下面是一些典型的案例：</p>
 <ul>
 <li>查询不需要的记录：MySQL 并不只是会返回我们需要的数据，而是先返回全部结果集再进行计算，然后再丢弃大量数据。</li>
 <li>多表关联时返回全部列：只选择需要使用的表中的列，而不要全部返回。</li>
-<li>总是取出全部列：也就是 <code>SELECT *</code>取出全部列，会让优化器无法完成<strong>索引覆盖扫描</strong>这类优化，还会消耗服务器资源。</li>
+<li>总是取出全部列：也就是 <code>SELECT *</code> 取出全部列，会让优化器无法完成<strong>索引覆盖扫描</strong>这类优化，还会消耗服务器资源。</li>
 <li>重复查询相同的数据：记得用缓存。</li>
 </ul>
 <h3 id="MySQL-是否在扫描额外的记录"><a href="#MySQL-是否在扫描额外的记录" class="headerlink" title="MySQL 是否在扫描额外的记录"></a>MySQL 是否在扫描额外的记录</h3><p>在确定查询只返回需要的数据后，接下来应该看看查询为了返回结果是否<strong>扫描了过多的数据</strong>。主要有三个指标，这三个指标会记录在 MySQL 的慢日志中：</p>
@@ -673,7 +673,7 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show status like &#39;%slow_queries%&#39;;</span><br><span class="line">+---------------+-------+</span><br><span class="line">| Variable_name | Value |</span><br><span class="line">+---------------+-------+</span><br><span class="line">| Slow_queries  | 0     |</span><br><span class="line">+---------------+-------+</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
 
 <p><strong>打开慢查询日志</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">set global slow_query_log &#x3D; on;</span><br><span class="line"></span><br><span class="line"># 添加索引</span><br><span class="line">alter table t_name from add index idx_name(name);</span><br><span class="line"></span><br><span class="line"># MySQL 默认查询并不一定是 聚集索引(主键)， 而是由 MySQL查询优化器来决定，消除尽可能多的重复</span><br><span class="line">select count(id) from t_name;</span><br><span class="line"># 强行指定查询索引</span><br><span class="line">select count(id) from t_name force index (primary);</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">set global slow_query_log &#x3D; on;</span><br><span class="line"></span><br><span class="line"># 添加索引</span><br><span class="line">alter table t_name add index idx_name(name);</span><br><span class="line"></span><br><span class="line"># MySQL 默认查询并不一定是 聚集索引(主键)， 而是由 MySQL查询优化器来决定，消除尽可能多的重复</span><br><span class="line">select count(id) from t_name;</span><br><span class="line"># 强行指定查询索引</span><br><span class="line">select count(id) from t_name force index (primary);</span><br></pre></td></tr></table></figure>
 
 <p><strong>设置慢查询阈值，超过 1s 即为慢查询(模拟)</strong></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">set long_query_time &#x3D; 1;</span><br></pre></td></tr></table></figure>
@@ -759,7 +759,7 @@
 <p>查看当前会话</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show profiles;</span><br><span class="line">Empty set, 1 warning (0.00 sec)</span><br></pre></td></tr></table></figure>
 
-<p>查看某 Query_ID 开销</p>
+<p>查看某 <code>Query_ID</code> 开销</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show profile for query xxx;</span><br><span class="line">Empty set, 1 warning (0.00 sec)</span><br></pre></td></tr></table></figure>
 
 <ul>
@@ -772,12 +772,10 @@
 <ul>
 <li><a href="https://www.processon.com/view/5ea7a1b9e401fd21c196eb17?fromnew=1" target="_blank" rel="noopener">JVM内存模型完整版</a></li>
 <li><a href="https://www.processon.com/view/5ee8dcd0e401fd1fd295ad26?fromnew=1#map" target="_blank" rel="noopener">JUC</a></li>
-<li><a href="https://www.processon.com/diagraming/5f27711ee0b34d54dadb5f21" target="_blank" rel="noopener">Spring Transaction 源码解析时序图</a></li>
 <li><a href="https://www.processon.com/view/5cc57a59e4b059e20a0c21c0?fromnew=1" target="_blank" rel="noopener">MyBatis-流程</a></li>
 <li><a href="https://www.processon.com/view/5bc9e623e4b0d4d65c368f71?fromnew=1#map" target="_blank" rel="noopener">并发编程-Java锁</a></li>
-<li><a href="https://www.processon.com/view/5aaf5e81e4b0d799de82814f?fromnew=1" target="_blank" rel="noopener">Spring源码分析图</a></li>
+<li><a href="https://www.processon.com/view/5aaf5e81e4b0d799de82814f?fromnew=1" target="_blank" rel="noopener">Spring 源码分析图</a></li>
 </ul>
-<p>跑题了跑题了跑题了…</p>
 
   
   
@@ -812,10 +810,10 @@
     <div class='new-meta-box'>
       
         
-          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-03-02T12:35:14+08:00">
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-03-19T14:51:26+08:00">
   <a class='notlink'>
     <i class="fas fa-edit fa-fw" aria-hidden="true"></i>
-    <p>更新于：Mar 2, 2021</p>
+    <p>更新于：Mar 19, 2021</p>
   </a>
 </div>
 
@@ -995,7 +993,7 @@
 
 
     <div class='content'>
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#查询为什么会变慢？"><span class="toc-text">查询为什么会变慢？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#慢查询基础：优化数据访问"><span class="toc-text">慢查询基础：优化数据访问</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-1-是否向数据库请求了不需要的数据"><span class="toc-text">6.2.1 是否向数据库请求了不需要的数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MySQL-是否在扫描额外的记录"><span class="toc-text">MySQL 是否在扫描额外的记录</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#重构查询的方式"><span class="toc-text">重构查询的方式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#查询执行的基础"><span class="toc-text">查询执行的基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#查询优化处理"><span class="toc-text">查询优化处理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#查询执行引擎"><span class="toc-text">查询执行引擎</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#返回结果"><span class="toc-text">返回结果</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#优化特定类型的查询"><span class="toc-text">优化特定类型的查询</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#慢查询优化"><span class="toc-text">慢查询优化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#慢查询优化基本步骤"><span class="toc-text">慢查询优化基本步骤</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#观察分析状态"><span class="toc-text">观察分析状态</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#定位慢查询-SQL"><span class="toc-text">定位慢查询 SQL</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#EXPLAIN-查看执行计划"><span class="toc-text">EXPLAIN 查看执行计划</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#SHOW-PROFILE-查看执行时间"><span class="toc-text">SHOW PROFILE 查看执行时间</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考"><span class="toc-text">参考</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#查询为什么会变慢？"><span class="toc-text">查询为什么会变慢？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#慢查询基础：优化数据访问"><span class="toc-text">慢查询基础：优化数据访问</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#是否向数据库请求了不需要的数据"><span class="toc-text">是否向数据库请求了不需要的数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MySQL-是否在扫描额外的记录"><span class="toc-text">MySQL 是否在扫描额外的记录</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#重构查询的方式"><span class="toc-text">重构查询的方式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#查询执行的基础"><span class="toc-text">查询执行的基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#查询优化处理"><span class="toc-text">查询优化处理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#查询执行引擎"><span class="toc-text">查询执行引擎</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#返回结果"><span class="toc-text">返回结果</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#优化特定类型的查询"><span class="toc-text">优化特定类型的查询</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#慢查询优化"><span class="toc-text">慢查询优化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#慢查询优化基本步骤"><span class="toc-text">慢查询优化基本步骤</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#观察分析状态"><span class="toc-text">观察分析状态</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#定位慢查询-SQL"><span class="toc-text">定位慢查询 SQL</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#EXPLAIN-查看执行计划"><span class="toc-text">EXPLAIN 查看执行计划</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#SHOW-PROFILE-查看执行时间"><span class="toc-text">SHOW PROFILE 查看执行时间</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考"><span class="toc-text">参考</span></a></li></ol>
     </div>
   </section>
 
@@ -1036,7 +1034,7 @@
       
     
       
-        <div><p>Blog content follows the <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener">Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0) License</a></p>
+        <div><p>博客内容遵循 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener">署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0) 协议</a></p>
 </div>
       
     
@@ -1048,9 +1046,9 @@
       
     
       
-        Use
+        本站使用
         <a href="https://github.com/volantis-x/hexo-theme-volantis/tree/4.0.0" target="_blank" class="codename">Volantis</a>
-        as theme
+        作为主题
       
     
       
