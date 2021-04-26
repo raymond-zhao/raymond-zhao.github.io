@@ -17,7 +17,7 @@
 
   <!-- 页面元数据 -->
   
-  <title>《Kafka权威指南》-安装Kafka - 吹梦到西洲</title>
+  <title>《Kafka 权威指南》：安装Kafka - 吹梦到西洲</title>
   
     <meta name="keywords" content="Kafka">
   
@@ -420,7 +420,7 @@
  
 <div id="pjax-data" style="display: none"> 
   <div id="pjax-ispage">true</div> 
-  <div id="pjax-pageTitle">《Kafka权威指南》-安装Kafka</div> 
+  <div id="pjax-pageTitle">《Kafka 权威指南》：安装Kafka</div> 
   <div id="pjax-enable-cover">true</div> 
   <div id="pjax-comment-path"></div> 
   <div id="pjax-comment-placeholder"></div> 
@@ -460,7 +460,7 @@
     
     
       <h1 class="title">
-        《Kafka权威指南》-安装Kafka
+        《Kafka 权威指南》：安装Kafka
       </h1>
       <div class='new-meta-box'>
         
@@ -491,7 +491,7 @@
             <div class="new-meta-item date">
   <a class='notlink'>
     <i class="fas fa-calendar-alt fa-fw" aria-hidden="true"></i>
-    <p>发布于：Mar 2, 2021</p>
+    <p>发布于：Feb 7, 2021</p>
   </a>
 </div>
 
@@ -502,7 +502,7 @@
   <div class="new-meta-item browse leancloud">
     <a class='notlink'>
       
-      <div id="lc-pv" data-title="《Kafka权威指南》-安装Kafka" data-path="/2021/03/02/2021-02-07-KafkaChapter2/">
+      <div id="lc-pv" data-title="《Kafka 权威指南》：安装Kafka" data-path="/2021/02/07/2021-02-07-KafkaChapter2/">
         <i class="fas fa-eye fa-fw" aria-hidden="true"></i>
         <span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span>
         次浏览
@@ -519,22 +519,139 @@
 
 
   
-  <h2 id="2-1-安装Kafka与Zookeeper"><a href="#2-1-安装Kafka与Zookeeper" class="headerlink" title="2.1 安装Kafka与Zookeeper"></a>2.1 安装Kafka与Zookeeper</h2><blockquote>
-<p>在安装 Zookeeper 和 Kafka 之前，需要先安装 Java 环境。</p>
+  <h2 id="2-1-安装-Kafka-Broker"><a href="#2-1-安装-Kafka-Broker" class="headerlink" title="2.1 安装 Kafka Broker"></a>2.1 安装 Kafka Broker</h2><blockquote>
+<p>在安装 Zookeeper 和 Kafka 之前，需要先安装 Java 环境，因为 Kafka 许多功能使用 Java 语言编写，如果运行源码时还需要安装 Scala。</p>
+<p>Zookeeper 用于保存集群的元数据信息和消费者信息。</p>
 </blockquote>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1gptmkcwvehj30zw0ccmyo.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/008i3skNly1gptmkcwvehj30zw0ccmyo.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="KafkaAndZookeeper"></p>
 <p>在 MacOS 环境下安装，使用 <code>Homebrew</code> 只需一条命令即可，在安装 Kafka 时 Homebrew 会自动下载相应的依赖，自然也包括 Zookeeper、OpenJDK。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> brew install kafka</span></span><br></pre></td></tr></table></figure>
 
-<p>Homebrew 会将 Kafka 安装到 <code>/usr/local/Cellar</code> 目录，不过文件会被链接到其他目录。</p>
+<p>Homebrew 会将 Kafka 安装到 <code>/usr/local/Cellar</code> 目录，不过某些文件会被链接到其他目录。</p>
 <ul>
 <li>二进制文件和脚本文件在 <code>/usr/local/bin</code> 目录下。</li>
 <li>Kafka 配置文件在 <code>/usr/local/etc/kafka</code> 目录下。</li>
-<li>Zookeeper 配置文件在 <code>/usr/local/etc/zookeeper</code> 目录下。</li>
+<li>Zookeeper 配置文件在 <code>/usr/local/etc/zookeeper</code> 目录下，需要配置 <code>zoo.cfg</code>。</li>
 <li><code>log.dirs</code> （Kafka 的数据目录）被设置为 <code>/usr/local/var/lib/kafka-logs</code>。</li>
 </ul>
-<p>安装完毕后，就可以启动 Zookeeper 和 Kafka了。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> zookeeper-server-start /usr/<span class="built_in">local</span>/etc/kafka/zookeeper.properties &amp; kafka-server-start /usr/<span class="built_in">local</span>/etc/kafka/server.properties</span></span><br></pre></td></tr></table></figure>
+<p>安装完毕后，就可以启动并测试 Zookeeper 和 Kafka了。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> zookeeper-server-start /usr/<span class="built_in">local</span>/etc/kafka/zookeeper.properties &amp; kafka-server-start /usr/<span class="built_in">local</span>/etc/kafka/server.properties</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> brew install telnet</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> telnet localhost 2181</span></span><br><span class="line">Trying ::1...</span><br><span class="line">Connected to localhost.</span><br><span class="line">Escape character is '^]'.</span><br><span class="line">srvr</span><br><span class="line">Zookeeper version: 3.5.8...</span><br><span class="line">Latency min/avg/max: 0/10/44</span><br><span class="line">Received: 80</span><br><span class="line">Sent: 81</span><br><span class="line">Connections: 2</span><br><span class="line">Outstanding: 0</span><br><span class="line">Zxid: 0x1d</span><br><span class="line">Mode: standalone</span><br><span class="line">Node count: 27</span><br><span class="line">Connection closed by foreign host.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建 Topic</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic <span class="built_in">test</span></span></span><br><span class="line">Created topic test.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 验证 Topic</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> kafka-topics --zookeeper localhost:2181 --describe --topic <span class="built_in">test</span></span></span><br><span class="line">Topic: test	PartitionCount: 1	ReplicationFactor: 1	Configs:</span><br><span class="line">	Topic: test	Partition: 0	Leader: 0	Replicas: 0	Isr: 0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 往测试 Topic 上发送消息，输入任意消息然后 Ctrl+C 退出，使用 Consumer 消费信息即可。</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> kafka-console-producer --broker-list localhost:9092 --topic <span class="built_in">test</span>                                             </span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">Test Message 1</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">Test Message 2</span></span><br><span class="line">^C</span><br><span class="line"><span class="meta">#</span><span class="bash"> 从测试 Topic 上消费消息</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> kafka-console-consumer --bootstrap-server localhost:9092 --topic <span class="built_in">test</span> --from-beginning</span></span><br></pre></td></tr></table></figure>
 
+<p>Zookeeper 集群被称为<strong>群组</strong>，使用的是<strong>一致性协议</strong>，因此建议集群中包含<strong>奇数个节点</strong>，因为只有当群组里的大多数节点处于可用状态，Zookeeper 才能处理外部的请求。</p>
+<h2 id="2-2-Broker-配置"><a href="#2-2-Broker-配置" class="headerlink" title="2.2 Broker 配置"></a>2.2 Broker 配置</h2><blockquote>
+<p>更为详细的配置信息可参考 Kafka 官网：<a href="https://kafka.apache.org/documentation/#configuration" target="_blank" rel="noopener">Configuration</a></p>
+</blockquote>
+<h3 id="2-2-1-常规配置"><a href="#2-2-1-常规配置" class="headerlink" title="2.2.1 常规配置"></a>2.2.1 常规配置</h3><p>位于 <code>/usr/local/etc/kafka/server.properties</code> 。</p>
+<table>
+<thead>
+<tr>
+<th align="center">配置项</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>broker.id</code></td>
+<td align="center">Kafka 集群内需唯一，默认值为 0。</td>
+</tr>
+<tr>
+<td align="center"><code>port</code></td>
+<td align="center">默认 <code>9092</code>，若设置到 <code>1024</code> 以下需要 <code>root</code> 权限启动。</td>
+</tr>
+<tr>
+<td align="center"><code>zookeeper.connect</code></td>
+<td align="center">默认 <code>2181</code>，冒号分割的一组 <code>host:port/path</code></td>
+</tr>
+<tr>
+<td align="center"><code>log.dirs</code></td>
+<td align="center">逗号分隔的本地文件系统路径，broker 会根据“最少使用”原则把同一个<strong>分区</strong>的日志片段保存到同一个路径下。</td>
+</tr>
+<tr>
+<td align="center"><code>num.recovery.threads.per.data.dir</code></td>
+<td align="center">每个数据目录的线程数，所配置的数字对应的是 <code>log.dirs</code> 指定的单个日志目录。</td>
+</tr>
+<tr>
+<td align="center"><code>auto.create.topics.enable</code></td>
+<td align="center">是否启动自动创建主题</td>
+</tr>
+</tbody></table>
+<p><code>num.recovery.threads.per.data.dir</code>：Kafka 使用可配置的线程池来处理日志片段的几种情况</p>
+<ul>
+<li>服务器正常启动，用于打开每个分区的日志片段；</li>
+<li>服务器崩溃后重启，用于检查和截短每个分区的日志片段；</li>
+<li>服务器正常关闭，用于关闭日志片段。</li>
+</ul>
+<p><code>auto.create.topics.enable</code>：Kafka 自动创建主题的几种情况</p>
+<ul>
+<li>当一个 <code>Producer</code> 向 <code>Topic</code> 写入消息时；</li>
+<li>当一个 <code>Consumer</code> 从 <code>Topic</code> 读取消息时；</li>
+<li>当任意一个 <code>Client</code> 向 <code>Topic</code> 发送 <code>Metadata</code> 请求时。</li>
+</ul>
+<h3 id="2-2-2-主题的默认配置"><a href="#2-2-2-主题的默认配置" class="headerlink" title="2.2.2 主题的默认配置"></a>2.2.2 主题的默认配置</h3><table>
+<thead>
+<tr>
+<th align="center">配置项</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>num.partitions</code></td>
+<td align="center">新建主题所包含的分区个数，默认值为 <code>1</code>。</td>
+</tr>
+<tr>
+<td align="center"><code>log.retention.hours</code></td>
+<td align="center">数据被保留的时间，默认  <code>168</code> 小时，即一周，也可将<code>hours</code>换成 <code>minutes</code>与<code>ms</code>。</td>
+</tr>
+<tr>
+<td align="center"><code>log.retention.bytes</code></td>
+<td align="center">通过消息字节数判断消息是否过期，作用在<strong>每一个分区</strong>上。</td>
+</tr>
+<tr>
+<td align="center"><code>log.segment.bytes</code></td>
+<td align="center">关闭日志片段的阈值，默认 <code>1GB</code>，超过此值将开启新的日志片段。</td>
+</tr>
+<tr>
+<td align="center"><code>log.segment.ms</code></td>
+<td align="center">关闭日志片段的阈值，以时间为单位。与<code>log.segment.bytes</code> 非互斥关系。</td>
+</tr>
+<tr>
+<td align="center"><code>message.max.bytes</code></td>
+<td align="center">单条消息被压缩后的最大阈值，默认为 <code>1 000 000</code>，即 <code>1MB</code>，超过则会被拒绝。</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p> Kafka 集群通过 Partition 实现对 Topic 的横向扩展，当有新的 Broker 加入集群时，可以通过 Partition 来实现集群的负载均衡。那么，如何确定分区的数量？</p>
+</blockquote>
+<ul>
+<li>Topic 需要多大的吞吐量？</li>
+<li>单个分区读取数据的最大吞吐量是多少？</li>
+<li>生产者向单个分区写入数据的吞吐量是多少？</li>
+<li>每个 <code>broker</code> 包含的分区个数、可用的磁盘空间和网络带宽。</li>
+<li>可以使用 <strong>主题吞吐量/消费者吞吐量</strong> 计算分区个数。</li>
+</ul>
+<blockquote>
+<p>消息何时会被清除？</p>
+</blockquote>
+<ul>
+<li>通过 <code>log.retention.hours/minutes/ms</code> 与 <code>log.retention.bytes</code> 确定，当消息条件满足任意条件之一时都将会被删除。</li>
+<li><strong>日志片段被关闭之前消息是不会过期的</strong>，即在达到 <code>log.segment.bytes</code> 设置的阈值之后日志片段关闭，然后再达到 <code>log.retention.xxxx</code> 条件之后消息才会真正过期。</li>
+</ul>
+<blockquote>
+<p>在服务端和客户端之间协调消息大小的配置</p>
+</blockquote>
+<ul>
+<li>消费者客户端所设置的 <code>fetch.message.max.bytes</code> 需要与服务器设置的消息大小 <code>message.max.bytes</code> 所协调，如果这个值比  <code>message.max.bytes</code> 小，那么消费者将无法读取较大的消息，导致消费者被阻塞。</li>
+<li>集群中的 <code>broker</code> 配置 <code>replica.fetch.max.bytes</code>，也遵循与上类似的原则。</li>
+</ul>
+<h2 id="2-3-Kafka-硬件的选择"><a href="#2-3-Kafka-硬件的选择" class="headerlink" title="2.3 Kafka 硬件的选择"></a>2.3 Kafka 硬件的选择</h2><p>影响 Kafka 性能的一些硬件因素主要包括：磁盘吞吐量（机械硬盘还是固态硬盘）、磁盘容量（1GB 还是 1TB）、内存大小、网络吞吐量、CPU、Kafka 集群。</p>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1gptoh8eoc8j30zw0k8acw.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/008i3skNly1gptoh8eoc8j30zw0k8acw.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="一个简单的Kafka集群"></p>
+<h3 id="2-3-1-需要多少个-broker"><a href="#2-3-1-需要多少个-broker" class="headerlink" title="2.3.1 需要多少个 broker"></a>2.3.1 需要多少个 <code>broker</code></h3><p>首先，考虑需要多少磁盘空间来保留数据，以及单个 <code>broker</code> 有多少空间可用；其次要考虑的因素是集群处理请求的能力，因磁盘吞吐量低和系统内存不足造成的性能问题，可以通过扩展多个 <code>broker</code> 来解决。</p>
+<h3 id="2-3-2-broker-的配置"><a href="#2-3-2-broker-的配置" class="headerlink" title="2.3.2 broker 的配置"></a>2.3.2 <code>broker</code> 的配置</h3><p>要把一个 <code>broker</code> 加入到集群里，只需要修改两个配置参数。</p>
+<ul>
+<li>所有 <code>broker</code> 都必须配置相同的 <code>zookeeper.connect</code>，该参数指定了用于保存元数据的 Zookeeper 群组和路径。</li>
+<li>每个 <code>broker</code> 都必须为 <code>broker.id</code> 参数设置唯一的值。</li>
+</ul>
+<h3 id="2-3-3-操作系统调优"><a href="#2-3-3-操作系统调优" class="headerlink" title="2.3.3 操作系统调优"></a>2.3.3 操作系统调优</h3><p>需要关注的是<strong>虚拟内存、磁盘以及网络</strong>。</p>
+<h3 id="2-3-4-生产环境的注意事项"><a href="#2-3-4-生产环境的注意事项" class="headerlink" title="2.3.4 生产环境的注意事项"></a>2.3.4 生产环境的注意事项</h3><p>需要注意的是 <strong>JVM  垃圾回收器的设置、数据中心的布局以及 Zookeeper 的配置。</strong></p>
 
   
   
@@ -552,7 +669,7 @@
               
             
               
-                <p>本文永久链接是：<a href=http://raymond-zhao.top/2021/03/02/2021-02-07-KafkaChapter2/>http://raymond-zhao.top/2021/03/02/2021-02-07-KafkaChapter2/</a></p>
+                <p>本文永久链接是：<a href=http://raymond-zhao.top/2021/02/07/2021-02-07-KafkaChapter2/>http://raymond-zhao.top/2021/02/07/2021-02-07-KafkaChapter2/</a></p>
               
             
           </blockquote>
@@ -569,10 +686,10 @@
     <div class='new-meta-box'>
       
         
-          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-03-02T12:35:14+08:00">
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-04-26T09:10:46+08:00">
   <a class='notlink'>
     <i class="fas fa-edit fa-fw" aria-hidden="true"></i>
-    <p>更新于：Mar 2, 2021</p>
+    <p>更新于：Apr 26, 2021</p>
   </a>
 </div>
 
@@ -594,7 +711,7 @@
       
         <a class="-mob-share-qq" title="" rel="external nofollow noopener noreferrer"
           
-          href="http://connect.qq.com/widget/shareqq/index.html?url=http://raymond-zhao.top/2021/03/02/2021-02-07-KafkaChapter2/&title=《Kafka权威指南》-安装Kafka - 吹梦到西洲&summary="
+          href="http://connect.qq.com/widget/shareqq/index.html?url=http://raymond-zhao.top/2021/02/07/2021-02-07-KafkaChapter2/&title=《Kafka 权威指南》：安装Kafka - 吹梦到西洲&summary="
           
           >
           
@@ -606,7 +723,7 @@
       
         <a class="-mob-share-qzone" title="" rel="external nofollow noopener noreferrer"
           
-          href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=http://raymond-zhao.top/2021/03/02/2021-02-07-KafkaChapter2/&title=《Kafka权威指南》-安装Kafka - 吹梦到西洲&summary="
+          href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=http://raymond-zhao.top/2021/02/07/2021-02-07-KafkaChapter2/&title=《Kafka 权威指南》：安装Kafka - 吹梦到西洲&summary="
           
           >
           
@@ -618,7 +735,7 @@
       
         <a class="-mob-share-weibo" title="" rel="external nofollow noopener noreferrer"
           
-          href="http://service.weibo.com/share/share.php?url=http://raymond-zhao.top/2021/03/02/2021-02-07-KafkaChapter2/&title=《Kafka权威指南》-安装Kafka - 吹梦到西洲&summary="
+          href="http://service.weibo.com/share/share.php?url=http://raymond-zhao.top/2021/02/07/2021-02-07-KafkaChapter2/&title=《Kafka 权威指南》：安装Kafka - 吹梦到西洲&summary="
           
           >
           
@@ -648,9 +765,14 @@
   
     <div class="prev-next">
       
+        <a class='prev' href='/2021/04/23/2021-04-23-KafkaChapter3/'>
+          <p class='title'><i class="fas fa-chevron-left" aria-hidden="true"></i>《Kafka 权威指南》：Kafka 生产者</p>
+          <p class='content'>3.1 Kafka 概览Kafka 的应用场景中多，如记录用户活动、记录度量指标、保存日志消息、记录智能家电信息、与其他应用程序进行异步通信、缓冲即将写入到数据库的数据等等。多样的应用场景自然也...</p>
+        </a>
+      
       
         <a class='next' href='/2021/02/07/2021-02-07-KafkaChapter1/'>
-          <p class='title'>《Kafka权威指南》-初识Kafka<i class="fas fa-chevron-right" aria-hidden="true"></i></p>
+          <p class='title'>《Kafka 权威指南》：初识Kafka<i class="fas fa-chevron-right" aria-hidden="true"></i></p>
           <p class='content'>1.1 发布与订阅消息系统数据（消息）的发送者（发布者）不会直接把消息发送给接收者，这是发布与订阅消息系统的一个特点。发布者以某种方式对消息进行分类，接收者（订阅者）订阅它们，以便接收特定类型的...</p>
         </a>
       
@@ -674,6 +796,59 @@
 
 
 
+  <script>
+  // https://github.com/theme-next/hexo-theme-next/blob/master/layout/_third-party/math/mathjax.swig
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3.0/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    // 文章章节标题不能为 “MathJax” ，否则会报错。
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+
 
 </div>
 <aside class='l_side'>
@@ -694,7 +869,7 @@
 
 
     <div class='content'>
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-安装Kafka与Zookeeper"><span class="toc-text">2.1 安装Kafka与Zookeeper</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-安装-Kafka-Broker"><span class="toc-text">2.1 安装 Kafka Broker</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-Broker-配置"><span class="toc-text">2.2 Broker 配置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-1-常规配置"><span class="toc-text">2.2.1 常规配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-2-主题的默认配置"><span class="toc-text">2.2.2 主题的默认配置</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-Kafka-硬件的选择"><span class="toc-text">2.3 Kafka 硬件的选择</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-1-需要多少个-broker"><span class="toc-text">2.3.1 需要多少个 broker</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-2-broker-的配置"><span class="toc-text">2.3.2 broker 的配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-3-操作系统调优"><span class="toc-text">2.3.3 操作系统调优</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-4-生产环境的注意事项"><span class="toc-text">2.3.4 生产环境的注意事项</span></a></li></ol></li></ol>
     </div>
   </section>
 

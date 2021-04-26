@@ -532,10 +532,14 @@
 
 <ul>
 <li>Set <code>ZSH_THEME=&quot;powerlevel10k/powerlevel10k&quot;</code> in <code>~/.zshrc</code>.</li>
-<li>重启终端，根据提示操作。相信我，界面出来后你一看就懂。</li>
+<li>重启终端，根据提示操作。</li>
 </ul>
-<h1 id="Homebrew"><a href="#Homebrew" class="headerlink" title="Homebrew"></a>Homebrew</h1><h2 id="官网"><a href="#官网" class="headerlink" title="官网"></a>官网</h2><p><a href="https://brew.sh/index_zh-cn" target="_blank" rel="noopener">Homebrew中文官网</a></p>
-<p><a href="https://docs.brew.sh/Manpage" target="_blank" rel="noopener">官方命令文档</a></p>
+<h1 id="Homebrew"><a href="#Homebrew" class="headerlink" title="Homebrew"></a>Homebrew</h1><h2 id="官网"><a href="#官网" class="headerlink" title="官网"></a>官网</h2><ul>
+<li><p><a href="https://brew.sh/index_zh-cn" target="_blank" rel="noopener">Homebrew中文官网</a></p>
+</li>
+<li><p><a href="https://docs.brew.sh/Manpage" target="_blank" rel="noopener">官方命令文档</a></p>
+</li>
+</ul>
 <h2 id="安装-1"><a href="#安装-1" class="headerlink" title="安装"></a>安装</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> /bin/bash -c <span class="string">"<span class="variable">$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)</span>"</span></span></span><br></pre></td></tr></table></figure>
 
 <h2 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h2><table>
@@ -578,7 +582,7 @@
 <td align="left">搜索可用的包</td>
 </tr>
 </tbody></table>
-<h2 id="Services控制"><a href="#Services控制" class="headerlink" title="Services控制"></a>Services控制</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> brew services list  <span class="comment"># 查看使用brew安装的服务列表</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> brew services run formula|--all  <span class="comment"># 启动服务（仅启动不注册）</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> brew services start formula|--all  <span class="comment"># 启动服务，并注册</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> brew services stop formula|--all   <span class="comment"># 停止服务，并取消注册</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> brew services restart formula|--all  <span class="comment"># 重启服务，并注册</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> brew services cleanup  <span class="comment"># 清除已卸载应用的无用的配置</span></span></span><br></pre></td></tr></table></figure>
+<h2 id="Services-控制"><a href="#Services-控制" class="headerlink" title="Services 控制"></a>Services 控制</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> brew services list  <span class="comment"># 查看使用brew安装的服务列表</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> brew services run formula|--all  <span class="comment"># 启动服务（仅启动不注册）</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> brew services start formula|--all  <span class="comment"># 启动服务，并注册</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> brew services stop formula|--all   <span class="comment"># 停止服务，并取消注册</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> brew services restart formula|--all  <span class="comment"># 重启服务，并注册</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> brew services cleanup  <span class="comment"># 清除已卸载应用的无用的配置</span></span></span><br></pre></td></tr></table></figure>
 
 <h1 id="配置环境变量"><a href="#配置环境变量" class="headerlink" title="配置环境变量"></a>配置环境变量</h1><blockquote>
 <p>在此假设读者已具备基本的 vim 操作技能，如果不具备的话可以使用右键选择常用的文本编辑软件进行编辑。</p>
@@ -587,10 +591,10 @@
 <h2 id="Visual-Studio-Code"><a href="#Visual-Studio-Code" class="headerlink" title="Visual Studio Code"></a>Visual Studio Code</h2><h3 id="方式一"><a href="#方式一" class="headerlink" title="方式一"></a>方式一</h3><ul>
 <li>打开 <code>Visual Studio Code</code></li>
 <li>同时按下<code>Command+Shift+P</code>，在命令框中输入<code>Shell Command:Install &#39;code&#39; command in PATH</code></li>
-<li>卸载的话: 你执行上面那一步时就懂了。</li>
+<li>卸载的话: 执行上面那一步时就应该已经注意到了。</li>
 </ul>
 <h3 id="方式二"><a href="#方式二" class="headerlink" title="方式二"></a>方式二</h3><ul>
-<li>如果你的<code>Visual Studio Code</code>是在<code>Applications</code>(英文操作系统)或者<code>应用程序</code>(中文操作系统)的话</li>
+<li>如果 <code>Visual Studio Code</code> 是在 <code>Applications</code> (英文操作系统)或者<code>应用程序</code>(中文操作系统)的话</li>
 <li>编辑配置文件 <code>vi ~/.bash_profile</code></li>
 <li>添加<code>Visual Studio Code</code>环境变量</li>
 </ul>
@@ -601,14 +605,14 @@
 <li>重新加载配置文件 <code>source ~/.bash_profile</code></li>
 </ul>
 <h2 id="Sublime"><a href="#Sublime" class="headerlink" title="Sublime"></a>Sublime</h2><ul>
-<li>如果你的<code>Sublime Text</code>是在<code>Applications</code>(英文操作系统)或者<code>应用程序</code>(中文操作系统)的话</li>
-<li>建立软连接，将 <code>Sublime</code> 的启动文件与 <code>/use/local/bin</code> 建立链接。</li>
+<li>如果 <code>Sublime Text</code> 是在 <code>Applications</code>(英文操作系统)或者<code>应用程序</code>(中文操作系统)的话</li>
+<li>建立软连接，将  <code>Sublime</code>  的启动文件与 <code>/use/local/bin</code> 建立链接。</li>
 </ul>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ln -s /Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl /usr/<span class="built_in">local</span>/bin/.</span></span><br></pre></td></tr></table></figure>
 
 <ul>
 <li>编辑配置文件 <code>vi ~/.bash_profile</code></li>
-<li>添加<code>Sublime</code>环境变量，并重命名命令缩写，我在此选择的是<code>subl</code>.</li>
+<li>添加 <code>Sublime</code> 环境变量，并重命名命令缩写，我在此选择的是<code>subl</code>。</li>
 </ul>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Setting PATH for Sublime</span></span><br><span class="line"><span class="built_in">export</span> PATH=<span class="string">"/usr/local/bin:<span class="variable">$PATH</span>"</span></span><br><span class="line"><span class="built_in">alias</span> subl=<span class="string">'/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl'</span></span><br></pre></td></tr></table></figure>
 
@@ -617,14 +621,14 @@
 <li>重新加载配置文件 <code>source ~/.bash_profile</code></li>
 </ul>
 <h2 id="Typora"><a href="#Typora" class="headerlink" title="Typora"></a>Typora</h2><h3 id="方式一-1"><a href="#方式一-1" class="headerlink" title="方式一"></a>方式一</h3><ul>
-<li>如果你的<code>Typora</code>是在<code>Applications</code>(英文操作系统)或者<code>应用程序</code>(中文操作系统)的话</li>
+<li>如果 <code>Typora</code> 是在 <code>Applications</code> (英文操作系统)或者<code>应用程序</code>(中文操作系统)的话</li>
 <li>建立软连接，将 <code>Typora</code> 的启动文件与 <code>/use/local/bin</code> 建立链接。</li>
 </ul>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ln -s /Applications/Typora.app/Contents/MacOS/Typora /usr/<span class="built_in">local</span>/bin/.</span></span><br></pre></td></tr></table></figure>
 
 <ul>
 <li>编辑配置文件 <code>vi ~/.bash_profile</code></li>
-<li>添加<code>Typora</code>环境变量，并重命名命令缩写，我在此选择的是<code>typo</code>.</li>
+<li>添加 <code>Typora</code> 环境变量，并重命名命令缩写，我在此选择的是<code>typo</code>。</li>
 </ul>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">alias</span> typo=<span class="string">'open -a Typora'</span></span><br></pre></td></tr></table></figure>
 
@@ -652,7 +656,7 @@
 <li>重新加载配置文件 <code>source ~/.bash_profile</code></li>
 </ul>
 <blockquote>
-<p>如果安装了多个版本的<code>JDK</code>，并且需要切换的话。</p>
+<p>如果安装了多个版本的<code>JDK</code>，并且需要切换的话，可以使用下面的方式。</p>
 </blockquote>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> JAVA_HOME=$(/usr/libexec/java_home -v 1.8)</span><br><span class="line"><span class="built_in">export</span> JAVA_HOME=$(/usr/libexec/java_home -v 11)</span><br><span class="line"><span class="built_in">export</span> JAVA_HOME=$(/usr/libexec/java_home -v 13)</span><br></pre></td></tr></table></figure>
 
@@ -668,7 +672,7 @@
 </ul>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Self Defined Clear Screen</span></span><br><span class="line"><span class="built_in">alias</span> cls=<span class="string">"clear"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Self Defined Commands</span></span><br><span class="line"><span class="built_in">alias</span> ll=<span class="string">'colorls -l --sd --gs --group-directories-first'</span></span><br><span class="line"><span class="built_in">alias</span> ls=<span class="string">'colorls --group-directories-first'</span></span><br><span class="line"><span class="built_in">alias</span> tree=<span class="string">"find . -print | sed -e 's;[^/]*/;|____;g;s;____|; |;g'"</span></span><br><span class="line"><span class="built_in">alias</span> doc=<span class="string">"docsify"</span></span><br></pre></td></tr></table></figure>
 
-<h1 id="iTerm2命令"><a href="#iTerm2命令" class="headerlink" title="iTerm2命令"></a>iTerm2命令</h1><h2 id="标签页"><a href="#标签页" class="headerlink" title="标签页"></a>标签页</h2><ul>
+<h1 id="iTerm2-命令"><a href="#iTerm2-命令" class="headerlink" title="iTerm2 命令"></a>iTerm2 命令</h1><h2 id="标签页"><a href="#标签页" class="headerlink" title="标签页"></a>标签页</h2><ul>
 <li>新建标签页：<code>command + T</code></li>
 <li>关闭当前标签页：<code>command + W</code></li>
 <li>标签页切换：<code>command + 数字(1，2...)</code>或者<code>command+左右方向键</code></li>
@@ -699,8 +703,8 @@
 <h2 id="自定义提示样式"><a href="#自定义提示样式" class="headerlink" title="自定义提示样式"></a>自定义提示样式</h2><p>默认情况下, 提示符显示为 <code>user@hostnam</code>，比如<code>xxxxx@xxxxdeMBP</code>，可以手动去除。</p>
 <ul>
 <li><code>whoami</code>查看当前用户</li>
-<li><code>vim ~/.zshrc</code>，增加 <code>DEFAULT_USER=&quot;user&quot;</code> ，其中的<code>user</code>比如和<code>whoami</code>中的输出匹配</li>
-<li>重载文件<code>source ~/.zshrc</code></li>
+<li><code>vim ~/.zshrc</code>，增加 <code>DEFAULT_USER=&quot;user&quot;</code> ，其中的<code>user</code>比如和 <code>whoami</code> 中的输出匹配</li>
+<li>重载文件 <code>source ~/.zshrc</code></li>
 </ul>
 <blockquote>
 <p>但是如果跟我的终端一样就不需要配置了。</p>
@@ -709,7 +713,7 @@
 <li>配置传送门：<a href="https://blog.biezhi.me/2018/11/build-a-beautiful-mac-terminal-environment.html" target="_blank" rel="noopener">编程和酒</a></li>
 </ul>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge8skdl3qij30vo0kykfp.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1ge8skdl3qij30vo0kykfp.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="终端美化后的界面"></p>
-<h1 id="Vim-命令"><a href="#Vim-命令" class="headerlink" title="Vim 命令"></a>Vim 命令</h1><p>在这颗蔚蓝色的星球上，有一群程序员，在这一群程序员中有两个广为流传的工具，一个是编辑器之神 <code>Vim</code>，一个是神之编辑器 <code>emacs</code>.</p>
+<h1 id="Vim-命令"><a href="#Vim-命令" class="headerlink" title="Vim 命令"></a>Vim 命令</h1><p>在这颗蔚蓝色的星球上，有一群程序员，在这一群程序员中有两个广为流传的工具，一个是编辑器之神 <code>Vim</code>，一个是神之编辑器 <code>emacs</code>。</p>
 <h2 id="插入模式"><a href="#插入模式" class="headerlink" title="插入模式"></a>插入模式</h2><table>
 <thead>
 <tr>
@@ -995,10 +999,10 @@
     <div class='new-meta-box'>
       
         
-          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-03-11T21:30:23+08:00">
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-04-13T15:31:47+08:00">
   <a class='notlink'>
     <i class="fas fa-edit fa-fw" aria-hidden="true"></i>
-    <p>更新于：Mar 11, 2021</p>
+    <p>更新于：Apr 13, 2021</p>
   </a>
 </div>
 
@@ -1130,7 +1134,7 @@
 
 
     <div class='content'>
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#安装"><span class="toc-text">安装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#官网"><span class="toc-text">官网</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装-1"><span class="toc-text">安装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#常用命令"><span class="toc-text">常用命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Services控制"><span class="toc-text">Services控制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Visual-Studio-Code"><span class="toc-text">Visual Studio Code</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#方式一"><span class="toc-text">方式一</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#方式二"><span class="toc-text">方式二</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Sublime"><span class="toc-text">Sublime</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Typora"><span class="toc-text">Typora</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#方式一-1"><span class="toc-text">方式一</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Java"><span class="toc-text">Java</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Python3"><span class="toc-text">Python3</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MySQL"><span class="toc-text">MySQL</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Node-js"><span class="toc-text">Node.js</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#命令重命名"><span class="toc-text">命令重命名</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#标签页"><span class="toc-text">标签页</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分屏"><span class="toc-text">分屏</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#命令-常用"><span class="toc-text">命令(常用)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#窗口"><span class="toc-text">窗口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#自定义提示样式"><span class="toc-text">自定义提示样式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#插入模式"><span class="toc-text">插入模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#光标移动"><span class="toc-text">光标移动</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#复制与删除"><span class="toc-text">复制与删除</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#搜索模式"><span class="toc-text">搜索模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#编辑模式"><span class="toc-text">编辑模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#窗口操作"><span class="toc-text">窗口操作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#关闭"><span class="toc-text">关闭</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考"><span class="toc-text">参考</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#安装"><span class="toc-text">安装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#官网"><span class="toc-text">官网</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装-1"><span class="toc-text">安装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#常用命令"><span class="toc-text">常用命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Services-控制"><span class="toc-text">Services 控制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Visual-Studio-Code"><span class="toc-text">Visual Studio Code</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#方式一"><span class="toc-text">方式一</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#方式二"><span class="toc-text">方式二</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Sublime"><span class="toc-text">Sublime</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Typora"><span class="toc-text">Typora</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#方式一-1"><span class="toc-text">方式一</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Java"><span class="toc-text">Java</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Python3"><span class="toc-text">Python3</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MySQL"><span class="toc-text">MySQL</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Node-js"><span class="toc-text">Node.js</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#命令重命名"><span class="toc-text">命令重命名</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#标签页"><span class="toc-text">标签页</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分屏"><span class="toc-text">分屏</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#命令-常用"><span class="toc-text">命令(常用)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#窗口"><span class="toc-text">窗口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#自定义提示样式"><span class="toc-text">自定义提示样式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#插入模式"><span class="toc-text">插入模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#光标移动"><span class="toc-text">光标移动</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#复制与删除"><span class="toc-text">复制与删除</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#搜索模式"><span class="toc-text">搜索模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#编辑模式"><span class="toc-text">编辑模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#窗口操作"><span class="toc-text">窗口操作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#关闭"><span class="toc-text">关闭</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考"><span class="toc-text">参考</span></a></li></ol>
     </div>
   </section>
 

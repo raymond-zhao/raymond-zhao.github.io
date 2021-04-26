@@ -1,23 +1,263 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>《Kafka权威指南》-安装Kafka</title>
-    <url>/2021/03/02/2021-02-07-KafkaChapter2/</url>
-    <content><![CDATA[<h2 id="2-1-安装Kafka与Zookeeper"><a href="#2-1-安装Kafka与Zookeeper" class="headerlink" title="2.1 安装Kafka与Zookeeper"></a>2.1 安装Kafka与Zookeeper</h2><blockquote>
-<p>在安装 Zookeeper 和 Kafka 之前，需要先安装 Java 环境。</p>
+    <title>《Kafka 权威指南》：Kafka 消费者</title>
+    <url>/2021/04/24/2021-04-24-KafkaChapter4/</url>
+    <content><![CDATA[<h2 id="4-1-KafkaConsumer-概念"><a href="#4-1-KafkaConsumer-概念" class="headerlink" title="4.1 KafkaConsumer 概念"></a>4.1 KafkaConsumer 概念</h2><h3 id="4-1-1-消费者和消费者群组"><a href="#4-1-1-消费者和消费者群组" class="headerlink" title="4.1.1 消费者和消费者群组"></a>4.1.1 消费者和消费者群组</h3><p>Kafka 消费者从属于<strong>消费者群组</strong>。一个群组里的消费者订阅的是同一个主题，每个消费者接收主题一部分分区的消息。这样可以协调消费者与生产者之间收发消息的不同速率以及 Broker 存储消息的能力。</p>
+<p>一个消费者可以接收多个主题分区的消息，但是如下图所示，如果消费者的数量超过主题中分区的数量，那么多余的消费者就会被闲置，不会接收到任何消息。</p>
+<p>![5个消费者受到4个分区的消息](/Users/raymond/Library/Application Support/typora-user-images/image-20210425102753887.png)</p>
+<p>往群组里增加消费者是横向伸缩消费能力的主要方式，有必要为主题创建大量的分区，在负载增长时可以加入更多的消费者，但是消费者的数量不要超过主题分区的数量。</p>
+<p>除横向收缩外，也可以使用多个应用程序从同一个主题读取数据，只要保证每个应用程序都有自己的消费者群组，就可以读取到主题内所有的消息。如下图所示，如果增加 <code>Consumer Group 2</code>，它也不会影响 <code>Consumer Group 1</code> 接收消息主题全部分区的消息。</p>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1gpvsg53es4j31000l4tcc.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/008i3skNly1gpvsg53es4j31000l4tcc.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="两个消费者群组对应一个主题"></p>
+<h3 id="4-1-2-消费者群组和分区再均衡"><a href="#4-1-2-消费者群组和分区再均衡" class="headerlink" title="4.1.2 消费者群组和分区再均衡"></a>4.1.2 消费者群组和分区再均衡</h3><p>一个新的消费者加入群组时，它读取的是原本由其他消费者读取的消息。当一个消费者被关闭或发生崩溃 时，它就离开群组，原本由它读取的分区将由群组里的其他消费者来读取。分区的所有权从一个消费者转移到另一个消费者，这样的行为被称为<strong>再均衡（rebalance）</strong>，它提供了<strong>高可用性和伸缩性</strong>。</p>
+<p>在<strong>再均衡</strong>期间，消费者无法读取消息，造成整个群组一小段时间的不可用。另外，当分区被重新分配给另一个消费者时，消费者当前的读取状态会丢失，它有可能还需要去刷新缓存，在它重新恢复状态之前会拖慢应用程序。</p>
+<p>消费者通过向被指派为群组协调器的 <code>broker</code>（不同的群组可以有不同的协调器）发送心跳来维持它们和群组的从属关系，以及它们对分区的所有权关系。只要消费者以正常的时间间隔发送心跳就被认为是活跃的，说明它还在读取分区里的消息。消费者会在<strong>轮询消息</strong>或<strong>提交偏移量</strong>时发送心跳。如果消费者停止发送心跳的时间足够长，会话就会过期，群组协调器认为它已经死亡，就会触发一次再均衡。</p>
+<p>如果一个消费者发生崩溃并停止读取消息，群组协调器会等待几秒钟，确认它死亡了才 会触发再均衡。在这几秒钟时间里，死掉的消费者不会读取分区里的消息。在清理消费者时，消费者会通知协调器它将要离开群组，协调器会立即触发一次再均衡，尽量降低处理停顿。</p>
+<blockquote>
+<p>kafka 0.10.1 在版本引入了一个独立的<strong>心跳进程</strong>，可以在轮询消息的空档发送心跳，使得发送心跳的频率与消息轮询的频率相互独立。在新版本的 Kafka 里，可以指定消费者在<strong>离开群组并触发再均衡之前</strong>可以有多长时间不进行消息轮询，这样可以避免出现<strong>活锁（livelock）</strong>。</p>
 </blockquote>
-<p>在 MacOS 环境下安装，使用 <code>Homebrew</code> 只需一条命令即可，在安装 Kafka 时 Homebrew 会自动下载相应的依赖，自然也包括 Zookeeper、OpenJDK。</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> brew install kafka</span></span><br></pre></td></tr></table></figure>
-
-<p>Homebrew 会将 Kafka 安装到 <code>/usr/local/Cellar</code> 目录，不过文件会被链接到其他目录。</p>
+<p><strong>分配分区是怎样的一个过程？</strong></p>
 <ul>
-<li>二进制文件和脚本文件在 <code>/usr/local/bin</code> 目录下。</li>
-<li>Kafka 配置文件在 <code>/usr/local/etc/kafka</code> 目录下。</li>
-<li>Zookeeper 配置文件在 <code>/usr/local/etc/zookeeper</code> 目录下。</li>
-<li><code>log.dirs</code> （Kafka 的数据目录）被设置为 <code>/usr/local/var/lib/kafka-logs</code>。</li>
+<li>消费者要加入群组时，先向<strong>群组协调器（group coordinator）</strong>发送 <code>JoinGroup</code> 请求。第一个加入群组的消费者将成为<strong>群主（leader）</strong>。</li>
+<li><strong>群主</strong>从<strong>协调器</strong>获得群组成员列表（包含所有最近发送过心跳的消费者），并为每一个消费者分配分区。群主实现了 <code>PartitionAssignor</code> 接口来决定哪些分区应该被分配给哪个消费者。</li>
+<li>分配完毕后，<strong>群主</strong>将<strong>分配情况列表</strong>发送给<strong>群组协调器</strong>，协调器再把这些消息发送给所有消费者。每个消费者只能看到自己的分配信息，只有群主知道所有消费者的分配信息。</li>
+<li>（再均衡时自然也会发生再分区）</li>
 </ul>
-<p>安装完毕后，就可以启动 Zookeeper 和 Kafka了。</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> zookeeper-server-start /usr/<span class="built_in">local</span>/etc/kafka/zookeeper.properties &amp; kafka-server-start /usr/<span class="built_in">local</span>/etc/kafka/server.properties</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Kafka 的分区分配策略：</p>
+<ul>
+<li><code>org.apache.kafka.clients.consumer.RangeAssignor</code>（默认）</li>
+<li><code>org.apache.kafka.clients.consumer.RoundRobinAssignor</code></li>
+<li><code>org.apache.kafka.clients.consumer.StickyAssignor</code></li>
+<li><code>org.apache.kafka.clients.consumer.CooperativeStickyAssignor</code></li>
+</ul>
+<p>也可以通过实现 <code>org.apache.kafka.clients.consumer.ConsumerPartitionAssignor</code> 接口自定义分区策略。</p>
+</blockquote>
+<h2 id="4-2-创建-Kafka-消费者"><a href="#4-2-创建-Kafka-消费者" class="headerlink" title="4.2 创建 Kafka 消费者"></a>4.2 创建 Kafka 消费者</h2><p>创建 <code>KafkaConsumer</code> 与创建 <code>KafkaProducer</code> 过程极为相似，需要提供 3 个必要的属性：<code>bootstrap.servers</code>、<code>key.deserializer</code>、<code>value.deserializer</code>。下面是 Kafka 0.10.1 中创建消费者的示例代码。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> KafkaConsumer&lt;Integer, String&gt; consumer;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> String topic;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">Consumer</span><span class="params">(String topic)</span> </span>&#123;</span><br><span class="line">    Properties props = <span class="keyword">new</span> Properties();</span><br><span class="line">    props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, <span class="string">"localhost:9092"</span>);</span><br><span class="line">    props.put(ConsumerConfig.GROUP_ID_CONFIG, <span class="string">"DemoConsumer"</span>);</span><br><span class="line">    props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, <span class="string">"true"</span>);</span><br><span class="line">    props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, <span class="string">"1000"</span>);</span><br><span class="line">    props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, <span class="string">"30000"</span>);</span><br><span class="line">    props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, <span class="string">"org.apache.kafka.common.serialization.IntegerDeserializer"</span>);</span><br><span class="line">    props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, <span class="string">"org.apache.kafka.common.serialization.StringDeserializer"</span>);</span><br><span class="line"></span><br><span class="line">    consumer = <span class="keyword">new</span> KafkaConsumer&lt;&gt;(props);</span><br><span class="line">    <span class="keyword">this</span>.topic = topic;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-3-订阅主题"><a href="#4-3-订阅主题" class="headerlink" title="4.3 订阅主题"></a>4.3 订阅主题</h2><p>消费者的 <code>subscribe()</code> 方法接受一个主题列表作为参数。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">consumeer.subscribe(Collections.singletonList(<span class="string">"customerCountries"</span>));</span><br></pre></td></tr></table></figure>
+
+<p>也可以在调用 <code>subscribe</code> 方法时传入正则表达式，用以匹配多个主题。<strong>如果创建了新主题，并且主题名与正则表达式相匹配，将会立即触发一次再均衡。</strong>要订阅所有与 <code>test</code> 相关的主题，可以</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">consumer.subscribe(<span class="string">"test.*"</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-4-轮询-Poll-Loop"><a href="#4-4-轮询-Poll-Loop" class="headerlink" title="4.4 轮询(Poll Loop)"></a>4.4 轮询(Poll Loop)</h2><p>消息轮询是消费者的核心 API，一旦消费者订阅了主题，轮询就会处理所有的细节，包括<strong>群组协调、分区再均衡、发送心跳和获取数据</strong>。消费者代码主要部分如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="keyword">true</span>) &#123; <span class="comment">// 消费者长期运行，持续轮询。</span></span><br><span class="line">        <span class="comment">// poll() 的参数是超时时间，它会在指定的毫秒数内一直等待 broker 返回数据。</span></span><br><span class="line">        ConsumerRecords&lt;String, String&gt; records = consumer.poll(<span class="number">100</span>);</span><br><span class="line">        <span class="keyword">for</span> (ConsumerRecord&lt;String, String&gt; record : records) &#123;</span><br><span class="line">            log.debug(<span class="string">"topic = %s, partition = %s, offset = %d, consumer = %s, country = %s\n"</span>,</span><br><span class="line">                     record.topic(), record.partition(), record.offset(), record.key(), record.value());</span><br><span class="line">            <span class="keyword">int</span> updateCount = <span class="number">1</span>;</span><br><span class="line">            <span class="keyword">if</span> (custCountryMap.countainsValue(record.value())) &#123;</span><br><span class="line">                updateCount = custCountryMap.get(record.value()) + <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            custCountryMap.put(record.value(), updateCount);</span><br><span class="line">            </span><br><span class="line">            JSONObject json = <span class="keyword">new</span> JSONObject(custCountryMap);</span><br><span class="line">            System.out.println(json.toString(<span class="number">4</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    <span class="comment">// 关闭后，网络连接和 Socket 也会随之关闭，并立即触发一次 再均衡，</span></span><br><span class="line">    <span class="comment">// 而不是等待群组协调器发现它不再发送发送心跳并认定它已死亡，节省了时间。</span></span><br><span class="line">    consumer.close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>轮询不只是获取数据那么简单，在第一次调用新消费者的 <code>poll()</code> 方法时，它会负责查找 <code>GroupCoordinator</code>，然后加入群组，接受分配的分区。如果发生了再均衡，整个过程也是在轮询期间进行的。当然，心跳也是从轮询里发送出去的。所以，要确保在轮询期间所做的任何处理工作都应该尽快完成。</p>
+<blockquote>
+<p><strong>线程安全</strong></p>
+<p>在同一个群组里，无法让一个线程运行多个消费者，也无法让多个线程安全地共享一个消费者。一个消费者应该单独使用一个线程，如果要在同一个消费者群组里运行多个消费者，需要让每个消费者运行在自己的线程里。最好是把消费者的逻辑封装在自己的对象里，然后使用 Java 的 ExecutorService 启动多个线程，使每个消费者运行在自己的线程上。</p>
+</blockquote>
+<h2 id="4-5-消费者的配置"><a href="#4-5-消费者的配置" class="headerlink" title="4.5 消费者的配置"></a>4.5 消费者的配置</h2><p>关于消费者的详细配置可参考 <a href="https://kafka.apache.org/documentation/#consumerconfigs" target="_blank" rel="noopener">Apache Kafka Consumer Configuration</a>，不再赘述。</p>
+<h2 id="4-6-提交和偏移量"><a href="#4-6-提交和偏移量" class="headerlink" title="4.6 提交和偏移量"></a>4.6 提交和偏移量</h2><p>每次调用 <code>poll()</code> 方法，它总是返回由生产者写入 Kafka 但还没有被消费者读取过的记录， 因此可以追踪到哪些记录是被群组里的哪个消费者读取的。Kafka 不会像其他 JMS 队列那样需要得到消费者的确认，相反，消费者可以使用 Kafka 来追踪消息在分区里的位置（偏移量）。</p>
+<p><strong>更新分区当前位置的操作被叫做提交。</strong></p>
+<p>消费者往一个叫作 <code>_consumer_offset</code> 的特殊主题发送消息，消息里包含每个分区的偏移量。当消费者发生崩溃或者有新的消费者加入群组时就会触发再均衡，再均衡之后，每个消费者可能分配到新的分区，而不是之前处理的分区。为了能够继续之前的工作，消费者需要读取每个分区最后一次提交的偏移量，然后从偏移量指定的地方继续处理。</p>
+<ul>
+<li>如果提交的偏移量小于客户端处理的最后一条消息的偏移量，那么处理两个偏移量之间的消息会被重复处理。如下图所示。</li>
+</ul>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1gpwvlvz2r8j31040bkmz6.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/008i3skNly1gpwvlvz2r8j31040bkmz6.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="提交的偏移量小于客户端处理的最后一个消息的偏移量"></p>
+<ul>
+<li>如果提交的偏移量大于客户端处理的最后一个消息的偏移量，那么处于两个偏移量之间的消息将会丢失。如下图所示。</li>
+</ul>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1gpvxl9dng5j31000d2767.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/008i3skNly1gpvxl9dng5j31000d2767.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="提交的偏移量大于客户端处理的最后一个消息的偏移量"></p>
+<h3 id="4-6-1-自动提交"><a href="#4-6-1-自动提交" class="headerlink" title="4.6.1 自动提交"></a>4.6.1 自动提交</h3><p>如果 <code>enable.auto.commit</code> 被设为 <code>true</code>，那 么每过 <code>5s</code>，消费者会自动把从 <code>poll()</code> 方法接收到的最大偏移量提交上去。提交时间间隔 由 <code>auto.commit.interval.ms</code> 控制，默认值是 <code>5s</code>。与消费者里的其他东西一样，自动提交也是在轮询里进行的。消费者每次在进行轮询时会检查是否该提交偏移量了，如果是，那么就会提交从上一次轮询返回的偏移量。</p>
+<p>在使用自动提交时，每次调用轮询方法都会把上一次调用返回的偏移量提交上去，它并不知道具体哪些消息已经被处理了。</p>
+<h3 id="4-6-2-提交当前偏移量"><a href="#4-6-2-提交当前偏移量" class="headerlink" title="4.6.2 提交当前偏移量"></a>4.6.2 提交当前偏移量</h3><p>开发者既可以通过控制<strong>偏移量提交时间</strong>，也可以通过<strong>提交偏移量</strong>来消除丢失消息的可能性，并在发生再均衡时减少重复消息的数量。</p>
+<p>把 <code>auto.commit.offset</code> 设为 <code>false</code>，让应用程序决定何时提交偏移量。消费者的 <code>commitSync()</code> API 会提交由 <code>poll()</code> 方法返回的最新偏移量，提交成功后马上返回，如果提交失败就抛出异常。</p>
+<p>要记住：<code>commitSync()</code> 将会提交由 <code>poll()</code> 返回的最新偏移量，所以在处理完所有记录后要确保调用了 <code>commitSync()</code>，否则还是会有丢失消息的风险。如果发生了再均衡，从<strong>最近一批消息到发生再均衡之间的所有消息</strong>都将被<strong>重复处理</strong>。</p>
+<h3 id="4-6-3-异步提交"><a href="#4-6-3-异步提交" class="headerlink" title="4.6.3 异步提交"></a>4.6.3 异步提交</h3><p>手动提交有一个不足之处，在 <code>broker</code> 对提交请求作出回应之前，应用程序会一直阻塞，这会影响吞吐量，可以通过<strong>降低提交频率</strong>来提升吞吐量，但如果发生了再均衡，会增加重复消息的数量。此时可以使用异步提交 API <code>commitAsync()</code>，只管发送提交请求，而无需等待 <code>broker</code> 的响应。</p>
+<blockquote>
+<p>在成功提交或碰到无法恢复的错误之前，<code>commitSync()</code> 会一直重试，但是 <code>commitAsync()</code> 不会，如果在服务器出现更大偏移量提交成功的情况下，出现了再均衡，就会出现重复消息。</p>
+</blockquote>
+<p><code>commitAsync()</code> 支持回调，在 <code>broker</code> 作出响应时会执行回调。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">consumer.commitAsync(<span class="keyword">new</span> OffsetCommitCallback() &#123;</span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onComplete</span><span class="params">(Map&lt;TopicPartition, OffsetAndMetadata&gt; offsets, Exception e)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">if</span> (e != <span class="keyword">null</span>) &#123;</span><br><span class="line">           log.error(<span class="string">"Commit failed for offsets &#123;&#125;"</span>, offsets, e);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-6-4-同步和异步组合提交"><a href="#4-6-4-同步和异步组合提交" class="headerlink" title="4.6.4 同步和异步组合提交"></a>4.6.4 同步和异步组合提交</h3><p>一般情况下，针对偶尔出现的提交失败，不进行重试不会有太大问题，因为如果提交失败是因为临时问题导致的，那么后续的提交总会有成功的。但如果这是发生在关闭消费者或再均衡前的最后一次提交，就要确保能够提交成功。</p>
+<ul>
+<li>如果一切正常，使用 <code>commitAsync()</code> 方法来提交。这样速度更快，而且即使这次提交失败，下一次提交很可能会成功。</li>
+<li>如果直接关闭消费者，就没有所谓的”下一次提交“了。使用 <code>commitSync()</code> 方法会一 直重试，直到提交成功或发生无法恢复的错误。</li>
+</ul>
+<h3 id="4-6-5-提交特定的偏移量"><a href="#4-6-5-提交特定的偏移量" class="headerlink" title="4.6.5 提交特定的偏移量"></a>4.6.5 提交特定的偏移量</h3><p>我们都知道，提交偏移量的频率与处理消息批次的频率是一样的。但如果想要更频繁地提交，或者在批次中间提交偏移量可以使用消费者 API，它允许在调用 <code>commitSync()</code> 和 <code>commitAsync()</code> 方法时传进去希望提交的分区和偏移量的 <code>map</code>。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> Map&lt;TopicPartition, OffsetAndMetadata&gt; currentOffsets = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line"><span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">    ConsumerRecords&lt;String, String&gt; records = consumer.poll(<span class="number">100</span>);</span><br><span class="line">    <span class="keyword">for</span> (ConsumerRecord&lt;String, String&gt; record : records) &#123;</span><br><span class="line">        System.out.println(<span class="string">"Topic, Partition, Offset, customer, country"</span>);</span><br><span class="line">        currentOffsets.put(<span class="keyword">new</span> TopicPartition(record.topic(), record.partition()), <span class="keyword">new</span> OffsetAndMetadata(record.offset() + <span class="number">1</span>, <span class="string">"no metadata"</span>));</span><br><span class="line">        <span class="keyword">if</span> (count % <span class="number">1000</span> == <span class="number">0</span>) <span class="comment">// 每处理 1000 条记录就提交一次偏移量</span></span><br><span class="line">            consumer.commitAsync(currentOffsets, <span class="keyword">null</span>);</span><br><span class="line">        count++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-7-再均衡监听器"><a href="#4-7-再均衡监听器" class="headerlink" title="4.7 再均衡监听器"></a>4.7 再均衡监听器</h2><p>上一节提到过，消费者在退出和进行分区再均衡之前，会做一些清理工作。</p>
+<p>应该在消费者失去对一个分区的所有权之前提交最后一个已处理记录的偏移量，还可能需要处理缓冲区累积下来的记录、关闭文件句柄、数据库连接等。</p>
+<p>在为消费者分配新分区或移除旧分区时， 可以通过消费者 API 执行程序代码，在调用 <code>subscribe()</code> 方法时传进 <code>ConsumerRebalanceListener</code> 实例，<a href="https://javadoc.io/doc/org.apache.kafka/kafka-clients/latest/index.html" target="_blank" rel="noopener">这个接口</a>有两个需要实现的方法。</p>
+<ul>
+<li><code>public void onPartitionsRevoked(Collection&lt;TopicPartition&gt; partitions)</code> 方法会在再均衡开始之前和消费者停止读取消息之后被调用，如果在这里提交偏移量，下一个接管分区的消费者就知道该从哪里开始读取了。</li>
+<li><code>public void onPartitionAssigned(Collection&lt;TopicPartition&gt; partitions)</code> 方法会在重新分配分区之后和消费者开始读取消息之前被调用。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> Map&lt;TopicPartition, OffsetAndMetadata&gt; currentOffsets = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">HandleRebalance</span> <span class="keyword">implements</span> <span class="title">ConsumerRebalanceListener</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onPartitionsRevoked</span><span class="params">(Collection&lt;TopicPartition&gt; collection)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onPartitionsAssigned</span><span class="params">(Collection&lt;TopicPartition&gt; partitions)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Lost partitions in rebalance, Committing current offsets: "</span> + currentOffsets);</span><br><span class="line">        consumer.commitSync(currentOffsets);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">someMethod</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        consumer.subscribe(Collections.singleton(topic), <span class="keyword">new</span> HandleRebalance());</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">            ConsumerRecords&lt;String, String&gt; records = consumer.poll(Duration.ofMillis(<span class="number">100</span>));</span><br><span class="line">            <span class="keyword">for</span> (ConsumerRecord&lt;String, String &gt; record : records) &#123;</span><br><span class="line">                System.out.println(<span class="string">"record: "</span> + record);</span><br><span class="line">                currentOffsets.put(<span class="keyword">new</span> TopicPartition(record.topic(), record.partition()), <span class="keyword">new</span> OffsetAndMetadata(record.offset() + <span class="number">1</span>, <span class="string">"no metadata"</span>));</span><br><span class="line">            &#125;</span><br><span class="line">            consumer.commitAsync(currentOffsets, <span class="keyword">null</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (WakeupException e) &#123;</span><br><span class="line">        log.error(<span class="string">"msg"</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        log.error(<span class="string">"Unexpected error "</span>, e);  </span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            consumer.commitSync(currentOffsets);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            consumer.close();</span><br><span class="line">            System.out.println(<span class="string">"Closed consumer and we are done"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-8-从特定偏移量处开始处理记录"><a href="#4-8-从特定偏移量处开始处理记录" class="headerlink" title="4.8 从特定偏移量处开始处理记录"></a>4.8 从特定偏移量处开始处理记录</h2><p><code>poll()</code> 方法从各个<strong>分区的最新偏移量</strong>开始处理消息，如果想从分区的<strong>起始位置</strong>，或者直接跳到<strong>分区的末尾</strong>开始读取消息，可以使用 <code>seekToBeginning(Collection&lt;TopicPartition&gt; tp)</code> 和 <code>seekToEnd(Collection&lt;TopicPartition&gt;) tp</code> 这两个方法。</p>
+<p>Kafka 也提供了用于查找特定偏移量的 API，它可以向后回退或向前跳过几个消息。在消费者启动或分配到新分区时，可以使用 <code>seek()</code> 方法查找保存在<strong>数据库</strong>里的偏移量。使用 <code>ConsumerRebalanceListener</code> 和 <code>seek()</code> 方法可以确保是从数据库里保存的偏移量所指定的位置开始处理消息的。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SaveOffsetsOnRebalance</span>  <span class="keyword">implements</span> <span class="title">ConsumerRebalanceListener</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onPartitionsRevoked</span><span class="params">(Collection&lt;TopicPartition&gt; partitions)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// commitDBTransactions(); 虚构的数据库事务，保存记录和偏移量。</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onPartitionsAssigned</span><span class="params">(Collection&lt;TopicPartition&gt; partitions)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (TopicPartition partition : partitions) &#123;</span><br><span class="line">            <span class="comment">// 虚构方法从数据库获取偏移量</span></span><br><span class="line">            consumer.seek(partition, getOffsetFromDB(partition));      </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">someMethod1</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    consumer.subscribe(Collections.singleton(topic), <span class="keyword">new</span> SaveOffsetsOnRebalance(consumer));</span><br><span class="line">    <span class="keyword">for</span> (TopicPartition partition : consumer.assignment()) &#123;</span><br><span class="line">        consumer.seek(partition, getOffsetFromDB(partition));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">        ConsumerRecords&lt;String, String&gt; records = consumer.poll(Duration.ofMillis(<span class="number">0</span>));</span><br><span class="line">        <span class="keyword">for</span> (ConsumerRecord&lt;String, String&gt; record : records) &#123;</span><br><span class="line">            <span class="comment">// processRecord(record);</span></span><br><span class="line">            <span class="comment">// storeRecordInDB(record);</span></span><br><span class="line">            <span class="comment">// storeOffsetInDB(record.topic(), record.partition(), record.offset());</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// commitDBTransaction();</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-9-如何退出"><a href="#4-9-如何退出" class="headerlink" title="4.9 如何退出"></a>4.9 如何退出</h2><p>如果确定要退出 <code>while(true)</code> 循环，需要通过另一个线程调用 <code>consumer.wakeup()</code> 方法。如果循环运行在主线程里，可以在 <code>ShutdownHook</code> 里调用该方法。要记住，<code>consumer.wakeup()</code> 是消费者唯一一个可以从其他线程里安全调用的方法。调用 <code>consumer.wakeup()</code> 可以退出 <code>poll()</code>， 并抛出 <code>WakeupException</code> 异常，或者如果调用 <code>consumer.wakeup()</code> 时线程没有等待轮询，那么异常将在下一轮调用 <code>poll()</code> 时抛出。不需要处理 <code>WakeupException</code>，因为它只是用于跳出循环的一种方式。不过，在退出线程之前调用 <code>consumer.close()</code> 是很有必要的，它会提交任何还没有提交的东西，并向群组协调器发送消息，告知自己要离开群组，接下来就会触发再均衡，而不需要等待会话超时。</p>
+<p>优雅退出的完整代码： <a href="https://github.com/gwenshap/kafka-examples/blob/master/SimpleMovingAvg/src/main/java/com/shapira/examples/newconsumer/simplemovingavg/SimpleMovingAvgNewConsumer.java" target="_blank" rel="noopener">CloseConsumer</a></p>
+<h2 id="4-10-反序列化器"><a href="#4-10-反序列化器" class="headerlink" title="4.10 反序列化器"></a>4.10 反序列化器</h2><p>前文提到，生产者需要用<strong>序列化器</strong>把对象转换成<strong>字节数组</strong>再发送给 Kafka。 类似地，消费者需要用<strong>反序列化器</strong>把从 Kafka 接收到的字节数组转换成 Java 对象。 很显然，生成消息使用的<strong>序列化器</strong>与读取消息使用的<strong>反序列化器</strong>应该是<strong>一一对应</strong>的。</p>
+<p>使用 Avro 和 schema 注册表进行序列化和反序列化的优势在于：</p>
+<ul>
+<li><code>AvroSerializer</code> 可以保证写入主题的数据与主题的 schema 是兼容的，也就是说，可以使用相应的反序列化器和 schema 来反序列化数据。</li>
+<li>另外，在生产者或消费者里出现的任何一个与兼容性有关的错误都会被捕捉到，它们都带有消息描述，也就是说，在出现序列化错误时，就没必要再去调试字节数组了。</li>
+</ul>
+<p>不推荐自定义序列化器与反序列化器，序列化与反序列化的逻辑相反，这里也不再赘述了。</p>
+<h2 id="4-11-无群组的独立消费者"><a href="#4-11-无群组的独立消费者" class="headerlink" title="4.11 无群组的独立消费者"></a>4.11 无群组的独立消费者</h2><p>此前提到的消费者均为属于某个群组的消费者，消费者在加入消费者群组后被自动分配分区，在群组里新增或移除消费者时自动触发再均衡。如果只需要单个消费者，而且不需要它加入消费者群组，那么就不需要让它订阅主题，取而代之的是它为自己分配分区。</p>
+<p>一个消费者可以订阅主题并加入消费者群组，或者为自己分配分区，但不能同时做这两件事情。下面代码展示了一个消费者如何为自己分配分区并从分区里读取消息的。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;PartitionInfo&gt; partitionInfos = <span class="keyword">null</span>;</span><br><span class="line"><span class="comment">// 1. 向集群请求主题可用的分区。如果只打算读取特定分区，可以跳过。</span></span><br><span class="line">partitionInfos = consumer.partitionsFor(<span class="string">"topic"</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (partitionInfos != <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">for</span> (PartitionInfo partition : partitionInfos) &#123;</span><br><span class="line">        partitions.add(<span class="keyword">new</span> TopicPartition(partition.topic(), partition.partition()));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 2. 知道需要哪些分区后，调用 assign() 方法。</span></span><br><span class="line">    consumer.assign(partitions);</span><br><span class="line">    <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">        ConsumerRecords&lt;String, String&gt; records = consumer.poll(Duration.ofMillis(<span class="number">1000</span>));</span><br><span class="line">        <span class="keyword">for</span> (ConsumerRecord&lt;String, String&gt; record : records) &#123;</span><br><span class="line">            System.out.println(<span class="string">"record: "</span> + record);</span><br><span class="line">        &#125;</span><br><span class="line">        consumer.commitSync();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>除了不会发生再均衡，也不需要手动查找分区。不过，如果主题增加了新的分区，消费者不会收到通知。所以，要么周期性地调用 <code>consumer.partitionsFor()</code> 方法来检查是否有分区加入，要么在添加新分区后重启应用程序。</p>
+]]></content>
+      <categories>
+        <category>消息中间件</category>
+      </categories>
+      <tags>
+        <tag>Kafka</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>《Kafka 权威指南》：Kafka 生产者</title>
+    <url>/2021/04/23/2021-04-23-KafkaChapter3/</url>
+    <content><![CDATA[<h2 id="3-1-Kafka-概览"><a href="#3-1-Kafka-概览" class="headerlink" title="3.1 Kafka 概览"></a>3.1 Kafka 概览</h2><p>Kafka 的应用场景中多，如记录用户活动、记录度量指标、保存日志消息、记录智能家电信息、与其他应用程序进行异步通信、缓冲即将写入到数据库的数据等等。多样的应用场景自然也意味着 Kafka 对消息的处理策略会有所不同，如哪些消息允许少量丢失或重复、哪些消息需要有严格的时延以及吞吐量等等。</p>
+<p>下图展示了向 Kafka 发送消息的主要步骤，主要包括</p>
+<ul>
+<li><p>创建 <code>ProducerRecord</code> 对象</p>
+<ul>
+<li><code>ProducerRecord</code> 对象包含<strong>目标主题</strong>和要发送的<strong>内容</strong>，还可以指定键或分区。</li>
+<li>在发送 <code>ProducerRecord</code> 对象时，生产者要先把<strong>键和值</strong>对象<strong>序列化</strong>成字节数组，这样它们才能够在网络上传输。</li>
+</ul>
+</li>
+<li><p>接下来，数据被传给<strong>分区器（Partitioner）</strong>。</p>
+<ul>
+<li>如果之前在 <code>ProducerRecord</code> 对象里指定了分区，那么分区器就不会再做任何事情，直接把指定的分区返回。</li>
+<li>如果没有指定分区，那么分区器会根据 <code>ProducerRecord</code> 对象的<strong>键（Key）</strong>来选择一个分区。选好分区以后，生产者就知道该往哪个主题和分区发送这条记录了。</li>
+<li>紧接着，这条记录被添加到一个记录<strong>批次（Batch）</strong>里，这个批次里的所有消息会被发送到相同的主题和分区上。</li>
+<li>之后，一个独立的线程负责把这些记录批次发送到相应的 <code>broker</code> 上。</li>
+</ul>
+</li>
+<li><p>服务器在收到这些消息时会返回响应。</p>
+<ul>
+<li>如果消息成功写入 Kafka，就返回一个 <code>RecordMetaData</code> 对象，它包含了主题和分区信息，以及记录在分区里的偏移量。</li>
+<li>如果写入失败，则会返回一个错误。生产者在收到错误之后会<strong>尝试重新（Retry）</strong>发送消息，几次重试仍然失败，就返回错误信息。</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1gptvt0edbwj30yt0u0wk2.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/008i3skNly1gptvt0edbwj30yt0u0wk2.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="Kafka生产者组件图"></p>
+<h2 id="3-2-创建-Kafka-生产者"><a href="#3-2-创建-Kafka-生产者" class="headerlink" title="3.2 创建 Kafka 生产者"></a>3.2 创建 Kafka 生产者</h2><p>在此选择 <code>Kafka 0.10.1.0</code> 中的示例源码，其中 <code>bootstrap.servers</code>、<code>key.serializer</code>、<code>value.serializer</code> 必须设置。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> String topic; <span class="comment">// 主题</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Boolean isAsync; <span class="comment">// 发送消息方式：同步、异步。</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">Producer</span><span class="params">(String topic, Boolean isAsync)</span> </span>&#123;</span><br><span class="line">    Properties props = <span class="keyword">new</span> Properties(); <span class="comment">// 1. 新建 Peoperties 对象</span></span><br><span class="line">    props.put(<span class="string">"bootstrap.servers"</span>, <span class="string">"localhost:9092"</span>); <span class="comment">// 2. 指定 broker 地址清单，可多个。</span></span><br><span class="line">    props.put(<span class="string">"client.id"</span>, <span class="string">"DemoProducer"</span>);</span><br><span class="line">    <span class="comment">// 3. 指定 Key 与 Value 的序列化方式。</span></span><br><span class="line">    props.put(<span class="string">"key.serializer"</span>, <span class="string">"org.apache.kafka.common.serialization.IntegerSerializer"</span>);</span><br><span class="line">    props.put(<span class="string">"value.serializer"</span>, <span class="string">"org.apache.kafka.common.serialization.StringSerializer"</span>);</span><br><span class="line">    producer = <span class="keyword">new</span> KafkaProducer&lt;&gt;(props);</span><br><span class="line">    <span class="keyword">this</span>.topic = topic;</span><br><span class="line">    <span class="keyword">this</span>.isAsync = isAsync;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-3-发送消息"><a href="#3-3-发送消息" class="headerlink" title="3.3 发送消息"></a>3.3 发送消息</h2><p>在实例化 <code>Producer</code> 对象后便可以开始发送消息，主要有以下 $3$ 种方式。</p>
+<ul>
+<li>发送并忘记（<code>fire-and-forget</code>）：只管把消息发送出去，而不关心其是否正常到达。</li>
+<li>同步发送（<code>synchronous send</code>）：返回 <code>Future</code> 对象，调用 <code>get()</code> 方法进行等待，就可以知道消息是否发送成功。</li>
+<li>异步发送（<code>asynchronous send</code>）：指定回调函数，服务器在返回响应时调用回调函数。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 一个简单的发送消息的例子</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> messageNo = <span class="number">1</span>; <span class="comment">// 消息编号</span></span><br><span class="line">    <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">        String messageStr = <span class="string">"消息-"</span> + messageNo;</span><br><span class="line">        <span class="keyword">long</span> startTime = System.currentTimeMillis();</span><br><span class="line">        <span class="keyword">if</span> (isAsync) &#123; <span class="comment">// 异步发送：发送后无序等待直接返回，所以需要传入回调函数 Callback 待消息成功后回调提醒。</span></span><br><span class="line">            producer.send(<span class="keyword">new</span> ProducerRecord&lt;&gt;(topic,</span><br><span class="line">                                               messageNo,</span><br><span class="line">                                               messageStr), <span class="keyword">new</span> DemoCallBack(startTime, messageNo, messageStr));</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123; <span class="comment">// 同步发送，返回的是 Future 对象，使用 get() 方法获取返回内容。</span></span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                producer.send(<span class="keyword">new</span> ProducerRecord&lt;&gt;(topic,</span><br><span class="line">                                                   messageNo,</span><br><span class="line">                                                   messageStr)).get();</span><br><span class="line">                System.out.println(<span class="string">"发送消息: ("</span> + messageNo + <span class="string">", "</span> + messageStr + <span class="string">")"</span>);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException | ExecutionException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        ++messageNo; <span class="comment">// 每发送完一条信息后计数器 +1。</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>回调函数，需要实现 <code>org.apache.kafka.clients.producer.Callback</code> 接口，实现 <code>onCompletion</code> 方法。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DemoCallBack</span> <span class="keyword">implements</span> <span class="title">Callback</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">long</span> startTime;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> key;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String message;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">DemoCallBack</span><span class="params">(<span class="keyword">long</span> startTime, <span class="keyword">int</span> key, String message)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.startTime = startTime;</span><br><span class="line">        <span class="keyword">this</span>.key = key;</span><br><span class="line">        <span class="keyword">this</span>.message = message;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCompletion</span><span class="params">(RecordMetadata metadata, Exception exception)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">long</span> elapsedTime = System.currentTimeMillis() - startTime;</span><br><span class="line">        <span class="keyword">if</span> (metadata != <span class="keyword">null</span>) &#123;</span><br><span class="line">            System.out.println(</span><br><span class="line">                    <span class="string">"message("</span> + key + <span class="string">", "</span> + message + <span class="string">") sent to partition("</span> + metadata.partition() +</span><br><span class="line">                            <span class="string">"), "</span> +</span><br><span class="line">                            <span class="string">"offset("</span> + metadata.offset() + <span class="string">") in "</span> + elapsedTime + <span class="string">" ms"</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            exception.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-4-Kafka-的配置"><a href="#3-4-Kafka-的配置" class="headerlink" title="3.4 Kafka 的配置"></a>3.4 Kafka 的配置</h2><p>Kafka 官方有详细的生产者配置信息，可前往 <a href="https://kafka.apache.org/documentation/#producerconfigs" target="_blank" rel="noopener">Producer</a> 查看，出去刚才提到的 $3$ 个，还有一些比较重要的。</p>
+<blockquote>
+<p>Kafka 可以保证同一个分区里的消息是有序的。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th align="center">配置项</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>acks</code></td>
+<td align="center">指定必须要有多少个分区副本收到消息，生产者才会认为消息时写入成功的。常用的值有 <code>0、1、all</code> 等。</td>
+</tr>
+<tr>
+<td align="center"><code>buffer.memory</code></td>
+<td align="center">设置生产者内存缓冲区的大小，生产者用缓冲区缓存要发送到服务器的消息。</td>
+</tr>
+<tr>
+<td align="center"><code>compression.type</code></td>
+<td align="center">消息被发送给 <code>broker</code> 之前的压缩算法，可选值为 <code>snappy</code>、<code>gzip</code>、<code>lz4</code>、<code>zstd</code>。默认为 <code>none</code>。</td>
+</tr>
+<tr>
+<td align="center"><code>retries</code></td>
+<td align="center">生产者重发消息的次数，达到后生产者会放弃重试并返回错误。</td>
+</tr>
+<tr>
+<td align="center"><code>batch.size</code></td>
+<td align="center">一个批次可以使用的内存大小，按照字节数计算，而非消息个数。</td>
+</tr>
+<tr>
+<td align="center"><code>linger.ms</code></td>
+<td align="center">生产者在发送批次之前等待更多消息加入批次的时间。KafkaProducer 会在批次填满或 <code>linger.ms</code> 达到上限时把批次发送出去。</td>
+</tr>
+<tr>
+<td align="center"><code>client.id</code></td>
+<td align="center">可以是任意字符串。</td>
+</tr>
+<tr>
+<td align="center"><code>max.in.flight.requests.per.connection</code></td>
+<td align="center">生产者在收到服务器相应之前可以发送的消息个数。</td>
+</tr>
+<tr>
+<td align="center"><code>request.timeout.ms</code></td>
+<td align="center">生产者在发送数据时等待服务器返回响应的时间</td>
+</tr>
+<tr>
+<td align="center"><code>metadata.fetch.timeout.ms</code></td>
+<td align="center">生产者在获取元数据时等待服务器返回响应的时间</td>
+</tr>
+<tr>
+<td align="center"><code>timeout.ms</code></td>
+<td align="center"><code>broker</code> 等待同步副本返回消息确认的时间</td>
+</tr>
+<tr>
+<td align="center"><code>max.request.size</code></td>
+<td align="center">可以指能发送的单个消息的最大值，也可以指单个请求里所有消息总的大小。</td>
+</tr>
+<tr>
+<td align="center"><code>receiver/send.buffer.bytes</code></td>
+<td align="center">TCP Socket 接收和发送数据包的缓冲区大小。</td>
+</tr>
+</tbody></table>
+<h2 id="3-5-序列化器"><a href="#3-5-序列化器" class="headerlink" title="3.5 序列化器"></a>3.5 序列化器</h2><p>创建生产者对象必须指定序列化器，Kafka 提供了整型和字节数组序列化器，但也可以利用 <code>Avro</code> 序列化器，或者自定义序列化器。</p>
+<h3 id="3-5-1-自定义序列化器"><a href="#3-5-1-自定义序列化器" class="headerlink" title="3.5.1 自定义序列化器"></a>3.5.1 自定义序列化器</h3><p>假设有一个类 <code>Customer</code>，它看起来是</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Customer</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> customerID;</span><br><span class="line">    <span class="keyword">private</span> String customerName;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>那么，<code>Customer</code> 类的序列化器可以是这样的。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CustomerSerializer</span> <span class="keyword">implements</span> <span class="title">Serializer</span>&lt;<span class="title">Customer</span>&gt; </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(Map configs, <span class="keyword">boolean</span> isKey)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// Nothing to configure.</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Customer 对象被序列化成：</span></span><br><span class="line"><span class="comment">    * 表示 customerID 的 4 字节整数</span></span><br><span class="line"><span class="comment">    * 表示 customerName 长度的 4 字节整数（为空时为 0）</span></span><br><span class="line"><span class="comment">    * 表示 customerName 的 N 个字节</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">byte</span>[] serialize(String topic, Customer data) &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">byte</span>[] serializedName;</span><br><span class="line">            <span class="keyword">int</span> stringSize;</span><br><span class="line">            <span class="keyword">if</span> (data == <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">if</span> (data.getName() != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    serializedName = data.getName().getBytes(<span class="string">"UTF-8"</span>);</span><br><span class="line">                    stringSize = serializedName.length;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    serializedName = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">0</span>];</span><br><span class="line">                    stringSize = <span class="number">0</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            ByteBuffer buffer = ByteBuffer.allocate(<span class="number">4</span> + <span class="number">4</span> + stringSize);</span><br><span class="line">            buffer.putInt(data.getID());</span><br><span class="line">            buffer.putInt(stringSize);</span><br><span class="line">            buffer.put(serializedName);</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">return</span> buffer.array();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> SerializationException(<span class="string">"序列化失败："</span> + e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">close</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// Nothing to close.</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>但是，这个自定义的序列化器真的很烂。还是使用 Avro 比较好。</p>
+<h3 id="3-5-2-使用-Avro-序列化"><a href="#3-5-2-使用-Avro-序列化" class="headerlink" title="3.5.2 使用 Avro 序列化"></a>3.5.2 使用 Avro 序列化</h3><p>Apache Arvo 是一种与编程语言无关的序列化格式，由 Doug Cutting 创建，目的是提供一种共享数据文件的方式。数据可被序列化为二进制文件或 JSON 文件，不过一般会使用二进制文件。</p>
+<p>当负责写消息的应用程序使用了新的 schema，负责读消息的应用程序可以继续处理消息而无需做任何改动。不过有两个需要注意的地方：</p>
+<ul>
+<li>用于写入数据和读取数据的 schema 必须是相互兼容的。</li>
+<li>反序列化器需要用到用于写入数据的 schema，即使它可能与用于读取数据的 schema 不一样。</li>
+</ul>
+<h3 id="3-5-3-在-Kafka-里使用-Avro"><a href="#3-5-3-在-Kafka-里使用-Avro" class="headerlink" title="3.5.3 在 Kafka 里使用 Avro"></a>3.5.3 在 Kafka 里使用 Avro</h3><p>写入数据需要用到的 schema 被保存在注册表里，然后在记录里引用 schema 的标识符。负责读取数据的应用程序使用标识符从注册表里拉取 schema 来反序列化记录。序列化器和反序列化器分别负责处理 schema 的注册和拉取。</p>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1gpuqrxfbdcj31000cw40i.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/008i3skNly1gpuqrxfbdcj31000cw40i.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="Avro记录的序列化与反序列化流程图"></p>
+<p>关于如何把 Avro 生成的 <strong>Avro对象</strong> 发送到 Kafka 可参考 <a href="https://avro.apache.org/docs/1.10.2/gettingstartedjava.html" target="_blank" rel="noopener">Apache Avro Documentation</a>，与前文创建生产者类似，可以在创建生产者时指定序列化方式以及 Schema 的存储位置。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">props.put(<span class="string">"key.serializer"</span>, <span class="string">"io.confluent.kafka.serializers.KafkaAvroSerializer"</span>);</span><br><span class="line">props.put(<span class="string">"value.serializer"</span>, <span class="string">"io.confluent.kafka.serializers.KafkaAvroSerializer"</span>);</span><br><span class="line">props.put(<span class="string">"schema.registry.url"</span>, schemaUrl);</span><br></pre></td></tr></table></figure>
+
+<p>如果选择使用一般的 Avro 对象而非生成的 Avro 对象，只需提供 schema 即可。</p>
+<h2 id="3-6-分区"><a href="#3-6-分区" class="headerlink" title="3.6 分区"></a>3.6 分区</h2><p>前文提到，<code>ProducerRecord</code> 对象包含了 <strong>目标主题</strong>、<strong>键</strong> 和 <strong>值</strong>。Kafka 的消息是一个个的<strong>键值对</strong>，<code>ProducerRecord</code> 对象可以只包含<strong>主题和值</strong>，<strong>键</strong>可以设置为默认的 <code>null</code>。<strong>键</strong>有两个用途：</p>
+<ul>
+<li>作为消息的附加信息</li>
+<li>被用来决定消息该被写到主题的哪个分区，拥有相同键的消息将被写到同一个分区。</li>
+</ul>
+<p>如果一个进程只从一个主题的分区读取数据，那么具有相同键的所有记录都会被该进程读取，创建包含键值的 <code>ProducerRecord</code> 如下。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">ProducerRecord&lt;Integer, String&gt; record = <span class="keyword">new</span> ProducerRecord&lt;&gt;(<span class="string">"CustomerCountry"</span>, <span class="string">"Laboratory Equipment"</span>, <span class="string">"USA"</span>);</span><br><span class="line"><span class="comment">// 如果要创建键为 null 的消息，不指定键即可，第一个参数为主题 Topic。</span></span><br><span class="line">ProducerRecord&lt;Integer, String&gt; record = <span class="keyword">new</span> ProducerRecord&lt;&gt;(<span class="string">"CustomerCountry"</span>, <span class="string">"USA"</span>);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>如果键值为 <code>null</code> 并且使用了默认的分区器，记录将被随机发送到主体内各个可用的分区上。分区器使用轮询（Round Robin）算法将消息均衡地分不到各个分区上。</li>
+<li>如果键不为 <code>null</code> 并且使用了默认的分区器，Kafka 将会对键进行散列，然后根据散列值把消息映射到特定的分区上。同一个键总是被映射到同一个分区上。</li>
+</ul>
+<p>只有在不改变主题分区数量的情况下，键与分区之间的映射才能保持不变。</p>
+<p>下面是一个自定义分区器的例子：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BananaPartitioner</span> <span class="keyword">implements</span> <span class="title">Partitioner</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(Map&lt;String, ?&gt; configs)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// Nothing to configure.</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">partition</span><span class="params">(String topic, Object key, <span class="keyword">byte</span>[] keyBytes, Object value, <span class="keyword">byte</span>[] valueBytes)</span> </span>&#123;</span><br><span class="line">        List&lt;PartitionInfo&gt; partitions = cluster.partitionsForTopic(topic);</span><br><span class="line">        <span class="keyword">int</span> numPartitions = partitions.size();</span><br><span class="line">        <span class="keyword">if</span> ((keyBytes == <span class="keyword">null</span>) || (!(key <span class="keyword">instanceof</span> String)))</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> InvalidRecordException(<span class="string">"Some shit."</span>);</span><br><span class="line">        <span class="keyword">if</span> (((String) key).equals(<span class="string">"Banana"</span>))</span><br><span class="line">            <span class="keyword">return</span> numPartitions; <span class="comment">//  Banana 总是被分配到最后一个分区。</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> (Math.abs(Utils.murmur2(keyBytes)) % (numPartitions - <span class="number">1</span>))</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">close</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// Nothing to close.</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 ]]></content>
       <categories>
@@ -28,7 +268,151 @@
       </tags>
   </entry>
   <entry>
-    <title>《Kafka权威指南》-初识Kafka</title>
+    <title>《Kafka 权威指南》：安装Kafka</title>
+    <url>/2021/02/07/2021-02-07-KafkaChapter2/</url>
+    <content><![CDATA[<h2 id="2-1-安装-Kafka-Broker"><a href="#2-1-安装-Kafka-Broker" class="headerlink" title="2.1 安装 Kafka Broker"></a>2.1 安装 Kafka Broker</h2><blockquote>
+<p>在安装 Zookeeper 和 Kafka 之前，需要先安装 Java 环境，因为 Kafka 许多功能使用 Java 语言编写，如果运行源码时还需要安装 Scala。</p>
+<p>Zookeeper 用于保存集群的元数据信息和消费者信息。</p>
+</blockquote>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1gptmkcwvehj30zw0ccmyo.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/008i3skNly1gptmkcwvehj30zw0ccmyo.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="KafkaAndZookeeper"></p>
+<p>在 MacOS 环境下安装，使用 <code>Homebrew</code> 只需一条命令即可，在安装 Kafka 时 Homebrew 会自动下载相应的依赖，自然也包括 Zookeeper、OpenJDK。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> brew install kafka</span></span><br></pre></td></tr></table></figure>
+
+<p>Homebrew 会将 Kafka 安装到 <code>/usr/local/Cellar</code> 目录，不过某些文件会被链接到其他目录。</p>
+<ul>
+<li>二进制文件和脚本文件在 <code>/usr/local/bin</code> 目录下。</li>
+<li>Kafka 配置文件在 <code>/usr/local/etc/kafka</code> 目录下。</li>
+<li>Zookeeper 配置文件在 <code>/usr/local/etc/zookeeper</code> 目录下，需要配置 <code>zoo.cfg</code>。</li>
+<li><code>log.dirs</code> （Kafka 的数据目录）被设置为 <code>/usr/local/var/lib/kafka-logs</code>。</li>
+</ul>
+<p>安装完毕后，就可以启动并测试 Zookeeper 和 Kafka了。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> zookeeper-server-start /usr/<span class="built_in">local</span>/etc/kafka/zookeeper.properties &amp; kafka-server-start /usr/<span class="built_in">local</span>/etc/kafka/server.properties</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> brew install telnet</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> telnet localhost 2181</span></span><br><span class="line">Trying ::1...</span><br><span class="line">Connected to localhost.</span><br><span class="line">Escape character is '^]'.</span><br><span class="line">srvr</span><br><span class="line">Zookeeper version: 3.5.8...</span><br><span class="line">Latency min/avg/max: 0/10/44</span><br><span class="line">Received: 80</span><br><span class="line">Sent: 81</span><br><span class="line">Connections: 2</span><br><span class="line">Outstanding: 0</span><br><span class="line">Zxid: 0x1d</span><br><span class="line">Mode: standalone</span><br><span class="line">Node count: 27</span><br><span class="line">Connection closed by foreign host.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建 Topic</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic <span class="built_in">test</span></span></span><br><span class="line">Created topic test.</span><br><span class="line"><span class="meta">#</span><span class="bash"> 验证 Topic</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> kafka-topics --zookeeper localhost:2181 --describe --topic <span class="built_in">test</span></span></span><br><span class="line">Topic: test	PartitionCount: 1	ReplicationFactor: 1	Configs:</span><br><span class="line">	Topic: test	Partition: 0	Leader: 0	Replicas: 0	Isr: 0</span><br><span class="line"><span class="meta">#</span><span class="bash"> 往测试 Topic 上发送消息，输入任意消息然后 Ctrl+C 退出，使用 Consumer 消费信息即可。</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> kafka-console-producer --broker-list localhost:9092 --topic <span class="built_in">test</span>                                             </span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">Test Message 1</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">Test Message 2</span></span><br><span class="line">^C</span><br><span class="line"><span class="meta">#</span><span class="bash"> 从测试 Topic 上消费消息</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> kafka-console-consumer --bootstrap-server localhost:9092 --topic <span class="built_in">test</span> --from-beginning</span></span><br></pre></td></tr></table></figure>
+
+<p>Zookeeper 集群被称为<strong>群组</strong>，使用的是<strong>一致性协议</strong>，因此建议集群中包含<strong>奇数个节点</strong>，因为只有当群组里的大多数节点处于可用状态，Zookeeper 才能处理外部的请求。</p>
+<h2 id="2-2-Broker-配置"><a href="#2-2-Broker-配置" class="headerlink" title="2.2 Broker 配置"></a>2.2 Broker 配置</h2><blockquote>
+<p>更为详细的配置信息可参考 Kafka 官网：<a href="https://kafka.apache.org/documentation/#configuration" target="_blank" rel="noopener">Configuration</a></p>
+</blockquote>
+<h3 id="2-2-1-常规配置"><a href="#2-2-1-常规配置" class="headerlink" title="2.2.1 常规配置"></a>2.2.1 常规配置</h3><p>位于 <code>/usr/local/etc/kafka/server.properties</code> 。</p>
+<table>
+<thead>
+<tr>
+<th align="center">配置项</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>broker.id</code></td>
+<td align="center">Kafka 集群内需唯一，默认值为 0。</td>
+</tr>
+<tr>
+<td align="center"><code>port</code></td>
+<td align="center">默认 <code>9092</code>，若设置到 <code>1024</code> 以下需要 <code>root</code> 权限启动。</td>
+</tr>
+<tr>
+<td align="center"><code>zookeeper.connect</code></td>
+<td align="center">默认 <code>2181</code>，冒号分割的一组 <code>host:port/path</code></td>
+</tr>
+<tr>
+<td align="center"><code>log.dirs</code></td>
+<td align="center">逗号分隔的本地文件系统路径，broker 会根据“最少使用”原则把同一个<strong>分区</strong>的日志片段保存到同一个路径下。</td>
+</tr>
+<tr>
+<td align="center"><code>num.recovery.threads.per.data.dir</code></td>
+<td align="center">每个数据目录的线程数，所配置的数字对应的是 <code>log.dirs</code> 指定的单个日志目录。</td>
+</tr>
+<tr>
+<td align="center"><code>auto.create.topics.enable</code></td>
+<td align="center">是否启动自动创建主题</td>
+</tr>
+</tbody></table>
+<p><code>num.recovery.threads.per.data.dir</code>：Kafka 使用可配置的线程池来处理日志片段的几种情况</p>
+<ul>
+<li>服务器正常启动，用于打开每个分区的日志片段；</li>
+<li>服务器崩溃后重启，用于检查和截短每个分区的日志片段；</li>
+<li>服务器正常关闭，用于关闭日志片段。</li>
+</ul>
+<p><code>auto.create.topics.enable</code>：Kafka 自动创建主题的几种情况</p>
+<ul>
+<li>当一个 <code>Producer</code> 向 <code>Topic</code> 写入消息时；</li>
+<li>当一个 <code>Consumer</code> 从 <code>Topic</code> 读取消息时；</li>
+<li>当任意一个 <code>Client</code> 向 <code>Topic</code> 发送 <code>Metadata</code> 请求时。</li>
+</ul>
+<h3 id="2-2-2-主题的默认配置"><a href="#2-2-2-主题的默认配置" class="headerlink" title="2.2.2 主题的默认配置"></a>2.2.2 主题的默认配置</h3><table>
+<thead>
+<tr>
+<th align="center">配置项</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>num.partitions</code></td>
+<td align="center">新建主题所包含的分区个数，默认值为 <code>1</code>。</td>
+</tr>
+<tr>
+<td align="center"><code>log.retention.hours</code></td>
+<td align="center">数据被保留的时间，默认  <code>168</code> 小时，即一周，也可将<code>hours</code>换成 <code>minutes</code>与<code>ms</code>。</td>
+</tr>
+<tr>
+<td align="center"><code>log.retention.bytes</code></td>
+<td align="center">通过消息字节数判断消息是否过期，作用在<strong>每一个分区</strong>上。</td>
+</tr>
+<tr>
+<td align="center"><code>log.segment.bytes</code></td>
+<td align="center">关闭日志片段的阈值，默认 <code>1GB</code>，超过此值将开启新的日志片段。</td>
+</tr>
+<tr>
+<td align="center"><code>log.segment.ms</code></td>
+<td align="center">关闭日志片段的阈值，以时间为单位。与<code>log.segment.bytes</code> 非互斥关系。</td>
+</tr>
+<tr>
+<td align="center"><code>message.max.bytes</code></td>
+<td align="center">单条消息被压缩后的最大阈值，默认为 <code>1 000 000</code>，即 <code>1MB</code>，超过则会被拒绝。</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p> Kafka 集群通过 Partition 实现对 Topic 的横向扩展，当有新的 Broker 加入集群时，可以通过 Partition 来实现集群的负载均衡。那么，如何确定分区的数量？</p>
+</blockquote>
+<ul>
+<li>Topic 需要多大的吞吐量？</li>
+<li>单个分区读取数据的最大吞吐量是多少？</li>
+<li>生产者向单个分区写入数据的吞吐量是多少？</li>
+<li>每个 <code>broker</code> 包含的分区个数、可用的磁盘空间和网络带宽。</li>
+<li>可以使用 <strong>主题吞吐量/消费者吞吐量</strong> 计算分区个数。</li>
+</ul>
+<blockquote>
+<p>消息何时会被清除？</p>
+</blockquote>
+<ul>
+<li>通过 <code>log.retention.hours/minutes/ms</code> 与 <code>log.retention.bytes</code> 确定，当消息条件满足任意条件之一时都将会被删除。</li>
+<li><strong>日志片段被关闭之前消息是不会过期的</strong>，即在达到 <code>log.segment.bytes</code> 设置的阈值之后日志片段关闭，然后再达到 <code>log.retention.xxxx</code> 条件之后消息才会真正过期。</li>
+</ul>
+<blockquote>
+<p>在服务端和客户端之间协调消息大小的配置</p>
+</blockquote>
+<ul>
+<li>消费者客户端所设置的 <code>fetch.message.max.bytes</code> 需要与服务器设置的消息大小 <code>message.max.bytes</code> 所协调，如果这个值比  <code>message.max.bytes</code> 小，那么消费者将无法读取较大的消息，导致消费者被阻塞。</li>
+<li>集群中的 <code>broker</code> 配置 <code>replica.fetch.max.bytes</code>，也遵循与上类似的原则。</li>
+</ul>
+<h2 id="2-3-Kafka-硬件的选择"><a href="#2-3-Kafka-硬件的选择" class="headerlink" title="2.3 Kafka 硬件的选择"></a>2.3 Kafka 硬件的选择</h2><p>影响 Kafka 性能的一些硬件因素主要包括：磁盘吞吐量（机械硬盘还是固态硬盘）、磁盘容量（1GB 还是 1TB）、内存大小、网络吞吐量、CPU、Kafka 集群。</p>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1gptoh8eoc8j30zw0k8acw.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/008i3skNly1gptoh8eoc8j30zw0k8acw.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="一个简单的Kafka集群"></p>
+<h3 id="2-3-1-需要多少个-broker"><a href="#2-3-1-需要多少个-broker" class="headerlink" title="2.3.1 需要多少个 broker"></a>2.3.1 需要多少个 <code>broker</code></h3><p>首先，考虑需要多少磁盘空间来保留数据，以及单个 <code>broker</code> 有多少空间可用；其次要考虑的因素是集群处理请求的能力，因磁盘吞吐量低和系统内存不足造成的性能问题，可以通过扩展多个 <code>broker</code> 来解决。</p>
+<h3 id="2-3-2-broker-的配置"><a href="#2-3-2-broker-的配置" class="headerlink" title="2.3.2 broker 的配置"></a>2.3.2 <code>broker</code> 的配置</h3><p>要把一个 <code>broker</code> 加入到集群里，只需要修改两个配置参数。</p>
+<ul>
+<li>所有 <code>broker</code> 都必须配置相同的 <code>zookeeper.connect</code>，该参数指定了用于保存元数据的 Zookeeper 群组和路径。</li>
+<li>每个 <code>broker</code> 都必须为 <code>broker.id</code> 参数设置唯一的值。</li>
+</ul>
+<h3 id="2-3-3-操作系统调优"><a href="#2-3-3-操作系统调优" class="headerlink" title="2.3.3 操作系统调优"></a>2.3.3 操作系统调优</h3><p>需要关注的是<strong>虚拟内存、磁盘以及网络</strong>。</p>
+<h3 id="2-3-4-生产环境的注意事项"><a href="#2-3-4-生产环境的注意事项" class="headerlink" title="2.3.4 生产环境的注意事项"></a>2.3.4 生产环境的注意事项</h3><p>需要注意的是 <strong>JVM  垃圾回收器的设置、数据中心的布局以及 Zookeeper 的配置。</strong></p>
+]]></content>
+      <categories>
+        <category>消息中间件</category>
+      </categories>
+      <tags>
+        <tag>Kafka</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>《Kafka 权威指南》：初识Kafka</title>
     <url>/2021/02/07/2021-02-07-KafkaChapter1/</url>
     <content><![CDATA[<h2 id="1-1-发布与订阅消息系统"><a href="#1-1-发布与订阅消息系统" class="headerlink" title="1.1 发布与订阅消息系统"></a>1.1 发布与订阅消息系统</h2><p><strong>数据（消息）的发送者（发布者）不会直接把消息发送给接收者</strong>，这是发布与订阅消息系统的一个特点。发布者以某种方式对消息进行分类，接收者（订阅者）订阅它们，以便接收特定类型的消息。发布与订阅系统一般会有一个 <code>broker</code>，也就是发布消息的中心点。</p>
 <h3 id="1-1-1-如何开始"><a href="#1-1-1-如何开始" class="headerlink" title="1.1.1 如何开始"></a>1.1.1 如何开始</h3><p>发布与订阅消息系统的大部分应用场景都是从一个简单的消息队列或一个进程间通道开始的。</p>
@@ -1067,7 +1451,7 @@
   <entry>
     <title>TCP的运输连接管理</title>
     <url>/2020/08/26/2020-08-26-Network-TCPANDUDP/</url>
-    <content><![CDATA[<h2 id="TCP的运输连接管理"><a href="#TCP的运输连接管理" class="headerlink" title="TCP的运输连接管理"></a>TCP的运输连接管理</h2><p>TCP 是面向连接的协议，运输连接是用来传送 TCP 报文的。TCP 运输连接的建立和释放是每一次面向连接的通信中必不可少的过程。因此，运输连接就有三个阶段，即：连接建立、数据传送和连接释放。运输连接的管理就是使运输连接的建立和释放都能正常地进行。</p>
+    <content><![CDATA[<h3 id="TCP的运输连接管理"><a href="#TCP的运输连接管理" class="headerlink" title="TCP的运输连接管理"></a>TCP的运输连接管理</h3><p>TCP 是面向连接的协议，运输连接是用来传送 TCP 报文的。TCP 运输连接的建立和释放是每一次面向连接的通信中必不可少的过程。因此，运输连接就有三个阶段，即：连接建立、数据传送和连接释放。运输连接的管理就是使运输连接的建立和释放都能正常地进行。</p>
 <p>在TCP连接建立过程中要解决以下三个问题:</p>
 <ul>
 <li>要使每一方能够确知对方的存在。</li>
@@ -1181,7 +1565,7 @@
 <td align="center">提供全双工通信</td>
 </tr>
 </tbody></table>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
 <li>《计算机网络》第七版，谢希仁。</li>
 </ul>
 ]]></content>
@@ -5110,7 +5494,7 @@
       </tags>
   </entry>
   <entry>
-    <title>学学Docker</title>
+    <title>学学 Docker</title>
     <url>/2020/06/08/2020-06-08-Docker/</url>
     <content><![CDATA[<h1 id="Docker简介"><a href="#Docker简介" class="headerlink" title="Docker简介"></a>Docker简介</h1><p><strong>Docker</strong> 是一个<a href="https://zh.wikipedia.org/wiki/開放原始碼" target="_blank" rel="noopener">开放源代码</a><a href="https://zh.wikipedia.org/wiki/軟體" target="_blank" rel="noopener">软件</a>，是一个<a href="https://zh.wikipedia.org/wiki/開放平臺" target="_blank" rel="noopener">开放平台</a>，用于开发应用、交付（shipping）应用、运行应用。 Docker允许用户将基础设施（Infrastructure）中的应用单独分割出来，形成更小的颗粒（容器），从而提高交付软件的速度。<a href="https://zh.wikipedia.org/wiki/Docker#cite_note-1" target="_blank" rel="noopener">[1]</a></p>
 <p><strong>Docker容器</strong> 与虚拟机类似，但原理上，容器是将<a href="https://zh.wikipedia.org/wiki/作業系統層虛擬化" target="_blank" rel="noopener">操作系统层虚拟化</a>，虚拟机则是虚拟化硬件，因此容器更具有便携性、高效地利用服务器。 容器更多的用于表示 软件的一个标准化单元。由于容器的标准化，因此它可以无视基础设施（Infrastructure）的差异，部署到任何一个地方。另外，Docker也为容器提供更强的业界的隔离兼容。<a href="https://zh.wikipedia.org/wiki/Docker#cite_note-2" target="_blank" rel="noopener">[2]</a></p>
@@ -7767,10 +8151,14 @@
 
 <ul>
 <li>Set <code>ZSH_THEME=&quot;powerlevel10k/powerlevel10k&quot;</code> in <code>~/.zshrc</code>.</li>
-<li>重启终端，根据提示操作。相信我，界面出来后你一看就懂。</li>
+<li>重启终端，根据提示操作。</li>
 </ul>
-<h1 id="Homebrew"><a href="#Homebrew" class="headerlink" title="Homebrew"></a>Homebrew</h1><h2 id="官网"><a href="#官网" class="headerlink" title="官网"></a>官网</h2><p><a href="https://brew.sh/index_zh-cn" target="_blank" rel="noopener">Homebrew中文官网</a></p>
-<p><a href="https://docs.brew.sh/Manpage" target="_blank" rel="noopener">官方命令文档</a></p>
+<h1 id="Homebrew"><a href="#Homebrew" class="headerlink" title="Homebrew"></a>Homebrew</h1><h2 id="官网"><a href="#官网" class="headerlink" title="官网"></a>官网</h2><ul>
+<li><p><a href="https://brew.sh/index_zh-cn" target="_blank" rel="noopener">Homebrew中文官网</a></p>
+</li>
+<li><p><a href="https://docs.brew.sh/Manpage" target="_blank" rel="noopener">官方命令文档</a></p>
+</li>
+</ul>
 <h2 id="安装-1"><a href="#安装-1" class="headerlink" title="安装"></a>安装</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> /bin/bash -c <span class="string">"<span class="variable">$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)</span>"</span></span></span><br></pre></td></tr></table></figure>
 
 <h2 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h2><table>
@@ -7813,7 +8201,7 @@
 <td align="left">搜索可用的包</td>
 </tr>
 </tbody></table>
-<h2 id="Services控制"><a href="#Services控制" class="headerlink" title="Services控制"></a>Services控制</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> brew services list  <span class="comment"># 查看使用brew安装的服务列表</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> brew services run formula|--all  <span class="comment"># 启动服务（仅启动不注册）</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> brew services start formula|--all  <span class="comment"># 启动服务，并注册</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> brew services stop formula|--all   <span class="comment"># 停止服务，并取消注册</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> brew services restart formula|--all  <span class="comment"># 重启服务，并注册</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> brew services cleanup  <span class="comment"># 清除已卸载应用的无用的配置</span></span></span><br></pre></td></tr></table></figure>
+<h2 id="Services-控制"><a href="#Services-控制" class="headerlink" title="Services 控制"></a>Services 控制</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> brew services list  <span class="comment"># 查看使用brew安装的服务列表</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> brew services run formula|--all  <span class="comment"># 启动服务（仅启动不注册）</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> brew services start formula|--all  <span class="comment"># 启动服务，并注册</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> brew services stop formula|--all   <span class="comment"># 停止服务，并取消注册</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> brew services restart formula|--all  <span class="comment"># 重启服务，并注册</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> brew services cleanup  <span class="comment"># 清除已卸载应用的无用的配置</span></span></span><br></pre></td></tr></table></figure>
 
 <h1 id="配置环境变量"><a href="#配置环境变量" class="headerlink" title="配置环境变量"></a>配置环境变量</h1><blockquote>
 <p>在此假设读者已具备基本的 vim 操作技能，如果不具备的话可以使用右键选择常用的文本编辑软件进行编辑。</p>
@@ -7822,10 +8210,10 @@
 <h2 id="Visual-Studio-Code"><a href="#Visual-Studio-Code" class="headerlink" title="Visual Studio Code"></a>Visual Studio Code</h2><h3 id="方式一"><a href="#方式一" class="headerlink" title="方式一"></a>方式一</h3><ul>
 <li>打开 <code>Visual Studio Code</code></li>
 <li>同时按下<code>Command+Shift+P</code>，在命令框中输入<code>Shell Command:Install &#39;code&#39; command in PATH</code></li>
-<li>卸载的话: 你执行上面那一步时就懂了。</li>
+<li>卸载的话: 执行上面那一步时就应该已经注意到了。</li>
 </ul>
 <h3 id="方式二"><a href="#方式二" class="headerlink" title="方式二"></a>方式二</h3><ul>
-<li>如果你的<code>Visual Studio Code</code>是在<code>Applications</code>(英文操作系统)或者<code>应用程序</code>(中文操作系统)的话</li>
+<li>如果 <code>Visual Studio Code</code> 是在 <code>Applications</code> (英文操作系统)或者<code>应用程序</code>(中文操作系统)的话</li>
 <li>编辑配置文件 <code>vi ~/.bash_profile</code></li>
 <li>添加<code>Visual Studio Code</code>环境变量</li>
 </ul>
@@ -7836,14 +8224,14 @@
 <li>重新加载配置文件 <code>source ~/.bash_profile</code></li>
 </ul>
 <h2 id="Sublime"><a href="#Sublime" class="headerlink" title="Sublime"></a>Sublime</h2><ul>
-<li>如果你的<code>Sublime Text</code>是在<code>Applications</code>(英文操作系统)或者<code>应用程序</code>(中文操作系统)的话</li>
-<li>建立软连接，将 <code>Sublime</code> 的启动文件与 <code>/use/local/bin</code> 建立链接。</li>
+<li>如果 <code>Sublime Text</code> 是在 <code>Applications</code>(英文操作系统)或者<code>应用程序</code>(中文操作系统)的话</li>
+<li>建立软连接，将  <code>Sublime</code>  的启动文件与 <code>/use/local/bin</code> 建立链接。</li>
 </ul>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ln -s /Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl /usr/<span class="built_in">local</span>/bin/.</span></span><br></pre></td></tr></table></figure>
 
 <ul>
 <li>编辑配置文件 <code>vi ~/.bash_profile</code></li>
-<li>添加<code>Sublime</code>环境变量，并重命名命令缩写，我在此选择的是<code>subl</code>.</li>
+<li>添加 <code>Sublime</code> 环境变量，并重命名命令缩写，我在此选择的是<code>subl</code>。</li>
 </ul>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Setting PATH for Sublime</span></span><br><span class="line"><span class="built_in">export</span> PATH=<span class="string">"/usr/local/bin:<span class="variable">$PATH</span>"</span></span><br><span class="line"><span class="built_in">alias</span> subl=<span class="string">'/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl'</span></span><br></pre></td></tr></table></figure>
 
@@ -7852,14 +8240,14 @@
 <li>重新加载配置文件 <code>source ~/.bash_profile</code></li>
 </ul>
 <h2 id="Typora"><a href="#Typora" class="headerlink" title="Typora"></a>Typora</h2><h3 id="方式一-1"><a href="#方式一-1" class="headerlink" title="方式一"></a>方式一</h3><ul>
-<li>如果你的<code>Typora</code>是在<code>Applications</code>(英文操作系统)或者<code>应用程序</code>(中文操作系统)的话</li>
+<li>如果 <code>Typora</code> 是在 <code>Applications</code> (英文操作系统)或者<code>应用程序</code>(中文操作系统)的话</li>
 <li>建立软连接，将 <code>Typora</code> 的启动文件与 <code>/use/local/bin</code> 建立链接。</li>
 </ul>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ln -s /Applications/Typora.app/Contents/MacOS/Typora /usr/<span class="built_in">local</span>/bin/.</span></span><br></pre></td></tr></table></figure>
 
 <ul>
 <li>编辑配置文件 <code>vi ~/.bash_profile</code></li>
-<li>添加<code>Typora</code>环境变量，并重命名命令缩写，我在此选择的是<code>typo</code>.</li>
+<li>添加 <code>Typora</code> 环境变量，并重命名命令缩写，我在此选择的是<code>typo</code>。</li>
 </ul>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">alias</span> typo=<span class="string">'open -a Typora'</span></span><br></pre></td></tr></table></figure>
 
@@ -7887,7 +8275,7 @@
 <li>重新加载配置文件 <code>source ~/.bash_profile</code></li>
 </ul>
 <blockquote>
-<p>如果安装了多个版本的<code>JDK</code>，并且需要切换的话。</p>
+<p>如果安装了多个版本的<code>JDK</code>，并且需要切换的话，可以使用下面的方式。</p>
 </blockquote>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">export</span> JAVA_HOME=$(/usr/libexec/java_home -v 1.8)</span><br><span class="line"><span class="built_in">export</span> JAVA_HOME=$(/usr/libexec/java_home -v 11)</span><br><span class="line"><span class="built_in">export</span> JAVA_HOME=$(/usr/libexec/java_home -v 13)</span><br></pre></td></tr></table></figure>
 
@@ -7903,7 +8291,7 @@
 </ul>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Self Defined Clear Screen</span></span><br><span class="line"><span class="built_in">alias</span> cls=<span class="string">"clear"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Self Defined Commands</span></span><br><span class="line"><span class="built_in">alias</span> ll=<span class="string">'colorls -l --sd --gs --group-directories-first'</span></span><br><span class="line"><span class="built_in">alias</span> ls=<span class="string">'colorls --group-directories-first'</span></span><br><span class="line"><span class="built_in">alias</span> tree=<span class="string">"find . -print | sed -e 's;[^/]*/;|____;g;s;____|; |;g'"</span></span><br><span class="line"><span class="built_in">alias</span> doc=<span class="string">"docsify"</span></span><br></pre></td></tr></table></figure>
 
-<h1 id="iTerm2命令"><a href="#iTerm2命令" class="headerlink" title="iTerm2命令"></a>iTerm2命令</h1><h2 id="标签页"><a href="#标签页" class="headerlink" title="标签页"></a>标签页</h2><ul>
+<h1 id="iTerm2-命令"><a href="#iTerm2-命令" class="headerlink" title="iTerm2 命令"></a>iTerm2 命令</h1><h2 id="标签页"><a href="#标签页" class="headerlink" title="标签页"></a>标签页</h2><ul>
 <li>新建标签页：<code>command + T</code></li>
 <li>关闭当前标签页：<code>command + W</code></li>
 <li>标签页切换：<code>command + 数字(1，2...)</code>或者<code>command+左右方向键</code></li>
@@ -7934,8 +8322,8 @@
 <h2 id="自定义提示样式"><a href="#自定义提示样式" class="headerlink" title="自定义提示样式"></a>自定义提示样式</h2><p>默认情况下, 提示符显示为 <code>user@hostnam</code>，比如<code>xxxxx@xxxxdeMBP</code>，可以手动去除。</p>
 <ul>
 <li><code>whoami</code>查看当前用户</li>
-<li><code>vim ~/.zshrc</code>，增加 <code>DEFAULT_USER=&quot;user&quot;</code> ，其中的<code>user</code>比如和<code>whoami</code>中的输出匹配</li>
-<li>重载文件<code>source ~/.zshrc</code></li>
+<li><code>vim ~/.zshrc</code>，增加 <code>DEFAULT_USER=&quot;user&quot;</code> ，其中的<code>user</code>比如和 <code>whoami</code> 中的输出匹配</li>
+<li>重载文件 <code>source ~/.zshrc</code></li>
 </ul>
 <blockquote>
 <p>但是如果跟我的终端一样就不需要配置了。</p>
@@ -7944,7 +8332,7 @@
 <li>配置传送门：<a href="https://blog.biezhi.me/2018/11/build-a-beautiful-mac-terminal-environment.html" target="_blank" rel="noopener">编程和酒</a></li>
 </ul>
 <p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge8skdl3qij30vo0kykfp.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1ge8skdl3qij30vo0kykfp.jpg" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="终端美化后的界面"></p>
-<h1 id="Vim-命令"><a href="#Vim-命令" class="headerlink" title="Vim 命令"></a>Vim 命令</h1><p>在这颗蔚蓝色的星球上，有一群程序员，在这一群程序员中有两个广为流传的工具，一个是编辑器之神 <code>Vim</code>，一个是神之编辑器 <code>emacs</code>.</p>
+<h1 id="Vim-命令"><a href="#Vim-命令" class="headerlink" title="Vim 命令"></a>Vim 命令</h1><p>在这颗蔚蓝色的星球上，有一群程序员，在这一群程序员中有两个广为流传的工具，一个是编辑器之神 <code>Vim</code>，一个是神之编辑器 <code>emacs</code>。</p>
 <h2 id="插入模式"><a href="#插入模式" class="headerlink" title="插入模式"></a>插入模式</h2><table>
 <thead>
 <tr>
