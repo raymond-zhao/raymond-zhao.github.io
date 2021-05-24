@@ -5,7 +5,9 @@
   <!-- SEO相关 -->
   
     
-      <meta name="robots" content="noindex,follow">
+      
+        <meta name="robots" content="noindex,follow">
+      
     
   
   <!-- 渲染优化 -->
@@ -19,7 +21,7 @@
 
   <!-- 页面元数据 -->
   
-  <title>Archive: 2021 - 吹梦到西洲</title>
+  <title>吹梦到西洲</title>
   
 
   
@@ -427,14 +429,14 @@
  
 <script> 
   // 处理封面 此时 jquery 还没加载 
-  if ("half" == "none") { // 移除封面 
+  if ("none" == "none") { // 移除封面 
     document.getElementsByClassName('cover-wrapper')[0].style.display = "none"; 
     document.getElementsByClassName('l_header', 'cover-wrapper')[0].classList.add("show"); 
   } else { 
-    if ("half" == "half") { // 半屏 
+    if ("none" == "half") { // 半屏 
       document.getElementsByClassName('cover-wrapper')[0].setAttribute('id', 'half'); 
       document.getElementsByClassName('scroll-down')[0].style.display = "none"; 
-    } else if ("half" == "full") { // 全屏 
+    } else if ("none" == "full") { // 全屏 
       document.getElementsByClassName('cover-wrapper')[0].setAttribute('id', 'full'); 
       document.getElementsByClassName('scroll-down')[0].style.display = ""; 
     } 
@@ -448,30 +450,9 @@
         
 
 <div class='l_main'>
-	
-		
+  
   <section class="post-list">
     
-      
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-      
-    
     
       
         
@@ -483,337 +464,29 @@
   
     
     <h2 class="article-title" >
-      <a href="/2021/04/26/2021-04-26-KafkaChapter5/">
-        《Kafka 权威指南》：深入 Kafka
+      <a href="/2020/03/16/2020-03-16-Java-BitOps/">
+        位运算的运用
       </a>
     </h2>
   
   <div class='md'>
     
-      <p>了解 Kafka 复制、请求处理、存储等的内部实现细节。</p>
+      <p>Java中的很多功能用基本的运算也能实现，但是位运算的效率更高，这里总结了一些关于位运算的常用知识。</p>
     
   </div>
   
     <div class='meta-v3' line_style='solid'>
       <div>
         
-        <time>2021-04-26</time>
+        <time>2020-03-16</time>
         
           <span class="dot"></span>
-          <a class="category-link" href="/categories/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/">消息中间件</a>
+          <a class="category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
         
       </div>
       
         <div>
-          <a class='readmore' href='/2021/04/26/2021-04-26-KafkaChapter5/'>
-            Read More
-          </a>
-        </div>
-      
-    </div>
-  
-
-</div>
-
-          </div>
-        
-      
-        
-          <div class='post-wrapper'>
-            <div class="post post-v3 white-box reveal shadow">
-  
-  
-  
-  
-    
-    <h2 class="article-title" >
-      <a href="/2021/04/24/2021-04-24-KafkaChapter4/">
-        《Kafka 权威指南》：Kafka 消费者
-      </a>
-    </h2>
-  
-  <div class='md'>
-    
-      <p>应用程序使用 KafkaConsumer 向 Kafka 订阅主题，并从订阅的主题上接收消息。</p>
-    
-  </div>
-  
-    <div class='meta-v3' line_style='solid'>
-      <div>
-        
-        <time>2021-04-24</time>
-        
-          <span class="dot"></span>
-          <a class="category-link" href="/categories/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/">消息中间件</a>
-        
-      </div>
-      
-        <div>
-          <a class='readmore' href='/2021/04/24/2021-04-24-KafkaChapter4/'>
-            Read More
-          </a>
-        </div>
-      
-    </div>
-  
-
-</div>
-
-          </div>
-        
-      
-        
-          <div class='post-wrapper'>
-            <div class="post post-v3 white-box reveal shadow">
-  
-  
-  
-  
-    
-    <h2 class="article-title" >
-      <a href="/2021/04/23/2021-04-23-KafkaChapter3/">
-        《Kafka 权威指南》：Kafka 生产者
-      </a>
-    </h2>
-  
-  <div class='md'>
-    
-      <p>从 Kafka 生产者的设计和组件讲起，学习如何使用 Kafka 生产者。</p>
-    
-  </div>
-  
-    <div class='meta-v3' line_style='solid'>
-      <div>
-        
-        <time>2021-04-23</time>
-        
-          <span class="dot"></span>
-          <a class="category-link" href="/categories/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/">消息中间件</a>
-        
-      </div>
-      
-        <div>
-          <a class='readmore' href='/2021/04/23/2021-04-23-KafkaChapter3/'>
-            Read More
-          </a>
-        </div>
-      
-    </div>
-  
-
-</div>
-
-          </div>
-        
-      
-        
-          <div class='post-wrapper'>
-            <div class="post post-v3 white-box reveal shadow">
-  
-  
-  
-  
-    
-    <h2 class="article-title" >
-      <a href="/2021/02/07/2021-02-07-KafkaChapter2/">
-        《Kafka 权威指南》：安装Kafka
-      </a>
-    </h2>
-  
-  <div class='md'>
-    
-      <p>介绍如何安装和运行Kafka，如何设置 Zookeeper，Kafka 的基本配置等。</p>
-    
-  </div>
-  
-    <div class='meta-v3' line_style='solid'>
-      <div>
-        
-        <time>2021-02-07</time>
-        
-          <span class="dot"></span>
-          <a class="category-link" href="/categories/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/">消息中间件</a>
-        
-      </div>
-      
-        <div>
-          <a class='readmore' href='/2021/02/07/2021-02-07-KafkaChapter2/'>
-            Read More
-          </a>
-        </div>
-      
-    </div>
-  
-
-</div>
-
-          </div>
-        
-      
-        
-          <div class='post-wrapper'>
-            <div class="post post-v3 white-box reveal shadow">
-  
-  
-  
-  
-    
-    <h2 class="article-title" >
-      <a href="/2021/02/07/2021-02-07-KafkaChapter1/">
-        《Kafka 权威指南》：初识Kafka
-      </a>
-    </h2>
-  
-  <div class='md'>
-    
-      <p>主要介绍了 Kafka 中的基本概念与术语。</p>
-    
-  </div>
-  
-    <div class='meta-v3' line_style='solid'>
-      <div>
-        
-        <time>2021-02-07</time>
-        
-          <span class="dot"></span>
-          <a class="category-link" href="/categories/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/">消息中间件</a>
-        
-      </div>
-      
-        <div>
-          <a class='readmore' href='/2021/02/07/2021-02-07-KafkaChapter1/'>
-            Read More
-          </a>
-        </div>
-      
-    </div>
-  
-
-</div>
-
-          </div>
-        
-      
-        
-          <div class='post-wrapper'>
-            <div class="post post-v3 white-box reveal shadow">
-  
-  
-  
-  
-    
-    <h2 class="article-title" >
-      <a href="/2021/02/02/2021-02-02-Java8InActionPart3/">
-        《Java8实战》高效Java 8编程
-      </a>
-    </h2>
-  
-  <div class='md'>
-    
-      <p>探究如何结合现代程序设计方法利用Java 8的各种特性更有效地改善代码质量。</p>
-    
-  </div>
-  
-    <div class='meta-v3' line_style='solid'>
-      <div>
-        
-        <time>2021-02-02</time>
-        
-          <span class="dot"></span>
-          <a class="category-link" href="/categories/Java/">Java</a>
-        
-      </div>
-      
-        <div>
-          <a class='readmore' href='/2021/02/02/2021-02-02-Java8InActionPart3/'>
-            Read More
-          </a>
-        </div>
-      
-    </div>
-  
-
-</div>
-
-          </div>
-        
-      
-        
-          <div class='post-wrapper'>
-            <div class="post post-v3 white-box reveal shadow">
-  
-  
-  
-  
-    
-    <h2 class="article-title" >
-      <a href="/2021/01/29/2021-01-29-Java8InActionPart2/">
-        《Java8实战》函数式数据处理
-      </a>
-    </h2>
-  
-  <div class='md'>
-    
-      <p>探索新的Stream API，它用来编写功能强大的代码，用声明性的方式处理数据集。本部分将介绍流是什么，以及如何在代码中使用流来简明而高效地处理数据集。</p>
-    
-  </div>
-  
-    <div class='meta-v3' line_style='solid'>
-      <div>
-        
-        <time>2021-01-29</time>
-        
-          <span class="dot"></span>
-          <a class="category-link" href="/categories/Java/">Java</a>
-        
-      </div>
-      
-        <div>
-          <a class='readmore' href='/2021/01/29/2021-01-29-Java8InActionPart2/'>
-            Read More
-          </a>
-        </div>
-      
-    </div>
-  
-
-</div>
-
-          </div>
-        
-      
-        
-          <div class='post-wrapper'>
-            <div class="post post-v3 white-box reveal shadow">
-  
-  
-  
-  
-    
-    <h2 class="article-title" >
-      <a href="/2021/01/29/2021-01-29-Java8InActionPart1/">
-        《Java8实战》基础知识
-      </a>
-    </h2>
-  
-  <div class='md'>
-    
-      <p>介绍 Java 8 的基础知识。学完第一部分，将会对 Lambda 表达式有充分的了解。</p>
-    
-  </div>
-  
-    <div class='meta-v3' line_style='solid'>
-      <div>
-        
-        <time>2021-01-29</time>
-        
-          <span class="dot"></span>
-          <a class="category-link" href="/categories/Java/">Java</a>
-        
-      </div>
-      
-        <div>
-          <a class='readmore' href='/2021/01/29/2021-01-29-Java8InActionPart1/'>
+          <a class='readmore' href='/2020/03/16/2020-03-16-Java-BitOps/'>
             Read More
           </a>
         </div>
@@ -830,10 +503,24 @@
   </section>
   
     
+      <br>
+      <div class="prev-next">
+        
+          <a class="prev" rel="prev" href="/page/4/">
+            <section class="post prev white-box shadow" >
+              <i class="fas fa-chevron-left" aria-hidden="true"></i>&nbsp;Previous&nbsp;
+            </section>
+          </a>
+        
+        <p class="current">
+          5 / 5
+        </p>
+        
+      </div>
+    
   
 
 
-	
 </div>
 <aside class='l_side'>
   
@@ -1036,6 +723,7 @@
 
 
 </aside>
+
 
 
         
