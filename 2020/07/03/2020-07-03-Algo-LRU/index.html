@@ -1,0 +1,1785 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head hexo-theme='https://github.com/volantis-x/hexo-theme-volantis/tree/4.0.0'>
+  <meta charset="utf-8">
+  <!-- SEO相关 -->
+  
+    
+  
+  <!-- 渲染优化 -->
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  <link rel='dns-prefetch' href='https://cdn.jsdelivr.net'>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <!-- 页面元数据 -->
+  
+  <title>Java LRU及Redis LRU - 吹梦到西洲</title>
+  
+    <meta name="keywords" content="算法">
+  
+
+  
+    <meta name="description" content="本篇文章起源于LeetCode上的一道算法题">
+  
+
+  <!-- feed -->
+  
+
+  <!-- import meta -->
+  
+
+  <!-- link -->
+  
+    <link rel="shortcut icon" type='image/x-icon' href="/images/3d-architecture.svg">
+  
+
+  <!-- import link -->
+  
+
+  
+    
+<link rel="stylesheet" href="/css/first.css">
+
+  
+
+  
+  <link rel="stylesheet" href="/css/style.css" media="print" onload="this.media='all';this.onload=null">
+  <noscript><link rel="stylesheet" href="/css/style.css"></noscript>
+  
+
+  <script id="loadcss"></script>
+
+</head>
+
+<body>
+  
+
+<header id="l_header" class="l_header auto shadow blur show" style='opacity: 0' >
+  <div class='container'>
+  <div id='wrapper'>
+    <div class='nav-sub'>
+      <p class="title"></p>
+      <ul class='switcher nav-list-h m-phone' id="pjax-header-nav-list">
+        <li><a id="s-comment" class="fas fa-comments fa-fw" target="_self" href='javascript:void(0)'></a></li>
+        
+          <li><a id="s-toc" class="s-toc fas fa-list fa-fw" target="_self" href='javascript:void(0)'></a></li>
+        
+      </ul>
+    </div>
+		<div class="nav-main">
+      
+        
+        <a class="title flat-box" target="_self" href='/'>
+          
+            <img no-lazy class='logo' src='https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/blog/Logo-NavBar@3x.png'/>
+          
+          
+          
+        </a>
+      
+
+			<div class='menu navigation'>
+				<ul class='nav-list-h m-pc'>
+          
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/
+                  
+                  
+                  
+                    id="home"
+                  >
+                  <i class='fas fa-rss fa-fw'></i>博客
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/categories/
+                  
+                  
+                  
+                    id="categories"
+                  >
+                  <i class='fas fa-folder-open fa-fw'></i>分类
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/tags/
+                  
+                  
+                  
+                    id="tags"
+                  >
+                  <i class='fas fa-tags fa-fw'></i>标签
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/archives/
+                  
+                  
+                  
+                    id="archives"
+                  >
+                  <i class='fas fa-archive fa-fw'></i>归档
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/friends/
+                  
+                  
+                  
+                    id="friends"
+                  >
+                  <i class='fas fa-link fa-fw'></i>友链
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/about/
+                  
+                  
+                  
+                    id="about"
+                  >
+                  <i class='fas fa-info-circle fa-fw'></i>关于
+                </a>
+                
+              </li>
+            
+          
+          
+				</ul>
+			</div>
+
+      <div class="m_search">
+        <form name="searchform" class="form u-search-form">
+          <i class="icon fas fa-search fa-fw"></i>
+          <input type="text" class="input u-search-input" placeholder="Search..." />
+        </form>
+      </div>
+
+			<ul class='switcher nav-list-h m-phone'>
+				
+					<li><a class="s-search fas fa-search fa-fw" target="_self" href='javascript:void(0)'></a></li>
+				
+				<li>
+          <a class="s-menu fas fa-bars fa-fw" target="_self" href='javascript:void(0)'></a>
+          <ul class="menu-phone list-v navigation white-box">
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/
+                  
+                  
+                  
+                    id="home"
+                  >
+                  <i class='fas fa-rss fa-fw'></i>博客
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/categories/
+                  
+                  
+                  
+                    id="categories"
+                  >
+                  <i class='fas fa-folder-open fa-fw'></i>分类
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/tags/
+                  
+                  
+                  
+                    id="tags"
+                  >
+                  <i class='fas fa-tags fa-fw'></i>标签
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/archives/
+                  
+                  
+                  
+                    id="archives"
+                  >
+                  <i class='fas fa-archive fa-fw'></i>归档
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/friends/
+                  
+                  
+                  
+                    id="friends"
+                  >
+                  <i class='fas fa-link fa-fw'></i>友链
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/about/
+                  
+                  
+                  
+                    id="about"
+                  >
+                  <i class='fas fa-info-circle fa-fw'></i>关于
+                </a>
+                
+              </li>
+            
+          
+            
+          </ul>
+        </li>
+			</ul>
+		</div>
+	</div>
+  </div>
+</header>
+
+  <div id="l_body">
+    <div id="l_cover">
+  
+    
+        <div id="full" class='cover-wrapper post search' style="display: none;">
+          
+            <div class='cover-bg lazyload placeholder' data-bg="/images/cover-2.jpg"></div>
+          
+          <div class='cover-body'>
+  <div class='top'>
+    
+    
+      <p class="title">吹梦到西洲</p>
+    
+    
+  </div>
+  <div class='bottom'>
+    
+      <div class="m_search">
+        <form name="searchform" class="form u-search-form">
+          <input type="text" class="input u-search-input" placeholder="Looking for something?" />
+          <i class="icon fas fa-search fa-fw"></i>
+        </form>
+      </div>
+    
+    <div class='menu navigation'>
+      <div class='list-h'>
+        
+          
+            <a href="/"
+              
+              
+              id="home">
+              <i class='fas fa-rss fa-fw'></i><p>博客</p>
+            </a>
+          
+            <a href="/categories/"
+              
+              
+              id="categories">
+              <i class='fas fa-folder-open fa-fw'></i><p>分类</p>
+            </a>
+          
+            <a href="/tags/"
+              
+              
+              id="tags">
+              <i class='fas fa-tags fa-fw'></i><p>标签</p>
+            </a>
+          
+            <a href="/archives/"
+              
+              
+              id="archives">
+              <i class='fas fa-archive fa-fw'></i><p>归档</p>
+            </a>
+          
+            <a href="/friends/"
+              
+              
+              id="friends">
+              <i class='fas fa-link fa-fw'></i><p>友链</p>
+            </a>
+          
+            <a href="/about/"
+              
+              
+              id="about">
+              <i class='fas fa-info-circle fa-fw'></i><p>关于</p>
+            </a>
+          
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+          <div id="scroll-down" style="display: none;"><i class="fa fa-chevron-down scroll-down-effects"></i></div>
+        </div>
+    
+  
+  </div>
+
+    <div id='safearea'>
+      <div class='body-wrapper' id="pjax-container">
+        
+
+<div class='l_main'>
+  <article class="article post white-box reveal md shadow article-type-post" id="post" itemscope itemprop="blogPost">
+  
+
+
+  
+  <div class="article-meta" id="top">
+    
+    
+    
+      <h1 class="title">
+        Java LRU及Redis LRU
+      </h1>
+      <div class='new-meta-box'>
+        
+          
+            
+<div class='new-meta-item author'>
+  <a class='author' href="/" rel="nofollow">
+    <img no-lazy src="">
+    <p>吹梦到西洲</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  <div class='new-meta-item category'>
+    <a class='notlink'>
+      <i class="fas fa-folder-open fa-fw" aria-hidden="true"></i>
+      <a class="category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+    </a>
+  </div>
+
+
+          
+        
+          
+            <div class="new-meta-item date">
+  <a class='notlink'>
+    <i class="fas fa-calendar-alt fa-fw" aria-hidden="true"></i>
+    <p>发布于：Jul 3, 2020</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  <div class="new-meta-item browse leancloud">
+    <a class='notlink'>
+      
+      <div id="lc-pv" data-title="Java LRU及Redis LRU" data-path="/2020/07/03/2020-07-03-Algo-LRU/">
+        <i class="fas fa-eye fa-fw" aria-hidden="true"></i>
+        <span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span>
+        次浏览
+      </div>
+    </a>
+  </div>
+
+
+          
+        
+      </div>
+    
+  </div>
+
+
+  
+  <h1 id="LRU缓存"><a href="#LRU缓存" class="headerlink" title="LRU缓存"></a>LRU缓存</h1><h2 id="LRU简介"><a href="#LRU简介" class="headerlink" title="LRU简介"></a>LRU简介</h2><p><code>LRU</code> 是 <code>Least Recently Used</code> 的缩写，即<strong>最不经常用、最长时间未使用</strong>，在操作系统中是一种常用的<a href="https://baike.baidu.com/item/页面置换算法/7626091" target="_blank" rel="noopener">页面置换算法</a>，选择最近<strong>最久未使用</strong>的页面予以淘汰。该算法赋予每个页面一个访问字段，用来记录一个页面自上次被访问以来所经历的时间 $t$，当须淘汰一个页面时，选择现有页面中其 $t$ 值最大的，即最久未使用的页面予以淘汰。</p>
+<p>这里说的缓存是一种广义的概念，在计算机存储层次结构中，低一层的存储器都可以看做是高一层的缓存。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gjwnrt976tj30f106174m.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gjwnrt976tj30f106174m.jpg" srcset="data:image/png;base64,666" alt="计算机系统存储层次示意图"></p>
+<p>缓存可以有效地解决存储器<strong>性能与容量</strong>的矛盾，但如果缓存算法设计不当，非但不能提高访问速度，反而会使系统变得更慢。</p>
+<p>从本质上来说，缓存之所以有效是因为程序和数据的<strong>局部性</strong>（<code>locality</code>）。<strong>程序会按固定的顺序执行，数据会存放在连续的内存空间并反复读写。</strong>这些特点使得我们可以缓存那些经常用到的数据，从而提高读写速度。</p>
+<p>缓存的大小是固定的，它应该只保存最常被访问的那些数据。然而未来不可预知，我们只能从过去的访问序列做预测，于是就有了各种各样的缓存替换策略。</p>
+<h2 id="LeetCode题目"><a href="#LeetCode题目" class="headerlink" title="LeetCode题目"></a>LeetCode题目</h2><h3 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h3><ul>
+<li><a href="https://leetcode-cn.com/problems/lru-cache/" target="_blank" rel="noopener">点我去做 - 146. LRU缓存机制</a></li>
+</ul>
+<p>运用你所掌握的数据结构，设计和实现一个 <code>LRU</code> (最久未使用) 缓存机制。它应该支持以下操作： 获取数据 <code>get</code> 和 写入数据 <code>put</code> 。</p>
+<ul>
+<li><p>获取数据 <code>get(key)</code>：如果关键字 (<code>key</code>) 存在于缓存中，则获取关键字的值（总是正数），否则返回 <code>-1</code>。</p>
+</li>
+<li><p>写入数据 <code>put(key, value)</code>：</p>
+<ul>
+<li>如果关键字已经存在，则变更其数据值；</li>
+<li>如果关键字不存在，则插入该组「关键字/值」；</li>
+<li>当缓存容量达到上限时，它应该在写入新数据之前删除最久未使用的数据值，从而为新的数据值留出空间。</li>
+</ul>
+</li>
+<li><p>进阶：你是否可以在 $O(1)$ 时间复杂度内完成这两种操作？</p>
+</li>
+</ul>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">LRUCache cache = new LRUCache( 2 /<span class="emphasis">* 缓存容量 *</span>/ );</span><br><span class="line"></span><br><span class="line">cache.put(1, 1);</span><br><span class="line">cache.put(2, 2);</span><br><span class="line">cache.get(1);       // 返回  1</span><br><span class="line">cache.put(3, 3);    // 该操作会使得关键字 2 作废</span><br><span class="line">cache.get(2);       // 返回 -1 (未找到)</span><br><span class="line">cache.put(4, 4);    // 该操作会使得关键字 1 作废</span><br><span class="line">cache.get(1);       // 返回 -1 (未找到)</span><br><span class="line">cache.get(3);       // 返回  3</span><br><span class="line">cache.get(4);       // 返回  4</span><br></pre></td></tr></table></figure>
+
+<h3 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h3><p>实现本题的两种操作，需要用到一个<strong>哈希表</strong>和一个<strong>双向链表</strong>。在<code>Java</code>语言中，<code>LinkedHashMap</code>拥有这种数据结构。而且利用这内置的数据结构很容易就可以实现<code>LRU</code>缓存的功能。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LRUCache</span> <span class="keyword">extends</span> <span class="title">LinkedHashMap</span>&lt;<span class="title">Integer</span>, <span class="title">Integer</span>&gt; </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> capacity;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">LRUCache</span><span class="params">(<span class="keyword">int</span> capacity)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(capacity, <span class="number">0.75f</span>, <span class="keyword">true</span>);</span><br><span class="line">        <span class="keyword">this</span>.capacity = capacity;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">get</span><span class="params">(<span class="keyword">int</span> key)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">super</span>.getOrDefault(key, -<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span><span class="params">(<span class="keyword">int</span> key, <span class="keyword">int</span> value)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.put(key, value);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">boolean</span> <span class="title">removeEldestEntry</span><span class="params">(Map.Entry&lt;Integer, Integer&gt; eldest)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> size() &gt; capacity;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>扩展阅读：<a href="https://juejin.im/post/5ace2bde6fb9a028e25deca8" target="_blank" rel="noopener">LinkedHashMap源码分析-像一只狗-掘金</a></li>
+</ul>
+<p>上面的代码虽然能够通过 <code>LeetCode</code> 的测试，但是如果在面试的时候面试官更想要看到的应该是候选人手动实现 <code>LRU</code> 的功能，而不是直接调用<code>JDK</code>。</p>
+<p>通过上面的内容可以了解到<code>LRU</code> 缓存机制主要用到了<strong>哈希表</strong>与<strong>双向链表</strong>，在这个过程中：</p>
+<ul>
+<li>哈希表：通过缓存数据的<code>key</code>在 $O(1)$ 的时间内获得<code>Node</code>在双向链表中的位置，结构其实是 <code>Map&lt;Integer, Node&gt;</code>；</li>
+<li>双向链表：按照被使用的顺序存储<strong>键值对(结点)</strong>，靠近 <code>head</code> 的结点是最近刚刚使用的，而靠近 <code>tail</code> 的结点则是最长时间未使用的。</li>
+</ul>
+<p>这样一来，我们需要做的就是：</p>
+<ul>
+<li>使用哈希表进行定位，找出缓存的数据在双向链表中的位置；</li>
+<li>根据进行的操作 <code>get/put</code> 以及容量 <code>capacity</code> 维护缓存数据在哈希表和双向链表中存储<ul>
+<li>把最近访问过的数据项移动到链表头部；</li>
+<li>在哈希表中 <code>insert/update/delete</code> 数据项。</li>
+</ul>
+</li>
+</ul>
+<p><strong>算法流程：</strong></p>
+<ol>
+<li>创建双向链表的结点<code>Node</code></li>
+<li>创建双向链表用于维护结点的使用信息<ol>
+<li><code>get(key)</code> 操作<ol>
+<li>如果 <code>key</code> 不存在，则返回 <code>-1</code>；</li>
+<li>如果 <code>key</code> 存在，则 <code>key</code> 对应的结点是刚刚被使用过的结点，通过哈希表定位到该结点在双向链表中的位置，并将其移动到双向链表的<strong>头部</strong>，最后返回该结点的值。</li>
+</ol>
+</li>
+<li><code>put(key, value)</code>操作<ol>
+<li><code>key == null</code>，使用 <code>key-value</code> 创建一个新的结点 <code>node</code>，添加该结点到双向链表头部 <code>head</code>，并将 <code>key-node</code> 添加到哈希表中。然后判断结点数量是否超出容量，如果超出，则删除双向链表的尾部结点，并删除哈希表中其对应的映射。</li>
+<li><code>key != null</code>，与 <code>get</code> 操作类似，先通过哈希表定位，再将对应结点的值更新为 <code>value</code>，并将该结点移动到双向链表的头部。</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<blockquote>
+<p><strong>哨兵结点：</strong></p>
+<p>在双向链表的实现中，使用伪头部 <code>dummy head</code> 和伪尾部 <code>dummy tail</code> 标记界限，这样在添加和删除结点的时候就不需要再检查相邻的结点是否存在。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LRUCache</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">DLinkedNode</span> </span>&#123;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">int</span> key, value;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">private</span> DLinkedNode pre, next;</span><br><span class="line">        </span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">DLinkedNode</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">        </span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">DLinkedNode</span><span class="params">(<span class="keyword">int</span> key, <span class="keyword">int</span> value)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.key = key;</span><br><span class="line">            <span class="keyword">this</span>.value = value;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> Map&lt;Integer, DLinkedNode&gt; cache = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> size; <span class="comment">// 缓存中实际存储的元素数量</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> capacity; <span class="comment">// 缓存容量</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> DLinkedNode head, tail;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">LRUCache</span><span class="params">(<span class="keyword">int</span> capacity)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.size = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">this</span>.capacity = capacity;</span><br><span class="line">        head = <span class="keyword">new</span> DLinkedNode();</span><br><span class="line">        tail = <span class="keyword">new</span> DLinkedNode();</span><br><span class="line">        head.next = tail;</span><br><span class="line">        tail.pre = head;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">get</span><span class="params">(<span class="keyword">int</span> key)</span> </span>&#123;</span><br><span class="line">        DLinkedNode node = cache.get(key);</span><br><span class="line">        <span class="keyword">if</span> (node == <span class="keyword">null</span>) <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">        <span class="comment">// 不空, 将获取到的结点放到双向链表头部</span></span><br><span class="line">		moveToHead(node);</span><br><span class="line">        <span class="keyword">return</span> node.value;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span><span class="params">(<span class="keyword">int</span> key, <span class="keyword">int</span> value)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (capacity == <span class="number">0</span>) </span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        DLinkedNode node = cache.get(key);</span><br><span class="line">        <span class="keyword">if</span> (node == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// 创建新结点并插入到双向链表头部, 存入 cache 中。</span></span><br><span class="line">            DLinkedNode newNode = <span class="keyword">new</span> DLinkedNode(key, value);</span><br><span class="line">            cache.put(key, newNode);</span><br><span class="line">            addToHead(newNode);</span><br><span class="line">            ++size;</span><br><span class="line">            <span class="keyword">if</span> (size &gt; capacity) &#123;</span><br><span class="line">                <span class="comment">// 删除双向链表尾部结点 同时清除 cache 中的记录。</span></span><br><span class="line">                DLinkedNode tailNode = removeTail();</span><br><span class="line">                cache.remove(tailNode.key);</span><br><span class="line">                --size;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 已经存在 key , 修改 value, 移动到头部。</span></span><br><span class="line">            node.value = value;</span><br><span class="line">            moveToHead(node);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">moveToHead</span><span class="params">(DLinkedNode node)</span> </span>&#123;</span><br><span class="line">        removeNode(node); <span class="comment">// 1. 在原链表中移除当前位置的结点, 否则只是移动到头部的话会产生重复。</span></span><br><span class="line">        addToHead(node); <span class="comment">// 2. 移动到头部。</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">removeNode</span><span class="params">(DLinkedNode node)</span> </span>&#123;</span><br><span class="line">        node.pre.next = node.next;</span><br><span class="line">        node.next.pre = node.pre;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">addToHead</span><span class="params">(DLinkedNode node)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 又是经典的双向链表插入结点问题了</span></span><br><span class="line">        node.pre = head;</span><br><span class="line">        node.next = head.next;</span><br><span class="line">        head.next.pre = node;</span><br><span class="line">        head.next = node;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">private</span> DLinkedNode <span class="title">removeTail</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        DLinkedNode tailNode = tail.pre;</span><br><span class="line">        removeNode(tailNode);</span><br><span class="line">        <span class="keyword">return</span> tailNode;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>时间复杂度：<code>get()、put()</code>都是 $O(1)$。</li>
+<li>空间复杂度：$O(capacity)$，哈希表和双向链表最多存储 <code>capacity + 1</code> 个元素。</li>
+</ul>
+<p>上面的代码应该可以让面试官比较满意了，但是如果想更加突出自己的过人之处还该考虑点什么？</p>
+<ul>
+<li><p>哨兵 (<code>head、tail</code>) 已经考虑；</p>
+</li>
+<li><p>线程安全 (<code>synchronized</code> 可行考虑)；</p>
+</li>
+<li><p>吞吐量 (<code>CAS</code>操作) 可以再提高一点吗？</p>
+</li>
+<li><p>考虑使用(<code>ConcurrentHashMap</code>) 分段锁；</p>
+</li>
+<li><p>如果容忍一定的准确性损失 (<code>ReadWriteLock</code>)；</p>
+</li>
+<li><p>环形 <code>LRU(Disruptor Ring Buffer)</code>；</p>
+</li>
+<li><p>提前分配空间的 <code>LRU</code>；</p>
+</li>
+<li><p>分布式的 <code>LRU</code> 应该如何设计？</p>
+</li>
+</ul>
+<h2 id="线程安全并且带有定时任务的LRU缓存"><a href="#线程安全并且带有定时任务的LRU缓存" class="headerlink" title="线程安全并且带有定时任务的LRU缓存"></a>线程安全并且带有定时任务的LRU缓存</h2><h3 id="ConcurrentLinkedQueue"><a href="#ConcurrentLinkedQueue" class="headerlink" title="ConcurrentLinkedQueue"></a>ConcurrentLinkedQueue</h3><p><code>ConcurrentLinkedQueue</code> 是一个基于单向链表的<strong>无界无锁</strong>线程安全的队列，适合在高并发环境下使用，效率比较高。在使用时，可以把它理解为基本的队列，但是保证了多线程下的安全性。<strong>和普通队列一样，它也是按照先进先出(FIFO)的规则对接点进行排序。</strong> 另外，队列元素中不可以放置 <code>null</code> 元素。</p>
+<p><code>ConcurrentLinkedQueue</code> 整个继承关系如下图所示：</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gge44o22s4j30o00e1t9a.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gge44o22s4j30o00e1t9a.jpg" srcset="data:image/png;base64,666" alt="ConcurrentLinkedQueue继承与实现关系"></p>
+<p><code>ConcurrentLinkedQueue</code> 中最主要的两个方法是：<code>offer(value)</code>和<code>poll()</code>，分别实现队列的两个重要的操作：入队和出队。(<code>offer(value)</code> 基本等价于 <code>add(value)</code>)。</p>
+<p>当添加一个元素到队列的时候，它会添加到队列的尾部，当获取一个元素时，它会返回队列头部的元素。</p>
+<p>利用 <code>ConcurrentLinkedQueue</code> 先进先出的特性，每当 <code>put/get</code> (缓存被使用)元素的时候，就将元素存放在队列尾部，这样能够保证头部的元素是最近最少使用的。</p>
+<h3 id="ReadWriteLock"><a href="#ReadWriteLock" class="headerlink" title="ReadWriteLock"></a><code>ReadWriteLock</code></h3><p><code>ReadWriteLock</code> 是一个接口，位于<code>java.util.concurrent.locks</code>包下，里面只有两个方法分别返回读锁和写锁：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ReadWriteLock</span> </span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> the lock used for reading</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function">Lock <span class="title">readLock</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> the lock used for writing</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function">Lock <span class="title">writeLock</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>ReentrantReadWriteLock</code> 是 <code>ReadWriteLock</code> 接口的具体实现类。</p>
+<p>读写锁比较适合缓存这种<strong>读多写少</strong>的场景。读写锁可以保证多个线程同时读取，但是只有一个线程可以写入。但是当读锁被线程持有的时候，读锁是无法被其他线程申请，会处于阻塞状态，直至读锁被释放。该锁也是可重入锁。</p>
+<p>另外，同一个线程持有写锁时可以继续申请读锁，但是持有读锁的时候不可以申请写锁。</p>
+<h3 id="ScheduledExecutorService"><a href="#ScheduledExecutorService" class="headerlink" title="ScheduledExecutorService"></a><code>ScheduledExecutorService</code></h3><p><code>ScheduledExecutorService</code> 是一个接口，<code>ScheduledThreadPoolExecutor</code> 是其主要实现类。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gge4j04h79j30o40eaaak.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gge4j04h79j30o40eaaak.jpg" srcset="data:image/png;base64,666" alt="ScheduledExecutorService继承与实现关系"></p>
+<p><strong><code>ScheduledThreadPoolExecutor</code></strong> <strong>主要用来在给定的延迟后运行任务，或者定期执行任务。</strong> 这个在实际项目用到的比较少，因为有其他方案选择比如 <code>quartz</code>。但是，在一些需求比较简单的场景下还是非常有用的！</p>
+<p><strong><code>ScheduledThreadPoolExecutor</code></strong> <strong>使用的任务队列</strong> <strong><code>DelayQueue</code></strong> <strong>封装了一个</strong> <strong><code>PriorityQueue</code>，<code>PriorityQueue</code></strong> <strong>会对队列中的任务进行排序，执行所需时间短的放在前面先被执行，如果执行所需时间相同则先提交的任务将被先执行。</strong></p>
+<h3 id="线程安全的LRU缓存"><a href="#线程安全的LRU缓存" class="headerlink" title="线程安全的LRU缓存"></a>线程安全的LRU缓存</h3><ul>
+<li>实现方法：<code>ConcurrentHashMap + ConcurrentLinkedQueue + ReadWriteLock</code>。</li>
+</ul>
+<p>这里可能会有疑问的点是：在<code>LeetCode</code>中选择使用双向链表来维护结点之前按使用时间的关系，也可以实现在 $O(1)$ 的时间内完成将结点的移动和删除操作，但是这里用队列来保存结点，如果刚刚访问了队列中间的结点，那这个结点之前或之后的结点该如何处理呢？</p>
+<p>这里的做法是：每当 <code>put/get</code> 元素的时候，就将这个元素对应的 <code>key</code> 放到队尾，这样就能保证队列头部的元素就是最近最少使用的，当缓存容量不够的时候，直接移除队列头部的<code>key</code>以及这个<code>key</code>对应的缓存即可。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LRUCache</span>&lt;<span class="title">K</span>, <span class="title">V</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> maxCapacity;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> ConcurrentHashMap&lt;K, V&gt; cacheMap;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> ConcurrentLinkedQueue&lt;K&gt; keys;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 读写锁</span></span><br><span class="line">    <span class="keyword">private</span> ReadWriteLock readWriteLock = <span class="keyword">new</span> ReentrantReadWriteLock();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Lock writeLock = readWriteLock.writeLock();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Lock readLock = readWriteLock.readLock();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">LRUCache</span><span class="params">(<span class="keyword">int</span> maxCapacity)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (maxCapacity &lt; <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"Illegal max capacity"</span> + maxCapacity);</span><br><span class="line">        <span class="keyword">this</span>.maxCapacity = maxCapacity;</span><br><span class="line">        cacheMap = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;(maxCapacity);</span><br><span class="line">        keys = <span class="keyword">new</span> ConcurrentLinkedQueue&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> V <span class="title">put</span><span class="params">(K key, V value)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 加写锁</span></span><br><span class="line">        writeLock.lock();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 1. 判断 key 是否存在于当前缓存</span></span><br><span class="line">            <span class="keyword">if</span> (cacheMap.containsKey(key)) &#123;</span><br><span class="line">                moveToTail(key);</span><br><span class="line">                cacheMap.put(key, value);</span><br><span class="line">                <span class="keyword">return</span> value;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 2. 是否超出缓存容量，超出的话就移除队列头部的元素以及其对应的缓存</span></span><br><span class="line">            <span class="keyword">if</span> (cacheMap.size() == maxCapacity) &#123;</span><br><span class="line">                System.out.println(<span class="string">"reached to maxCapacity"</span>);</span><br><span class="line">                removeEldestKey();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 3. key 不存在于当前缓存 将 key 添加到队列的尾部并且缓存 key 及其对应的元素</span></span><br><span class="line">            keys.offer(key);</span><br><span class="line">            cacheMap.put(key, value);</span><br><span class="line">            <span class="keyword">return</span>  value;</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            writeLock.unlock();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> V <span class="title">get</span><span class="params">(K key)</span> </span>&#123;</span><br><span class="line">        readLock.lock();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 1. 判断 key 是否存在于缓存</span></span><br><span class="line">            <span class="keyword">if</span> (cacheMap.containsKey(key)) &#123;</span><br><span class="line">                <span class="comment">// 2 存在的话将 key 移动到队列尾部</span></span><br><span class="line">                moveToTail(key);</span><br><span class="line">                <span class="keyword">return</span> cacheMap.get(key);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            readLock.unlock();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> V <span class="title">remove</span><span class="params">(K key)</span> </span>&#123;</span><br><span class="line">        writeLock.lock();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 1. 判断 key 是否存在于缓存</span></span><br><span class="line">            <span class="keyword">if</span> (cacheMap.containsKey(key)) &#123;</span><br><span class="line">                keys.remove(key);</span><br><span class="line">                <span class="keyword">return</span> cacheMap.remove(key);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            writeLock.unlock();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">removeEldestKey</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        K eldestKey = keys.poll();</span><br><span class="line">        <span class="keyword">if</span> (eldestKey != <span class="keyword">null</span>)</span><br><span class="line">            cacheMap.remove(eldestKey);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 将元素添加到队列的尾部(put/get的时候执行)</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">moveToTail</span><span class="params">(K key)</span> </span>&#123;</span><br><span class="line">        keys.remove(key);</span><br><span class="line">        keys.add(key);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">size</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> cacheMap.size();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>非并发环境测试</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NonConcurrentTest</span>  </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        LRUCache&lt;Integer, String&gt; lruCache = <span class="keyword">new</span> LRUCache&lt;&gt;(<span class="number">3</span>);</span><br><span class="line">        lruCache.put(<span class="number">1</span>, <span class="string">"Java"</span>);</span><br><span class="line">        System.out.println(lruCache.get(<span class="number">1</span>)); <span class="comment">// Java</span></span><br><span class="line">        lruCache.remove(<span class="number">1</span>);</span><br><span class="line">        System.out.println(lruCache.get(<span class="number">1</span>)); <span class="comment">// null</span></span><br><span class="line">        lruCache.put(<span class="number">2</span>, <span class="string">"C++"</span>);</span><br><span class="line">        lruCache.put(<span class="number">3</span>, <span class="string">"Python"</span>);</span><br><span class="line">        <span class="comment">// ["C++", "Python"] 队头在左 队尾在右</span></span><br><span class="line">        System.out.println(lruCache.keys); <span class="comment">// [2, 3]</span></span><br><span class="line">        System.out.println(lruCache.get(<span class="number">2</span>)); <span class="comment">// C++</span></span><br><span class="line">        <span class="comment">// ["Python", "C++"]</span></span><br><span class="line">        lruCache.put(<span class="number">4</span>, <span class="string">"C"</span>);</span><br><span class="line">        <span class="comment">// ["Python", "C++", "C"]</span></span><br><span class="line">        System.out.println(lruCache.keys); <span class="comment">// [3, 2, 4]</span></span><br><span class="line">        lruCache.put(<span class="number">5</span>, <span class="string">"PHP"</span>);</span><br><span class="line">        <span class="comment">// ["C++", "C", "PHP"]</span></span><br><span class="line">        System.out.println(lruCache.get(<span class="number">2</span>)); <span class="comment">// C++</span></span><br><span class="line">        <span class="comment">// ["C", "PHP", "C++"]</span></span><br><span class="line">        System.out.println(lruCache.keys); <span class="comment">// [4, 5, 2]</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>并发环境测试</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConcurrentTest</span> </span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 初始化一个固定容量为 10 的线程池和 count 为 10 的 CountDownLatch。</span></span><br><span class="line"><span class="comment">     * 将 100 次操作分 10 次添加到线程池</span></span><br><span class="line"><span class="comment">     * 然后等待线程池执行完成 10 次操作（正常情况下会有10个线程同时执行任务，所以速度很快）。</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> args</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> threadNum = <span class="number">10</span>;</span><br><span class="line">        <span class="keyword">int</span> batchSize = <span class="number">10</span>;</span><br><span class="line">        LRUCache&lt;String, Integer&gt; lruCache = <span class="keyword">new</span> LRUCache&lt;&gt;(batchSize * <span class="number">10</span>);</span><br><span class="line">        ExecutorService fixedThreadPool = Executors.newFixedThreadPool(threadNum);</span><br><span class="line">        CountDownLatch countDownLatch = <span class="keyword">new</span> CountDownLatch(threadNum);</span><br><span class="line">        AtomicInteger atomicInteger = <span class="keyword">new</span> AtomicInteger(<span class="number">0</span>);</span><br><span class="line">        <span class="keyword">long</span> startTime = System.currentTimeMillis();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> t = <span class="number">0</span>; t &lt; threadNum; t++) &#123;</span><br><span class="line">            fixedThreadPool.submit(() -&gt; &#123;</span><br><span class="line">               <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; batchSize; i++) &#123;</span><br><span class="line">                   <span class="keyword">int</span> value = atomicInteger.incrementAndGet();</span><br><span class="line">                   lruCache.put(<span class="string">"id:"</span> + value, value);</span><br><span class="line">               &#125;</span><br><span class="line">               countDownLatch.countDown();</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">        countDownLatch.await();</span><br><span class="line">        fixedThreadPool.shutdown();</span><br><span class="line">        System.out.println(<span class="string">"Cache size:"</span> + lruCache.size());</span><br><span class="line">        <span class="keyword">long</span> endTime = System.currentTimeMillis();</span><br><span class="line">        <span class="keyword">long</span> duration = endTime - startTime;</span><br><span class="line">        System.out.println(String.format(<span class="string">"Time cost：%dms"</span>, duration));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="线程安全并且带有定时任务的LRU缓存-1"><a href="#线程安全并且带有定时任务的LRU缓存-1" class="headerlink" title="线程安全并且带有定时任务的LRU缓存"></a>线程安全并且带有定时任务的LRU缓存</h3><p>实际上就是在上面实现的<code>LRU</code>的基础上加上一个定时任务去删除缓存，实现定时任务的方式有很多种：</p>
+<ul>
+<li><code>Timer</code> :不被推荐，多线程会存在问题。</li>
+<li><code>ScheduledExecutorService</code> ：定时器线程池，可以用来替代 <code>Timer</code></li>
+<li><code>DelayQueue</code> ：延时队列</li>
+<li><code>quartz</code> ：一个很火的开源任务调度框架，很多其他框架都是基于 <code>quartz</code> 开发的，比如当当网的<code>elastic-job</code>就是基于<code>quartz</code>二次开发之后的分布式调度解决方案</li>
+<li>$\dots$</li>
+</ul>
+<p>因为只是一个小练习，所以选择<code>JDK</code>自带的<code>ScheduledExecutorService</code>，它基于<code>DelayQueue</code>做了很多封装，能够满足大部分需求。</p>
+<p>在上面实现的基础上增加一个方法，在<code>put</code>操作的时候，通过这个方法就能直接设置过期时间。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">removeAfterExpire</span><span class="params">(K key, <span class="keyword">long</span> expireTime)</span> </span>&#123;</span><br><span class="line">    scheduledExecutorService.schedule(() -&gt; &#123;</span><br><span class="line">        <span class="comment">//过期后清除该键值对</span></span><br><span class="line">        cacheMap.remove(key);</span><br><span class="line">        keys.remove(key);</span><br><span class="line">    &#125;, expireTime, TimeUnit.MILLISECONDS);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> V <span class="title">put</span><span class="params">(K key, V value, <span class="keyword">long</span> expireTime)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 加写锁</span></span><br><span class="line">    writeLock.lock();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">//1.key是否存在于当前缓存</span></span><br><span class="line">        <span class="keyword">if</span> (cacheMap.containsKey(key)) &#123;</span><br><span class="line">            moveToTail(key);</span><br><span class="line">            cacheMap.put(key, value);</span><br><span class="line">            <span class="keyword">return</span> value;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//2.是否超出缓存容量，超出的话就移除队列头部的元素以及其对应的缓存</span></span><br><span class="line">        <span class="keyword">if</span> (cacheMap.size() == maxCapacity) &#123;</span><br><span class="line">            System.out.println(<span class="string">"maxCapacity of cache reached"</span>);</span><br><span class="line">            removeEldestKey();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//3.key不存在于当前缓存。将key添加到队列的尾部并且缓存key及其对应的元素</span></span><br><span class="line">        keys.add(key);</span><br><span class="line">        cacheMap.put(key, value);</span><br><span class="line">        <span class="keyword">if</span> (expireTime &gt; <span class="number">0</span>)</span><br><span class="line">            removeAfterExpireTime(key, expireTime);</span><br><span class="line">        <span class="keyword">return</span> value;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        writeLock.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>存在的问题：<code>Lock</code> 与 <code>ConcurrentXxx</code>一起使用显得多余。从此也可以产生两种方案</p>
+<ul>
+<li>读写锁加基本的<code>HashMap、双向链表</code>，或者<code>synchronized</code>同步方法。</li>
+<li>使用并发工具类<code>ConcurrentXxxx</code></li>
+</ul>
+<p>待改进之处：维护队列 $O(n)$，可以使用其他数据结构减少到 $O(1)$。</p>
+</blockquote>
+<h2 id="Redis-中的-LRU"><a href="#Redis-中的-LRU" class="headerlink" title="Redis 中的 LRU"></a><a href="https://www.cnblogs.com/linxiyue/p/10945216.html" target="_blank" rel="noopener">Redis 中的 LRU</a></h2><p><code>Redis</code> 作为缓存使用时，一些场景下要考虑内存的空间消耗问题。<code>Redis</code> 会删除过期键以释放空间，<strong>过期键的删除策略</strong>有两种：</p>
+<ul>
+<li>惰性删除：每次从键空间获取键时，都检查键是否过期，如果过期的话就删除该键，否则返回该键。</li>
+<li>定期删除：每隔一段时间，程序就对数据库进行一次检查，删除里面的过期键。</li>
+</ul>
+<p>当需要从缓存中淘汰数据时，我们希望能淘汰那些将来不可能再被使用的数据，保留那些将来还会频繁访问的数据，但最大的问题是缓存并不能预言未来。一个解决方法就是通过 <code>LRU</code> 进行预测：</p>
+<ul>
+<li>最近被频繁访问的数据将来被访问的可能性也越大；</li>
+<li>缓存中的数据一般会有这样的访问分布：<ul>
+<li>一部分数据拥有绝大部分的访问量；</li>
+<li>当访问模式很少改变时，可以记录每个数据的最后一次访问时间，拥有最少空闲时间的数据可以被认为将来最有可能被访问到。</li>
+</ul>
+</li>
+</ul>
+<h3 id="LRU配置参数"><a href="#LRU配置参数" class="headerlink" title="LRU配置参数"></a><code>LRU</code>配置参数</h3><p><code>Redis</code>配置中和<code>LRU</code>有关的有三个：</p>
+<ul>
+<li><code>maxmemory</code>：配置 <code>Redis</code> 存储数据时指定限制的内存大小，比如 <code>100m</code>。当缓存消耗的内存超过这个数值时, 将触发数据淘汰。该数据配置为 $0$ 时，表示缓存的数据量没有限制, 即 $LRU$ 功能不生效。$64$ 位的系统默认值为 $0$，$32$ 位的系统默认内存限制为 $3GB$。</li>
+<li><code>maxmemory_policy</code>：触发数据淘汰后的淘汰策略。</li>
+<li><code>maxmemory_samples</code>：随机采样的精度，也就是随即取出 $key$ 的数目。该数值配置越大, 越接近于真实的 $LRU$ 算法，但是数值越大，相应消耗也变高，对性能有一定影响，样本值默认为 $5$ 。</li>
+</ul>
+<h3 id="内存淘汰策略"><a href="#内存淘汰策略" class="headerlink" title="内存淘汰策略"></a>内存淘汰策略</h3><p>在 <code>Redis</code> 中的内存淘汰策略有：</p>
+<ul>
+<li><code>volatile-lru</code>：从已设置过期时间的数据集（<code>server.db[i].expires</code>）中挑选最久未使用的数据淘汰；</li>
+<li><code>volatile-ttl</code>：从已设置过期时间的数据集（<code>server.db[i].expires</code>）中挑选将要过期的数据淘汰；</li>
+<li><code>volatile-random</code>：从已设置过期时间的数据集（<code>server.db[i].expires</code>）中随机选取数据淘汰；</li>
+<li><code>allkeys-lru</code>：当内存不足以容纳新写入数据时，在键空间中，移除最久未使用的 <code>key</code>；</li>
+<li><code>allkeys-random</code>：从数据集（<code>server.db[i].dict</code>）中随机选取数据淘汰；</li>
+<li><code>no-eviction</code>：禁止驱逐数据，也就是说当内存不足以容纳新写入数据时，新写入操作会报错。</li>
+</ul>
+<p><code>volatile-xxx</code> 这三个淘汰策略使用的不是全量数据，有可能无法淘汰出足够的内存空间。在没有过期键或者没有设置超时属性的键的情况下，这三种策略和 <code>noeviction</code> 差不多。</p>
+<p>一般的经验规则：</p>
+<ul>
+<li>使用 <code>allkeys-lru</code> 策略：当预期请求符合一个幂次分布(二八法则等)，比如一部分的子集元素比其它元素被访问的更多时，可以选择这个策略。</li>
+<li>使用 <code>allkeys-random</code> 策略：循环连续的访问所有的键时，或者预期请求分布平均（所有元素被访问的概率都差不多）。</li>
+<li>使用 <code>volatile-ttl</code>：要采取这个策略，缓存对象的 <code>TTL</code> 值最好有差异。</li>
+</ul>
+<p><code>volatile-lru</code> 和 <code>volatile-random</code> 策略，当想要使用<strong>单一</strong>的 <code>Redis</code> 实例来同时实现<strong>缓存淘汰和持久化</strong>一些经常使用的键集合时很有用。</p>
+<ul>
+<li>对未设置过期时间的键进行持久化保存，对设置了过期时间的键参与缓存淘汰。</li>
+<li>不过一般运行两个实例是解决这个问题的更好方法。</li>
+</ul>
+<p>为键设置过期时间也是需要消耗内存的，所以使用 <code>allkeys-lru</code> 这种策略更加节省空间，因为这种策略下可以不为键设置过期时间。</p>
+<p>4.0 版本后增加以下两种：</p>
+<ul>
+<li><code>volatile-lfu</code>：从已设置过期时间的数据集(<code>server.db[i].expires</code>)中挑选最不经常使用的数据淘汰。</li>
+<li><code>allkeys-lfu</code>：当内存不足以容纳新写入数据时，在键空间中，移除最不经常使用的 <code>key</code>。</li>
+</ul>
+<h3 id="近似LRU算法"><a href="#近似LRU算法" class="headerlink" title="近似LRU算法"></a>近似LRU算法</h3><p> $LRU$ 算法需要使用一个双向链表来记录数据的最近被访问顺序，出于节省内存的考虑，$Redis$ 的 $LRU$ 算法并未完整实现。</p>
+<p>$Redis$ 并不会选择最久未被访问的键进行回收，而是尝试运行一个近似 $LRU$ 算法，<strong>通过对少量键进行取样，然后回收其中的最久未被访问的键</strong>。通过调整每次回收时的采样数量 <code>maxmemory-samples</code>，可以实现调整算法的精度。</p>
+<p>根据 Redis 作者的说法，每个 <code>Redis Object</code> 可以挤出 $24 bits$ 的空间，但 $24 bits$ 是不够存储两个指针的，而够存储一个低位时间戳，<code>Redis Object</code> 以秒为单位存储了对象新建或者更新时的 <code>Unix Time</code>，也就是 <code>LRU Clock</code>，$24 bits$ 数据要溢出的话需要 $194$ 天，而缓存的数据更新非常频繁，已经足够了。</p>
+<p><code>Redis</code> 的键空间是放在一个哈希表中的，要从所有的键中选出一个最久未被访问的键，需要另外一个数据结构存储这些源信息。最初，<code>Redis</code>只是随机地选 $3$ 个 $key$，然后从中淘汰，后来算法改进到了<code>N</code>个<code>key</code> 的策略，默认是 $5$ 个。</p>
+<p>Redis 3.0 之后又改善了算法的性能，提供了一个待淘汰候选 $key$ 的<code>pool</code>，里面默认有 $16$ 个 $key$，按照<strong>空闲时间</strong>排好序。更新时从 Redis 键空间随机选择 $N$ 个 $key$，分别计算它们的空闲时间 <code>idle</code>，$key$ 只会在 <code>pool</code> 不满或者空闲时间大于 <code>pool</code> 里最小的时，才会进入 <code>pool</code>，然后从 <code>pool</code> 中选择空闲时间最大的 $key$ 淘汰掉。</p>
+<h3 id="扩展阅读"><a href="#扩展阅读" class="headerlink" title="扩展阅读"></a>扩展阅读</h3><ul>
+<li><p><a href="https://www.cnblogs.com/linxiyue/p/10945216.html" target="_blank" rel="noopener">博客园-再见紫罗兰</a></p>
+</li>
+<li><p><a href="https://www.jianshu.com/p/c8aeb3eee6bc" target="_blank" rel="noopener">简书-后厂村老司机-Redis的缓存淘汰策略LRU与LFU</a></p>
+</li>
+<li><p><a href="https://juejin.im/post/5e902c92e51d4546b847732b" target="_blank" rel="noopener">掘金-Takagi_san-Redis内存淘汰策略源码分析以及LFU/LRU实现</a></p>
+</li>
+</ul>
+
+  
+  
+    
+    <div class='footer'>
+      
+      
+      
+        <div class='copyright'>
+          <blockquote>
+            
+              
+                <p>博客内容遵循 署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0) 协议</p>
+
+              
+            
+              
+                <p>本文永久链接是：<a href=http://raymond-zhao.top/2020/07/03/2020-07-03-Algo-LRU/>http://raymond-zhao.top/2020/07/03/2020-07-03-Algo-LRU/</a></p>
+              
+            
+          </blockquote>
+        </div>
+      
+      
+    </div>
+  
+  
+    
+
+
+  <div class='article-meta' id="bottom">
+    <div class='new-meta-box'>
+      
+        
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-06-20T13:59:48+08:00">
+  <a class='notlink'>
+    <i class="fas fa-edit fa-fw" aria-hidden="true"></i>
+    <p>更新于：Jun 20, 2021</p>
+  </a>
+</div>
+
+        
+      
+        
+          
+  
+  <div class="new-meta-item meta-tags"><a class="tag" href="/tags/%E7%AE%97%E6%B3%95/" rel="nofollow"><i class="fas fa-hashtag fa-fw" aria-hidden="true"></i><p>算法</p></a></div>
+
+
+        
+      
+        
+          
+  <div class="new-meta-item share -mob-share-list">
+  <div class="-mob-share-list share-body">
+    
+      
+        <a class="-mob-share-qq" title="" rel="external nofollow noopener noreferrer"
+          
+          href="http://connect.qq.com/widget/shareqq/index.html?url=http://raymond-zhao.top/2020/07/03/2020-07-03-Algo-LRU/&title=Java LRU及Redis LRU - 吹梦到西洲&summary="
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qq.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qq.png" srcset="data:image/png;base64,666">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-qzone" title="" rel="external nofollow noopener noreferrer"
+          
+          href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=http://raymond-zhao.top/2020/07/03/2020-07-03-Algo-LRU/&title=Java LRU及Redis LRU - 吹梦到西洲&summary="
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qzone.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qzone.png" srcset="data:image/png;base64,666">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-weibo" title="" rel="external nofollow noopener noreferrer"
+          
+          href="http://service.weibo.com/share/share.php?url=http://raymond-zhao.top/2020/07/03/2020-07-03-Algo-LRU/&title=Java LRU及Redis LRU - 吹梦到西洲&summary="
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/weibo.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/weibo.png" srcset="data:image/png;base64,666">
+          
+        </a>
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+
+
+        
+      
+    </div>
+  </div>
+
+
+  
+  
+
+  
+    <div class="prev-next">
+      
+        <a class='prev' href='/2020/07/05/2020-07-05-Algo-LFU/'>
+          <p class='title'><i class="fas fa-chevron-left" aria-hidden="true"></i>LFU缓存</p>
+          <p class='content'>LFU缓存LeetCode 460. LFU缓存请你为 最不经常使用（LFU）缓存算法设计并实现数据结构。它应该支持以下操作：$get$ 和 $put$。
+
+$get(key)$:  - 如果键...</p>
+        </a>
+      
+      
+        <a class='next' href='/2020/06/19/2020-06-19-Redis-DataStructure/'>
+          <p class='title'>Redis内部数据结构<i class="fas fa-chevron-right" aria-hidden="true"></i></p>
+          <p class='content'>Redis 和其他很多key-value 数据库的不同之处在于，Redis 不仅支持简单的字符串键值对，它还提供了一系列数据结构类型值，比如列表、哈希、集合和有序集，并在这些数据结构类型上 定义...</p>
+        </a>
+      
+    </div>
+  
+</article>
+
+
+  
+
+  <article class="post white-box reveal shadow" id="comments">
+    <p ct><i class='fas fa-comments'></i> 评论</p>
+    
+    <div id="valine_container" class="valine_thread">
+  <i class="fas fa-cog fa-spin fa-fw fa-2x"></i>
+</div>
+
+  </article>
+
+
+
+
+
+  <script>
+  // https://github.com/theme-next/hexo-theme-next/blob/master/layout/_third-party/math/mathjax.swig
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3.0/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    // 文章章节标题不能为 “MathJax” ，否则会报错。
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+
+
+</div>
+<aside class='l_side'>
+  
+  
+    
+    
+
+
+
+  <section class="widget toc-wrapper shadow desktop mobile" id="toc-div" >
+    
+  <header>
+    
+      <i class="fas fa-list fa-fw" aria-hidden="true"></i><span class='name'>本文目录</span>
+    
+  </header>
+
+
+    <div class='content'>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#LRU简介"><span class="toc-text">LRU简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LeetCode题目"><span class="toc-text">LeetCode题目</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#题目描述"><span class="toc-text">题目描述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解题思路"><span class="toc-text">解题思路</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#线程安全并且带有定时任务的LRU缓存"><span class="toc-text">线程安全并且带有定时任务的LRU缓存</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ConcurrentLinkedQueue"><span class="toc-text">ConcurrentLinkedQueue</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ReadWriteLock"><span class="toc-text">ReadWriteLock</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ScheduledExecutorService"><span class="toc-text">ScheduledExecutorService</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#线程安全的LRU缓存"><span class="toc-text">线程安全的LRU缓存</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#线程安全并且带有定时任务的LRU缓存-1"><span class="toc-text">线程安全并且带有定时任务的LRU缓存</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Redis-中的-LRU"><span class="toc-text">Redis 中的 LRU</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#LRU配置参数"><span class="toc-text">LRU配置参数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#内存淘汰策略"><span class="toc-text">内存淘汰策略</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#近似LRU算法"><span class="toc-text">近似LRU算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#扩展阅读"><span class="toc-text">扩展阅读</span></a></li></ol></li></ol>
+    </div>
+  </section>
+
+
+  
+
+
+</aside>
+
+
+
+        
+        
+          <!--此文件用来存放一些不方便取值的变量-->
+<!--思路大概是将值藏到重加载的区域内-->
+
+<script>
+  window.pdata={}
+  pdata.ispage=true;
+  pdata.postTitle="Java LRU及Redis LRU";
+  pdata.commentPath="";
+  pdata.commentPlaceholder="";
+
+  var l_header=document.getElementById("l_header");
+  
+  l_header.classList.add("show");
+  
+</script>
+
+        
+      </div>
+      
+  
+  <footer class="footer clearfix">
+    <br><br>
+    
+      
+        <div class="aplayer-container">
+          
+
+
+        </div>
+      
+    
+      
+        <br>
+        <div class="social-wrapper">
+          
+            
+          
+            
+          
+            
+          
+        </div>
+      
+    
+      
+        <div><p>博客內容遵循 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW" target="_blank" rel="noopener">姓名標示-非商業性-相同方式分享 4.0 國際 (CC BY-NC-SA 4.0) 協議</a></p>
+</div>
+      
+    
+      
+        
+          <div><p><span id="lc-sv">本站总访问量为 <span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span> 次</span> <span id="lc-uv">访客数为 <span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span> 人</span></p>
+</div>
+        
+      
+    
+      
+        本站使用
+        <a href="https://github.com/volantis-x/hexo-theme-volantis/tree/4.0.0" target="_blank" class="codename">Volantis</a>
+        作為主題
+      
+    
+      
+        <div class='copyright'>
+        <p><a href="/">Copyright © 2017-2020 XXX</a></p>
+
+        </div>
+      
+    
+  </footer>
+
+
+      <a id="s-top" class="fas fa-arrow-up fa-fw" href='javascript:void(0)'></a>
+    </div>
+  </div>
+  <div>
+    <script>
+window.volantis={};
+window.volantis.loadcss=document.getElementById("loadcss");
+/********************脚本懒加载函数********************************/
+function loadScript(src, cb) {
+var HEAD = document.getElementsByTagName('head')[0] || document.documentElement;
+var script = document.createElement('script');
+script.setAttribute('type','text/javascript');
+if (cb) script.onload = cb;
+script.setAttribute('src', src);
+HEAD.appendChild(script);
+}
+//https://github.com/filamentgroup/loadCSS
+var loadCSS = function( href, before, media, attributes ){
+	var doc = window.document;
+	var ss = doc.createElement( "link" );
+	var ref;
+	if( before ){
+		ref = before;
+	}
+	else {
+		var refs = ( doc.body || doc.getElementsByTagName( "head" )[ 0 ] ).childNodes;
+		ref = refs[ refs.length - 1];
+	}
+	var sheets = doc.styleSheets;
+	if( attributes ){
+		for( var attributeName in attributes ){
+			if( attributes.hasOwnProperty( attributeName ) ){
+				ss.setAttribute( attributeName, attributes[attributeName] );
+			}
+		}
+	}
+	ss.rel = "stylesheet";
+	ss.href = href;
+	ss.media = "only x";
+	function ready( cb ){
+		if( doc.body ){
+			return cb();
+		}
+		setTimeout(function(){
+			ready( cb );
+		});
+	}
+	ready( function(){
+		ref.parentNode.insertBefore( ss, ( before ? ref : ref.nextSibling ) );
+	});
+	var onloadcssdefined = function( cb ){
+		var resolvedHref = ss.href;
+		var i = sheets.length;
+		while( i-- ){
+			if( sheets[ i ].href === resolvedHref ){
+				return cb();
+			}
+		}
+		setTimeout(function() {
+			onloadcssdefined( cb );
+		});
+	};
+	function loadCB(){
+		if( ss.addEventListener ){
+			ss.removeEventListener( "load", loadCB );
+		}
+		ss.media = media || "all";
+	}
+	if( ss.addEventListener ){
+		ss.addEventListener( "load", loadCB);
+	}
+	ss.onloadcssdefined = onloadcssdefined;
+	onloadcssdefined( loadCB );
+	return ss;
+};
+</script>
+<script>
+  
+  loadCSS("https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14/css/all.min.css", window.volantis.loadcss);
+  
+  
+  
+  
+</script>
+<!-- required -->
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5/dist/jquery.min.js"></script>
+
+<script>
+  function pjax_fancybox() {
+    $(".md .gallery").find("img").each(function () { //渲染 fancybox
+      var element = document.createElement("a"); // a 标签
+      $(element).attr("class", "fancybox");
+      $(element).attr("pjax-fancybox", "");  // 过滤 pjax
+      $(element).attr("href", $(this).attr("src"));
+      if ($(this).attr("data-original")) {
+        $(element).attr("href", $(this).attr("data-original"));
+      }
+      $(element).attr("data-fancybox", "images");
+      var caption = "";   // 描述信息
+      if ($(this).attr('alt')) {  // 判断当前页面是否存在描述信息
+        $(element).attr('data-caption', $(this).attr('alt'));
+        caption = $(this).attr('alt');
+      }
+      var div = document.createElement("div");
+      $(div).addClass("fancybox");
+      $(this).wrap(div); // 最外层套 div ，其实主要作用还是 class 样式
+      var span = document.createElement("span");
+      $(span).addClass("image-caption");
+      $(span).text(caption); // 加描述
+      $(this).after(span);  // 再套一层描述
+      $(this).wrap(element);  // 最后套 a 标签
+    })
+    $(".md .gallery").find("img").fancybox({
+      selector: '[data-fancybox="images"]',
+      hash: false,
+      loop: false,
+      closeClick: true,
+      helpers: {
+        overlay: {closeClick: true}
+      },
+      buttons: [
+        "zoom",
+        "close"
+      ]
+    });
+  };
+  function SCload_fancybox() {
+    if ($(".md .gallery").find("img").length == 0) return;
+    loadCSS("https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css", document.getElementById("loadcss"));
+    setTimeout(function() {
+      loadScript('https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js', pjax_fancybox)
+    }, 1);
+  };
+  $(function () {
+    SCload_fancybox();
+  });
+</script>
+
+
+<!-- internal -->
+
+
+
+
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+
+
+  
+  
+    <script>
+      window.FPConfig = {
+        delay: 0,
+        ignoreKeywords: [],
+        maxRPS: 5,
+        hoverDelay: 25
+      };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/gh/gijo-varghese/flying-pages@2.1.2/flying-pages.min.js"></script>
+  
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+    var clipboard = new ClipboardJS('.btn-copy', {
+        target: function (trigger) {
+            return trigger.nextElementSibling
+        }
+    });
+    function wait(callback, seconds) {
+        var timelag = null;
+        timelag = window.setTimeout(callback, seconds)
+    }
+    function pjax_initCopyCode() {
+		if($(".highlight .code pre").length+$(".article pre code").length==0)return;
+        var copyHtml = '';
+        copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+        copyHtml += '<i class="fas fa-copy"></i><span>COPY</span>';
+        copyHtml += '</button>';
+        $(".highlight .code pre").before(copyHtml);
+        $(".article pre code").before(copyHtml);
+        clipboard.off('success').on('success', function (e) {
+            let $btn = $(e.trigger);
+            $btn.addClass('copied');
+            let $icon = $($btn.find('i'));
+            $icon.removeClass('fa-copy');
+            $icon.addClass('fa-check-circle');
+            let $span = $($btn.find('span'));
+            $span[0].innerText = 'COPIED';
+            wait(function () {
+                $icon.removeClass('fa-check-circle');
+                $icon.addClass('fa-copy');
+                $span[0].innerText = 'COPY'
+            }, 2000)
+        });
+        clipboard.off('error').on('error', function (e) {
+            e.clearSelection();
+            let $btn = $(e.trigger);
+            $btn.addClass('copy-failed');
+            let $icon = $($btn.find('i'));
+            $icon.removeClass('fa-copy');
+            $icon.addClass('fa-times-circle');
+            let $span = $($btn.find('span'));
+            $span[0].innerText = 'COPY FAILED';
+            wait(function () {
+                $icon.removeClass('fa-times-circle');
+                $icon.addClass('fa-copy');
+                $span[0].innerText = 'COPY'
+            }, 2000)
+        })
+    }
+    $(function () {
+        pjax_initCopyCode()
+    });
+</script>
+
+
+
+
+
+
+
+
+  
+  
+<script src="/js/valine.js"></script>
+
+
+<script>
+  var GUEST_INFO = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link'.split(',').filter(function (item) {
+    return GUEST_INFO.indexOf(item) > -1
+  });
+  var REQUIRED_FIELDS = ['nick', 'mail', 'link'];
+  var requiredFields = ''.split(',').filter(function (item) {
+    return REQUIRED_FIELDS.indexOf(item) > -1
+  });
+
+  function emoji(path, idx, ext) {
+    return path + "/" + path + "-" + idx + "." + ext;
+  }
+
+  var emojiMaps = {};
+  for (var i = 1; i <= 54; i++) {
+    emojiMaps['tieba-' + i] = emoji('tieba', i, 'png');
+  }
+  for (var i = 1; i <= 101; i++) {
+    emojiMaps['qq-' + i] = emoji('qq', i, 'gif');
+  }
+  for (var i = 1; i <= 116; i++) {
+    emojiMaps['aru-' + i] = emoji('aru', i, 'gif');
+  }
+  for (var i = 1; i <= 125; i++) {
+    emojiMaps['twemoji-' + i] = emoji('twemoji', i, 'png');
+  }
+  for (var i = 1; i <= 4; i++) {
+    emojiMaps['weibo-' + i] = emoji('weibo', i, 'png');
+  }
+
+  function pjax_valine() {
+    if(!document.querySelectorAll("#valine_container")[0])return;
+
+    let pagePlaceholder = pdata.commentPlaceholder || "快来评论吧~";
+
+    let path = pdata.commentPath;
+    if (path.length == 0) {
+      let defaultPath = '';
+      path = defaultPath || decodeURI(window.location.pathname);
+    }
+
+    var valine = new Valine();
+    valine.init({
+      el: '#valine_container',
+      meta: meta,
+      placeholder: pagePlaceholder,
+      path: path,
+      appId: "v6cb35sRa1lfGq6EOtTQHHyf-gzGzoHsz",
+      appKey: "2ulfq63r4brxg2l9QfXp0cTM",
+      pageSize: '10',
+      avatar: 'robohash',
+      lang: 'zh-cn',
+      visitor: 'true',
+      highlight: 'true',
+      mathJax: 'true',
+      enableQQ: 'true',
+      recordIP: 'true',
+      requiredFields: requiredFields,
+      emojiCDN: 'https://cdn.jsdelivr.net/gh/volantis-x/cdn-emoji/valine/',
+      emojiMaps: emojiMaps
+    })
+  }
+
+  $(function () {
+    pjax_valine();
+  });
+</script>
+
+
+
+
+
+  
+<script src="/js/app.js"></script>
+
+
+
+<!-- optional -->
+
+  <script>
+const SearchServiceimagePath="https://cdn.jsdelivr.net/gh/volantis-x/cdn-volantis@master/img/";
+const ROOT =  ("/" || "/").endsWith('/') ? ("/" || "/") : ("//" || "/" );
+
+$('.input.u-search-input').one('focus',function(){
+	
+		loadScript('/js/search/hexo.js',setSearchService);
+	
+})
+
+function listenSearch(){
+  
+    customSearch = new HexoSearch({
+      imagePath: SearchServiceimagePath
+    });
+  
+}
+function setSearchService() {
+	listenSearch();
+	
+		document.addEventListener("pjax:success", listenSearch);
+	
+}
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  <script defer>
+
+  const LCCounter = {
+    app_id: 'v6cb35sRa1lfGq6EOtTQHHyf-gzGzoHsz',
+    app_key: '2ulfq63r4brxg2l9QfXp0cTM',
+    custom_api_server: '',
+
+    // 查询存储的记录
+    getRecord(Counter, url, title) {
+      return new Promise(function (resolve, reject) {
+        Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({url})))
+          .then(resp => resp.json())
+          .then(({results, code, error}) => {
+            if (code === 401) {
+              throw error;
+            }
+            if (results && results.length > 0) {
+              var record = results[0];
+              resolve(record);
+            } else {
+              Counter('post', '/classes/Counter', {url, title: title, times: 0})
+                .then(resp => resp.json())
+                .then((record, error) => {
+                  if (error) {
+                    throw error;
+                  }
+                  resolve(record);
+                }).catch(error => {
+                console.error('Failed to create', error);
+                reject(error);
+              });
+            }
+          }).catch((error) => {
+          console.error('LeanCloud Counter Error:', error);
+          reject(error);
+        });
+      })
+    },
+
+    // 发起自增请求
+    increment(Counter, incrArr) {
+      return new Promise(function (resolve, reject) {
+        Counter('post', '/batch', {
+          "requests": incrArr
+        }).then((res) => {
+          res = res.json();
+          if (res.error) {
+            throw res.error;
+          }
+          resolve(res);
+        }).catch((error) => {
+          console.error('Failed to save visitor count', error);
+          reject(error);
+        });
+      });
+    },
+
+    // 构建自增请求体
+    buildIncrement(objectId) {
+      return {
+        "method": "PUT",
+        "path": `/1.1/classes/Counter/${ objectId }`,
+        "body": {
+          "times": {
+            '__op': 'Increment',
+            'amount': 1
+          }
+        }
+      }
+    },
+
+    // 校验是否为有效的 UV
+    validUV() {
+      var key = 'LeanCloudUVTimestamp';
+      var flag = localStorage.getItem(key);
+      if (flag) {
+        // 距离标记小于 24 小时则不计为 UV
+        if (new Date().getTime() - parseInt(flag) <= 86400000) {
+          return false;
+        }
+      }
+      localStorage.setItem(key, new Date().getTime().toString());
+      return true;
+    },
+
+    addCount(Counter) {
+      var enableIncr = '' === 'true' && window.location.hostname !== 'localhost';
+      enableIncr = true;
+      var getterArr = [];
+      var incrArr = [];
+      // 请求 PV 并自增
+      var pvCtn = document.querySelector('#lc-sv');
+      if (pvCtn || enableIncr) {
+        var pvGetter = this.getRecord(Counter, 'http://raymond-zhao.top' + '/#lc-sv', 'Visits').then((record) => {
+          incrArr.push(this.buildIncrement(record.objectId))
+          var eles = document.querySelectorAll('#lc-sv #number');
+          if (eles.length > 0) {
+            eles.forEach((el,index,array)=>{
+              el.innerText = record.times + 1;
+              if (pvCtn) {
+                pvCtn.style.display = 'inline';
+              }
+            })
+          }
+        });
+        getterArr.push(pvGetter);
+      }
+
+      // 请求 UV 并自增
+      var uvCtn = document.querySelector('#lc-uv');
+      if (uvCtn || enableIncr) {
+        var uvGetter = this.getRecord(Counter, 'http://raymond-zhao.top' + '/#lc-uv', 'Visitors').then((record) => {
+          var vuv = this.validUV();
+          vuv && incrArr.push(this.buildIncrement(record.objectId))
+          var eles = document.querySelectorAll('#lc-uv #number');
+          if (eles.length > 0) {
+            eles.forEach((el,index,array)=>{
+              el.innerText = record.times + (vuv ? 1 : 0);
+              if (uvCtn) {
+                uvCtn.style.display = 'inline';
+              }
+            })
+          }
+        });
+        getterArr.push(uvGetter);
+      }
+
+      // 请求文章的浏览数，如果是当前页面就自增
+      var allPV = document.querySelectorAll('#lc-pv');
+      if (allPV.length > 0 || enableIncr) {
+        for (i = 0; i < allPV.length; i++) {
+          let pv = allPV[i];
+          let title = pv.getAttribute('data-title');
+          var url = 'http://raymond-zhao.top' + pv.getAttribute('data-path');
+          if (url) {
+            var viewGetter = this.getRecord(Counter, url, title).then((record) => {
+              // 是当前页面就自增
+              let curPath = window.location.pathname;
+              if (curPath.includes('index.html')) {
+                curPath = curPath.substring(0, curPath.lastIndexOf('index.html'));
+              }
+              if (pv.getAttribute('data-path') == curPath) {
+                incrArr.push(this.buildIncrement(record.objectId));
+              }
+              if (pv) {
+                var ele = pv.querySelector('#lc-pv #number');
+                if (ele) {
+                  if (pv.getAttribute('data-path') == curPath) {
+                    ele.innerText = (record.times || 0) + 1;
+                  } else {
+                    ele.innerText = record.times || 0;
+                  }
+                  pv.style.display = 'inline';
+                }
+              }
+            });
+            getterArr.push(viewGetter);
+          }
+        }
+      }
+
+      // 如果启动计数自增，批量发起自增请求
+      if (enableIncr) {
+        Promise.all(getterArr).then(() => {
+          incrArr.length > 0 && this.increment(Counter, incrArr);
+        })
+      }
+
+    },
+
+
+    fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${ api_server }/1.1${ url }`, {
+          method,
+          headers: {
+            'X-LC-Id': this.app_id,
+            'X-LC-Key': this.app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      this.addCount(Counter);
+    },
+
+    refreshCounter() {
+      var api_server = this.app_id.slice(-9) !== '-MdYXbMMI' ? this.custom_api_server : `https://${ this.app_id.slice(0, 8).toLowerCase() }.api.lncldglobal.com`;
+      if (api_server) {
+        this.fetchData(api_server);
+      } else {
+        fetch('https://app-router.leancloud.cn/2/route?appId=' + this.app_id)
+          .then(resp => resp.json())
+          .then(({api_server}) => {
+            this.fetchData('https://' + api_server);
+          });
+      }
+    }
+
+  };
+
+  LCCounter.refreshCounter();
+
+  document.addEventListener('pjax:complete', function () {
+    LCCounter.refreshCounter();
+  });
+</script>
+
+
+
+
+
+
+
+
+<script>
+function listennSidebarTOC() {
+  const navItems = document.querySelectorAll(".toc li");
+  if (!navItems.length) return;
+  const sections = [...navItems].map((element) => {
+    const link = element.querySelector(".toc-link");
+    const target = document.getElementById(
+      decodeURI(link.getAttribute("href")).replace("#", "")
+    );
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      window.scrollTo({
+		top: target.offsetTop + 100,
+		
+	  });
+    });
+    return target;
+  });
+
+  function activateNavByIndex(target) {
+    if (target.classList.contains("active-current")) return;
+
+    document.querySelectorAll(".toc .active").forEach((element) => {
+      element.classList.remove("active", "active-current");
+    });
+    target.classList.add("active", "active-current");
+    let parent = target.parentNode;
+    while (!parent.matches(".toc")) {
+      if (parent.matches("li")) parent.classList.add("active");
+      parent = parent.parentNode;
+    }
+  }
+
+  function findIndex(entries) {
+    let index = 0;
+    let entry = entries[index];
+    if (entry.boundingClientRect.top > 0) {
+      index = sections.indexOf(entry.target);
+      return index === 0 ? 0 : index - 1;
+    }
+    for (; index < entries.length; index++) {
+      if (entries[index].boundingClientRect.top <= 0) {
+        entry = entries[index];
+      } else {
+        return sections.indexOf(entry.target);
+      }
+    }
+    return sections.indexOf(entry.target);
+  }
+
+  function createIntersectionObserver(marginTop) {
+    marginTop = Math.floor(marginTop + 10000);
+    let intersectionObserver = new IntersectionObserver(
+      (entries, observe) => {
+        let scrollHeight = document.documentElement.scrollHeight + 100;
+        if (scrollHeight > marginTop) {
+          observe.disconnect();
+          createIntersectionObserver(scrollHeight);
+          return;
+        }
+        let index = findIndex(entries);
+        activateNavByIndex(navItems[index]);
+      },
+      {
+        rootMargin: marginTop + "px 0px -100% 0px",
+        threshold: 0,
+      }
+    );
+    sections.forEach((element) => {
+      element && intersectionObserver.observe(element);
+    });
+  }
+  createIntersectionObserver(document.documentElement.scrollHeight);
+}
+
+document.addEventListener("DOMContentLoaded", listennSidebarTOC);
+document.addEventListener("pjax:success", listennSidebarTOC);
+</script>
+
+<!-- more -->
+
+
+
+
+    
+      
+
+
+<script src="https://cdn.jsdelivr.net/npm/pjax@0.2.8/pjax.min.js"></script>
+
+
+<!-- 样式位于：source/css/_third-party/pjaxanimate.styl -->
+
+<div class="pjax-animate">
+  
+    <script src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script>
+    <div id="loading-bar-wrapper"><script>NProgress.configure({parent:"#loading-bar-wrapper",trickleSpeed: 100})</script></div>
+    <script>
+      window.ShowLoading = function() {
+        NProgress.start();
+      };
+      window.HideLoading = function() {
+        NProgress.done();
+      }
+    </script>
+  
+</div>
+
+
+<script>
+    var pjax;
+    document.addEventListener('DOMContentLoaded', function () {
+      pjax = new Pjax({
+        elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([pjax-fancybox])',
+        selectors: [
+          "title",
+          "#l_cover",
+          "#pjax-container",
+          "#pjax-header-nav-list"
+        ],
+        cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+        timeout: 5000
+      });
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+      //window.stop(); // 相当于点击了浏览器的停止按钮
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      window.subData = null; // 移除标题（用于一二级导航栏切换处）
+      if (typeof $.fancybox != "undefined") {
+        $.fancybox.close();    // 关闭弹窗
+      }
+      volantis.$switcher.removeClass('active'); // 关闭移动端激活的搜索框
+      volantis.$header.removeClass('z_search-open'); // 关闭移动端激活的搜索框
+      volantis.$wrapper.removeClass('sub'); // 跳转页面时关闭二级导航
+
+      // 解绑事件 避免重复监听
+      volantis.$topBtn.unbind('click');
+      $('.menu a').unbind('click');
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+	  
+      window.ShowLoading();
+	  
+    });
+
+    document.addEventListener('pjax:complete', function () {
+      // 关于百度统计对 SPA 页面的处理：
+      // 方案一：百度统计>管理>单页应用设置中，打开开启按钮即可对SPA进行统计。 https://tongji.baidu.com/web/help/article?id=324
+      // 方案二：取消注释下列代码。 https://tongji.baidu.com/web/help/article?id=235
+       
+
+      // 关于谷歌统计对 SPA 页面的处理：
+      // 当应用以动态方式加载内容并更新地址栏中的网址时，也应该更新通过 gtag.js 存储的网页网址。
+      // https://developers.google.cn/analytics/devguides/collection/gtagjs/single-page-applications?hl=zh-cn
+      
+	 
+
+      $('.nav-main').find('.list-v').not('.menu-phone').removeAttr("style",""); // 移除小尾巴的移除
+      $('.menu-phone.list-v').removeAttr("style",""); // 移除小尾巴的移除
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+      try{
+          if (typeof $.fancybox == "undefined") {
+            SCload_fancybox();
+          } else {
+            pjax_fancybox();
+          }
+        
+        
+        
+        
+        
+          pjax_initCopyCode();
+        
+        
+          pjax_valine();
+        
+        
+        
+        
+      } catch (e) {
+        console.log(e);
+      }
+	  
+      window.HideLoading();
+	  
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+	  
+      window.HideLoading();
+	  
+      window.location.href = e.triggerElement.href;
+    });
+</script>
+
+    
+  </div>
+</body>
+</html>

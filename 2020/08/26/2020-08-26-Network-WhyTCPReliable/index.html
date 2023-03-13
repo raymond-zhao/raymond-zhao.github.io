@@ -1,0 +1,1789 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head hexo-theme='https://github.com/volantis-x/hexo-theme-volantis/tree/4.0.0'>
+  <meta charset="utf-8">
+  <!-- SEO相关 -->
+  
+    
+  
+  <!-- 渲染优化 -->
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  <link rel='dns-prefetch' href='https://cdn.jsdelivr.net'>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <!-- 页面元数据 -->
+  
+  <title>TCP传输为什么是可靠的？ - 吹梦到西洲</title>
+  
+    <meta name="keywords" content="TCP">
+  
+
+  
+    <meta name="description" content="昨天百度面试问到了这题，回答的不是很好，只答出了滑动窗口，特此亡羊补牢一下。此文是谢希仁老师《计算机网络》的摘要版，比较权威。">
+  
+
+  <!-- feed -->
+  
+
+  <!-- import meta -->
+  
+
+  <!-- link -->
+  
+    <link rel="shortcut icon" type='image/x-icon' href="/images/3d-architecture.svg">
+  
+
+  <!-- import link -->
+  
+
+  
+    
+<link rel="stylesheet" href="/css/first.css">
+
+  
+
+  
+  <link rel="stylesheet" href="/css/style.css" media="print" onload="this.media='all';this.onload=null">
+  <noscript><link rel="stylesheet" href="/css/style.css"></noscript>
+  
+
+  <script id="loadcss"></script>
+
+</head>
+
+<body>
+  
+
+<header id="l_header" class="l_header auto shadow blur show" style='opacity: 0' >
+  <div class='container'>
+  <div id='wrapper'>
+    <div class='nav-sub'>
+      <p class="title"></p>
+      <ul class='switcher nav-list-h m-phone' id="pjax-header-nav-list">
+        <li><a id="s-comment" class="fas fa-comments fa-fw" target="_self" href='javascript:void(0)'></a></li>
+        
+          <li><a id="s-toc" class="s-toc fas fa-list fa-fw" target="_self" href='javascript:void(0)'></a></li>
+        
+      </ul>
+    </div>
+		<div class="nav-main">
+      
+        
+        <a class="title flat-box" target="_self" href='/'>
+          
+            <img no-lazy class='logo' src='https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/blog/Logo-NavBar@3x.png'/>
+          
+          
+          
+        </a>
+      
+
+			<div class='menu navigation'>
+				<ul class='nav-list-h m-pc'>
+          
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/
+                  
+                  
+                  
+                    id="home"
+                  >
+                  <i class='fas fa-rss fa-fw'></i>博客
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/categories/
+                  
+                  
+                  
+                    id="categories"
+                  >
+                  <i class='fas fa-folder-open fa-fw'></i>分类
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/tags/
+                  
+                  
+                  
+                    id="tags"
+                  >
+                  <i class='fas fa-tags fa-fw'></i>标签
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/archives/
+                  
+                  
+                  
+                    id="archives"
+                  >
+                  <i class='fas fa-archive fa-fw'></i>归档
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/friends/
+                  
+                  
+                  
+                    id="friends"
+                  >
+                  <i class='fas fa-link fa-fw'></i>友链
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/about/
+                  
+                  
+                  
+                    id="about"
+                  >
+                  <i class='fas fa-info-circle fa-fw'></i>关于
+                </a>
+                
+              </li>
+            
+          
+          
+				</ul>
+			</div>
+
+      <div class="m_search">
+        <form name="searchform" class="form u-search-form">
+          <i class="icon fas fa-search fa-fw"></i>
+          <input type="text" class="input u-search-input" placeholder="Search..." />
+        </form>
+      </div>
+
+			<ul class='switcher nav-list-h m-phone'>
+				
+					<li><a class="s-search fas fa-search fa-fw" target="_self" href='javascript:void(0)'></a></li>
+				
+				<li>
+          <a class="s-menu fas fa-bars fa-fw" target="_self" href='javascript:void(0)'></a>
+          <ul class="menu-phone list-v navigation white-box">
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/
+                  
+                  
+                  
+                    id="home"
+                  >
+                  <i class='fas fa-rss fa-fw'></i>博客
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/categories/
+                  
+                  
+                  
+                    id="categories"
+                  >
+                  <i class='fas fa-folder-open fa-fw'></i>分类
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/tags/
+                  
+                  
+                  
+                    id="tags"
+                  >
+                  <i class='fas fa-tags fa-fw'></i>标签
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/archives/
+                  
+                  
+                  
+                    id="archives"
+                  >
+                  <i class='fas fa-archive fa-fw'></i>归档
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/friends/
+                  
+                  
+                  
+                    id="friends"
+                  >
+                  <i class='fas fa-link fa-fw'></i>友链
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/about/
+                  
+                  
+                  
+                    id="about"
+                  >
+                  <i class='fas fa-info-circle fa-fw'></i>关于
+                </a>
+                
+              </li>
+            
+          
+            
+          </ul>
+        </li>
+			</ul>
+		</div>
+	</div>
+  </div>
+</header>
+
+  <div id="l_body">
+    <div id="l_cover">
+  
+    
+        <div id="full" class='cover-wrapper post search' style="display: none;">
+          
+            <div class='cover-bg lazyload placeholder' data-bg="/images/cover-2.jpg"></div>
+          
+          <div class='cover-body'>
+  <div class='top'>
+    
+    
+      <p class="title">吹梦到西洲</p>
+    
+    
+  </div>
+  <div class='bottom'>
+    
+      <div class="m_search">
+        <form name="searchform" class="form u-search-form">
+          <input type="text" class="input u-search-input" placeholder="Looking for something?" />
+          <i class="icon fas fa-search fa-fw"></i>
+        </form>
+      </div>
+    
+    <div class='menu navigation'>
+      <div class='list-h'>
+        
+          
+            <a href="/"
+              
+              
+              id="home">
+              <i class='fas fa-rss fa-fw'></i><p>博客</p>
+            </a>
+          
+            <a href="/categories/"
+              
+              
+              id="categories">
+              <i class='fas fa-folder-open fa-fw'></i><p>分类</p>
+            </a>
+          
+            <a href="/tags/"
+              
+              
+              id="tags">
+              <i class='fas fa-tags fa-fw'></i><p>标签</p>
+            </a>
+          
+            <a href="/archives/"
+              
+              
+              id="archives">
+              <i class='fas fa-archive fa-fw'></i><p>归档</p>
+            </a>
+          
+            <a href="/friends/"
+              
+              
+              id="friends">
+              <i class='fas fa-link fa-fw'></i><p>友链</p>
+            </a>
+          
+            <a href="/about/"
+              
+              
+              id="about">
+              <i class='fas fa-info-circle fa-fw'></i><p>关于</p>
+            </a>
+          
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+          <div id="scroll-down" style="display: none;"><i class="fa fa-chevron-down scroll-down-effects"></i></div>
+        </div>
+    
+  
+  </div>
+
+    <div id='safearea'>
+      <div class='body-wrapper' id="pjax-container">
+        
+
+<div class='l_main'>
+  <article class="article post white-box reveal md shadow article-type-post" id="post" itemscope itemprop="blogPost">
+  
+
+
+  
+  <div class="article-meta" id="top">
+    
+    
+    
+      <h1 class="title">
+        TCP传输为什么是可靠的？
+      </h1>
+      <div class='new-meta-box'>
+        
+          
+            
+<div class='new-meta-item author'>
+  <a class='author' href="/" rel="nofollow">
+    <img no-lazy src="">
+    <p>吹梦到西洲</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  <div class='new-meta-item category'>
+    <a class='notlink'>
+      <i class="fas fa-folder-open fa-fw" aria-hidden="true"></i>
+      <a class="category-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a>
+    </a>
+  </div>
+
+
+          
+        
+          
+            <div class="new-meta-item date">
+  <a class='notlink'>
+    <i class="fas fa-calendar-alt fa-fw" aria-hidden="true"></i>
+    <p>发布于：Aug 26, 2020</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  <div class="new-meta-item browse leancloud">
+    <a class='notlink'>
+      
+      <div id="lc-pv" data-title="TCP传输为什么是可靠的？" data-path="/2020/08/26/2020-08-26-Network-WhyTCPReliable/">
+        <i class="fas fa-eye fa-fw" aria-hidden="true"></i>
+        <span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span>
+        次浏览
+      </div>
+    </a>
+  </div>
+
+
+          
+        
+      </div>
+    
+  </div>
+
+
+  
+  <h2 id="TCP可靠传输的工作原理"><a href="#TCP可靠传输的工作原理" class="headerlink" title="TCP可靠传输的工作原理"></a>TCP可靠传输的工作原理</h2><p>TCP 发送的报文段是交给 IP层 传送的。但 IP层 只能提供尽最大努力交付，也就是说，TCP 下面的网络所提供的是<strong>不可靠的传输</strong>。因此，TCP必须采用适当的措施才能使得两个运输层之间的通信变得可靠。</p>
+<p>理想的传输信道有以下两个特点：</p>
+<ul>
+<li>传输信道不产生差错</li>
+<li>不管发送方发送速度多快，接收方总是来得及处理到来的数据。</li>
+</ul>
+<p>然鹅，理想很丰满，现实很骨感。实际网络并不具备这两个条件，但是可以使用一些可靠的传输协议，当</p>
+<ul>
+<li>出现差错时让发送方<strong>重传</strong>出现差错的数据</li>
+<li>在接收方来不及处理到来的数据时，及时告诉发送方适当降低发送数据的速率。</li>
+</ul>
+<h3 id="停止等待协议"><a href="#停止等待协议" class="headerlink" title="停止等待协议"></a>停止等待协议</h3><p>全双工通信的双方既是发送方也是接收方。以下仅考虑 A 发送数据而 B 接收数据并发送确认。称 A 为发送方，B 为接收方。</p>
+<p>这里讨论可靠传输的原理，因此把传送的数据单元都称为<strong>分组</strong>，而并不考虑数据是在哪一层次上传送的。</p>
+<blockquote>
+<p>“停止等待”就是每发送完一个分组就停止发送，等待对方的确认。在收到确认后再发送下一个分组。</p>
+</blockquote>
+<ol>
+<li>无差错情况</li>
+</ol>
+<p>最简单的情况，如 (a) 所示，A 发送完分组 $M_1$ ，发完就暂停发送，等待 B 的确认。B 收到 $M_1$ 后向 A 发送确认，A 收到对 $M_1$ 的确认后才发送下一个分组 $M_2$ 。其他的分组也采用同样的策略发送。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4d0o095nj30um0cuq7e.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4d0o095nj30um0cuq7e.jpg" srcset="data:image/png;base64,666" alt="停止等待协议"></p>
+<ol start="2">
+<li>出现差错</li>
+</ol>
+<p>图 (b) 是分组在传输中出现差错的情况。</p>
+<ul>
+<li>B 收到 $M_1$ 时检测到差错便丢弃 $M_1$，不对 A 作出应答。 </li>
+<li>$M_1$  在传输过程中走丢了，B 没有收到过，也不会作出应答。</li>
+</ul>
+<blockquote>
+<p><strong>可靠传输协议</strong>：A只要超过了一段时间仍然没有收到确认，就认为刚才发送的分组丢失了，因而重传前面发送过的分组。这就叫做<strong>超时重传</strong>。</p>
+</blockquote>
+<p>要实现<strong>超时重传</strong>，要在每发送完一个分组时设置一个超时计时器。如果在超时计时器到期之前<strong>收到确认</strong>，就撤销已设置的超时计时器。</p>
+<p>🧐 需要注意三点：</p>
+<ul>
+<li>A 在发送完一个分组后，必须暂存已发送的分组的副本(超时重传时是用)，收到相应的确认后才能清除。</li>
+<li>分组和确认分组都必须进行编号，这样才能知道是哪一个发送出去的分组收到了确认，而哪一个分组还没有收到确认。</li>
+<li>超时计时器设置的重传时间应当比数据在分组传输的平均往返时间更长一些。(其实这个时间的选择很有讲究)</li>
+</ul>
+<ol start="3">
+<li>确认丢失和确认迟到</li>
+</ol>
+<p>如下图 (a) 所示，B 收到了 $M_1$ 并且也对 A 发出了确认，但是确认在中途丢失了。A 在设定的超时重传时间内没有收到确认，它也无法得知是自己发送的 $M_1$ 出错、丢失、还是 B 的确认丢失了，总之，A 会重传。</p>
+<p>A 重传之后，B 收到了重传的分组 $M_1$ ，这时摆在它面前的有两个选择：</p>
+<ul>
+<li>直接丢弃 $M_1$ ，不向上层报告(交付)。</li>
+<li>继续对 A 发送确认。B 不能认为已经发送给确认就不再崇法确认，毕竟 A 就是因为没有收到确认才重发的，如果不回复确认，A 还会一直重发。</li>
+</ul>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4denxlg9j30uw0bajvg.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4denxlg9j30uw0bajvg.jpg" srcset="data:image/png;base64,666" alt="确认丢失和确认迟到"></p>
+<p>上图 (b) 是另一种可能的情况。B 对 A 发出了确认，但是确认在网络中滞留了很久(可能是迷路了，可能是堵车了，可能是被裹挟了)，此时 A 会收到重复的确认，对重复的确认的处理很简单：收下后就丢弃。B 仍然会收到重复的 $M_1$(超时重传的)，并且同样要丢弃重复的 $M_1$，并重传确认分组。</p>
+<p>通常 A 最终总是可以收到对所有发出的分组的确认。如果 A 不断重传分组但总是收不到确认，就说明通信线路太差，不能进行通信。</p>
+<blockquote>
+<p>上述可靠传输协议称为<strong>自动重传请求ARQ</strong>(Automatic Repeat reQuest)。</p>
+<p>意思是重传的请求是自动进行的，接收方不需要请求发送方重传某个出错的分组。</p>
+</blockquote>
+<ol start="4">
+<li>信道利用率</li>
+</ol>
+<p>显而易见，每次只传一个分组有点太浪费了，完全没有充分利用信道。</p>
+<blockquote>
+<p>想起 Amdahl 定律，我想我们应该意识到的一点是：现代社会如果想获得最大限度的发展，那就要用尽种种方法去压榨机器的潜能，提高机器的利用率。</p>
+</blockquote>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4dt1aj4bj30uc07sjto.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4dt1aj4bj30uc07sjto.jpg" srcset="data:image/png;base64,666" alt="停止等待协议的信道利用率太低"></p>
+<p>为了提高传输效率，发送方可以不使用低效率的停止等待协议，而采用<strong>流水线传输</strong>。</p>
+<p>流水线传输就是发送方可连续发送多个分组，不必每发完一个分组就停顿下来等待对方的确认。这样可使信道上一直有数据不间断地在传送。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4dzrsygaj30u00680vp.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4dzrsygaj30u00680vp.jpg" srcset="data:image/png;base64,666" alt="流水线传输可提高信道利用率"></p>
+<p>当使用流水线传输时，就要使用下面将要介绍的<strong>连续ARQ协议</strong>和<strong>滑动窗口协议</strong>。</p>
+<h3 id="连续-ARQ-协议"><a href="#连续-ARQ-协议" class="headerlink" title="连续 ARQ 协议"></a>连续 ARQ 协议</h3><p>下图（a）表示发送方维持的发送窗口，它的意义是：位于发送窗口内的5个分组都可连续发送出去，而不需要等待对方的确认。</p>
+<p>向前是指向着时间增大的方向，分组发送是按照分组序号从小到大发送的。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4e3kzgqtj30um0cejvg.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4e3kzgqtj30um0cejvg.jpg" srcset="data:image/png;base64,666" alt="连续ARQ协议的工作原理"></p>
+<p>连续 ARQ 协议规定：发送方每收到一个确认，就把发送窗口向前滑动一个分组的位置。</p>
+<p>上图（b）表示发送方收到了对第1个分组的确认，于是把发送窗口向前移动一个分组的位置。</p>
+<p>接收方采用<strong>累积确认</strong>的方式。即，接收方不必对收到的分组逐个发送确认，而是在收到几个分组后，<strong>对</strong>按序到达的<strong>最后一个分组发送确认</strong>。这表示：到这个分组为止的所有分组都已正确收到了。</p>
+<p>累积确认有优点也有缺点</p>
+<ul>
+<li>优点：容易实现，即使确认丢失也不必重传。</li>
+<li>缺点：不能向发送方反映出接收方已经正确收到的所有分组的信息。</li>
+</ul>
+<p>比如，发送方发送了前 5 个分组，而第 3 个分组丢失了。接收方只能对前两个分组发出确认，发送方无法知道后面三个分组的下落，而只好把后面的三个分组都再重传一次。这就叫做 <strong>Go-back-N</strong>(回退 N 帧)，表示需要再退回来重传 已发送过的 N 个分组。</p>
+<h2 id="TCP-可靠传输的实现"><a href="#TCP-可靠传输的实现" class="headerlink" title="TCP 可靠传输的实现"></a>TCP 可靠传输的实现</h2><h3 id="TCP报文段的首部格式"><a href="#TCP报文段的首部格式" class="headerlink" title="TCP报文段的首部格式"></a>TCP报文段的首部格式</h3><p>TCP 虽然是面向字节流的，但 TCP 传送的数据单元却是报文段。一个TCP报文段分为<strong>首部</strong>和<strong>数据</strong>两部分，而 TCP 的全部功能都体现在它首部中各字段的作用。</p>
+<p>TCP 报文段首部的前 20 个字节是固定的，后面有 4n 字节是根据需要而增加的选项(n是整数)。因此TCP首部的最小长度是 20 字节，而 UDP 首部 8 字节。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4eev1dpbj30ue0gw43u.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4eev1dpbj30ue0gw43u.jpg" srcset="data:image/png;base64,666" alt="TCP报文段的首部格式"></p>
+<p>TCP 首部中的信息有很多，参考图片基本已经可以见字知意了。如果没有，那就要反思一下自己的六级了。</p>
+<h3 id="TCP-可靠传输的实现-1"><a href="#TCP-可靠传输的实现-1" class="headerlink" title="TCP 可靠传输的实现"></a>TCP 可靠传输的实现</h3><p>假定数据传输只在一个方向进行，即 A 发送数据，B 给出确认。但是不要忘记 A 与 B 的通信其实是全双工通信。</p>
+<h4 id="以字节为单位的滑动窗口"><a href="#以字节为单位的滑动窗口" class="headerlink" title="以字节为单位的滑动窗口"></a>以字节为单位的滑动窗口</h4><p>TCP的滑动窗口是以字节为单位的。为方便，图中字节编号都取得很小。</p>
+<p>假定 A 收到了 B 发来的确认报文段，其中窗口是 20 字节，而确认号是 31 (表明 B 期望收到的下一个序号是 31，而序号 30 为止的数据已经收到了)。根据这两个数据，A就构造出自己的发送窗口。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4el62ss3j30ua07ggow.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4el62ss3j30ua07ggow.jpg" srcset="data:image/png;base64,666" alt="根据B给出的窗口值，A构造出自己的发送窗口"></p>
+<p>A 的发送窗口：在没有收到 B 的确认的情下，A 可以连续把窗口内的数据都发送出去。凡是已经发送过的数据，在未收到确认之前都必须暂时保留，以便在<strong>超时重传</strong>时使用。</p>
+<p>接收方会把自己的接收窗口数值放在<strong>窗口字段</strong>(首部字段)中发送给对方。 因此，A 的发送窗口一定不能超过 B 的接收窗口数值。</p>
+<p>发送方的发送窗口大小还要受到当时<strong>网络拥塞程度</strong>的制约。</p>
+<p>发送窗口后沿的后面部分表示已发送且已收到了确认，不需要保留。而发送窗口前沿的前面部分不允许发送，因为接收方都没有为这部分数据保留临时存放的缓存空间。</p>
+<p>发送窗口的位置由窗口前沿和后沿的位置共同确定。发送窗口后沿的变化情况 有且仅有两种可能，即<strong>不动</strong>(没有收到新的确认)和<strong>前移</strong>(收到了新的确认)，不能走回头路。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4exvs3zcj30t20biwjy.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4exvs3zcj30t20biwjy.jpg" srcset="data:image/png;base64,666" alt="A发送了11个字节的数据"></p>
+<p>从所述可以看出，要描述一个发送窗口的状态需要三个指针：P1、P2和 P3，指针都指向字节的序号。</p>
+<p>小于 $P_1$ 的是已发送并已收到确认的部分，而大于 $P_3$ 的是不允许发送的部分。</p>
+<ul>
+<li>$P_3–P_1$=A的发送窗口</li>
+<li>$P_2–P_1$=已发送但尚未收到确认的字节数</li>
+<li>$P_3–P_2$=允许发送但当前尚未发送的字节数(又称为可用窗口或有效窗口)</li>
+</ul>
+<p>B 的接收窗口：B 只能对按序收到的数据中的<strong>最高序号给出确认</strong>，因此 B 发送的确认报文段中的确认号仍然是 31。</p>
+<blockquote>
+<p>可能情况：发送窗口内所有的数据都已正确到达 B，B 也早已发出了确认。但所有确认都滞留在网络中。</p>
+<p>在没有收到 B 的确认时，A 不能猜测：“或许 B 已经收到了？” 为了保证可靠传输，A 只能认为 B 还没有收到这些数据。于是，A 在经过一段时间后(超时计时器控制)就重传这部分数据，重新设置超时计时器，直到收到 B 的确认为止。</p>
+</blockquote>
+<p>发送方的应用进程把字节流写入 TCP 的<strong>发送缓存</strong>，接收方的应用进程从 TCP 的<strong>接收缓存</strong>中读取字节流。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4f9c0riaj30ug0a4wjv.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4f9c0riaj30ug0a4wjv.jpg" srcset="data:image/png;base64,666" alt="TCP的缓存和窗口的关系"></p>
+<p>发送缓存用来暂时存放：</p>
+<ul>
+<li>发送应用程序传送给发送方 TCP 准备发送的数据</li>
+<li>TCP已发送出但尚未收到确认的数据</li>
+</ul>
+<p>接收缓存用来暂时存放：</p>
+<ul>
+<li>按序到达的、但尚未被接收应用程序读取的数据</li>
+<li>未按序到达的数据</li>
+</ul>
+<p>根据以上内容，需要注意三点：</p>
+<ul>
+<li>虽然 A 的发送窗口是根据 B 的接收窗口设置的，但在同一时刻，A 的发送窗口并不总是和 B 的接收窗口一样大。</li>
+<li>TCP 通常对<strong>不按序到达</strong>的数据是先临时存放在<strong>接收窗口</strong>中，等到字节流中所缺少的字节收到后，再按序交付上层的应用进程。</li>
+<li>TCP 要求接收方必须有累积确认的功能，这样可以减小传输开销。</li>
+</ul>
+<h4 id="超时重传时间的选择"><a href="#超时重传时间的选择" class="headerlink" title="超时重传时间的选择"></a>超时重传时间的选择</h4><p>报文段每重传一次，就把超时重传时间 RTO 增大一些。典型的做法是取新的重传时间为旧的重传时间的 2 倍。当不再发生报文段的重传时，才根据下式计算超时重传时间。<br>$$<br>RTO=RTT_s+4\times RTT_d\tag{1}<br>$$<br>$RTT_S$代表加权平均往返时间，$RTT_D$ 是 RTT 的偏差的加权平均值。<br>$$<br>新RTT_d=(1-\beta)\times (旧RTT_d)+\beta \times |RTT_s-新的RTT样本|\tag{2}<br>$$<br>$\beta$ 是小于 1 的系数，推荐值为 0.25。</p>
+<h4 id="选择确认SACK"><a href="#选择确认SACK" class="headerlink" title="选择确认SACK"></a>选择确认SACK</h4><p>若收到的报文段无差错，只是未按序号，中间缺少某些序号的数据，那么能否设法只传送缺少的数据而不重传已经正确到达接收方的数据？</p>
+<p>选择确认(Selective ACK) 就是一种可行的方法。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4fifcaa7j30u404sjt1.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4fifcaa7j30u404sjt1.jpg" srcset="data:image/png;base64,666" alt="接收到的字节流序号不连续"></p>
+<p>RFC 2018 规定，如果要使用选择确认SACK，那么在建立TCP连接时，就要在TCP首部的选项中加上“允许SACK”的选项，双方必须事先商定好。</p>
+<blockquote>
+<p>SACK 并没有指明发送方应当怎样响应 SACK，大多数的实现还是重传所有未被确认的数据块。</p>
+</blockquote>
+<h2 id="TCP的流量控制"><a href="#TCP的流量控制" class="headerlink" title="TCP的流量控制"></a>TCP的流量控制</h2><blockquote>
+<p>利用滑动窗口实现流量控制</p>
+</blockquote>
+<p>如果发送方把数据发送得过快，接收方就可能来不及接收，这就会造成数据的丢失。所谓<strong>流量控制</strong>(flow control)就是让发送方的发送速率不要太快，要让接收方来得及接收。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4fuhuylkj30ra0ec48c.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4fuhuylkj30ra0ec48c.jpg" srcset="data:image/png;base64,666" alt="利用可变窗口进行流量控制举例"></p>
+<p>在上图最下面，B 向 A发送了零窗口的报文段。</p>
+<p>如果 B 的接收缓存又有了一些存储空间，于是 B 向 A 发送了 rwnd=400 的报文段。然而这个报文段在传送过程中丢失了。A 一直等待收到 B 发送的非零窗口的通知，而 B 也一直等待A发送的数据。形成 <strong>死锁</strong> 局面。</p>
+<p>为了解决这个问题，TCP 为每一个连接设有一个持续计时器(persistence timer)。只要 TCP 连接的一方收到对方的<strong>零窗口通知</strong>，就启动持续计时器。</p>
+<p>若持续计时器设置的时间到期，就发送一个<strong>零窗口探测报文段</strong>(仅携带1字节的数据)，而对方就在确认这个探测报文段时给出现在的窗口值。如果窗口仍然是零，那么收到这个报文段的一方就重新设置持续计时器。如果窗口不是零，死锁的僵局就可以打破。</p>
+<h2 id="TCP的拥塞控制"><a href="#TCP的拥塞控制" class="headerlink" title="TCP的拥塞控制"></a>TCP的拥塞控制</h2><blockquote>
+<p>拥塞(congestion)：在某段时间，若对网络中某一资源的需求超过了该资源所能提供的可用部分，网络的性能就要变坏。</p>
+</blockquote>
+<p>$$<br>\sum对资源的需求&gt;可用资源\tag{3}<br>$$</p>
+<p>要进行拥塞控制，实际上就是寻求打破表达式(3) 的条件。</p>
+<p>TCP 进行拥塞控制的算法有四种，即</p>
+<ul>
+<li>慢开始(slow-start)</li>
+<li>拥塞避免 (congestion avoidance)</li>
+<li>快重传(fast retransmit)</li>
+<li>快恢复(fast recovery)</li>
+</ul>
+<p>仍通之前一样，假定：</p>
+<ul>
+<li>数据是单方向传送的，对方只传送确认报文。</li>
+<li>接收方总是有足够大的缓存空间，因而发送窗口的大小由网络的拥塞程度 来决定。</li>
+</ul>
+<h3 id="慢开始和拥塞避免"><a href="#慢开始和拥塞避免" class="headerlink" title="慢开始和拥塞避免"></a>慢开始和拥塞避免</h3><p>发送方控制拥塞窗口：</p>
+<ul>
+<li>只要网络没有出现拥塞，拥塞窗口就可以再增 大一些，以便把更多的分组发送出去，这样就可以提高网络的利用率。</li>
+<li>只要网络出现拥塞或有可能出现拥塞，就必须把拥塞窗口减小一些，以减少注入到网络中的分组数，以便缓解网络出现的拥塞。</li>
+</ul>
+<p>发送方确认网络拥塞：</p>
+<ul>
+<li>网络发生拥塞时，路由器就要丢弃分组。</li>
+<li>因此，只要发送方没有按时收到应当到达的确认报文，也就是说，只要出现了超时，就可以猜想网络可能出现了拥塞。</li>
+</ul>
+<blockquote>
+<p>慢开始算法的思路:</p>
+<p>当主机开始发送数据时，由于并不清楚网络的负荷情况，所以如果立即把大量数据字节注入到网络，那么就有可能引起网络发生拥塞。经验证明，较好的方法是先探测一下，即由小到大逐渐增大发送窗口，也就是说，由小到大逐渐增大拥塞窗口数值。</p>
+</blockquote>
+<p>慢开始规定，在每收到一个对新的报文段的确认后，可以把拥塞窗口增加最多 一个最大报文段SMSS(Sender Maximum Segment Size)的数值。</p>
+<p>使用慢开始算法后，每经过一个传输轮次(transmission round)，拥塞窗口 cwnd 就加倍。(指数增长)</p>
+<p>为了防止拥塞窗口 cwnd 增长过大引起网络拥塞，还需要设置一个慢开始门限</p>
+<p><code>ssthresh</code> 状态变量。</p>
+<ul>
+<li>当<code>cwnd&lt;ssthresh</code>时，使用慢开始算法。</li>
+<li>当<code>cwnd&gt;ssthresh</code>时，停止使用慢开始算法，改用拥塞避免算法。</li>
+<li>当<code>cwnd=ssthresh</code>时，既可使用慢开始算法，也可使用拥塞避免算法。</li>
+</ul>
+<p>拥塞避免算法的思路是让拥塞窗口cwnd缓慢地增大，即每经过一个往返时间 RTT就把发送方的拥塞窗口 cwnd 加 1。(线性增长)</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4glfprynj30uk09aq6r.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4glfprynj30uk09aq6r.jpg" srcset="data:image/png;base64,666" alt="TCP拥塞窗口cwnd在拥塞控制时的变化情况"></p>
+<h3 id="快重传与快恢复"><a href="#快重传与快恢复" class="headerlink" title="快重传与快恢复"></a>快重传与快恢复</h3><p>快重传算法：要求接收方不要等待自己发送数据时才进行捎带确认，而是要立即发送确认，即使收到了失序的报文段也要立即发出对已收到的报文段的重复确认。</p>
+<p>快重传算法规定，发送方只要一连收到 3 个重复确认，就知道接收方确实没有收到报文段 $M_3$，因而应当立即进行重传(即“快重传”)，这样就不会出现超时，发送方也不就会误认为出现了网络拥塞。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4go0pwcbj30u00dwjyp.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4go0pwcbj30u00dwjyp.jpg" srcset="data:image/png;base64,666" alt="快重传的示意图"></p>
+<p>快恢复：是把快恢复开始时的拥塞窗口 cwnd 值再增大一些 (增大3个报文段的长度)，即等于新的<code>ssthresh+3xMS</code>。</p>
+<h3 id="拥塞避免流程图"><a href="#拥塞避免流程图" class="headerlink" title="拥塞避免流程图"></a>拥塞避免流程图</h3><p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4gtatekrj30u60dydjq.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gi4gtatekrj30u60dydjq.jpg" srcset="data:image/png;base64,666" alt="TCP的拥塞控制的流程图"></p>
+<h2 id="TCP-可靠传输的总结"><a href="#TCP-可靠传输的总结" class="headerlink" title="TCP 可靠传输的总结"></a>TCP 可靠传输的总结</h2><ul>
+<li>首先，采用三次握手来建立 TCP 连接，四次握手来释放 TCP 连接，从而保证建立的<strong>传输信道可靠</strong>。</li>
+<li>其次，TCP 采用了<strong>停止等待协议</strong>与<strong>连续 ARQ 协议</strong>（回退N，Go-back-N；超时自动重传）来保证数据传输的正确性。</li>
+<li>使用<strong>滑动窗口协议</strong>来保证接方能够及时处理所接收到的数据，进行<strong>流量控制</strong>。</li>
+<li>最后，TCP 使用<strong>慢开始</strong>、<strong>拥塞避免</strong>、<strong>快重传</strong>和<strong>快恢复</strong>来进行拥塞控制，避免网络拥塞。</li>
+</ul>
+<blockquote>
+<p>也看到网上比较流行的另外一个版本的总结：</p>
+</blockquote>
+<p><code>TCP</code> 通过<strong>序列号</strong>、<strong>超时重传</strong>、<strong>检验和</strong>、<strong>流量控制</strong>、<strong>滑动窗口</strong>、<strong>拥塞控制</strong>实现可靠性。</p>
+<ol>
+<li>应用数据被分割成 <code>TCP</code> 认为最适合发送的数据块。</li>
+<li><code>TCP</code> 给发送的每一个包进行编号，接收方对数据包进行排序，把有序数据传送给应用层。</li>
+<li><code>TCP</code> 的接收端会丢弃重复的数据。</li>
+<li><strong>超时重传</strong>：当 <code>TCP</code> 发出一个段后，它启动一个定时器，等待目的端确认收到这个报文段。如果不能及时收到一个确认，将重发这个报文段。</li>
+<li><strong>校验和</strong>：<code>TCP</code> 将保持它首部和数据的检验和，发送的数据包的二进制相加然后取反。这是一个端到端的检验和，目的是检测数据在传输过程中的任何变化。如果收到段的检验和有差错，<code>TCP</code>将丢弃这个报文段和不确认收到此报文段。</li>
+<li><strong>流量控制</strong>：<code>TCP</code> 连接的每一方都有固定大小的缓冲空间，<code>TCP</code> 的接收端只允许发送端发送接收端缓冲区能接纳的我数据。当接收方来不及处理发送方的数据，能提示发送方降低发送的速率，防止包丢失。<code>TCP</code> 使用的流量控制协议是可变大小的滑动窗口协议。接收方有即时窗口（滑动窗口），随 <code>ACK</code> 报文发送。（<code>TCP</code> 利用滑动窗口实现流量控制）</li>
+<li><strong>滑动窗口</strong>：实际中的传输方式。</li>
+<li><strong>拥塞控制</strong>：当网络拥塞时，减少数据的发送。发送方有拥塞窗口，发送数据前比对接收方发过来的即使窗口，取小慢启动、拥塞避免、拥塞发送、快速恢复。应用数据被分割成TCP认为最适合发送的数据块，<code>TCP</code> 的接收端会丢弃重复的数据。</li>
+</ol>
+<p><a href="https://github.com/JasonJe/notes/issues/109" target="_blank" rel="noopener">停止等待协议</a>也是为了 <code>TCP</code> 协议传输稳定可靠，它的基本原理就是每发完一个分组就停止发送，等待对方确认。在收到确认后再发下一个分组。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>《计算机网络》第七版，谢希仁。</li>
+<li><a href="https://github.com/JasonJe/notes/issues/110" target="_blank" rel="noopener">GitHub - TCP 如何保证可靠传输</a></li>
+</ul>
+
+  
+  
+    
+    <div class='footer'>
+      
+      
+      
+        <div class='copyright'>
+          <blockquote>
+            
+              
+                <p>博客内容遵循 署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0) 协议</p>
+
+              
+            
+              
+                <p>本文永久链接是：<a href=http://raymond-zhao.top/2020/08/26/2020-08-26-Network-WhyTCPReliable/>http://raymond-zhao.top/2020/08/26/2020-08-26-Network-WhyTCPReliable/</a></p>
+              
+            
+          </blockquote>
+        </div>
+      
+      
+    </div>
+  
+  
+    
+
+
+  <div class='article-meta' id="bottom">
+    <div class='new-meta-box'>
+      
+        
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-06-20T13:59:48+08:00">
+  <a class='notlink'>
+    <i class="fas fa-edit fa-fw" aria-hidden="true"></i>
+    <p>更新于：Jun 20, 2021</p>
+  </a>
+</div>
+
+        
+      
+        
+          
+  
+  <div class="new-meta-item meta-tags"><a class="tag" href="/tags/TCP/" rel="nofollow"><i class="fas fa-hashtag fa-fw" aria-hidden="true"></i><p>TCP</p></a></div>
+
+
+        
+      
+        
+          
+  <div class="new-meta-item share -mob-share-list">
+  <div class="-mob-share-list share-body">
+    
+      
+        <a class="-mob-share-qq" title="" rel="external nofollow noopener noreferrer"
+          
+          href="http://connect.qq.com/widget/shareqq/index.html?url=http://raymond-zhao.top/2020/08/26/2020-08-26-Network-WhyTCPReliable/&title=TCP传输为什么是可靠的？ - 吹梦到西洲&summary="
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qq.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qq.png" srcset="data:image/png;base64,666">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-qzone" title="" rel="external nofollow noopener noreferrer"
+          
+          href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=http://raymond-zhao.top/2020/08/26/2020-08-26-Network-WhyTCPReliable/&title=TCP传输为什么是可靠的？ - 吹梦到西洲&summary="
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qzone.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qzone.png" srcset="data:image/png;base64,666">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-weibo" title="" rel="external nofollow noopener noreferrer"
+          
+          href="http://service.weibo.com/share/share.php?url=http://raymond-zhao.top/2020/08/26/2020-08-26-Network-WhyTCPReliable/&title=TCP传输为什么是可靠的？ - 吹梦到西洲&summary="
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/weibo.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/weibo.png" srcset="data:image/png;base64,666">
+          
+        </a>
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+
+
+        
+      
+    </div>
+  </div>
+
+
+  
+  
+
+  
+    <div class="prev-next">
+      
+        <a class='prev' href='/2020/08/26/2020-08-26-Network-TCPANDUDP/'>
+          <p class='title'><i class="fas fa-chevron-left" aria-hidden="true"></i>TCP的运输连接管理</p>
+          <p class='content'>TCP的运输连接管理TCP 是面向连接的协议，运输连接是用来传送 TCP 报文的。TCP 运输连接的建立和释放是每一次面向连接的通信中必不可少的过程。因此，运输连接就有三个阶段，即：连接建立、数...</p>
+        </a>
+      
+      
+        <a class='next' href='/2020/08/25/2020-08-25-Network-HTTPSAndHTTP/'>
+          <p class='title'>HTTP 与 HTTPS<i class="fas fa-chevron-right" aria-hidden="true"></i></p>
+          <p class='content'>分层体系OSI 的七层协议体系结构的概念清楚，理论也较完整，但它既复杂又不实用。TCP/IP体系结构则不同，但它现在却得到了非常广泛的应用。
+TCP/IP是一个四层的体系结构，它包含应用层、运输...</p>
+        </a>
+      
+    </div>
+  
+</article>
+
+
+  
+
+  <article class="post white-box reveal shadow" id="comments">
+    <p ct><i class='fas fa-comments'></i> 评论</p>
+    
+    <div id="valine_container" class="valine_thread">
+  <i class="fas fa-cog fa-spin fa-fw fa-2x"></i>
+</div>
+
+  </article>
+
+
+
+
+
+  <script>
+  // https://github.com/theme-next/hexo-theme-next/blob/master/layout/_third-party/math/mathjax.swig
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3.0/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    // 文章章节标题不能为 “MathJax” ，否则会报错。
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+
+
+</div>
+<aside class='l_side'>
+  
+  
+    
+    
+
+
+
+  <section class="widget toc-wrapper shadow desktop mobile" id="toc-div" >
+    
+  <header>
+    
+      <i class="fas fa-list fa-fw" aria-hidden="true"></i><span class='name'>本文目录</span>
+    
+  </header>
+
+
+    <div class='content'>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#TCP可靠传输的工作原理"><span class="toc-text">TCP可靠传输的工作原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#停止等待协议"><span class="toc-text">停止等待协议</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#连续-ARQ-协议"><span class="toc-text">连续 ARQ 协议</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TCP-可靠传输的实现"><span class="toc-text">TCP 可靠传输的实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#TCP报文段的首部格式"><span class="toc-text">TCP报文段的首部格式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TCP-可靠传输的实现-1"><span class="toc-text">TCP 可靠传输的实现</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#以字节为单位的滑动窗口"><span class="toc-text">以字节为单位的滑动窗口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#超时重传时间的选择"><span class="toc-text">超时重传时间的选择</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#选择确认SACK"><span class="toc-text">选择确认SACK</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TCP的流量控制"><span class="toc-text">TCP的流量控制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TCP的拥塞控制"><span class="toc-text">TCP的拥塞控制</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#慢开始和拥塞避免"><span class="toc-text">慢开始和拥塞避免</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#快重传与快恢复"><span class="toc-text">快重传与快恢复</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#拥塞避免流程图"><span class="toc-text">拥塞避免流程图</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TCP-可靠传输的总结"><span class="toc-text">TCP 可靠传输的总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考"><span class="toc-text">参考</span></a></li></ol>
+    </div>
+  </section>
+
+
+  
+
+
+</aside>
+
+
+
+        
+        
+          <!--此文件用来存放一些不方便取值的变量-->
+<!--思路大概是将值藏到重加载的区域内-->
+
+<script>
+  window.pdata={}
+  pdata.ispage=true;
+  pdata.postTitle="TCP传输为什么是可靠的？";
+  pdata.commentPath="";
+  pdata.commentPlaceholder="";
+
+  var l_header=document.getElementById("l_header");
+  
+  l_header.classList.add("show");
+  
+</script>
+
+        
+      </div>
+      
+  
+  <footer class="footer clearfix">
+    <br><br>
+    
+      
+        <div class="aplayer-container">
+          
+
+
+        </div>
+      
+    
+      
+        <br>
+        <div class="social-wrapper">
+          
+            
+          
+            
+          
+            
+          
+        </div>
+      
+    
+      
+        <div><p>博客內容遵循 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW" target="_blank" rel="noopener">姓名標示-非商業性-相同方式分享 4.0 國際 (CC BY-NC-SA 4.0) 協議</a></p>
+</div>
+      
+    
+      
+        
+          <div><p><span id="lc-sv">本站总访问量为 <span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span> 次</span> <span id="lc-uv">访客数为 <span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span> 人</span></p>
+</div>
+        
+      
+    
+      
+        本站使用
+        <a href="https://github.com/volantis-x/hexo-theme-volantis/tree/4.0.0" target="_blank" class="codename">Volantis</a>
+        作為主題
+      
+    
+      
+        <div class='copyright'>
+        <p><a href="/">Copyright © 2017-2020 XXX</a></p>
+
+        </div>
+      
+    
+  </footer>
+
+
+      <a id="s-top" class="fas fa-arrow-up fa-fw" href='javascript:void(0)'></a>
+    </div>
+  </div>
+  <div>
+    <script>
+window.volantis={};
+window.volantis.loadcss=document.getElementById("loadcss");
+/********************脚本懒加载函数********************************/
+function loadScript(src, cb) {
+var HEAD = document.getElementsByTagName('head')[0] || document.documentElement;
+var script = document.createElement('script');
+script.setAttribute('type','text/javascript');
+if (cb) script.onload = cb;
+script.setAttribute('src', src);
+HEAD.appendChild(script);
+}
+//https://github.com/filamentgroup/loadCSS
+var loadCSS = function( href, before, media, attributes ){
+	var doc = window.document;
+	var ss = doc.createElement( "link" );
+	var ref;
+	if( before ){
+		ref = before;
+	}
+	else {
+		var refs = ( doc.body || doc.getElementsByTagName( "head" )[ 0 ] ).childNodes;
+		ref = refs[ refs.length - 1];
+	}
+	var sheets = doc.styleSheets;
+	if( attributes ){
+		for( var attributeName in attributes ){
+			if( attributes.hasOwnProperty( attributeName ) ){
+				ss.setAttribute( attributeName, attributes[attributeName] );
+			}
+		}
+	}
+	ss.rel = "stylesheet";
+	ss.href = href;
+	ss.media = "only x";
+	function ready( cb ){
+		if( doc.body ){
+			return cb();
+		}
+		setTimeout(function(){
+			ready( cb );
+		});
+	}
+	ready( function(){
+		ref.parentNode.insertBefore( ss, ( before ? ref : ref.nextSibling ) );
+	});
+	var onloadcssdefined = function( cb ){
+		var resolvedHref = ss.href;
+		var i = sheets.length;
+		while( i-- ){
+			if( sheets[ i ].href === resolvedHref ){
+				return cb();
+			}
+		}
+		setTimeout(function() {
+			onloadcssdefined( cb );
+		});
+	};
+	function loadCB(){
+		if( ss.addEventListener ){
+			ss.removeEventListener( "load", loadCB );
+		}
+		ss.media = media || "all";
+	}
+	if( ss.addEventListener ){
+		ss.addEventListener( "load", loadCB);
+	}
+	ss.onloadcssdefined = onloadcssdefined;
+	onloadcssdefined( loadCB );
+	return ss;
+};
+</script>
+<script>
+  
+  loadCSS("https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14/css/all.min.css", window.volantis.loadcss);
+  
+  
+  
+  
+</script>
+<!-- required -->
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5/dist/jquery.min.js"></script>
+
+<script>
+  function pjax_fancybox() {
+    $(".md .gallery").find("img").each(function () { //渲染 fancybox
+      var element = document.createElement("a"); // a 标签
+      $(element).attr("class", "fancybox");
+      $(element).attr("pjax-fancybox", "");  // 过滤 pjax
+      $(element).attr("href", $(this).attr("src"));
+      if ($(this).attr("data-original")) {
+        $(element).attr("href", $(this).attr("data-original"));
+      }
+      $(element).attr("data-fancybox", "images");
+      var caption = "";   // 描述信息
+      if ($(this).attr('alt')) {  // 判断当前页面是否存在描述信息
+        $(element).attr('data-caption', $(this).attr('alt'));
+        caption = $(this).attr('alt');
+      }
+      var div = document.createElement("div");
+      $(div).addClass("fancybox");
+      $(this).wrap(div); // 最外层套 div ，其实主要作用还是 class 样式
+      var span = document.createElement("span");
+      $(span).addClass("image-caption");
+      $(span).text(caption); // 加描述
+      $(this).after(span);  // 再套一层描述
+      $(this).wrap(element);  // 最后套 a 标签
+    })
+    $(".md .gallery").find("img").fancybox({
+      selector: '[data-fancybox="images"]',
+      hash: false,
+      loop: false,
+      closeClick: true,
+      helpers: {
+        overlay: {closeClick: true}
+      },
+      buttons: [
+        "zoom",
+        "close"
+      ]
+    });
+  };
+  function SCload_fancybox() {
+    if ($(".md .gallery").find("img").length == 0) return;
+    loadCSS("https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css", document.getElementById("loadcss"));
+    setTimeout(function() {
+      loadScript('https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js', pjax_fancybox)
+    }, 1);
+  };
+  $(function () {
+    SCload_fancybox();
+  });
+</script>
+
+
+<!-- internal -->
+
+
+
+
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+
+
+  
+  
+    <script>
+      window.FPConfig = {
+        delay: 0,
+        ignoreKeywords: [],
+        maxRPS: 5,
+        hoverDelay: 25
+      };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/gh/gijo-varghese/flying-pages@2.1.2/flying-pages.min.js"></script>
+  
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+    var clipboard = new ClipboardJS('.btn-copy', {
+        target: function (trigger) {
+            return trigger.nextElementSibling
+        }
+    });
+    function wait(callback, seconds) {
+        var timelag = null;
+        timelag = window.setTimeout(callback, seconds)
+    }
+    function pjax_initCopyCode() {
+		if($(".highlight .code pre").length+$(".article pre code").length==0)return;
+        var copyHtml = '';
+        copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+        copyHtml += '<i class="fas fa-copy"></i><span>COPY</span>';
+        copyHtml += '</button>';
+        $(".highlight .code pre").before(copyHtml);
+        $(".article pre code").before(copyHtml);
+        clipboard.off('success').on('success', function (e) {
+            let $btn = $(e.trigger);
+            $btn.addClass('copied');
+            let $icon = $($btn.find('i'));
+            $icon.removeClass('fa-copy');
+            $icon.addClass('fa-check-circle');
+            let $span = $($btn.find('span'));
+            $span[0].innerText = 'COPIED';
+            wait(function () {
+                $icon.removeClass('fa-check-circle');
+                $icon.addClass('fa-copy');
+                $span[0].innerText = 'COPY'
+            }, 2000)
+        });
+        clipboard.off('error').on('error', function (e) {
+            e.clearSelection();
+            let $btn = $(e.trigger);
+            $btn.addClass('copy-failed');
+            let $icon = $($btn.find('i'));
+            $icon.removeClass('fa-copy');
+            $icon.addClass('fa-times-circle');
+            let $span = $($btn.find('span'));
+            $span[0].innerText = 'COPY FAILED';
+            wait(function () {
+                $icon.removeClass('fa-times-circle');
+                $icon.addClass('fa-copy');
+                $span[0].innerText = 'COPY'
+            }, 2000)
+        })
+    }
+    $(function () {
+        pjax_initCopyCode()
+    });
+</script>
+
+
+
+
+
+
+
+
+  
+  
+<script src="/js/valine.js"></script>
+
+
+<script>
+  var GUEST_INFO = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link'.split(',').filter(function (item) {
+    return GUEST_INFO.indexOf(item) > -1
+  });
+  var REQUIRED_FIELDS = ['nick', 'mail', 'link'];
+  var requiredFields = ''.split(',').filter(function (item) {
+    return REQUIRED_FIELDS.indexOf(item) > -1
+  });
+
+  function emoji(path, idx, ext) {
+    return path + "/" + path + "-" + idx + "." + ext;
+  }
+
+  var emojiMaps = {};
+  for (var i = 1; i <= 54; i++) {
+    emojiMaps['tieba-' + i] = emoji('tieba', i, 'png');
+  }
+  for (var i = 1; i <= 101; i++) {
+    emojiMaps['qq-' + i] = emoji('qq', i, 'gif');
+  }
+  for (var i = 1; i <= 116; i++) {
+    emojiMaps['aru-' + i] = emoji('aru', i, 'gif');
+  }
+  for (var i = 1; i <= 125; i++) {
+    emojiMaps['twemoji-' + i] = emoji('twemoji', i, 'png');
+  }
+  for (var i = 1; i <= 4; i++) {
+    emojiMaps['weibo-' + i] = emoji('weibo', i, 'png');
+  }
+
+  function pjax_valine() {
+    if(!document.querySelectorAll("#valine_container")[0])return;
+
+    let pagePlaceholder = pdata.commentPlaceholder || "快来评论吧~";
+
+    let path = pdata.commentPath;
+    if (path.length == 0) {
+      let defaultPath = '';
+      path = defaultPath || decodeURI(window.location.pathname);
+    }
+
+    var valine = new Valine();
+    valine.init({
+      el: '#valine_container',
+      meta: meta,
+      placeholder: pagePlaceholder,
+      path: path,
+      appId: "v6cb35sRa1lfGq6EOtTQHHyf-gzGzoHsz",
+      appKey: "2ulfq63r4brxg2l9QfXp0cTM",
+      pageSize: '10',
+      avatar: 'robohash',
+      lang: 'zh-cn',
+      visitor: 'true',
+      highlight: 'true',
+      mathJax: 'true',
+      enableQQ: 'true',
+      recordIP: 'true',
+      requiredFields: requiredFields,
+      emojiCDN: 'https://cdn.jsdelivr.net/gh/volantis-x/cdn-emoji/valine/',
+      emojiMaps: emojiMaps
+    })
+  }
+
+  $(function () {
+    pjax_valine();
+  });
+</script>
+
+
+
+
+
+  
+<script src="/js/app.js"></script>
+
+
+
+<!-- optional -->
+
+  <script>
+const SearchServiceimagePath="https://cdn.jsdelivr.net/gh/volantis-x/cdn-volantis@master/img/";
+const ROOT =  ("/" || "/").endsWith('/') ? ("/" || "/") : ("//" || "/" );
+
+$('.input.u-search-input').one('focus',function(){
+	
+		loadScript('/js/search/hexo.js',setSearchService);
+	
+})
+
+function listenSearch(){
+  
+    customSearch = new HexoSearch({
+      imagePath: SearchServiceimagePath
+    });
+  
+}
+function setSearchService() {
+	listenSearch();
+	
+		document.addEventListener("pjax:success", listenSearch);
+	
+}
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  <script defer>
+
+  const LCCounter = {
+    app_id: 'v6cb35sRa1lfGq6EOtTQHHyf-gzGzoHsz',
+    app_key: '2ulfq63r4brxg2l9QfXp0cTM',
+    custom_api_server: '',
+
+    // 查询存储的记录
+    getRecord(Counter, url, title) {
+      return new Promise(function (resolve, reject) {
+        Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({url})))
+          .then(resp => resp.json())
+          .then(({results, code, error}) => {
+            if (code === 401) {
+              throw error;
+            }
+            if (results && results.length > 0) {
+              var record = results[0];
+              resolve(record);
+            } else {
+              Counter('post', '/classes/Counter', {url, title: title, times: 0})
+                .then(resp => resp.json())
+                .then((record, error) => {
+                  if (error) {
+                    throw error;
+                  }
+                  resolve(record);
+                }).catch(error => {
+                console.error('Failed to create', error);
+                reject(error);
+              });
+            }
+          }).catch((error) => {
+          console.error('LeanCloud Counter Error:', error);
+          reject(error);
+        });
+      })
+    },
+
+    // 发起自增请求
+    increment(Counter, incrArr) {
+      return new Promise(function (resolve, reject) {
+        Counter('post', '/batch', {
+          "requests": incrArr
+        }).then((res) => {
+          res = res.json();
+          if (res.error) {
+            throw res.error;
+          }
+          resolve(res);
+        }).catch((error) => {
+          console.error('Failed to save visitor count', error);
+          reject(error);
+        });
+      });
+    },
+
+    // 构建自增请求体
+    buildIncrement(objectId) {
+      return {
+        "method": "PUT",
+        "path": `/1.1/classes/Counter/${ objectId }`,
+        "body": {
+          "times": {
+            '__op': 'Increment',
+            'amount': 1
+          }
+        }
+      }
+    },
+
+    // 校验是否为有效的 UV
+    validUV() {
+      var key = 'LeanCloudUVTimestamp';
+      var flag = localStorage.getItem(key);
+      if (flag) {
+        // 距离标记小于 24 小时则不计为 UV
+        if (new Date().getTime() - parseInt(flag) <= 86400000) {
+          return false;
+        }
+      }
+      localStorage.setItem(key, new Date().getTime().toString());
+      return true;
+    },
+
+    addCount(Counter) {
+      var enableIncr = '' === 'true' && window.location.hostname !== 'localhost';
+      enableIncr = true;
+      var getterArr = [];
+      var incrArr = [];
+      // 请求 PV 并自增
+      var pvCtn = document.querySelector('#lc-sv');
+      if (pvCtn || enableIncr) {
+        var pvGetter = this.getRecord(Counter, 'http://raymond-zhao.top' + '/#lc-sv', 'Visits').then((record) => {
+          incrArr.push(this.buildIncrement(record.objectId))
+          var eles = document.querySelectorAll('#lc-sv #number');
+          if (eles.length > 0) {
+            eles.forEach((el,index,array)=>{
+              el.innerText = record.times + 1;
+              if (pvCtn) {
+                pvCtn.style.display = 'inline';
+              }
+            })
+          }
+        });
+        getterArr.push(pvGetter);
+      }
+
+      // 请求 UV 并自增
+      var uvCtn = document.querySelector('#lc-uv');
+      if (uvCtn || enableIncr) {
+        var uvGetter = this.getRecord(Counter, 'http://raymond-zhao.top' + '/#lc-uv', 'Visitors').then((record) => {
+          var vuv = this.validUV();
+          vuv && incrArr.push(this.buildIncrement(record.objectId))
+          var eles = document.querySelectorAll('#lc-uv #number');
+          if (eles.length > 0) {
+            eles.forEach((el,index,array)=>{
+              el.innerText = record.times + (vuv ? 1 : 0);
+              if (uvCtn) {
+                uvCtn.style.display = 'inline';
+              }
+            })
+          }
+        });
+        getterArr.push(uvGetter);
+      }
+
+      // 请求文章的浏览数，如果是当前页面就自增
+      var allPV = document.querySelectorAll('#lc-pv');
+      if (allPV.length > 0 || enableIncr) {
+        for (i = 0; i < allPV.length; i++) {
+          let pv = allPV[i];
+          let title = pv.getAttribute('data-title');
+          var url = 'http://raymond-zhao.top' + pv.getAttribute('data-path');
+          if (url) {
+            var viewGetter = this.getRecord(Counter, url, title).then((record) => {
+              // 是当前页面就自增
+              let curPath = window.location.pathname;
+              if (curPath.includes('index.html')) {
+                curPath = curPath.substring(0, curPath.lastIndexOf('index.html'));
+              }
+              if (pv.getAttribute('data-path') == curPath) {
+                incrArr.push(this.buildIncrement(record.objectId));
+              }
+              if (pv) {
+                var ele = pv.querySelector('#lc-pv #number');
+                if (ele) {
+                  if (pv.getAttribute('data-path') == curPath) {
+                    ele.innerText = (record.times || 0) + 1;
+                  } else {
+                    ele.innerText = record.times || 0;
+                  }
+                  pv.style.display = 'inline';
+                }
+              }
+            });
+            getterArr.push(viewGetter);
+          }
+        }
+      }
+
+      // 如果启动计数自增，批量发起自增请求
+      if (enableIncr) {
+        Promise.all(getterArr).then(() => {
+          incrArr.length > 0 && this.increment(Counter, incrArr);
+        })
+      }
+
+    },
+
+
+    fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${ api_server }/1.1${ url }`, {
+          method,
+          headers: {
+            'X-LC-Id': this.app_id,
+            'X-LC-Key': this.app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      this.addCount(Counter);
+    },
+
+    refreshCounter() {
+      var api_server = this.app_id.slice(-9) !== '-MdYXbMMI' ? this.custom_api_server : `https://${ this.app_id.slice(0, 8).toLowerCase() }.api.lncldglobal.com`;
+      if (api_server) {
+        this.fetchData(api_server);
+      } else {
+        fetch('https://app-router.leancloud.cn/2/route?appId=' + this.app_id)
+          .then(resp => resp.json())
+          .then(({api_server}) => {
+            this.fetchData('https://' + api_server);
+          });
+      }
+    }
+
+  };
+
+  LCCounter.refreshCounter();
+
+  document.addEventListener('pjax:complete', function () {
+    LCCounter.refreshCounter();
+  });
+</script>
+
+
+
+
+
+
+
+
+<script>
+function listennSidebarTOC() {
+  const navItems = document.querySelectorAll(".toc li");
+  if (!navItems.length) return;
+  const sections = [...navItems].map((element) => {
+    const link = element.querySelector(".toc-link");
+    const target = document.getElementById(
+      decodeURI(link.getAttribute("href")).replace("#", "")
+    );
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      window.scrollTo({
+		top: target.offsetTop + 100,
+		
+	  });
+    });
+    return target;
+  });
+
+  function activateNavByIndex(target) {
+    if (target.classList.contains("active-current")) return;
+
+    document.querySelectorAll(".toc .active").forEach((element) => {
+      element.classList.remove("active", "active-current");
+    });
+    target.classList.add("active", "active-current");
+    let parent = target.parentNode;
+    while (!parent.matches(".toc")) {
+      if (parent.matches("li")) parent.classList.add("active");
+      parent = parent.parentNode;
+    }
+  }
+
+  function findIndex(entries) {
+    let index = 0;
+    let entry = entries[index];
+    if (entry.boundingClientRect.top > 0) {
+      index = sections.indexOf(entry.target);
+      return index === 0 ? 0 : index - 1;
+    }
+    for (; index < entries.length; index++) {
+      if (entries[index].boundingClientRect.top <= 0) {
+        entry = entries[index];
+      } else {
+        return sections.indexOf(entry.target);
+      }
+    }
+    return sections.indexOf(entry.target);
+  }
+
+  function createIntersectionObserver(marginTop) {
+    marginTop = Math.floor(marginTop + 10000);
+    let intersectionObserver = new IntersectionObserver(
+      (entries, observe) => {
+        let scrollHeight = document.documentElement.scrollHeight + 100;
+        if (scrollHeight > marginTop) {
+          observe.disconnect();
+          createIntersectionObserver(scrollHeight);
+          return;
+        }
+        let index = findIndex(entries);
+        activateNavByIndex(navItems[index]);
+      },
+      {
+        rootMargin: marginTop + "px 0px -100% 0px",
+        threshold: 0,
+      }
+    );
+    sections.forEach((element) => {
+      element && intersectionObserver.observe(element);
+    });
+  }
+  createIntersectionObserver(document.documentElement.scrollHeight);
+}
+
+document.addEventListener("DOMContentLoaded", listennSidebarTOC);
+document.addEventListener("pjax:success", listennSidebarTOC);
+</script>
+
+<!-- more -->
+
+
+
+
+    
+      
+
+
+<script src="https://cdn.jsdelivr.net/npm/pjax@0.2.8/pjax.min.js"></script>
+
+
+<!-- 样式位于：source/css/_third-party/pjaxanimate.styl -->
+
+<div class="pjax-animate">
+  
+    <script src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script>
+    <div id="loading-bar-wrapper"><script>NProgress.configure({parent:"#loading-bar-wrapper",trickleSpeed: 100})</script></div>
+    <script>
+      window.ShowLoading = function() {
+        NProgress.start();
+      };
+      window.HideLoading = function() {
+        NProgress.done();
+      }
+    </script>
+  
+</div>
+
+
+<script>
+    var pjax;
+    document.addEventListener('DOMContentLoaded', function () {
+      pjax = new Pjax({
+        elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([pjax-fancybox])',
+        selectors: [
+          "title",
+          "#l_cover",
+          "#pjax-container",
+          "#pjax-header-nav-list"
+        ],
+        cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+        timeout: 5000
+      });
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+      //window.stop(); // 相当于点击了浏览器的停止按钮
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      window.subData = null; // 移除标题（用于一二级导航栏切换处）
+      if (typeof $.fancybox != "undefined") {
+        $.fancybox.close();    // 关闭弹窗
+      }
+      volantis.$switcher.removeClass('active'); // 关闭移动端激活的搜索框
+      volantis.$header.removeClass('z_search-open'); // 关闭移动端激活的搜索框
+      volantis.$wrapper.removeClass('sub'); // 跳转页面时关闭二级导航
+
+      // 解绑事件 避免重复监听
+      volantis.$topBtn.unbind('click');
+      $('.menu a').unbind('click');
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+	  
+      window.ShowLoading();
+	  
+    });
+
+    document.addEventListener('pjax:complete', function () {
+      // 关于百度统计对 SPA 页面的处理：
+      // 方案一：百度统计>管理>单页应用设置中，打开开启按钮即可对SPA进行统计。 https://tongji.baidu.com/web/help/article?id=324
+      // 方案二：取消注释下列代码。 https://tongji.baidu.com/web/help/article?id=235
+       
+
+      // 关于谷歌统计对 SPA 页面的处理：
+      // 当应用以动态方式加载内容并更新地址栏中的网址时，也应该更新通过 gtag.js 存储的网页网址。
+      // https://developers.google.cn/analytics/devguides/collection/gtagjs/single-page-applications?hl=zh-cn
+      
+	 
+
+      $('.nav-main').find('.list-v').not('.menu-phone').removeAttr("style",""); // 移除小尾巴的移除
+      $('.menu-phone.list-v').removeAttr("style",""); // 移除小尾巴的移除
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+      try{
+          if (typeof $.fancybox == "undefined") {
+            SCload_fancybox();
+          } else {
+            pjax_fancybox();
+          }
+        
+        
+        
+        
+        
+          pjax_initCopyCode();
+        
+        
+          pjax_valine();
+        
+        
+        
+        
+      } catch (e) {
+        console.log(e);
+      }
+	  
+      window.HideLoading();
+	  
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+	  
+      window.HideLoading();
+	  
+      window.location.href = e.triggerElement.href;
+    });
+</script>
+
+    
+  </div>
+</body>
+</html>

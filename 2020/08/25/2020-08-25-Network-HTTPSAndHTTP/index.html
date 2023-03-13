@@ -1,0 +1,2128 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head hexo-theme='https://github.com/volantis-x/hexo-theme-volantis/tree/4.0.0'>
+  <meta charset="utf-8">
+  <!-- SEO相关 -->
+  
+    
+  
+  <!-- 渲染优化 -->
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  <link rel='dns-prefetch' href='https://cdn.jsdelivr.net'>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <!-- 页面元数据 -->
+  
+  <title>HTTP 与 HTTPS - 吹梦到西洲</title>
+  
+    <meta name="keywords" content="HTTP,HTTPS">
+  
+
+  
+    <meta name="description" content="HTTP 与 HTTPS 中的常见问题的梳理">
+  
+
+  <!-- feed -->
+  
+
+  <!-- import meta -->
+  
+
+  <!-- link -->
+  
+    <link rel="shortcut icon" type='image/x-icon' href="/images/3d-architecture.svg">
+  
+
+  <!-- import link -->
+  
+
+  
+    
+<link rel="stylesheet" href="/css/first.css">
+
+  
+
+  
+  <link rel="stylesheet" href="/css/style.css" media="print" onload="this.media='all';this.onload=null">
+  <noscript><link rel="stylesheet" href="/css/style.css"></noscript>
+  
+
+  <script id="loadcss"></script>
+
+</head>
+
+<body>
+  
+
+<header id="l_header" class="l_header auto shadow blur show" style='opacity: 0' >
+  <div class='container'>
+  <div id='wrapper'>
+    <div class='nav-sub'>
+      <p class="title"></p>
+      <ul class='switcher nav-list-h m-phone' id="pjax-header-nav-list">
+        <li><a id="s-comment" class="fas fa-comments fa-fw" target="_self" href='javascript:void(0)'></a></li>
+        
+          <li><a id="s-toc" class="s-toc fas fa-list fa-fw" target="_self" href='javascript:void(0)'></a></li>
+        
+      </ul>
+    </div>
+		<div class="nav-main">
+      
+        
+        <a class="title flat-box" target="_self" href='/'>
+          
+            <img no-lazy class='logo' src='https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/blog/Logo-NavBar@3x.png'/>
+          
+          
+          
+        </a>
+      
+
+			<div class='menu navigation'>
+				<ul class='nav-list-h m-pc'>
+          
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/
+                  
+                  
+                  
+                    id="home"
+                  >
+                  <i class='fas fa-rss fa-fw'></i>博客
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/categories/
+                  
+                  
+                  
+                    id="categories"
+                  >
+                  <i class='fas fa-folder-open fa-fw'></i>分类
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/tags/
+                  
+                  
+                  
+                    id="tags"
+                  >
+                  <i class='fas fa-tags fa-fw'></i>标签
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/archives/
+                  
+                  
+                  
+                    id="archives"
+                  >
+                  <i class='fas fa-archive fa-fw'></i>归档
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/friends/
+                  
+                  
+                  
+                    id="friends"
+                  >
+                  <i class='fas fa-link fa-fw'></i>友链
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/about/
+                  
+                  
+                  
+                    id="about"
+                  >
+                  <i class='fas fa-info-circle fa-fw'></i>关于
+                </a>
+                
+              </li>
+            
+          
+          
+				</ul>
+			</div>
+
+      <div class="m_search">
+        <form name="searchform" class="form u-search-form">
+          <i class="icon fas fa-search fa-fw"></i>
+          <input type="text" class="input u-search-input" placeholder="Search..." />
+        </form>
+      </div>
+
+			<ul class='switcher nav-list-h m-phone'>
+				
+					<li><a class="s-search fas fa-search fa-fw" target="_self" href='javascript:void(0)'></a></li>
+				
+				<li>
+          <a class="s-menu fas fa-bars fa-fw" target="_self" href='javascript:void(0)'></a>
+          <ul class="menu-phone list-v navigation white-box">
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/
+                  
+                  
+                  
+                    id="home"
+                  >
+                  <i class='fas fa-rss fa-fw'></i>博客
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/categories/
+                  
+                  
+                  
+                    id="categories"
+                  >
+                  <i class='fas fa-folder-open fa-fw'></i>分类
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/tags/
+                  
+                  
+                  
+                    id="tags"
+                  >
+                  <i class='fas fa-tags fa-fw'></i>标签
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/archives/
+                  
+                  
+                  
+                    id="archives"
+                  >
+                  <i class='fas fa-archive fa-fw'></i>归档
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/friends/
+                  
+                  
+                  
+                    id="friends"
+                  >
+                  <i class='fas fa-link fa-fw'></i>友链
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/about/
+                  
+                  
+                  
+                    id="about"
+                  >
+                  <i class='fas fa-info-circle fa-fw'></i>关于
+                </a>
+                
+              </li>
+            
+          
+            
+          </ul>
+        </li>
+			</ul>
+		</div>
+	</div>
+  </div>
+</header>
+
+  <div id="l_body">
+    <div id="l_cover">
+  
+    
+        <div id="full" class='cover-wrapper post search' style="display: none;">
+          
+            <div class='cover-bg lazyload placeholder' data-bg="/images/cover-2.jpg"></div>
+          
+          <div class='cover-body'>
+  <div class='top'>
+    
+    
+      <p class="title">吹梦到西洲</p>
+    
+    
+  </div>
+  <div class='bottom'>
+    
+      <div class="m_search">
+        <form name="searchform" class="form u-search-form">
+          <input type="text" class="input u-search-input" placeholder="Looking for something?" />
+          <i class="icon fas fa-search fa-fw"></i>
+        </form>
+      </div>
+    
+    <div class='menu navigation'>
+      <div class='list-h'>
+        
+          
+            <a href="/"
+              
+              
+              id="home">
+              <i class='fas fa-rss fa-fw'></i><p>博客</p>
+            </a>
+          
+            <a href="/categories/"
+              
+              
+              id="categories">
+              <i class='fas fa-folder-open fa-fw'></i><p>分类</p>
+            </a>
+          
+            <a href="/tags/"
+              
+              
+              id="tags">
+              <i class='fas fa-tags fa-fw'></i><p>标签</p>
+            </a>
+          
+            <a href="/archives/"
+              
+              
+              id="archives">
+              <i class='fas fa-archive fa-fw'></i><p>归档</p>
+            </a>
+          
+            <a href="/friends/"
+              
+              
+              id="friends">
+              <i class='fas fa-link fa-fw'></i><p>友链</p>
+            </a>
+          
+            <a href="/about/"
+              
+              
+              id="about">
+              <i class='fas fa-info-circle fa-fw'></i><p>关于</p>
+            </a>
+          
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+          <div id="scroll-down" style="display: none;"><i class="fa fa-chevron-down scroll-down-effects"></i></div>
+        </div>
+    
+  
+  </div>
+
+    <div id='safearea'>
+      <div class='body-wrapper' id="pjax-container">
+        
+
+<div class='l_main'>
+  <article class="article post white-box reveal md shadow article-type-post" id="post" itemscope itemprop="blogPost">
+  
+
+
+  
+  <div class="article-meta" id="top">
+    
+    
+    
+      <h1 class="title">
+        HTTP 与 HTTPS
+      </h1>
+      <div class='new-meta-box'>
+        
+          
+            
+<div class='new-meta-item author'>
+  <a class='author' href="/" rel="nofollow">
+    <img no-lazy src="">
+    <p>吹梦到西洲</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  <div class='new-meta-item category'>
+    <a class='notlink'>
+      <i class="fas fa-folder-open fa-fw" aria-hidden="true"></i>
+      <a class="category-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a>
+    </a>
+  </div>
+
+
+          
+        
+          
+            <div class="new-meta-item date">
+  <a class='notlink'>
+    <i class="fas fa-calendar-alt fa-fw" aria-hidden="true"></i>
+    <p>发布于：Aug 25, 2020</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  <div class="new-meta-item browse leancloud">
+    <a class='notlink'>
+      
+      <div id="lc-pv" data-title="HTTP 与 HTTPS" data-path="/2020/08/25/2020-08-25-Network-HTTPSAndHTTP/">
+        <i class="fas fa-eye fa-fw" aria-hidden="true"></i>
+        <span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span>
+        次浏览
+      </div>
+    </a>
+  </div>
+
+
+          
+        
+      </div>
+    
+  </div>
+
+
+  
+  <h2 id="分层体系"><a href="#分层体系" class="headerlink" title="分层体系"></a>分层体系</h2><p>OSI 的七层协议体系结构的概念清楚，理论也较完整，但它既复杂又不实用。TCP/IP体系结构则不同，但它现在却得到了非常广泛的应用。</p>
+<p>TCP/IP是一个四层的体系结构，它包含应用层、运输层、网际层和网络接口层。</p>
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gd9qb100evj31f40ocdvs.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/00831rSTly1gd9qb100evj31f40ocdvs.jpg" srcset="data:image/png;base64,666" alt="计算机网络体系结构"></p>
+<ul>
+<li><p>应用层(application layer)：应用层的任务是<strong>通过应用进程间的交互来完成特定网络应用</strong>。应用层协议定义的是<strong>应用进程间</strong>通信和交互的规则。在互联网中的应用层协议很多，如域名系统DNS，支持万维网应用的HTTP协议，支持电子邮件的SMTP协议等等。应用层交互的数据单元称为<strong>报文(message)</strong>。</p>
+</li>
+<li><p>运输层(transport layer)：运输层的任务就是负责<strong>向两台主机中进程之间的通信提供通用的数据传输服务</strong>。应用进程利用该服务传送应用层报文。所谓“通用的”，是指并不针对某个特定网络应用，而是多种应用可以使用同一个运输层服务。由于一台主机可同时运行多个进程，因此运输层有<strong>复用和分用</strong>的功能。复用就是多个应用层进程可同时使用下面运输层的服务，分用和复用相反，是运输层把收到的信息分别交付上面应用层中的相应进程。运输层主要使用以下两种协议:</p>
+<ul>
+<li>传输控制协议TCP(Transmission Control Protocol)—提供面向连接的、可靠的数据传输服务，其数据传输的单位是<strong>报文段(segment)</strong>。</li>
+<li>用户数据报协议UDP(User Datagram Protocol)—提供无连接的、尽最大努力(best-effort)的数据传输服务(不保证数据传输的可靠性)，其数据传输的单位是<strong>用户数据报</strong>。</li>
+</ul>
+</li>
+<li><p>网络层：网络层负责<strong>为分组交换网上的不同主机提供通信服务</strong>。在发送数据时，网络层把运输层产生的<strong>报文段或用户数据报封装成分组或包进行传送</strong>。在TCP/IP体系中，由于网络层使用IP协议，因此分组也叫做IP数据报，或简称为数据报。</p>
+<ul>
+<li>网络层的另一个任务就是要选择合适的路由，使源主机运输层所传下来的分组，能够通过网络中的路由器找到目的主机。</li>
+<li>不要将运输层的“用户数据报UDP”和网络层的“IP数据报”弄混。此外，无论在哪一层传送的数据单元，都可笼统地用“分组”来表示。</li>
+</ul>
+</li>
+<li><p>数据链路层(data link layer)：两台主机之间的数据传输，总是在一段一段的链路上传送的，这就需要使用专门的链路层的协议。在两个相邻结点之间传送数据时，数据链路层将网络层交下来的<strong>IP数据报组装成帧(framing)</strong>，在两个相邻结点间的链路上传送<strong>帧(frame)</strong>。每一帧包括数据和必要的控制信息(如同步信息、地址信息、差错控制等)。</p>
+<ul>
+<li>在接收数据时，控制信息使接收端能够知道一个帧从哪个比特开始和到哪个比特结束。</li>
+<li>控制信息还使接收端能够检测到所收到的帧中有无差错。</li>
+</ul>
+</li>
+<li><p>物理层(physical layer)：考虑的是怎样在传输媒体上<strong>透明地传输数据比特流</strong>，而不是指具体的传输媒体。物理层的作用是尽可能屏蔽传输媒体和通信手段的差异，使数据链路层感觉不到这些差异。</p>
+</li>
+</ul>
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gczcfmgbzjg30u016i0yk.gif" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/00831rSTly1gczcfmgbzjg30u016i0yk.gif" srcset="data:image/png;base64,666" alt="计算机网络分层体系图"></p>
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gd9rqohwupj31ea0jgk38.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/00831rSTly1gd9rqohwupj31ea0jgk38.jpg" srcset="data:image/png;base64,666" alt="数据在各层之间的传递过程"></p>
+<h3 id="请求方法"><a href="#请求方法" class="headerlink" title="请求方法"></a>请求方法</h3><blockquote>
+<p>问题：POST 方法与 PUT 方法的区别?</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th align="center">方法名</th>
+<th align="center">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>GET</code></td>
+<td align="center">向指定的资源发出“显示”请求。</td>
+</tr>
+<tr>
+<td align="center"><code>PATCH</code></td>
+<td align="center">用于将局部修改应用到资源。</td>
+</tr>
+<tr>
+<td align="center"><code>POST</code></td>
+<td align="center">向指定资源提交数据，请求服务器进行处理。</td>
+</tr>
+<tr>
+<td align="center"><code>PUT</code></td>
+<td align="center">向指定资源位置上传其最新内容。</td>
+</tr>
+<tr>
+<td align="center"><code>DELETE</code></td>
+<td align="center">请求服务器删除Request-URI所标识的资源。</td>
+</tr>
+<tr>
+<td align="center"><code>HEAD</code></td>
+<td align="center">与GET方法一样，都是向服务器发出指定资源的请求。只不过服务器将不传回资源的本文部分。</td>
+</tr>
+<tr>
+<td align="center"><code>TRACE</code></td>
+<td align="center">回显服务器收到的请求，主要用于测试或诊断。</td>
+</tr>
+<tr>
+<td align="center"><code>OPTIONS</code></td>
+<td align="center">可使服务器传回该资源所支持的所有HTTP请求方法。</td>
+</tr>
+<tr>
+<td align="center"><code>CONNECT</code></td>
+<td align="center">通常用于SSL加密服务器的链接</td>
+</tr>
+</tbody></table>
+<h3 id="GET-与-POST的区别"><a href="#GET-与-POST的区别" class="headerlink" title="GET 与 POST的区别"></a>GET 与 POST的区别</h3><table>
+<thead>
+<tr>
+<th align="center">比较方面</th>
+<th align="center">GET</th>
+<th align="center">POST</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">请求主体(Body)</td>
+<td align="center">只有URL，无请求主体</td>
+<td align="center">有请求主体</td>
+</tr>
+<tr>
+<td align="center">响应主体</td>
+<td align="center">有</td>
+<td align="center">有</td>
+</tr>
+<tr>
+<td align="center">后退按钮/刷新</td>
+<td align="center">无副作用</td>
+<td align="center">数据会被重新提交</td>
+</tr>
+<tr>
+<td align="center">书签</td>
+<td align="center">可收藏为书签</td>
+<td align="center">不可收藏为书签</td>
+</tr>
+<tr>
+<td align="center">缓存</td>
+<td align="center">可被缓存</td>
+<td align="center">不能缓存</td>
+</tr>
+<tr>
+<td align="center">编码类型</td>
+<td align="center"><code>application/x-www-form-urlencoded</code></td>
+<td align="center"><code>application/x-www-form-urlencoded</code><br /><code>multipart/form-data</code><br /><code>text/plain</code></td>
+</tr>
+<tr>
+<td align="center">历史</td>
+<td align="center">参数保留在浏览器历史中</td>
+<td align="center">参数不会保存在浏览器历史中</td>
+</tr>
+<tr>
+<td align="center">URL长度</td>
+<td align="center">有限制，但不同浏览器限制又不同。常说的2KB其实是指IE8，Chrome和Apache为8KB</td>
+<td align="center">无限制(Post请求本身不限制长度，但是服务器是会限制的。)</td>
+</tr>
+<tr>
+<td align="center">对数据类型的限制</td>
+<td align="center">只允许 ASCII 字符</td>
+<td align="center">没有限制、也允许二进制数据，Percent Encoding编码</td>
+</tr>
+<tr>
+<td align="center">安全性</td>
+<td align="center">与 POST 相比，GET 的安全性较差，因为所发送的数据是 URL 的一部分。在发送密码或其他敏感信息时绝不要使用 GET</td>
+<td align="center">POST 比 GET 更安全，因为参数不会被保存在浏览器历史或 web 服务器日志中。</td>
+</tr>
+<tr>
+<td align="center">幂等性</td>
+<td align="center">支持</td>
+<td align="center">不支持</td>
+</tr>
+<tr>
+<td align="center">可见性</td>
+<td align="center">数据在 URL 中对所有人都是可见的</td>
+<td align="center">数据不会显示在 URL 中</td>
+</tr>
+</tbody></table>
+<h3 id="状态码"><a href="#状态码" class="headerlink" title="状态码"></a>状态码</h3><p>所有HTTP响应的第一行都是<strong>状态行</strong>，依次是当前HTTP版本号，3位数字组成的<a href="https://zh.wikipedia.org/wiki/HTTP状态码" target="_blank" rel="noopener">状态代码</a>，以及描述状态的短语，彼此由空格分隔。</p>
+<p>状态代码的第一个数字代表当前响应的类型：</p>
+<ul>
+<li><p><a href="https://zh.wikipedia.org/wiki/HTTP状态码#1xx消息" target="_blank" rel="noopener">1xx消息</a>——请求已被服务器接收，继续处理</p>
+</li>
+<li><p><a href="https://zh.wikipedia.org/wiki/HTTP状态码#2xx成功" target="_blank" rel="noopener">2xx成功</a>——请求已成功被服务器接收、理解、并接受</p>
+<ul>
+<li>200: 正常返回信息</li>
+</ul>
+</li>
+<li><p><a href="https://zh.wikipedia.org/wiki/HTTP状态码#3xx重定向" target="_blank" rel="noopener">3xx重定向</a>——需要后续操作才能完成这一请求</p>
+<ul>
+<li><strong>300 Multiple Choices</strong></li>
+<li>301 Moved Permanently: 资源已经被永久移动，通常会发送HTTP Location来重定向到正确的新位置。Google 认为这是将网站从HTTP迁移到HTTPS的最佳方法。</li>
+<li>302 Found: 临时重定向。</li>
+</ul>
+<blockquote>
+<p>当 301、302、303 响应状态码返回时，几乎所有的浏览器都会把 POST 改成 GET，并删除请求报文内的主体，之后请求会自动再次 发送。</p>
+<p>301、302 标准是禁止将 POST 方法改变成 GET 方法的，但实际使 用时大家都会这么做。</p>
+</blockquote>
+<ul>
+<li>304 Not Modified: 表示客户端发送附带条件的请求时，服务器端允许请求访问资源，但未满足条件的情况。304 状态码返回时，不包含任何响应的主体部分。304 虽然被划分在 3XX 类别中，但是和重定向没有关系。</li>
+</ul>
+<blockquote>
+<p>附带条件的请求是指采用 GET 方法的请求报文中包含 If-Match，If-Modified- Since，If-None-Match，If-Range，If-Unmodified-Since 中任一首部。</p>
+</blockquote>
+</li>
+<li><p><a href="https://zh.wikipedia.org/wiki/HTTP状态码#4xx请求错误" target="_blank" rel="noopener">4xx请求错误</a>——请求含有词法错误或者无法被执行</p>
+<ul>
+<li>401 Unauthorized：请求未经授权，即用户没有权限执行这个请求。</li>
+<li>403 Forbidden：服务器收到请求，但是拒绝提供服务</li>
+<li>404 Not Found：请求资源不存在。最常见的就是URL错误</li>
+</ul>
+</li>
+<li><p><a href="https://zh.wikipedia.org/wiki/HTTP状态码#5xx服务器错误" target="_blank" rel="noopener">5xx服务器错误</a>——服务器在处理某个正确请求时发生错误</p>
+<ul>
+<li>500 Internal Server Error：服务器发生不可预期的错误</li>
+<li>502 Bad Gateway：作为网关或者代理工作的服务器尝试执行请求时，从上游服务器接收到无效的响应。</li>
+<li>503 Service Unavailable：服务器当前不能处理客户端的请求，一段时间后可能恢复正常。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="HTTP的缺点"><a href="#HTTP的缺点" class="headerlink" title="HTTP的缺点"></a>HTTP的缺点</h3><ul>
+<li>通信使用明文(不加密)，内容可能会被窃听。</li>
+<li>不验证通信方的身份，因此有可能遭遇伪装。</li>
+<li>无法证明报文的完整性，所以有可能已遭篡改。</li>
+</ul>
+<h3 id="HTTP各版本区别"><a href="#HTTP各版本区别" class="headerlink" title="HTTP各版本区别"></a>HTTP各版本区别</h3><p><strong>HTTP1.0</strong></p>
+<ul>
+<li>短连接：每次发送请求都要重新建立 TCP 连接，即三次握手，数据发送完毕就要关闭连接。</li>
+<li>无 host 头域，也就是 http 请求头里的 host。</li>
+<li>不允许断点续传，而且不能只传输对象的一部分，要求传输整个对象。</li>
+</ul>
+<p><strong>HTTP1.1</strong></p>
+<ul>
+<li>引入了持久连接(persistent connectio)，又称长连接。客户端和服务器发现对方一段时间没有活动，可以主动关闭连接。</li>
+<li>引入了流水线机制(pipelining)，也就是在同一个TCP连接里面，客户端可以同时发送多个请求。</li>
+<li>采用”流模式”（stream）取代”缓存模式”（buffer），采用分块传输编码，产生一块数据，就发送一块。</li>
+<li>客户端请求的头信息新增了 <strong>Host 字段</strong>，用来指定服务器的域名。</li>
+<li>新增许多方法：PUT、PATCH、HEAD、 OPTIONS、DELETE。</li>
+<li>将 Content-length 字段的作用进行扩充，声明本次回应(Response)的数据长度。</li>
+</ul>
+<blockquote>
+<p>虽然 HTTP1.1 允许复用 TCP 连接，但是同一个 TCP 连接里面，所有的数据通信是按次序进行的。服务器只有处理完一个回应，才会进行下一个回应。要是前面的回应特别慢，后面就会有许多请求排队等着。这称为”队头堵塞”（Head-of-line blocking）。</p>
+<p>为了避免这个问题，只有两种方法：<strong>一是减少请求数，二是同时多开持久连接。</strong></p>
+<p>这产生了很多的网页优化技巧，比如合并脚本和样式表、将图片嵌入CSS代码、域名分片（domain sharding）等等。如果HTTP协议设计得更好一些，这些额外的工作是可以避免的。</p>
+</blockquote>
+<p><strong>HTTP1.x</strong>的缺点</p>
+<ol>
+<li>HTTP/1.0一次只允许在<strong>一个TCP连接上发起一个请求</strong>，HTTP/1.1 使用的流水线技术也只能<strong>部分处理请求并发</strong>，仍然会存在<strong>队列头阻塞</strong>问题，因此客户端在需要发起多次请求时，通常会采用建立<strong>多连接</strong>来减少延迟。</li>
+<li>单向请求，只能由客户端发起。</li>
+<li>请求报文与响应报文首部信息冗余量大。</li>
+<li>数据未压缩，导致数据的传输量大。</li>
+</ol>
+<p><strong>HTTP2.0</strong></p>
+<blockquote>
+<p>主要基于SPDY协议(Google开发的基于TCP协议的应用层协议)</p>
+<p>核心思想是尽量减少TCP连接数。</p>
+<p>目标是优化HTTP协议的性能，通过<strong>压缩、多路复用和优先级</strong>等技术，缩短网页的加载时间并提高安全性。</p>
+<p>在不改动HTTP语义、方法、状态码、URI及首部字段的情况下，大幅度提高了 Web 性能。</p>
+</blockquote>
+<ul>
+<li>改用<strong>二进制传输</strong>，HTTP1.x 使用文本传输。<ul>
+<li>在应用层与传输层之间增加一个<strong>二进制分帧层</strong>，在二进制分帧层上，HTTP2.0 会将所有传输的信息分为更小的消息和帧，并采用二进制格式编码。</li>
+<li>其中 HTTP1.x 的首部信息会被封装到 <strong>Headers帧</strong>，而Request Body则封装到 <strong>Data帧</strong>。</li>
+</ul>
+</li>
+<li><strong>头部(Header)压缩</strong>：<ul>
+<li>使用 HPACK (头部压缩算法)压缩格式对传输的 header 进行编码，减小了 header 的体积。</li>
+<li>在两端维护了索引表(Map)，用于记录出现过的header，后面在传输过程中就可以传输已经记录过的 header 的键名，对端收到数据后就可以通过键名找到对应的值。</li>
+</ul>
+</li>
+<li><strong>多路复用</strong>：使用多个流(stream)，每个流分帧传输，使得一个 TCP 连接能够处理多个 HTTP 请求，避免 HTTP1.x版本的队头阻塞问题。</li>
+<li><strong>服务器端推送</strong>Push：服务端可以在客户端某个请求后，主动推送其他资源。</li>
+<li>更安全：使用了 TLS 的 拓展ALPN 作为协议升级，除此之外，HTTP2.0 对 TLS 的安全性做了近一步加强，通过黑名单机制禁用了几百种不再安全的加密算法。</li>
+</ul>
+<p><strong>HTTP3.0</strong></p>
+<ul>
+<li>基于 Google 的 QUIC 协议，利用UDP实现可靠数据传输。</li>
+<li>减少了 TCP 三次握手时间，减少了 TLS 握手时间。</li>
+<li>解决了 HTTP 2.0 中前一个 stream 丢包导致后一个 stream 被阻塞的问题。</li>
+<li>优化了重传策略，重传包和原包的编号不同，降低后续重传计算的消耗。</li>
+<li>连接迁移，不再用 TCP 四元组确定一个连接，而是用一个 64 位随机数来确定这个连接。</li>
+<li>更合适的流量控制。</li>
+</ul>
+<h3 id="HTTP-与-FTP"><a href="#HTTP-与-FTP" class="headerlink" title="HTTP 与 FTP"></a>HTTP 与 FTP</h3><blockquote>
+<p>关于文件上传：</p>
+<ul>
+<li><a href="https://blog.csdn.net/liang19890820/article/details/53215087" target="_blank" rel="noopener">断点续传</a></li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>HTTP</th>
+<th>FTP</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>侧重点</td>
+<td>用来浏览网站、更多的是为终端用户提供文件传输，比如电影、图片、音乐。</td>
+<td>用来访问和传输文件，FTP 文件传输常见于批量上传和维护网站。</td>
+</tr>
+<tr>
+<td>客户端</td>
+<td>通常是浏览器</td>
+<td>命令行或特定的图形界面</td>
+</tr>
+<tr>
+<td>头部</td>
+<td>包含 meta-data，比如最后修改日期、编码方式、服务器名称等。</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>数据格式</td>
+<td>只支持二进制格式文件</td>
+<td>支持ASCII与二进制</td>
+</tr>
+<tr>
+<td>流水线</td>
+<td>支持流水线，这就意味着客户端可以在上一个请求处理完之前，发出下一个请求，其结果就是多次请求数据之前省掉了部分服务器客户端往返时延。</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>动态端口</td>
+<td>在双向传输中使用动态端口</td>
+<td>使用两个连接，第一个连接用来发送控制指令，当接收或者发送数据的时候，又打开第二个TCP连接。</td>
+</tr>
+<tr>
+<td>持久连接(长连接)</td>
+<td>可以维护一个单个的连接并使用它进行任意数量的数据传输。</td>
+<td>每次有数据的需要时都创建一个新的连接。</td>
+</tr>
+<tr>
+<td>压缩算法</td>
+<td>提供了在一些压缩算法中客户端和服务器共同协商选择的办法，比如 gzip。</td>
+<td>不存在这种算法</td>
+</tr>
+<tr>
+<td>对代理的支持</td>
+<td>支持代理，这种功能是构建在协议里。</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>面向的对象</td>
+<td>没有这个概念</td>
+<td>面向文件，ftp 可以通过命令列出远程服务器的目录列表。</td>
+</tr>
+<tr>
+<td>文件大小</td>
+<td>比较适合上传小文件</td>
+<td>比较适合上传大文件，不需要将文件全部载入内存中。</td>
+</tr>
+</tbody></table>
+<p><strong>什么使 FTP 服务更快</strong></p>
+<ul>
+<li>发送数据中没有<code>meta-data</code>，仅传输原始的二进制文件。</li>
+<li>没有过度的分块编码。</li>
+</ul>
+<p><strong>什么使HTTP服务更快？</strong></p>
+<ul>
+<li>重用已存在的持久连接，从而有更好的TCP表现。</li>
+<li>流水线的支持使得从同一个服务器上请求多个文件更快。</li>
+<li>自动的压缩机制使得传输的数据更少。</li>
+<li>没有命令/应答机制最大限度的减少了往返时延。</li>
+</ul>
+<h3 id="HTTPS的工作流程"><a href="#HTTPS的工作流程" class="headerlink" title="HTTPS的工作流程"></a>HTTPS的工作流程</h3><h4 id="如何验证公钥证书"><a href="#如何验证公钥证书" class="headerlink" title="如何验证公钥证书"></a>如何验证公钥证书</h4><p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0r9c0msvj30k60g0480.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0r9c0msvj30k60g0480.jpg" srcset="data:image/png;base64,666" alt="证明公开密钥正确性的证书"></p>
+<h4 id="简易版的HTTPS工作流程"><a href="#简易版的HTTPS工作流程" class="headerlink" title="简易版的HTTPS工作流程"></a>简易版的HTTPS工作流程</h4><p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0rcx6t6hj30hw0fldjy.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0rcx6t6hj30hw0fldjy.jpg" srcset="data:image/png;base64,666" alt="简易版的HTTPS工作流程"></p>
+<ol>
+<li><p><strong>客户端发起HTTPS请求</strong>，连接到 Server 的 443 端口。</p>
+</li>
+<li><p><strong>服务器检测并选择客户端能支持的加密方式</strong></p>
+</li>
+<li><p><strong>传送证书</strong></p>
+<p>服务器将自己的数字证书的部分信息返回给客户端，其中包括公钥，以及支持的SSL 版本等信息。</p>
+</li>
+<li><p><strong>客户端解析证书</strong></p>
+<p>客户端首先会验证公钥是否有效，如果发现异常，则弹出警告。否则那么就生成一个随机值（Premaster Secret），然后用公钥对该随机值进行加密。</p>
+</li>
+<li><p><strong>传送加密信息</strong></p>
+<p>传送的是用证书加密后的随机值，目的就是让服务端得到这个随机值，以后客户端和服务端的通信就可以通过这个随机值来进行加密解密了。</p>
+</li>
+<li><p><strong>服务端解密信息</strong></p>
+<p>服务端用与公钥配对的私钥解密后，得到客户端传过来的随机值。从客户端生成随机值到服务器解密获取随机值这个过程称为<strong>非对称加密</strong>。</p>
+</li>
+<li><p><strong>传输加密后的信息</strong></p>
+<p>服务器用刚刚解密得到的随机值加密需要传输的内容，并将加密后的信息发送给客户端。</p>
+</li>
+<li><p><strong>客户端解密信息</strong></p>
+<p>客户端用之前生成的随机值解密服务器传过来的信息，获取实际传输的内容。这个过程称为<strong>对称加密</strong>。</p>
+</li>
+</ol>
+<h4 id="SSL-协商过程"><a href="#SSL-协商过程" class="headerlink" title="SSL 协商过程"></a>SSL 协商过程</h4><blockquote>
+<p>继续借用《图解HTTP》中的图文。</p>
+<p>HTTP连接需要交换3个包，而HTTPS连接需要交换 3(TCP) + 9 个包(SSL/TLS连接)。</p>
+<p>这里说的加密过程是指 SSL 的加密，至于 TLS 的加密…</p>
+</blockquote>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0rrhm2boj30k30og13g.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0rrhm2boj30k30og13g.jpg" srcset="data:image/png;base64,666" alt="HTTPS通信"></p>
+<ol>
+<li><strong>客户端</strong>发送 Client Hello 报文开始 SSL 通信。报文中包含客户端支持的 SSL 的指定版本、加密组件列表(所使用的加密算法及密钥长度等)。</li>
+<li><strong>服务器</strong>确定可进行 SSL 通信时，以 Server Hello 报文作为应答。报文中包含 SSL 版本以及加密组件(Cipher Suite)。服务器的加密组件内容是<strong>从接收到的客户端加密组件内筛选出来的。</strong></li>
+<li><strong>服务器</strong>继续发送 Certificate 报文。报文中包含公钥证书。</li>
+<li><strong>服务器</strong>继续发送 ServerHelloDone 报文。通知客户端第一阶段的 SSL 握手协商部分结束。</li>
+<li><strong>客户端</strong>发送 Client Key Exchange 报文作为回应。报文中包含通信加密中一种被称为 <code>Pre-master secret</code>的随机密码串。这个报文已用第 3 步中的公钥进行加密。</li>
+<li><strong>客户端</strong>继续发送 Change Cipher Spec 报文。该报文会提示服务器，在此报文之后的通信都将会采用 <code>Premaster secret</code>秘钥加密。</li>
+<li><strong>客户端</strong>发送 Finished 报文。该报文包含连接至今，全部报文的整体校验值。此次握手协商能否成功，取决于服务器能否正确解密该报文。</li>
+<li><strong>服务器</strong>同样发送 Change Cipher Spec 报文。</li>
+<li><strong>服务器</strong>继续发送 Finished 报文。</li>
+<li>服务器与客户端交换完 Finished 报文之后，SSL 连接建立成功，通信将会受到 SSL 的保护。从此处开始进行<strong>应用层协议</strong>的通信，即发送 HTTP 请求。</li>
+<li><strong>应用层协议</strong>通信，即发送 HTTP 响应。</li>
+<li>由<strong>客户端</strong>断开连接。发送 close_notify 报文，之后发送 TCP FIN 报文来关闭与 TCP 的通信。</li>
+</ol>
+<p>下面是对整个流程的图解。图中说明了从仅使用服务器端的公开密钥证书(服务器证书)建立 HTTPS 通信的整个过程。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0sk6p3nuj30jh0cb11y.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/007S8ZIlly1gi0sk6p3nuj30jh0cb11y.jpg" srcset="data:image/png;base64,666" alt="HTTPS 通信的整个过程"></p>
+<h3 id="SSL-与-TLS"><a href="#SSL-与-TLS" class="headerlink" title="SSL 与 TLS"></a>SSL 与 TLS</h3><ul>
+<li><a href="https://baike.baidu.com/item/安全套接层" target="_blank" rel="noopener">SSL(Secure Sockets Layer安全套接层)</a></li>
+<li><a href="https://zh.wikipedia.org/wiki/%E5%82%B3%E8%BC%B8%E5%B1%A4%E5%AE%89%E5%85%A8%E6%80%A7%E5%8D%94%E5%AE%9A" target="_blank" rel="noopener">TLS (<strong>T</strong>ransport <strong>L</strong>ayer <strong>S</strong>ecurity 传输层安全性协议)</a></li>
+</ul>
+<p>TLS 与  SSL 的差异</p>
+<ul>
+<li><p>版本号：TLS 记录格式与 SSL 记录格式相同，但版本号的值不同，TLS1.0 使用的版本号为 SSLv3.1。</p>
+</li>
+<li><p>报文鉴别码：SSLv3.0 和 TLS 的 MAC 算法及 MAC 计算的范围不同。TLS 使用 HMAC 算法。SSLv3.0使用了相似的算法，两者差别在于 SSLv3.0 中，填充字节与密钥之间采用的是<strong>连接运算</strong>，而 HMAC 算法采用的是<strong>异或运算</strong>。</p>
+</li>
+<li><p>伪随机函数：TLS 使用了称为 PRF 的伪随机函数来将密钥扩展成数据块。</p>
+</li>
+<li><p>报警代码：TLS 在支持几乎所有的SSLv3.0报警代码的基础上，补充定义了很多报警代码，如解密失败（decryption_failed）、记录溢出（record_overflow）、未知CA（unknown_ca）、拒绝访问（access_denied）等。</p>
+</li>
+<li><p>密文族和客户证书：SSLv3.0 和 TLS 存在少量差别，TLS 不支持 Fortezza 密钥交换、加密算法和客户证书。</p>
+</li>
+<li><p>certificate_verify 和 finished 消息：SSLv3.0 和 TLS 在用 certificate_verify 和 finished 消息计算 MD5 和 SHA-1 散列码时，计算的输入有少许差别，但安全性相当。</p>
+</li>
+<li><p>加密计算：TLS 与 SSLv3.0 在计算<strong>主密值(master secret)</strong>时采用的方式不同。</p>
+</li>
+<li><p>填充：用户数据加密之前需要增加的填充字节。</p>
+<ul>
+<li>在 SSL 中，填充后的数据长度要达到密文块长度的最小整数倍。</li>
+<li>在 TLS 中，填充后的数据长度可以是密文块长度的任意整数倍（但填充的最大长度为255字节），这种方式可以防止基于对报文长度进行分析的攻击。</li>
+</ul>
+</li>
+</ul>
+<h3 id="HTTP与HTTPS的区别"><a href="#HTTP与HTTPS的区别" class="headerlink" title="HTTP与HTTPS的区别"></a>HTTP与HTTPS的区别</h3><table>
+<thead>
+<tr>
+<th align="center">方面</th>
+<th align="center">HTTP</th>
+<th align="center">HTTPS</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">开发目的</td>
+<td align="center">发布和接收 HTML 页面<br />浏览器和网站服务器之间传递信息</td>
+<td align="center">提供对网站服务器的身份认证<br />保护交换数据的隐私与完整性。</td>
+</tr>
+<tr>
+<td align="center">连接端口</td>
+<td align="center">80</td>
+<td align="center">443</td>
+</tr>
+<tr>
+<td align="center">安全协议</td>
+<td align="center">无</td>
+<td align="center">SSL/TLS</td>
+</tr>
+<tr>
+<td align="center">加密方式</td>
+<td align="center">无</td>
+<td align="center">对称加密、非对称加密、哈希算法、数字签名</td>
+</tr>
+<tr>
+<td align="center">安全性</td>
+<td align="center">明文传输、相对较低</td>
+<td align="center">加密传输、相对较高</td>
+</tr>
+<tr>
+<td align="center">建立连接</td>
+<td align="center">TCP三次握手交换3个包</td>
+<td align="center">TCP3个包+SSL9个包</td>
+</tr>
+<tr>
+<td align="center">响应速度</td>
+<td align="center">相对较快</td>
+<td align="center">相对较慢(比HTTP慢2到100倍)</td>
+</tr>
+<tr>
+<td align="center">所需费用</td>
+<td align="center">免费</td>
+<td align="center">可能需要购买证书</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="Cookie-与-Session"><a href="#Cookie-与-Session" class="headerlink" title="Cookie 与 Session"></a>Cookie 与 Session</h3><p>由于 HTTP 协议是无状态的协议，每一个 HTTP 请求都是互相独立的，服务器分辨不出两次请求是否来自同一个浏览器或同一位用户。</p>
+<p>所以服务端需要记录用户的状态时，就需要用某种机制来识具体的用户，这个机制就是 Session。</p>
+<p><strong>Cookie 简介</strong></p>
+<ul>
+<li>浏览器第一次连接服务器时 Cookie 是不存在的</li>
+<li>服务器响应客户端时，会在 Header 中设置 Set-Cookie，服务器收到 Cookie 后存在本地。每一个 Cookie 都是 name-value 对。</li>
+<li>此后浏览器再连接服务器，都会包含上 Cookie，服务器可以用它来关联特定的请求。</li>
+</ul>
+<p><strong>Cookie里有什么？</strong></p>
+<ul>
+<li>Name and data.<ul>
+<li>数据大小通常被浏览器所限定，一般小于 4KB。</li>
+<li>一个服务器可以通过不同的 Name 定义多个 Cookie，但是浏览器限制了每一个服务器可以拥有的 Cookie 数量(50个左右)。</li>
+</ul>
+</li>
+<li>当前 Cookie 的 Domain(作用域)信息：Server、port(可选)、URL 前缀(可选)。Cookie 只会被包含在匹配的作用域的请求之中。</li>
+<li>过期时间：浏览器可以删除老旧的 Cookies。</li>
+</ul>
+<p><strong>工作流程</strong></p>
+<ul>
+<li><p>由服务器发给客户端的特殊信息，以文本的形式存放在客户端</p>
+</li>
+<li><p>客户端再次请求的时候，会把 <code>Cookie</code> 回发</p>
+</li>
+<li><p>服务器收到后，会解析 <code>Cookie</code> 生成与客户端相对应的内容</p>
+</li>
+</ul>
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gda16yd3y9j30qi0d6gnh.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/00831rSTly1gda16yd3y9j30qi0d6gnh.jpg" srcset="data:image/png;base64,666" alt="Cookie的设置与工作过程"></p>
+<p><strong>Session简介</strong></p>
+<ul>
+<li>Cookie 是服务器用来实现 Session 的一种方式</li>
+<li>Cookie 中包含了 Session 的表示，通常被称为 SessionID。</li>
+<li>Session 的管理<ul>
+<li>可以储存在内存里</li>
+<li>或者储存在磁盘中的文件中</li>
+<li>或者存在数据库中</li>
+</ul>
+</li>
+</ul>
+<p><strong>简单工作流程</strong></p>
+<ul>
+<li>保存在服务器上的信息</li>
+<li>解析客户端请求并操作 <code>SessionId</code> ，按需保存状态信息。</li>
+<li>实现方式<ul>
+<li>使用 <code>Cookie</code> 来实现</li>
+<li>当客户端禁用 <code>Cookie</code> 时，可以使用 <code>URL</code> 回写来实现</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gda1a9ou70j30sq0bcjwe.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/00831rSTly1gda1a9ou70j30sq0bcjwe.jpg" srcset="data:image/png;base64,666" alt="Session的工作方式"></p>
+<p> <code>Cookie</code> 和 <code>Session</code> 的区别</p>
+<table>
+<thead>
+<tr>
+<th>对比角度</th>
+<th>Cookie</th>
+<th>Session</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>存放位置</td>
+<td>位于客户端的一段文本、包含用户信息，是 Session 的一种实现方式。</td>
+<td>位于服务器的文件，包含用户信息。在 Tomcat 中使用 StandardSession 实现，使用到的数据结构是 ConcurrentHashMap。</td>
+</tr>
+<tr>
+<td>生存时间</td>
+<td>可以手动设定</td>
+<td>当关闭浏览器时就消失</td>
+</tr>
+<tr>
+<td>容量大小</td>
+<td>一般最大为 4KB</td>
+<td>理论上可以存储随意多的信息，唯一的限制是一个脚本一次最大能占用的内存，默认是128MB</td>
+</tr>
+<tr>
+<td>依赖性</td>
+<td>Cookie 不依赖于 Session，Cookie 是 Session 的一种实现方式。</td>
+<td>Session 依赖于 Cookie，当 Cookie 禁用时，可以通过 URL 回写来实现。</td>
+</tr>
+<tr>
+<td>安全性</td>
+<td>相对较低</td>
+<td>相对较高</td>
+</tr>
+</tbody></table>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>《计算机网络》第七版，谢希仁。</li>
+<li>《图解HTTP》上野 宣、于均良 译。</li>
+<li><a href="https://juejin.im/post/6844903575684907016" target="_blank" rel="noopener">掘金 - Cookie 和 Session 关系和区别</a></li>
+<li><a href="https://www.jianshu.com/p/25802021be63" target="_blank" rel="noopener">简书 - 看完就彻底懂了session和cookie</a></li>
+<li><a href="https://web.stanford.edu/~ouster/cgi-bin/cs142-fall10/index.php" target="_blank" rel="noopener">Stanford University - CS 142: Web Applications (Fall 2010)</a></li>
+</ul>
+
+  
+  
+    
+    <div class='footer'>
+      
+      
+      
+        <div class='copyright'>
+          <blockquote>
+            
+              
+                <p>博客内容遵循 署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0) 协议</p>
+
+              
+            
+              
+                <p>本文永久链接是：<a href=http://raymond-zhao.top/2020/08/25/2020-08-25-Network-HTTPSAndHTTP/>http://raymond-zhao.top/2020/08/25/2020-08-25-Network-HTTPSAndHTTP/</a></p>
+              
+            
+          </blockquote>
+        </div>
+      
+      
+    </div>
+  
+  
+    
+
+
+  <div class='article-meta' id="bottom">
+    <div class='new-meta-box'>
+      
+        
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-06-20T13:59:48+08:00">
+  <a class='notlink'>
+    <i class="fas fa-edit fa-fw" aria-hidden="true"></i>
+    <p>更新于：Jun 20, 2021</p>
+  </a>
+</div>
+
+        
+      
+        
+          
+  
+  <div class="new-meta-item meta-tags"><a class="tag" href="/tags/HTTP/" rel="nofollow"><i class="fas fa-hashtag fa-fw" aria-hidden="true"></i><p>HTTP</p></a></div> <div class="new-meta-item meta-tags"><a class="tag" href="/tags/HTTPS/" rel="nofollow"><i class="fas fa-hashtag fa-fw" aria-hidden="true"></i><p>HTTPS</p></a></div>
+
+
+        
+      
+        
+          
+  <div class="new-meta-item share -mob-share-list">
+  <div class="-mob-share-list share-body">
+    
+      
+        <a class="-mob-share-qq" title="" rel="external nofollow noopener noreferrer"
+          
+          href="http://connect.qq.com/widget/shareqq/index.html?url=http://raymond-zhao.top/2020/08/25/2020-08-25-Network-HTTPSAndHTTP/&title=HTTP 与 HTTPS - 吹梦到西洲&summary="
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qq.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qq.png" srcset="data:image/png;base64,666">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-qzone" title="" rel="external nofollow noopener noreferrer"
+          
+          href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=http://raymond-zhao.top/2020/08/25/2020-08-25-Network-HTTPSAndHTTP/&title=HTTP 与 HTTPS - 吹梦到西洲&summary="
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qzone.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qzone.png" srcset="data:image/png;base64,666">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-weibo" title="" rel="external nofollow noopener noreferrer"
+          
+          href="http://service.weibo.com/share/share.php?url=http://raymond-zhao.top/2020/08/25/2020-08-25-Network-HTTPSAndHTTP/&title=HTTP 与 HTTPS - 吹梦到西洲&summary="
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/weibo.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/weibo.png" srcset="data:image/png;base64,666">
+          
+        </a>
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+
+
+        
+      
+    </div>
+  </div>
+
+
+  
+  
+
+  
+    <div class="prev-next">
+      
+        <a class='prev' href='/2020/08/26/2020-08-26-Network-WhyTCPReliable/'>
+          <p class='title'><i class="fas fa-chevron-left" aria-hidden="true"></i>TCP传输为什么是可靠的？</p>
+          <p class='content'>TCP可靠传输的工作原理TCP 发送的报文段是交给 IP层 传送的。但 IP层 只能提供尽最大努力交付，也就是说，TCP 下面的网络所提供的是不可靠的传输。因此，TCP必须采用适当的措施才能使得...</p>
+        </a>
+      
+      
+        <a class='next' href='/2020/08/20/2020-08-19-volatile/'>
+          <p class='title'>volatile底层实现原理<i class="fas fa-chevron-right" aria-hidden="true"></i></p>
+          <p class='content'>volatile底层实现原理《Java并发编程的艺术》这本书的每一节基本上都是面试中的高频考点或者是重难点，实体书在书桌上摆了许久竟然都忽视掉了，现在必须要把这本书整理成电子版的。
+
+volat...</p>
+        </a>
+      
+    </div>
+  
+</article>
+
+
+  
+
+  <article class="post white-box reveal shadow" id="comments">
+    <p ct><i class='fas fa-comments'></i> 评论</p>
+    
+    <div id="valine_container" class="valine_thread">
+  <i class="fas fa-cog fa-spin fa-fw fa-2x"></i>
+</div>
+
+  </article>
+
+
+
+
+
+  <script>
+  // https://github.com/theme-next/hexo-theme-next/blob/master/layout/_third-party/math/mathjax.swig
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3.0/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    // 文章章节标题不能为 “MathJax” ，否则会报错。
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+
+
+</div>
+<aside class='l_side'>
+  
+  
+    
+    
+
+
+
+  <section class="widget toc-wrapper shadow desktop mobile" id="toc-div" >
+    
+  <header>
+    
+      <i class="fas fa-list fa-fw" aria-hidden="true"></i><span class='name'>本文目录</span>
+    
+  </header>
+
+
+    <div class='content'>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#分层体系"><span class="toc-text">分层体系</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#请求方法"><span class="toc-text">请求方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#GET-与-POST的区别"><span class="toc-text">GET 与 POST的区别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#状态码"><span class="toc-text">状态码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HTTP的缺点"><span class="toc-text">HTTP的缺点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HTTP各版本区别"><span class="toc-text">HTTP各版本区别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HTTP-与-FTP"><span class="toc-text">HTTP 与 FTP</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HTTPS的工作流程"><span class="toc-text">HTTPS的工作流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#如何验证公钥证书"><span class="toc-text">如何验证公钥证书</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#简易版的HTTPS工作流程"><span class="toc-text">简易版的HTTPS工作流程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#SSL-协商过程"><span class="toc-text">SSL 协商过程</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SSL-与-TLS"><span class="toc-text">SSL 与 TLS</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HTTP与HTTPS的区别"><span class="toc-text">HTTP与HTTPS的区别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Cookie-与-Session"><span class="toc-text">Cookie 与 Session</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考"><span class="toc-text">参考</span></a></li></ol>
+    </div>
+  </section>
+
+
+  
+
+
+</aside>
+
+
+
+        
+        
+          <!--此文件用来存放一些不方便取值的变量-->
+<!--思路大概是将值藏到重加载的区域内-->
+
+<script>
+  window.pdata={}
+  pdata.ispage=true;
+  pdata.postTitle="HTTP 与 HTTPS";
+  pdata.commentPath="";
+  pdata.commentPlaceholder="";
+
+  var l_header=document.getElementById("l_header");
+  
+  l_header.classList.add("show");
+  
+</script>
+
+        
+      </div>
+      
+  
+  <footer class="footer clearfix">
+    <br><br>
+    
+      
+        <div class="aplayer-container">
+          
+
+
+        </div>
+      
+    
+      
+        <br>
+        <div class="social-wrapper">
+          
+            
+          
+            
+          
+            
+          
+        </div>
+      
+    
+      
+        <div><p>博客內容遵循 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW" target="_blank" rel="noopener">姓名標示-非商業性-相同方式分享 4.0 國際 (CC BY-NC-SA 4.0) 協議</a></p>
+</div>
+      
+    
+      
+        
+          <div><p><span id="lc-sv">本站总访问量为 <span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span> 次</span> <span id="lc-uv">访客数为 <span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span> 人</span></p>
+</div>
+        
+      
+    
+      
+        本站使用
+        <a href="https://github.com/volantis-x/hexo-theme-volantis/tree/4.0.0" target="_blank" class="codename">Volantis</a>
+        作為主題
+      
+    
+      
+        <div class='copyright'>
+        <p><a href="/">Copyright © 2017-2020 XXX</a></p>
+
+        </div>
+      
+    
+  </footer>
+
+
+      <a id="s-top" class="fas fa-arrow-up fa-fw" href='javascript:void(0)'></a>
+    </div>
+  </div>
+  <div>
+    <script>
+window.volantis={};
+window.volantis.loadcss=document.getElementById("loadcss");
+/********************脚本懒加载函数********************************/
+function loadScript(src, cb) {
+var HEAD = document.getElementsByTagName('head')[0] || document.documentElement;
+var script = document.createElement('script');
+script.setAttribute('type','text/javascript');
+if (cb) script.onload = cb;
+script.setAttribute('src', src);
+HEAD.appendChild(script);
+}
+//https://github.com/filamentgroup/loadCSS
+var loadCSS = function( href, before, media, attributes ){
+	var doc = window.document;
+	var ss = doc.createElement( "link" );
+	var ref;
+	if( before ){
+		ref = before;
+	}
+	else {
+		var refs = ( doc.body || doc.getElementsByTagName( "head" )[ 0 ] ).childNodes;
+		ref = refs[ refs.length - 1];
+	}
+	var sheets = doc.styleSheets;
+	if( attributes ){
+		for( var attributeName in attributes ){
+			if( attributes.hasOwnProperty( attributeName ) ){
+				ss.setAttribute( attributeName, attributes[attributeName] );
+			}
+		}
+	}
+	ss.rel = "stylesheet";
+	ss.href = href;
+	ss.media = "only x";
+	function ready( cb ){
+		if( doc.body ){
+			return cb();
+		}
+		setTimeout(function(){
+			ready( cb );
+		});
+	}
+	ready( function(){
+		ref.parentNode.insertBefore( ss, ( before ? ref : ref.nextSibling ) );
+	});
+	var onloadcssdefined = function( cb ){
+		var resolvedHref = ss.href;
+		var i = sheets.length;
+		while( i-- ){
+			if( sheets[ i ].href === resolvedHref ){
+				return cb();
+			}
+		}
+		setTimeout(function() {
+			onloadcssdefined( cb );
+		});
+	};
+	function loadCB(){
+		if( ss.addEventListener ){
+			ss.removeEventListener( "load", loadCB );
+		}
+		ss.media = media || "all";
+	}
+	if( ss.addEventListener ){
+		ss.addEventListener( "load", loadCB);
+	}
+	ss.onloadcssdefined = onloadcssdefined;
+	onloadcssdefined( loadCB );
+	return ss;
+};
+</script>
+<script>
+  
+  loadCSS("https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14/css/all.min.css", window.volantis.loadcss);
+  
+  
+  
+  
+</script>
+<!-- required -->
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5/dist/jquery.min.js"></script>
+
+<script>
+  function pjax_fancybox() {
+    $(".md .gallery").find("img").each(function () { //渲染 fancybox
+      var element = document.createElement("a"); // a 标签
+      $(element).attr("class", "fancybox");
+      $(element).attr("pjax-fancybox", "");  // 过滤 pjax
+      $(element).attr("href", $(this).attr("src"));
+      if ($(this).attr("data-original")) {
+        $(element).attr("href", $(this).attr("data-original"));
+      }
+      $(element).attr("data-fancybox", "images");
+      var caption = "";   // 描述信息
+      if ($(this).attr('alt')) {  // 判断当前页面是否存在描述信息
+        $(element).attr('data-caption', $(this).attr('alt'));
+        caption = $(this).attr('alt');
+      }
+      var div = document.createElement("div");
+      $(div).addClass("fancybox");
+      $(this).wrap(div); // 最外层套 div ，其实主要作用还是 class 样式
+      var span = document.createElement("span");
+      $(span).addClass("image-caption");
+      $(span).text(caption); // 加描述
+      $(this).after(span);  // 再套一层描述
+      $(this).wrap(element);  // 最后套 a 标签
+    })
+    $(".md .gallery").find("img").fancybox({
+      selector: '[data-fancybox="images"]',
+      hash: false,
+      loop: false,
+      closeClick: true,
+      helpers: {
+        overlay: {closeClick: true}
+      },
+      buttons: [
+        "zoom",
+        "close"
+      ]
+    });
+  };
+  function SCload_fancybox() {
+    if ($(".md .gallery").find("img").length == 0) return;
+    loadCSS("https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css", document.getElementById("loadcss"));
+    setTimeout(function() {
+      loadScript('https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js', pjax_fancybox)
+    }, 1);
+  };
+  $(function () {
+    SCload_fancybox();
+  });
+</script>
+
+
+<!-- internal -->
+
+
+
+
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+
+
+  
+  
+    <script>
+      window.FPConfig = {
+        delay: 0,
+        ignoreKeywords: [],
+        maxRPS: 5,
+        hoverDelay: 25
+      };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/gh/gijo-varghese/flying-pages@2.1.2/flying-pages.min.js"></script>
+  
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+    var clipboard = new ClipboardJS('.btn-copy', {
+        target: function (trigger) {
+            return trigger.nextElementSibling
+        }
+    });
+    function wait(callback, seconds) {
+        var timelag = null;
+        timelag = window.setTimeout(callback, seconds)
+    }
+    function pjax_initCopyCode() {
+		if($(".highlight .code pre").length+$(".article pre code").length==0)return;
+        var copyHtml = '';
+        copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+        copyHtml += '<i class="fas fa-copy"></i><span>COPY</span>';
+        copyHtml += '</button>';
+        $(".highlight .code pre").before(copyHtml);
+        $(".article pre code").before(copyHtml);
+        clipboard.off('success').on('success', function (e) {
+            let $btn = $(e.trigger);
+            $btn.addClass('copied');
+            let $icon = $($btn.find('i'));
+            $icon.removeClass('fa-copy');
+            $icon.addClass('fa-check-circle');
+            let $span = $($btn.find('span'));
+            $span[0].innerText = 'COPIED';
+            wait(function () {
+                $icon.removeClass('fa-check-circle');
+                $icon.addClass('fa-copy');
+                $span[0].innerText = 'COPY'
+            }, 2000)
+        });
+        clipboard.off('error').on('error', function (e) {
+            e.clearSelection();
+            let $btn = $(e.trigger);
+            $btn.addClass('copy-failed');
+            let $icon = $($btn.find('i'));
+            $icon.removeClass('fa-copy');
+            $icon.addClass('fa-times-circle');
+            let $span = $($btn.find('span'));
+            $span[0].innerText = 'COPY FAILED';
+            wait(function () {
+                $icon.removeClass('fa-times-circle');
+                $icon.addClass('fa-copy');
+                $span[0].innerText = 'COPY'
+            }, 2000)
+        })
+    }
+    $(function () {
+        pjax_initCopyCode()
+    });
+</script>
+
+
+
+
+
+
+
+
+  
+  
+<script src="/js/valine.js"></script>
+
+
+<script>
+  var GUEST_INFO = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link'.split(',').filter(function (item) {
+    return GUEST_INFO.indexOf(item) > -1
+  });
+  var REQUIRED_FIELDS = ['nick', 'mail', 'link'];
+  var requiredFields = ''.split(',').filter(function (item) {
+    return REQUIRED_FIELDS.indexOf(item) > -1
+  });
+
+  function emoji(path, idx, ext) {
+    return path + "/" + path + "-" + idx + "." + ext;
+  }
+
+  var emojiMaps = {};
+  for (var i = 1; i <= 54; i++) {
+    emojiMaps['tieba-' + i] = emoji('tieba', i, 'png');
+  }
+  for (var i = 1; i <= 101; i++) {
+    emojiMaps['qq-' + i] = emoji('qq', i, 'gif');
+  }
+  for (var i = 1; i <= 116; i++) {
+    emojiMaps['aru-' + i] = emoji('aru', i, 'gif');
+  }
+  for (var i = 1; i <= 125; i++) {
+    emojiMaps['twemoji-' + i] = emoji('twemoji', i, 'png');
+  }
+  for (var i = 1; i <= 4; i++) {
+    emojiMaps['weibo-' + i] = emoji('weibo', i, 'png');
+  }
+
+  function pjax_valine() {
+    if(!document.querySelectorAll("#valine_container")[0])return;
+
+    let pagePlaceholder = pdata.commentPlaceholder || "快来评论吧~";
+
+    let path = pdata.commentPath;
+    if (path.length == 0) {
+      let defaultPath = '';
+      path = defaultPath || decodeURI(window.location.pathname);
+    }
+
+    var valine = new Valine();
+    valine.init({
+      el: '#valine_container',
+      meta: meta,
+      placeholder: pagePlaceholder,
+      path: path,
+      appId: "v6cb35sRa1lfGq6EOtTQHHyf-gzGzoHsz",
+      appKey: "2ulfq63r4brxg2l9QfXp0cTM",
+      pageSize: '10',
+      avatar: 'robohash',
+      lang: 'zh-cn',
+      visitor: 'true',
+      highlight: 'true',
+      mathJax: 'true',
+      enableQQ: 'true',
+      recordIP: 'true',
+      requiredFields: requiredFields,
+      emojiCDN: 'https://cdn.jsdelivr.net/gh/volantis-x/cdn-emoji/valine/',
+      emojiMaps: emojiMaps
+    })
+  }
+
+  $(function () {
+    pjax_valine();
+  });
+</script>
+
+
+
+
+
+  
+<script src="/js/app.js"></script>
+
+
+
+<!-- optional -->
+
+  <script>
+const SearchServiceimagePath="https://cdn.jsdelivr.net/gh/volantis-x/cdn-volantis@master/img/";
+const ROOT =  ("/" || "/").endsWith('/') ? ("/" || "/") : ("//" || "/" );
+
+$('.input.u-search-input').one('focus',function(){
+	
+		loadScript('/js/search/hexo.js',setSearchService);
+	
+})
+
+function listenSearch(){
+  
+    customSearch = new HexoSearch({
+      imagePath: SearchServiceimagePath
+    });
+  
+}
+function setSearchService() {
+	listenSearch();
+	
+		document.addEventListener("pjax:success", listenSearch);
+	
+}
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  <script defer>
+
+  const LCCounter = {
+    app_id: 'v6cb35sRa1lfGq6EOtTQHHyf-gzGzoHsz',
+    app_key: '2ulfq63r4brxg2l9QfXp0cTM',
+    custom_api_server: '',
+
+    // 查询存储的记录
+    getRecord(Counter, url, title) {
+      return new Promise(function (resolve, reject) {
+        Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({url})))
+          .then(resp => resp.json())
+          .then(({results, code, error}) => {
+            if (code === 401) {
+              throw error;
+            }
+            if (results && results.length > 0) {
+              var record = results[0];
+              resolve(record);
+            } else {
+              Counter('post', '/classes/Counter', {url, title: title, times: 0})
+                .then(resp => resp.json())
+                .then((record, error) => {
+                  if (error) {
+                    throw error;
+                  }
+                  resolve(record);
+                }).catch(error => {
+                console.error('Failed to create', error);
+                reject(error);
+              });
+            }
+          }).catch((error) => {
+          console.error('LeanCloud Counter Error:', error);
+          reject(error);
+        });
+      })
+    },
+
+    // 发起自增请求
+    increment(Counter, incrArr) {
+      return new Promise(function (resolve, reject) {
+        Counter('post', '/batch', {
+          "requests": incrArr
+        }).then((res) => {
+          res = res.json();
+          if (res.error) {
+            throw res.error;
+          }
+          resolve(res);
+        }).catch((error) => {
+          console.error('Failed to save visitor count', error);
+          reject(error);
+        });
+      });
+    },
+
+    // 构建自增请求体
+    buildIncrement(objectId) {
+      return {
+        "method": "PUT",
+        "path": `/1.1/classes/Counter/${ objectId }`,
+        "body": {
+          "times": {
+            '__op': 'Increment',
+            'amount': 1
+          }
+        }
+      }
+    },
+
+    // 校验是否为有效的 UV
+    validUV() {
+      var key = 'LeanCloudUVTimestamp';
+      var flag = localStorage.getItem(key);
+      if (flag) {
+        // 距离标记小于 24 小时则不计为 UV
+        if (new Date().getTime() - parseInt(flag) <= 86400000) {
+          return false;
+        }
+      }
+      localStorage.setItem(key, new Date().getTime().toString());
+      return true;
+    },
+
+    addCount(Counter) {
+      var enableIncr = '' === 'true' && window.location.hostname !== 'localhost';
+      enableIncr = true;
+      var getterArr = [];
+      var incrArr = [];
+      // 请求 PV 并自增
+      var pvCtn = document.querySelector('#lc-sv');
+      if (pvCtn || enableIncr) {
+        var pvGetter = this.getRecord(Counter, 'http://raymond-zhao.top' + '/#lc-sv', 'Visits').then((record) => {
+          incrArr.push(this.buildIncrement(record.objectId))
+          var eles = document.querySelectorAll('#lc-sv #number');
+          if (eles.length > 0) {
+            eles.forEach((el,index,array)=>{
+              el.innerText = record.times + 1;
+              if (pvCtn) {
+                pvCtn.style.display = 'inline';
+              }
+            })
+          }
+        });
+        getterArr.push(pvGetter);
+      }
+
+      // 请求 UV 并自增
+      var uvCtn = document.querySelector('#lc-uv');
+      if (uvCtn || enableIncr) {
+        var uvGetter = this.getRecord(Counter, 'http://raymond-zhao.top' + '/#lc-uv', 'Visitors').then((record) => {
+          var vuv = this.validUV();
+          vuv && incrArr.push(this.buildIncrement(record.objectId))
+          var eles = document.querySelectorAll('#lc-uv #number');
+          if (eles.length > 0) {
+            eles.forEach((el,index,array)=>{
+              el.innerText = record.times + (vuv ? 1 : 0);
+              if (uvCtn) {
+                uvCtn.style.display = 'inline';
+              }
+            })
+          }
+        });
+        getterArr.push(uvGetter);
+      }
+
+      // 请求文章的浏览数，如果是当前页面就自增
+      var allPV = document.querySelectorAll('#lc-pv');
+      if (allPV.length > 0 || enableIncr) {
+        for (i = 0; i < allPV.length; i++) {
+          let pv = allPV[i];
+          let title = pv.getAttribute('data-title');
+          var url = 'http://raymond-zhao.top' + pv.getAttribute('data-path');
+          if (url) {
+            var viewGetter = this.getRecord(Counter, url, title).then((record) => {
+              // 是当前页面就自增
+              let curPath = window.location.pathname;
+              if (curPath.includes('index.html')) {
+                curPath = curPath.substring(0, curPath.lastIndexOf('index.html'));
+              }
+              if (pv.getAttribute('data-path') == curPath) {
+                incrArr.push(this.buildIncrement(record.objectId));
+              }
+              if (pv) {
+                var ele = pv.querySelector('#lc-pv #number');
+                if (ele) {
+                  if (pv.getAttribute('data-path') == curPath) {
+                    ele.innerText = (record.times || 0) + 1;
+                  } else {
+                    ele.innerText = record.times || 0;
+                  }
+                  pv.style.display = 'inline';
+                }
+              }
+            });
+            getterArr.push(viewGetter);
+          }
+        }
+      }
+
+      // 如果启动计数自增，批量发起自增请求
+      if (enableIncr) {
+        Promise.all(getterArr).then(() => {
+          incrArr.length > 0 && this.increment(Counter, incrArr);
+        })
+      }
+
+    },
+
+
+    fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${ api_server }/1.1${ url }`, {
+          method,
+          headers: {
+            'X-LC-Id': this.app_id,
+            'X-LC-Key': this.app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      this.addCount(Counter);
+    },
+
+    refreshCounter() {
+      var api_server = this.app_id.slice(-9) !== '-MdYXbMMI' ? this.custom_api_server : `https://${ this.app_id.slice(0, 8).toLowerCase() }.api.lncldglobal.com`;
+      if (api_server) {
+        this.fetchData(api_server);
+      } else {
+        fetch('https://app-router.leancloud.cn/2/route?appId=' + this.app_id)
+          .then(resp => resp.json())
+          .then(({api_server}) => {
+            this.fetchData('https://' + api_server);
+          });
+      }
+    }
+
+  };
+
+  LCCounter.refreshCounter();
+
+  document.addEventListener('pjax:complete', function () {
+    LCCounter.refreshCounter();
+  });
+</script>
+
+
+
+
+
+
+
+
+<script>
+function listennSidebarTOC() {
+  const navItems = document.querySelectorAll(".toc li");
+  if (!navItems.length) return;
+  const sections = [...navItems].map((element) => {
+    const link = element.querySelector(".toc-link");
+    const target = document.getElementById(
+      decodeURI(link.getAttribute("href")).replace("#", "")
+    );
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      window.scrollTo({
+		top: target.offsetTop + 100,
+		
+	  });
+    });
+    return target;
+  });
+
+  function activateNavByIndex(target) {
+    if (target.classList.contains("active-current")) return;
+
+    document.querySelectorAll(".toc .active").forEach((element) => {
+      element.classList.remove("active", "active-current");
+    });
+    target.classList.add("active", "active-current");
+    let parent = target.parentNode;
+    while (!parent.matches(".toc")) {
+      if (parent.matches("li")) parent.classList.add("active");
+      parent = parent.parentNode;
+    }
+  }
+
+  function findIndex(entries) {
+    let index = 0;
+    let entry = entries[index];
+    if (entry.boundingClientRect.top > 0) {
+      index = sections.indexOf(entry.target);
+      return index === 0 ? 0 : index - 1;
+    }
+    for (; index < entries.length; index++) {
+      if (entries[index].boundingClientRect.top <= 0) {
+        entry = entries[index];
+      } else {
+        return sections.indexOf(entry.target);
+      }
+    }
+    return sections.indexOf(entry.target);
+  }
+
+  function createIntersectionObserver(marginTop) {
+    marginTop = Math.floor(marginTop + 10000);
+    let intersectionObserver = new IntersectionObserver(
+      (entries, observe) => {
+        let scrollHeight = document.documentElement.scrollHeight + 100;
+        if (scrollHeight > marginTop) {
+          observe.disconnect();
+          createIntersectionObserver(scrollHeight);
+          return;
+        }
+        let index = findIndex(entries);
+        activateNavByIndex(navItems[index]);
+      },
+      {
+        rootMargin: marginTop + "px 0px -100% 0px",
+        threshold: 0,
+      }
+    );
+    sections.forEach((element) => {
+      element && intersectionObserver.observe(element);
+    });
+  }
+  createIntersectionObserver(document.documentElement.scrollHeight);
+}
+
+document.addEventListener("DOMContentLoaded", listennSidebarTOC);
+document.addEventListener("pjax:success", listennSidebarTOC);
+</script>
+
+<!-- more -->
+
+
+
+
+    
+      
+
+
+<script src="https://cdn.jsdelivr.net/npm/pjax@0.2.8/pjax.min.js"></script>
+
+
+<!-- 样式位于：source/css/_third-party/pjaxanimate.styl -->
+
+<div class="pjax-animate">
+  
+    <script src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script>
+    <div id="loading-bar-wrapper"><script>NProgress.configure({parent:"#loading-bar-wrapper",trickleSpeed: 100})</script></div>
+    <script>
+      window.ShowLoading = function() {
+        NProgress.start();
+      };
+      window.HideLoading = function() {
+        NProgress.done();
+      }
+    </script>
+  
+</div>
+
+
+<script>
+    var pjax;
+    document.addEventListener('DOMContentLoaded', function () {
+      pjax = new Pjax({
+        elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([pjax-fancybox])',
+        selectors: [
+          "title",
+          "#l_cover",
+          "#pjax-container",
+          "#pjax-header-nav-list"
+        ],
+        cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+        timeout: 5000
+      });
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+      //window.stop(); // 相当于点击了浏览器的停止按钮
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      window.subData = null; // 移除标题（用于一二级导航栏切换处）
+      if (typeof $.fancybox != "undefined") {
+        $.fancybox.close();    // 关闭弹窗
+      }
+      volantis.$switcher.removeClass('active'); // 关闭移动端激活的搜索框
+      volantis.$header.removeClass('z_search-open'); // 关闭移动端激活的搜索框
+      volantis.$wrapper.removeClass('sub'); // 跳转页面时关闭二级导航
+
+      // 解绑事件 避免重复监听
+      volantis.$topBtn.unbind('click');
+      $('.menu a').unbind('click');
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+	  
+      window.ShowLoading();
+	  
+    });
+
+    document.addEventListener('pjax:complete', function () {
+      // 关于百度统计对 SPA 页面的处理：
+      // 方案一：百度统计>管理>单页应用设置中，打开开启按钮即可对SPA进行统计。 https://tongji.baidu.com/web/help/article?id=324
+      // 方案二：取消注释下列代码。 https://tongji.baidu.com/web/help/article?id=235
+       
+
+      // 关于谷歌统计对 SPA 页面的处理：
+      // 当应用以动态方式加载内容并更新地址栏中的网址时，也应该更新通过 gtag.js 存储的网页网址。
+      // https://developers.google.cn/analytics/devguides/collection/gtagjs/single-page-applications?hl=zh-cn
+      
+	 
+
+      $('.nav-main').find('.list-v').not('.menu-phone').removeAttr("style",""); // 移除小尾巴的移除
+      $('.menu-phone.list-v').removeAttr("style",""); // 移除小尾巴的移除
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+      try{
+          if (typeof $.fancybox == "undefined") {
+            SCload_fancybox();
+          } else {
+            pjax_fancybox();
+          }
+        
+        
+        
+        
+        
+          pjax_initCopyCode();
+        
+        
+          pjax_valine();
+        
+        
+        
+        
+      } catch (e) {
+        console.log(e);
+      }
+	  
+      window.HideLoading();
+	  
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+	  
+      window.HideLoading();
+	  
+      window.location.href = e.triggerElement.href;
+    });
+</script>
+
+    
+  </div>
+</body>
+</html>

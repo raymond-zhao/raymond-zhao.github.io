@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head hexo-theme='https://github.com/volantis-x/hexo-theme-volantis/tree/4.0.0'>
+  <meta charset="utf-8">
+  <!-- SEO相关 -->
+  
+    
+  
+  <!-- 渲染优化 -->
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  <link rel='dns-prefetch' href='https://cdn.jsdelivr.net'>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <!-- 页面元数据 -->
+  
+  <title>《Kafka 权威指南》：Kafka 消费者 - 吹梦到西洲</title>
+  
+    <meta name="keywords" content="Kafka">
+  
+
+  
+    <meta name="description" content="应用程序使用 KafkaConsumer 向 Kafka 订阅主题，并从订阅的主题上接收消息。">
+  
+
+  <!-- feed -->
+  
+
+  <!-- import meta -->
+  
+
+  <!-- link -->
+  
+    <link rel="shortcut icon" type='image/x-icon' href="/images/3d-architecture.svg">
+  
+
+  <!-- import link -->
+  
+
+  
+    
+<link rel="stylesheet" href="/css/first.css">
+
+  
+
+  
+  <link rel="stylesheet" href="/css/style.css" media="print" onload="this.media='all';this.onload=null">
+  <noscript><link rel="stylesheet" href="/css/style.css"></noscript>
+  
+
+  <script id="loadcss"></script>
+
+</head>
+
+<body>
+  
+
+<header id="l_header" class="l_header auto shadow blur show" style='opacity: 0' >
+  <div class='container'>
+  <div id='wrapper'>
+    <div class='nav-sub'>
+      <p class="title"></p>
+      <ul class='switcher nav-list-h m-phone' id="pjax-header-nav-list">
+        <li><a id="s-comment" class="fas fa-comments fa-fw" target="_self" href='javascript:void(0)'></a></li>
+        
+          <li><a id="s-toc" class="s-toc fas fa-list fa-fw" target="_self" href='javascript:void(0)'></a></li>
+        
+      </ul>
+    </div>
+		<div class="nav-main">
+      
+        
+        <a class="title flat-box" target="_self" href='/'>
+          
+            <img no-lazy class='logo' src='https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/blog/Logo-NavBar@3x.png'/>
+          
+          
+          
+        </a>
+      
+
+			<div class='menu navigation'>
+				<ul class='nav-list-h m-pc'>
+          
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/
+                  
+                  
+                  
+                    id="home"
+                  >
+                  <i class='fas fa-rss fa-fw'></i>博客
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/categories/
+                  
+                  
+                  
+                    id="categories"
+                  >
+                  <i class='fas fa-folder-open fa-fw'></i>分类
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/tags/
+                  
+                  
+                  
+                    id="tags"
+                  >
+                  <i class='fas fa-tags fa-fw'></i>标签
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/archives/
+                  
+                  
+                  
+                    id="archives"
+                  >
+                  <i class='fas fa-archive fa-fw'></i>归档
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/friends/
+                  
+                  
+                  
+                    id="friends"
+                  >
+                  <i class='fas fa-link fa-fw'></i>友链
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/about/
+                  
+                  
+                  
+                    id="about"
+                  >
+                  <i class='fas fa-info-circle fa-fw'></i>关于
+                </a>
+                
+              </li>
+            
+          
+          
+				</ul>
+			</div>
+
+      <div class="m_search">
+        <form name="searchform" class="form u-search-form">
+          <i class="icon fas fa-search fa-fw"></i>
+          <input type="text" class="input u-search-input" placeholder="Search..." />
+        </form>
+      </div>
+
+			<ul class='switcher nav-list-h m-phone'>
+				
+					<li><a class="s-search fas fa-search fa-fw" target="_self" href='javascript:void(0)'></a></li>
+				
+				<li>
+          <a class="s-menu fas fa-bars fa-fw" target="_self" href='javascript:void(0)'></a>
+          <ul class="menu-phone list-v navigation white-box">
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/
+                  
+                  
+                  
+                    id="home"
+                  >
+                  <i class='fas fa-rss fa-fw'></i>博客
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/categories/
+                  
+                  
+                  
+                    id="categories"
+                  >
+                  <i class='fas fa-folder-open fa-fw'></i>分类
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/tags/
+                  
+                  
+                  
+                    id="tags"
+                  >
+                  <i class='fas fa-tags fa-fw'></i>标签
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/archives/
+                  
+                  
+                  
+                    id="archives"
+                  >
+                  <i class='fas fa-archive fa-fw'></i>归档
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/friends/
+                  
+                  
+                  
+                    id="friends"
+                  >
+                  <i class='fas fa-link fa-fw'></i>友链
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/about/
+                  
+                  
+                  
+                    id="about"
+                  >
+                  <i class='fas fa-info-circle fa-fw'></i>关于
+                </a>
+                
+              </li>
+            
+          
+            
+          </ul>
+        </li>
+			</ul>
+		</div>
+	</div>
+  </div>
+</header>
+
+  <div id="l_body">
+    <div id="l_cover">
+  
+    
+        <div id="full" class='cover-wrapper post search' style="display: none;">
+          
+            <div class='cover-bg lazyload placeholder' data-bg="/images/cover-2.jpg"></div>
+          
+          <div class='cover-body'>
+  <div class='top'>
+    
+    
+      <p class="title">吹梦到西洲</p>
+    
+    
+  </div>
+  <div class='bottom'>
+    
+      <div class="m_search">
+        <form name="searchform" class="form u-search-form">
+          <input type="text" class="input u-search-input" placeholder="Looking for something?" />
+          <i class="icon fas fa-search fa-fw"></i>
+        </form>
+      </div>
+    
+    <div class='menu navigation'>
+      <div class='list-h'>
+        
+          
+            <a href="/"
+              
+              
+              id="home">
+              <i class='fas fa-rss fa-fw'></i><p>博客</p>
+            </a>
+          
+            <a href="/categories/"
+              
+              
+              id="categories">
+              <i class='fas fa-folder-open fa-fw'></i><p>分类</p>
+            </a>
+          
+            <a href="/tags/"
+              
+              
+              id="tags">
+              <i class='fas fa-tags fa-fw'></i><p>标签</p>
+            </a>
+          
+            <a href="/archives/"
+              
+              
+              id="archives">
+              <i class='fas fa-archive fa-fw'></i><p>归档</p>
+            </a>
+          
+            <a href="/friends/"
+              
+              
+              id="friends">
+              <i class='fas fa-link fa-fw'></i><p>友链</p>
+            </a>
+          
+            <a href="/about/"
+              
+              
+              id="about">
+              <i class='fas fa-info-circle fa-fw'></i><p>关于</p>
+            </a>
+          
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+          <div id="scroll-down" style="display: none;"><i class="fa fa-chevron-down scroll-down-effects"></i></div>
+        </div>
+    
+  
+  </div>
+
+    <div id='safearea'>
+      <div class='body-wrapper' id="pjax-container">
+        
+
+<div class='l_main'>
+  <article class="article post white-box reveal md shadow article-type-post" id="post" itemscope itemprop="blogPost">
+  
+
+
+  
+  <div class="article-meta" id="top">
+    
+    
+    
+      <h1 class="title">
+        《Kafka 权威指南》：Kafka 消费者
+      </h1>
+      <div class='new-meta-box'>
+        
+          
+            
+<div class='new-meta-item author'>
+  <a class='author' href="/" rel="nofollow">
+    <img no-lazy src="">
+    <p>吹梦到西洲</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  <div class='new-meta-item category'>
+    <a class='notlink'>
+      <i class="fas fa-folder-open fa-fw" aria-hidden="true"></i>
+      <a class="category-link" href="/categories/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/">消息中间件</a>
+    </a>
+  </div>
+
+
+          
+        
+          
+            <div class="new-meta-item date">
+  <a class='notlink'>
+    <i class="fas fa-calendar-alt fa-fw" aria-hidden="true"></i>
+    <p>发布于：Apr 24, 2021</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  <div class="new-meta-item browse leancloud">
+    <a class='notlink'>
+      
+      <div id="lc-pv" data-title="《Kafka 权威指南》：Kafka 消费者" data-path="/2021/04/24/2021-04-24-KafkaChapter4/">
+        <i class="fas fa-eye fa-fw" aria-hidden="true"></i>
+        <span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span>
+        次浏览
+      </div>
+    </a>
+  </div>
+
+
+          
+        
+      </div>
+    
+  </div>
+
+
+  
+  <h2 id="4-1-KafkaConsumer-概念"><a href="#4-1-KafkaConsumer-概念" class="headerlink" title="4.1 KafkaConsumer 概念"></a>4.1 KafkaConsumer 概念</h2><h3 id="4-1-1-消费者和消费者群组"><a href="#4-1-1-消费者和消费者群组" class="headerlink" title="4.1.1 消费者和消费者群组"></a>4.1.1 消费者和消费者群组</h3><p>Kafka 消费者从属于<strong>消费者群组</strong>。一个群组里的消费者订阅的是同一个主题，每个消费者接收主题一部分分区的消息。这样可以协调消费者与生产者之间收发消息的不同速率以及 Broker 存储消息的能力。</p>
+<p>一个消费者可以接收多个主题分区的消息，但是如下图所示，如果消费者的数量超过主题中分区的数量，那么多余的消费者就会被闲置，不会接收到任何消息。</p>
+<p>![5个消费者受到4个分区的消息](/Users/raymond/Library/Application Support/typora-user-images/image-20210425102753887.png)</p>
+<p>往群组里增加消费者是横向伸缩消费能力的主要方式，有必要为主题创建大量的分区，在负载增长时可以加入更多的消费者，但是消费者的数量不要超过主题分区的数量。</p>
+<p>除横向收缩外，也可以使用多个应用程序从同一个主题读取数据，只要保证每个应用程序都有自己的消费者群组，就可以读取到主题内所有的消息。如下图所示，如果增加 <code>Consumer Group 2</code>，它也不会影响 <code>Consumer Group 1</code> 接收消息主题全部分区的消息。</p>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1gpvsg53es4j31000l4tcc.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/008i3skNly1gpvsg53es4j31000l4tcc.jpg" srcset="data:image/png;base64,666" alt="两个消费者群组对应一个主题"></p>
+<h3 id="4-1-2-消费者群组和分区再均衡"><a href="#4-1-2-消费者群组和分区再均衡" class="headerlink" title="4.1.2 消费者群组和分区再均衡"></a>4.1.2 消费者群组和分区再均衡</h3><p>一个新的消费者加入群组时，它读取的是原本由其他消费者读取的消息。当一个消费者被关闭或发生崩溃 时，它就离开群组，原本由它读取的分区将由群组里的其他消费者来读取。分区的所有权从一个消费者转移到另一个消费者，这样的行为被称为<strong>再均衡（rebalance）</strong>，它提供了<strong>高可用性和伸缩性</strong>。</p>
+<p>在<strong>再均衡</strong>期间，消费者无法读取消息，造成整个群组一小段时间的不可用。另外，当分区被重新分配给另一个消费者时，消费者当前的读取状态会丢失，它有可能还需要去刷新缓存，在它重新恢复状态之前会拖慢应用程序。</p>
+<p>消费者通过向被指派为群组协调器的 <code>broker</code>（不同的群组可以有不同的协调器）发送心跳来维持它们和群组的从属关系，以及它们对分区的所有权关系。只要消费者以正常的时间间隔发送心跳就被认为是活跃的，说明它还在读取分区里的消息。消费者会在<strong>轮询消息</strong>或<strong>提交偏移量</strong>时发送心跳。如果消费者停止发送心跳的时间足够长，会话就会过期，群组协调器认为它已经死亡，就会触发一次再均衡。</p>
+<p>如果一个消费者发生崩溃并停止读取消息，群组协调器会等待几秒钟，确认它死亡了才 会触发再均衡。在这几秒钟时间里，死掉的消费者不会读取分区里的消息。在清理消费者时，消费者会通知协调器它将要离开群组，协调器会立即触发一次再均衡，尽量降低处理停顿。</p>
+<blockquote>
+<p>kafka 0.10.1 在版本引入了一个独立的<strong>心跳进程</strong>，可以在轮询消息的空档发送心跳，使得发送心跳的频率与消息轮询的频率相互独立。在新版本的 Kafka 里，可以指定消费者在<strong>离开群组并触发再均衡之前</strong>可以有多长时间不进行消息轮询，这样可以避免出现<strong>活锁（livelock）</strong>。</p>
+</blockquote>
+<p><strong>分配分区是怎样的一个过程？</strong></p>
+<ul>
+<li>消费者要加入群组时，先向<strong>群组协调器（group coordinator）</strong>发送 <code>JoinGroup</code> 请求。第一个加入群组的消费者将成为<strong>群主（leader）</strong>。</li>
+<li><strong>群主</strong>从<strong>协调器</strong>获得群组成员列表（包含所有最近发送过心跳的消费者），并为每一个消费者分配分区。群主实现了 <code>PartitionAssignor</code> 接口来决定哪些分区应该被分配给哪个消费者。</li>
+<li>分配完毕后，<strong>群主</strong>将<strong>分配情况列表</strong>发送给<strong>群组协调器</strong>，协调器再把这些消息发送给所有消费者。每个消费者只能看到自己的分配信息，只有群主知道所有消费者的分配信息。</li>
+<li>（再均衡时自然也会发生再分区）</li>
+</ul>
+<blockquote>
+<p>Kafka 的分区分配策略：</p>
+<ul>
+<li><code>org.apache.kafka.clients.consumer.RangeAssignor</code>（默认）</li>
+<li><code>org.apache.kafka.clients.consumer.RoundRobinAssignor</code></li>
+<li><code>org.apache.kafka.clients.consumer.StickyAssignor</code></li>
+<li><code>org.apache.kafka.clients.consumer.CooperativeStickyAssignor</code></li>
+</ul>
+<p>也可以通过实现 <code>org.apache.kafka.clients.consumer.ConsumerPartitionAssignor</code> 接口自定义分区策略。</p>
+</blockquote>
+<h2 id="4-2-创建-Kafka-消费者"><a href="#4-2-创建-Kafka-消费者" class="headerlink" title="4.2 创建 Kafka 消费者"></a>4.2 创建 Kafka 消费者</h2><p>创建 <code>KafkaConsumer</code> 与创建 <code>KafkaProducer</code> 过程极为相似，需要提供 3 个必要的属性：<code>bootstrap.servers</code>、<code>key.deserializer</code>、<code>value.deserializer</code>。下面是 Kafka 0.10.1 中创建消费者的示例代码。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> KafkaConsumer&lt;Integer, String&gt; consumer;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> String topic;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">Consumer</span><span class="params">(String topic)</span> </span>&#123;</span><br><span class="line">    Properties props = <span class="keyword">new</span> Properties();</span><br><span class="line">    props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, <span class="string">"localhost:9092"</span>);</span><br><span class="line">    props.put(ConsumerConfig.GROUP_ID_CONFIG, <span class="string">"DemoConsumer"</span>);</span><br><span class="line">    props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, <span class="string">"true"</span>);</span><br><span class="line">    props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, <span class="string">"1000"</span>);</span><br><span class="line">    props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, <span class="string">"30000"</span>);</span><br><span class="line">    props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, <span class="string">"org.apache.kafka.common.serialization.IntegerDeserializer"</span>);</span><br><span class="line">    props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, <span class="string">"org.apache.kafka.common.serialization.StringDeserializer"</span>);</span><br><span class="line"></span><br><span class="line">    consumer = <span class="keyword">new</span> KafkaConsumer&lt;&gt;(props);</span><br><span class="line">    <span class="keyword">this</span>.topic = topic;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-3-订阅主题"><a href="#4-3-订阅主题" class="headerlink" title="4.3 订阅主题"></a>4.3 订阅主题</h2><p>消费者的 <code>subscribe()</code> 方法接受一个主题列表作为参数。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">consumeer.subscribe(Collections.singletonList(<span class="string">"customerCountries"</span>));</span><br></pre></td></tr></table></figure>
+
+<p>也可以在调用 <code>subscribe</code> 方法时传入正则表达式，用以匹配多个主题。<strong>如果创建了新主题，并且主题名与正则表达式相匹配，将会立即触发一次再均衡。</strong>要订阅所有与 <code>test</code> 相关的主题，可以</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">consumer.subscribe(<span class="string">"test.*"</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-4-轮询-Poll-Loop"><a href="#4-4-轮询-Poll-Loop" class="headerlink" title="4.4 轮询(Poll Loop)"></a>4.4 轮询(Poll Loop)</h2><p>消息轮询是消费者的核心 API，一旦消费者订阅了主题，轮询就会处理所有的细节，包括<strong>群组协调、分区再均衡、发送心跳和获取数据</strong>。消费者代码主要部分如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="keyword">true</span>) &#123; <span class="comment">// 消费者长期运行，持续轮询。</span></span><br><span class="line">        <span class="comment">// poll() 的参数是超时时间，它会在指定的毫秒数内一直等待 broker 返回数据。</span></span><br><span class="line">        ConsumerRecords&lt;String, String&gt; records = consumer.poll(<span class="number">100</span>);</span><br><span class="line">        <span class="keyword">for</span> (ConsumerRecord&lt;String, String&gt; record : records) &#123;</span><br><span class="line">            log.debug(<span class="string">"topic = %s, partition = %s, offset = %d, consumer = %s, country = %s\n"</span>,</span><br><span class="line">                     record.topic(), record.partition(), record.offset(), record.key(), record.value());</span><br><span class="line">            <span class="keyword">int</span> updateCount = <span class="number">1</span>;</span><br><span class="line">            <span class="keyword">if</span> (custCountryMap.countainsValue(record.value())) &#123;</span><br><span class="line">                updateCount = custCountryMap.get(record.value()) + <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            custCountryMap.put(record.value(), updateCount);</span><br><span class="line">            </span><br><span class="line">            JSONObject json = <span class="keyword">new</span> JSONObject(custCountryMap);</span><br><span class="line">            System.out.println(json.toString(<span class="number">4</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    <span class="comment">// 关闭后，网络连接和 Socket 也会随之关闭，并立即触发一次 再均衡，</span></span><br><span class="line">    <span class="comment">// 而不是等待群组协调器发现它不再发送发送心跳并认定它已死亡，节省了时间。</span></span><br><span class="line">    consumer.close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>轮询不只是获取数据那么简单，在第一次调用新消费者的 <code>poll()</code> 方法时，它会负责查找 <code>GroupCoordinator</code>，然后加入群组，接受分配的分区。如果发生了再均衡，整个过程也是在轮询期间进行的。当然，心跳也是从轮询里发送出去的。所以，要确保在轮询期间所做的任何处理工作都应该尽快完成。</p>
+<blockquote>
+<p><strong>线程安全</strong></p>
+<p>在同一个群组里，无法让一个线程运行多个消费者，也无法让多个线程安全地共享一个消费者。一个消费者应该单独使用一个线程，如果要在同一个消费者群组里运行多个消费者，需要让每个消费者运行在自己的线程里。最好是把消费者的逻辑封装在自己的对象里，然后使用 Java 的 ExecutorService 启动多个线程，使每个消费者运行在自己的线程上。</p>
+</blockquote>
+<h2 id="4-5-消费者的配置"><a href="#4-5-消费者的配置" class="headerlink" title="4.5 消费者的配置"></a>4.5 消费者的配置</h2><p>关于消费者的详细配置可参考 <a href="https://kafka.apache.org/documentation/#consumerconfigs" target="_blank" rel="noopener">Apache Kafka Consumer Configuration</a>，不再赘述。</p>
+<h2 id="4-6-提交和偏移量"><a href="#4-6-提交和偏移量" class="headerlink" title="4.6 提交和偏移量"></a>4.6 提交和偏移量</h2><p>每次调用 <code>poll()</code> 方法，它总是返回由生产者写入 Kafka 但还没有被消费者读取过的记录， 因此可以追踪到哪些记录是被群组里的哪个消费者读取的。Kafka 不会像其他 JMS 队列那样需要得到消费者的确认，相反，消费者可以使用 Kafka 来追踪消息在分区里的位置（偏移量）。</p>
+<p><strong>更新分区当前位置的操作被叫做提交。</strong></p>
+<p>消费者往一个叫作 <code>_consumer_offset</code> 的特殊主题发送消息，消息里包含每个分区的偏移量。当消费者发生崩溃或者有新的消费者加入群组时就会触发再均衡，再均衡之后，每个消费者可能分配到新的分区，而不是之前处理的分区。为了能够继续之前的工作，消费者需要读取每个分区最后一次提交的偏移量，然后从偏移量指定的地方继续处理。</p>
+<ul>
+<li>如果提交的偏移量小于客户端处理的最后一条消息的偏移量，那么处理两个偏移量之间的消息会被重复处理。如下图所示。</li>
+</ul>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1gpwvlvz2r8j31040bkmz6.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/008i3skNly1gpwvlvz2r8j31040bkmz6.jpg" srcset="data:image/png;base64,666" alt="提交的偏移量小于客户端处理的最后一个消息的偏移量"></p>
+<ul>
+<li>如果提交的偏移量大于客户端处理的最后一个消息的偏移量，那么处于两个偏移量之间的消息将会丢失。如下图所示。</li>
+</ul>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1gpvxl9dng5j31000d2767.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/008i3skNly1gpvxl9dng5j31000d2767.jpg" srcset="data:image/png;base64,666" alt="提交的偏移量大于客户端处理的最后一个消息的偏移量"></p>
+<h3 id="4-6-1-自动提交"><a href="#4-6-1-自动提交" class="headerlink" title="4.6.1 自动提交"></a>4.6.1 自动提交</h3><p>如果 <code>enable.auto.commit</code> 被设为 <code>true</code>，那 么每过 <code>5s</code>，消费者会自动把从 <code>poll()</code> 方法接收到的最大偏移量提交上去。提交时间间隔 由 <code>auto.commit.interval.ms</code> 控制，默认值是 <code>5s</code>。与消费者里的其他东西一样，自动提交也是在轮询里进行的。消费者每次在进行轮询时会检查是否该提交偏移量了，如果是，那么就会提交从上一次轮询返回的偏移量。</p>
+<p>在使用自动提交时，每次调用轮询方法都会把上一次调用返回的偏移量提交上去，它并不知道具体哪些消息已经被处理了。</p>
+<h3 id="4-6-2-提交当前偏移量"><a href="#4-6-2-提交当前偏移量" class="headerlink" title="4.6.2 提交当前偏移量"></a>4.6.2 提交当前偏移量</h3><p>开发者既可以通过控制<strong>偏移量提交时间</strong>，也可以通过<strong>提交偏移量</strong>来消除丢失消息的可能性，并在发生再均衡时减少重复消息的数量。</p>
+<p>把 <code>auto.commit.offset</code> 设为 <code>false</code>，让应用程序决定何时提交偏移量。消费者的 <code>commitSync()</code> API 会提交由 <code>poll()</code> 方法返回的最新偏移量，提交成功后马上返回，如果提交失败就抛出异常。</p>
+<p>要记住：<code>commitSync()</code> 将会提交由 <code>poll()</code> 返回的最新偏移量，所以在处理完所有记录后要确保调用了 <code>commitSync()</code>，否则还是会有丢失消息的风险。如果发生了再均衡，从<strong>最近一批消息到发生再均衡之间的所有消息</strong>都将被<strong>重复处理</strong>。</p>
+<h3 id="4-6-3-异步提交"><a href="#4-6-3-异步提交" class="headerlink" title="4.6.3 异步提交"></a>4.6.3 异步提交</h3><p>手动提交有一个不足之处，在 <code>broker</code> 对提交请求作出回应之前，应用程序会一直阻塞，这会影响吞吐量，可以通过<strong>降低提交频率</strong>来提升吞吐量，但如果发生了再均衡，会增加重复消息的数量。此时可以使用异步提交 API <code>commitAsync()</code>，只管发送提交请求，而无需等待 <code>broker</code> 的响应。</p>
+<blockquote>
+<p>在成功提交或碰到无法恢复的错误之前，<code>commitSync()</code> 会一直重试，但是 <code>commitAsync()</code> 不会，如果在服务器出现更大偏移量提交成功的情况下，出现了再均衡，就会出现重复消息。</p>
+</blockquote>
+<p><code>commitAsync()</code> 支持回调，在 <code>broker</code> 作出响应时会执行回调。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">consumer.commitAsync(<span class="keyword">new</span> OffsetCommitCallback() &#123;</span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onComplete</span><span class="params">(Map&lt;TopicPartition, OffsetAndMetadata&gt; offsets, Exception e)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">if</span> (e != <span class="keyword">null</span>) &#123;</span><br><span class="line">           log.error(<span class="string">"Commit failed for offsets &#123;&#125;"</span>, offsets, e);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-6-4-同步和异步组合提交"><a href="#4-6-4-同步和异步组合提交" class="headerlink" title="4.6.4 同步和异步组合提交"></a>4.6.4 同步和异步组合提交</h3><p>一般情况下，针对偶尔出现的提交失败，不进行重试不会有太大问题，因为如果提交失败是因为临时问题导致的，那么后续的提交总会有成功的。但如果这是发生在关闭消费者或再均衡前的最后一次提交，就要确保能够提交成功。</p>
+<ul>
+<li>如果一切正常，使用 <code>commitAsync()</code> 方法来提交。这样速度更快，而且即使这次提交失败，下一次提交很可能会成功。</li>
+<li>如果直接关闭消费者，就没有所谓的”下一次提交“了。使用 <code>commitSync()</code> 方法会一 直重试，直到提交成功或发生无法恢复的错误。</li>
+</ul>
+<h3 id="4-6-5-提交特定的偏移量"><a href="#4-6-5-提交特定的偏移量" class="headerlink" title="4.6.5 提交特定的偏移量"></a>4.6.5 提交特定的偏移量</h3><p>我们都知道，提交偏移量的频率与处理消息批次的频率是一样的。但如果想要更频繁地提交，或者在批次中间提交偏移量可以使用消费者 API，它允许在调用 <code>commitSync()</code> 和 <code>commitAsync()</code> 方法时传进去希望提交的分区和偏移量的 <code>map</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> Map&lt;TopicPartition, OffsetAndMetadata&gt; currentOffsets = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line"><span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">    ConsumerRecords&lt;String, String&gt; records = consumer.poll(<span class="number">100</span>);</span><br><span class="line">    <span class="keyword">for</span> (ConsumerRecord&lt;String, String&gt; record : records) &#123;</span><br><span class="line">        System.out.println(<span class="string">"Topic, Partition, Offset, customer, country"</span>);</span><br><span class="line">        currentOffsets.put(<span class="keyword">new</span> TopicPartition(record.topic(), record.partition()), <span class="keyword">new</span> OffsetAndMetadata(record.offset() + <span class="number">1</span>, <span class="string">"no metadata"</span>));</span><br><span class="line">        <span class="keyword">if</span> (count % <span class="number">1000</span> == <span class="number">0</span>) <span class="comment">// 每处理 1000 条记录就提交一次偏移量</span></span><br><span class="line">            consumer.commitAsync(currentOffsets, <span class="keyword">null</span>);</span><br><span class="line">        count++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-7-再均衡监听器"><a href="#4-7-再均衡监听器" class="headerlink" title="4.7 再均衡监听器"></a>4.7 再均衡监听器</h2><p>上一节提到过，消费者在退出和进行分区再均衡之前，会做一些清理工作。</p>
+<p>应该在消费者失去对一个分区的所有权之前提交最后一个已处理记录的偏移量，还可能需要处理缓冲区累积下来的记录、关闭文件句柄、数据库连接等。</p>
+<p>在为消费者分配新分区或移除旧分区时， 可以通过消费者 API 执行程序代码，在调用 <code>subscribe()</code> 方法时传进 <code>ConsumerRebalanceListener</code> 实例，<a href="https://javadoc.io/doc/org.apache.kafka/kafka-clients/latest/index.html" target="_blank" rel="noopener">这个接口</a>有两个需要实现的方法。</p>
+<ul>
+<li><code>public void onPartitionsRevoked(Collection&lt;TopicPartition&gt; partitions)</code> 方法会在再均衡开始之前和消费者停止读取消息之后被调用，如果在这里提交偏移量，下一个接管分区的消费者就知道该从哪里开始读取了。</li>
+<li><code>public void onPartitionAssigned(Collection&lt;TopicPartition&gt; partitions)</code> 方法会在重新分配分区之后和消费者开始读取消息之前被调用。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> Map&lt;TopicPartition, OffsetAndMetadata&gt; currentOffsets = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">HandleRebalance</span> <span class="keyword">implements</span> <span class="title">ConsumerRebalanceListener</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onPartitionsRevoked</span><span class="params">(Collection&lt;TopicPartition&gt; collection)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onPartitionsAssigned</span><span class="params">(Collection&lt;TopicPartition&gt; partitions)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Lost partitions in rebalance, Committing current offsets: "</span> + currentOffsets);</span><br><span class="line">        consumer.commitSync(currentOffsets);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">someMethod</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        consumer.subscribe(Collections.singleton(topic), <span class="keyword">new</span> HandleRebalance());</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">            ConsumerRecords&lt;String, String&gt; records = consumer.poll(Duration.ofMillis(<span class="number">100</span>));</span><br><span class="line">            <span class="keyword">for</span> (ConsumerRecord&lt;String, String &gt; record : records) &#123;</span><br><span class="line">                System.out.println(<span class="string">"record: "</span> + record);</span><br><span class="line">                currentOffsets.put(<span class="keyword">new</span> TopicPartition(record.topic(), record.partition()), <span class="keyword">new</span> OffsetAndMetadata(record.offset() + <span class="number">1</span>, <span class="string">"no metadata"</span>));</span><br><span class="line">            &#125;</span><br><span class="line">            consumer.commitAsync(currentOffsets, <span class="keyword">null</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (WakeupException e) &#123;</span><br><span class="line">        log.error(<span class="string">"msg"</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        log.error(<span class="string">"Unexpected error "</span>, e);  </span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            consumer.commitSync(currentOffsets);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            consumer.close();</span><br><span class="line">            System.out.println(<span class="string">"Closed consumer and we are done"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-8-从特定偏移量处开始处理记录"><a href="#4-8-从特定偏移量处开始处理记录" class="headerlink" title="4.8 从特定偏移量处开始处理记录"></a>4.8 从特定偏移量处开始处理记录</h2><p><code>poll()</code> 方法从各个<strong>分区的最新偏移量</strong>开始处理消息，如果想从分区的<strong>起始位置</strong>，或者直接跳到<strong>分区的末尾</strong>开始读取消息，可以使用 <code>seekToBeginning(Collection&lt;TopicPartition&gt; tp)</code> 和 <code>seekToEnd(Collection&lt;TopicPartition&gt;) tp</code> 这两个方法。</p>
+<p>Kafka 也提供了用于查找特定偏移量的 API，它可以向后回退或向前跳过几个消息。在消费者启动或分配到新分区时，可以使用 <code>seek()</code> 方法查找保存在<strong>数据库</strong>里的偏移量。使用 <code>ConsumerRebalanceListener</code> 和 <code>seek()</code> 方法可以确保是从数据库里保存的偏移量所指定的位置开始处理消息的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SaveOffsetsOnRebalance</span>  <span class="keyword">implements</span> <span class="title">ConsumerRebalanceListener</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onPartitionsRevoked</span><span class="params">(Collection&lt;TopicPartition&gt; partitions)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// commitDBTransactions(); 虚构的数据库事务，保存记录和偏移量。</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onPartitionsAssigned</span><span class="params">(Collection&lt;TopicPartition&gt; partitions)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (TopicPartition partition : partitions) &#123;</span><br><span class="line">            <span class="comment">// 虚构方法从数据库获取偏移量</span></span><br><span class="line">            consumer.seek(partition, getOffsetFromDB(partition));      </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">someMethod1</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    consumer.subscribe(Collections.singleton(topic), <span class="keyword">new</span> SaveOffsetsOnRebalance(consumer));</span><br><span class="line">    <span class="keyword">for</span> (TopicPartition partition : consumer.assignment()) &#123;</span><br><span class="line">        consumer.seek(partition, getOffsetFromDB(partition));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">        ConsumerRecords&lt;String, String&gt; records = consumer.poll(Duration.ofMillis(<span class="number">0</span>));</span><br><span class="line">        <span class="keyword">for</span> (ConsumerRecord&lt;String, String&gt; record : records) &#123;</span><br><span class="line">            <span class="comment">// processRecord(record);</span></span><br><span class="line">            <span class="comment">// storeRecordInDB(record);</span></span><br><span class="line">            <span class="comment">// storeOffsetInDB(record.topic(), record.partition(), record.offset());</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// commitDBTransaction();</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-9-如何退出"><a href="#4-9-如何退出" class="headerlink" title="4.9 如何退出"></a>4.9 如何退出</h2><p>如果确定要退出 <code>while(true)</code> 循环，需要通过另一个线程调用 <code>consumer.wakeup()</code> 方法。如果循环运行在主线程里，可以在 <code>ShutdownHook</code> 里调用该方法。要记住，<code>consumer.wakeup()</code> 是消费者唯一一个可以从其他线程里安全调用的方法。调用 <code>consumer.wakeup()</code> 可以退出 <code>poll()</code>， 并抛出 <code>WakeupException</code> 异常，或者如果调用 <code>consumer.wakeup()</code> 时线程没有等待轮询，那么异常将在下一轮调用 <code>poll()</code> 时抛出。不需要处理 <code>WakeupException</code>，因为它只是用于跳出循环的一种方式。不过，在退出线程之前调用 <code>consumer.close()</code> 是很有必要的，它会提交任何还没有提交的东西，并向群组协调器发送消息，告知自己要离开群组，接下来就会触发再均衡，而不需要等待会话超时。</p>
+<p>优雅退出的完整代码： <a href="https://github.com/gwenshap/kafka-examples/blob/master/SimpleMovingAvg/src/main/java/com/shapira/examples/newconsumer/simplemovingavg/SimpleMovingAvgNewConsumer.java" target="_blank" rel="noopener">CloseConsumer</a></p>
+<h2 id="4-10-反序列化器"><a href="#4-10-反序列化器" class="headerlink" title="4.10 反序列化器"></a>4.10 反序列化器</h2><p>前文提到，生产者需要用<strong>序列化器</strong>把对象转换成<strong>字节数组</strong>再发送给 Kafka。 类似地，消费者需要用<strong>反序列化器</strong>把从 Kafka 接收到的字节数组转换成 Java 对象。 很显然，生成消息使用的<strong>序列化器</strong>与读取消息使用的<strong>反序列化器</strong>应该是<strong>一一对应</strong>的。</p>
+<p>使用 Avro 和 schema 注册表进行序列化和反序列化的优势在于：</p>
+<ul>
+<li><code>AvroSerializer</code> 可以保证写入主题的数据与主题的 schema 是兼容的，也就是说，可以使用相应的反序列化器和 schema 来反序列化数据。</li>
+<li>另外，在生产者或消费者里出现的任何一个与兼容性有关的错误都会被捕捉到，它们都带有消息描述，也就是说，在出现序列化错误时，就没必要再去调试字节数组了。</li>
+</ul>
+<p>不推荐自定义序列化器与反序列化器，序列化与反序列化的逻辑相反，这里也不再赘述了。</p>
+<h2 id="4-11-无群组的独立消费者"><a href="#4-11-无群组的独立消费者" class="headerlink" title="4.11 无群组的独立消费者"></a>4.11 无群组的独立消费者</h2><p>此前提到的消费者均为属于某个群组的消费者，消费者在加入消费者群组后被自动分配分区，在群组里新增或移除消费者时自动触发再均衡。如果只需要单个消费者，而且不需要它加入消费者群组，那么就不需要让它订阅主题，取而代之的是它为自己分配分区。</p>
+<p>一个消费者可以订阅主题并加入消费者群组，或者为自己分配分区，但不能同时做这两件事情。下面代码展示了一个消费者如何为自己分配分区并从分区里读取消息的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">List&lt;PartitionInfo&gt; partitionInfos = <span class="keyword">null</span>;</span><br><span class="line"><span class="comment">// 1. 向集群请求主题可用的分区。如果只打算读取特定分区，可以跳过。</span></span><br><span class="line">partitionInfos = consumer.partitionsFor(<span class="string">"topic"</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (partitionInfos != <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">for</span> (PartitionInfo partition : partitionInfos) &#123;</span><br><span class="line">        partitions.add(<span class="keyword">new</span> TopicPartition(partition.topic(), partition.partition()));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 2. 知道需要哪些分区后，调用 assign() 方法。</span></span><br><span class="line">    consumer.assign(partitions);</span><br><span class="line">    <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">        ConsumerRecords&lt;String, String&gt; records = consumer.poll(Duration.ofMillis(<span class="number">1000</span>));</span><br><span class="line">        <span class="keyword">for</span> (ConsumerRecord&lt;String, String&gt; record : records) &#123;</span><br><span class="line">            System.out.println(<span class="string">"record: "</span> + record);</span><br><span class="line">        &#125;</span><br><span class="line">        consumer.commitSync();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>除了不会发生再均衡，也不需要手动查找分区。不过，如果主题增加了新的分区，消费者不会收到通知。所以，要么周期性地调用 <code>consumer.partitionsFor()</code> 方法来检查是否有分区加入，要么在添加新分区后重启应用程序。</p>
+
+  
+  
+    
+    <div class='footer'>
+      
+      
+      
+        <div class='copyright'>
+          <blockquote>
+            
+              
+                <p>博客内容遵循 署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0) 协议</p>
+
+              
+            
+              
+                <p>本文永久链接是：<a href=http://raymond-zhao.top/2021/04/24/2021-04-24-KafkaChapter4/>http://raymond-zhao.top/2021/04/24/2021-04-24-KafkaChapter4/</a></p>
+              
+            
+          </blockquote>
+        </div>
+      
+      
+    </div>
+  
+  
+    
+
+
+  <div class='article-meta' id="bottom">
+    <div class='new-meta-box'>
+      
+        
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-06-20T13:59:48+08:00">
+  <a class='notlink'>
+    <i class="fas fa-edit fa-fw" aria-hidden="true"></i>
+    <p>更新于：Jun 20, 2021</p>
+  </a>
+</div>
+
+        
+      
+        
+          
+  
+  <div class="new-meta-item meta-tags"><a class="tag" href="/tags/Kafka/" rel="nofollow"><i class="fas fa-hashtag fa-fw" aria-hidden="true"></i><p>Kafka</p></a></div>
+
+
+        
+      
+        
+          
+  <div class="new-meta-item share -mob-share-list">
+  <div class="-mob-share-list share-body">
+    
+      
+        <a class="-mob-share-qq" title="" rel="external nofollow noopener noreferrer"
+          
+          href="http://connect.qq.com/widget/shareqq/index.html?url=http://raymond-zhao.top/2021/04/24/2021-04-24-KafkaChapter4/&title=《Kafka 权威指南》：Kafka 消费者 - 吹梦到西洲&summary="
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qq.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qq.png" srcset="data:image/png;base64,666">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-qzone" title="" rel="external nofollow noopener noreferrer"
+          
+          href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=http://raymond-zhao.top/2021/04/24/2021-04-24-KafkaChapter4/&title=《Kafka 权威指南》：Kafka 消费者 - 吹梦到西洲&summary="
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qzone.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qzone.png" srcset="data:image/png;base64,666">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-weibo" title="" rel="external nofollow noopener noreferrer"
+          
+          href="http://service.weibo.com/share/share.php?url=http://raymond-zhao.top/2021/04/24/2021-04-24-KafkaChapter4/&title=《Kafka 权威指南》：Kafka 消费者 - 吹梦到西洲&summary="
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/weibo.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/weibo.png" srcset="data:image/png;base64,666">
+          
+        </a>
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+
+
+        
+      
+    </div>
+  </div>
+
+
+  
+  
+
+  
+    <div class="prev-next">
+      
+        <a class='prev' href='/2021/04/26/2021-04-26-KafkaChapter5/'>
+          <p class='title'><i class="fas fa-chevron-left" aria-hidden="true"></i>《Kafka 权威指南》：深入 Kafka</p>
+          <p class='content'>5.1 集群成员关系Kafka 使用 Zookeeper 来维护集群成员的信息。每个 broker 都有一个唯一标识符，这个标识符可以在配置文件里指定，也可以自动生成。在 broker 启动的时...</p>
+        </a>
+      
+      
+        <a class='next' href='/2021/04/23/2021-04-23-KafkaChapter3/'>
+          <p class='title'>《Kafka 权威指南》：Kafka 生产者<i class="fas fa-chevron-right" aria-hidden="true"></i></p>
+          <p class='content'>3.1 Kafka 概览Kafka 的应用场景中多，如记录用户活动、记录度量指标、保存日志消息、记录智能家电信息、与其他应用程序进行异步通信、缓冲即将写入到数据库的数据等等。多样的应用场景自然也...</p>
+        </a>
+      
+    </div>
+  
+</article>
+
+
+  
+
+  <article class="post white-box reveal shadow" id="comments">
+    <p ct><i class='fas fa-comments'></i> 评论</p>
+    
+    <div id="valine_container" class="valine_thread">
+  <i class="fas fa-cog fa-spin fa-fw fa-2x"></i>
+</div>
+
+  </article>
+
+
+
+
+
+
+</div>
+<aside class='l_side'>
+  
+  
+    
+    
+
+
+
+  <section class="widget toc-wrapper shadow desktop mobile" id="toc-div" >
+    
+  <header>
+    
+      <i class="fas fa-list fa-fw" aria-hidden="true"></i><span class='name'>本文目录</span>
+    
+  </header>
+
+
+    <div class='content'>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1-KafkaConsumer-概念"><span class="toc-text">4.1 KafkaConsumer 概念</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-1-消费者和消费者群组"><span class="toc-text">4.1.1 消费者和消费者群组</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-2-消费者群组和分区再均衡"><span class="toc-text">4.1.2 消费者群组和分区再均衡</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2-创建-Kafka-消费者"><span class="toc-text">4.2 创建 Kafka 消费者</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3-订阅主题"><span class="toc-text">4.3 订阅主题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-4-轮询-Poll-Loop"><span class="toc-text">4.4 轮询(Poll Loop)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-5-消费者的配置"><span class="toc-text">4.5 消费者的配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-6-提交和偏移量"><span class="toc-text">4.6 提交和偏移量</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-6-1-自动提交"><span class="toc-text">4.6.1 自动提交</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-6-2-提交当前偏移量"><span class="toc-text">4.6.2 提交当前偏移量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-6-3-异步提交"><span class="toc-text">4.6.3 异步提交</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-6-4-同步和异步组合提交"><span class="toc-text">4.6.4 同步和异步组合提交</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-6-5-提交特定的偏移量"><span class="toc-text">4.6.5 提交特定的偏移量</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-7-再均衡监听器"><span class="toc-text">4.7 再均衡监听器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-8-从特定偏移量处开始处理记录"><span class="toc-text">4.8 从特定偏移量处开始处理记录</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-9-如何退出"><span class="toc-text">4.9 如何退出</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-10-反序列化器"><span class="toc-text">4.10 反序列化器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-11-无群组的独立消费者"><span class="toc-text">4.11 无群组的独立消费者</span></a></li></ol>
+    </div>
+  </section>
+
+
+  
+
+
+</aside>
+
+
+
+        
+        
+          <!--此文件用来存放一些不方便取值的变量-->
+<!--思路大概是将值藏到重加载的区域内-->
+
+<script>
+  window.pdata={}
+  pdata.ispage=true;
+  pdata.postTitle="《Kafka 权威指南》：Kafka 消费者";
+  pdata.commentPath="";
+  pdata.commentPlaceholder="";
+
+  var l_header=document.getElementById("l_header");
+  
+  l_header.classList.add("show");
+  
+</script>
+
+        
+      </div>
+      
+  
+  <footer class="footer clearfix">
+    <br><br>
+    
+      
+        <div class="aplayer-container">
+          
+
+
+        </div>
+      
+    
+      
+        <br>
+        <div class="social-wrapper">
+          
+            
+          
+            
+          
+            
+          
+        </div>
+      
+    
+      
+        <div><p>博客內容遵循 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW" target="_blank" rel="noopener">姓名標示-非商業性-相同方式分享 4.0 國際 (CC BY-NC-SA 4.0) 協議</a></p>
+</div>
+      
+    
+      
+        
+          <div><p><span id="lc-sv">本站总访问量为 <span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span> 次</span> <span id="lc-uv">访客数为 <span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span> 人</span></p>
+</div>
+        
+      
+    
+      
+        本站使用
+        <a href="https://github.com/volantis-x/hexo-theme-volantis/tree/4.0.0" target="_blank" class="codename">Volantis</a>
+        作為主題
+      
+    
+      
+        <div class='copyright'>
+        <p><a href="/">Copyright © 2017-2020 XXX</a></p>
+
+        </div>
+      
+    
+  </footer>
+
+
+      <a id="s-top" class="fas fa-arrow-up fa-fw" href='javascript:void(0)'></a>
+    </div>
+  </div>
+  <div>
+    <script>
+window.volantis={};
+window.volantis.loadcss=document.getElementById("loadcss");
+/********************脚本懒加载函数********************************/
+function loadScript(src, cb) {
+var HEAD = document.getElementsByTagName('head')[0] || document.documentElement;
+var script = document.createElement('script');
+script.setAttribute('type','text/javascript');
+if (cb) script.onload = cb;
+script.setAttribute('src', src);
+HEAD.appendChild(script);
+}
+//https://github.com/filamentgroup/loadCSS
+var loadCSS = function( href, before, media, attributes ){
+	var doc = window.document;
+	var ss = doc.createElement( "link" );
+	var ref;
+	if( before ){
+		ref = before;
+	}
+	else {
+		var refs = ( doc.body || doc.getElementsByTagName( "head" )[ 0 ] ).childNodes;
+		ref = refs[ refs.length - 1];
+	}
+	var sheets = doc.styleSheets;
+	if( attributes ){
+		for( var attributeName in attributes ){
+			if( attributes.hasOwnProperty( attributeName ) ){
+				ss.setAttribute( attributeName, attributes[attributeName] );
+			}
+		}
+	}
+	ss.rel = "stylesheet";
+	ss.href = href;
+	ss.media = "only x";
+	function ready( cb ){
+		if( doc.body ){
+			return cb();
+		}
+		setTimeout(function(){
+			ready( cb );
+		});
+	}
+	ready( function(){
+		ref.parentNode.insertBefore( ss, ( before ? ref : ref.nextSibling ) );
+	});
+	var onloadcssdefined = function( cb ){
+		var resolvedHref = ss.href;
+		var i = sheets.length;
+		while( i-- ){
+			if( sheets[ i ].href === resolvedHref ){
+				return cb();
+			}
+		}
+		setTimeout(function() {
+			onloadcssdefined( cb );
+		});
+	};
+	function loadCB(){
+		if( ss.addEventListener ){
+			ss.removeEventListener( "load", loadCB );
+		}
+		ss.media = media || "all";
+	}
+	if( ss.addEventListener ){
+		ss.addEventListener( "load", loadCB);
+	}
+	ss.onloadcssdefined = onloadcssdefined;
+	onloadcssdefined( loadCB );
+	return ss;
+};
+</script>
+<script>
+  
+  loadCSS("https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14/css/all.min.css", window.volantis.loadcss);
+  
+  
+  
+  
+</script>
+<!-- required -->
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5/dist/jquery.min.js"></script>
+
+<script>
+  function pjax_fancybox() {
+    $(".md .gallery").find("img").each(function () { //渲染 fancybox
+      var element = document.createElement("a"); // a 标签
+      $(element).attr("class", "fancybox");
+      $(element).attr("pjax-fancybox", "");  // 过滤 pjax
+      $(element).attr("href", $(this).attr("src"));
+      if ($(this).attr("data-original")) {
+        $(element).attr("href", $(this).attr("data-original"));
+      }
+      $(element).attr("data-fancybox", "images");
+      var caption = "";   // 描述信息
+      if ($(this).attr('alt')) {  // 判断当前页面是否存在描述信息
+        $(element).attr('data-caption', $(this).attr('alt'));
+        caption = $(this).attr('alt');
+      }
+      var div = document.createElement("div");
+      $(div).addClass("fancybox");
+      $(this).wrap(div); // 最外层套 div ，其实主要作用还是 class 样式
+      var span = document.createElement("span");
+      $(span).addClass("image-caption");
+      $(span).text(caption); // 加描述
+      $(this).after(span);  // 再套一层描述
+      $(this).wrap(element);  // 最后套 a 标签
+    })
+    $(".md .gallery").find("img").fancybox({
+      selector: '[data-fancybox="images"]',
+      hash: false,
+      loop: false,
+      closeClick: true,
+      helpers: {
+        overlay: {closeClick: true}
+      },
+      buttons: [
+        "zoom",
+        "close"
+      ]
+    });
+  };
+  function SCload_fancybox() {
+    if ($(".md .gallery").find("img").length == 0) return;
+    loadCSS("https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css", document.getElementById("loadcss"));
+    setTimeout(function() {
+      loadScript('https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js', pjax_fancybox)
+    }, 1);
+  };
+  $(function () {
+    SCload_fancybox();
+  });
+</script>
+
+
+<!-- internal -->
+
+
+
+
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+
+
+  
+  
+    <script>
+      window.FPConfig = {
+        delay: 0,
+        ignoreKeywords: [],
+        maxRPS: 5,
+        hoverDelay: 25
+      };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/gh/gijo-varghese/flying-pages@2.1.2/flying-pages.min.js"></script>
+  
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+    var clipboard = new ClipboardJS('.btn-copy', {
+        target: function (trigger) {
+            return trigger.nextElementSibling
+        }
+    });
+    function wait(callback, seconds) {
+        var timelag = null;
+        timelag = window.setTimeout(callback, seconds)
+    }
+    function pjax_initCopyCode() {
+		if($(".highlight .code pre").length+$(".article pre code").length==0)return;
+        var copyHtml = '';
+        copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+        copyHtml += '<i class="fas fa-copy"></i><span>COPY</span>';
+        copyHtml += '</button>';
+        $(".highlight .code pre").before(copyHtml);
+        $(".article pre code").before(copyHtml);
+        clipboard.off('success').on('success', function (e) {
+            let $btn = $(e.trigger);
+            $btn.addClass('copied');
+            let $icon = $($btn.find('i'));
+            $icon.removeClass('fa-copy');
+            $icon.addClass('fa-check-circle');
+            let $span = $($btn.find('span'));
+            $span[0].innerText = 'COPIED';
+            wait(function () {
+                $icon.removeClass('fa-check-circle');
+                $icon.addClass('fa-copy');
+                $span[0].innerText = 'COPY'
+            }, 2000)
+        });
+        clipboard.off('error').on('error', function (e) {
+            e.clearSelection();
+            let $btn = $(e.trigger);
+            $btn.addClass('copy-failed');
+            let $icon = $($btn.find('i'));
+            $icon.removeClass('fa-copy');
+            $icon.addClass('fa-times-circle');
+            let $span = $($btn.find('span'));
+            $span[0].innerText = 'COPY FAILED';
+            wait(function () {
+                $icon.removeClass('fa-times-circle');
+                $icon.addClass('fa-copy');
+                $span[0].innerText = 'COPY'
+            }, 2000)
+        })
+    }
+    $(function () {
+        pjax_initCopyCode()
+    });
+</script>
+
+
+
+
+
+
+
+
+  
+  
+<script src="/js/valine.js"></script>
+
+
+<script>
+  var GUEST_INFO = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link'.split(',').filter(function (item) {
+    return GUEST_INFO.indexOf(item) > -1
+  });
+  var REQUIRED_FIELDS = ['nick', 'mail', 'link'];
+  var requiredFields = ''.split(',').filter(function (item) {
+    return REQUIRED_FIELDS.indexOf(item) > -1
+  });
+
+  function emoji(path, idx, ext) {
+    return path + "/" + path + "-" + idx + "." + ext;
+  }
+
+  var emojiMaps = {};
+  for (var i = 1; i <= 54; i++) {
+    emojiMaps['tieba-' + i] = emoji('tieba', i, 'png');
+  }
+  for (var i = 1; i <= 101; i++) {
+    emojiMaps['qq-' + i] = emoji('qq', i, 'gif');
+  }
+  for (var i = 1; i <= 116; i++) {
+    emojiMaps['aru-' + i] = emoji('aru', i, 'gif');
+  }
+  for (var i = 1; i <= 125; i++) {
+    emojiMaps['twemoji-' + i] = emoji('twemoji', i, 'png');
+  }
+  for (var i = 1; i <= 4; i++) {
+    emojiMaps['weibo-' + i] = emoji('weibo', i, 'png');
+  }
+
+  function pjax_valine() {
+    if(!document.querySelectorAll("#valine_container")[0])return;
+
+    let pagePlaceholder = pdata.commentPlaceholder || "快来评论吧~";
+
+    let path = pdata.commentPath;
+    if (path.length == 0) {
+      let defaultPath = '';
+      path = defaultPath || decodeURI(window.location.pathname);
+    }
+
+    var valine = new Valine();
+    valine.init({
+      el: '#valine_container',
+      meta: meta,
+      placeholder: pagePlaceholder,
+      path: path,
+      appId: "v6cb35sRa1lfGq6EOtTQHHyf-gzGzoHsz",
+      appKey: "2ulfq63r4brxg2l9QfXp0cTM",
+      pageSize: '10',
+      avatar: 'robohash',
+      lang: 'zh-cn',
+      visitor: 'true',
+      highlight: 'true',
+      mathJax: 'true',
+      enableQQ: 'true',
+      recordIP: 'true',
+      requiredFields: requiredFields,
+      emojiCDN: 'https://cdn.jsdelivr.net/gh/volantis-x/cdn-emoji/valine/',
+      emojiMaps: emojiMaps
+    })
+  }
+
+  $(function () {
+    pjax_valine();
+  });
+</script>
+
+
+
+
+
+  
+<script src="/js/app.js"></script>
+
+
+
+<!-- optional -->
+
+  <script>
+const SearchServiceimagePath="https://cdn.jsdelivr.net/gh/volantis-x/cdn-volantis@master/img/";
+const ROOT =  ("/" || "/").endsWith('/') ? ("/" || "/") : ("//" || "/" );
+
+$('.input.u-search-input').one('focus',function(){
+	
+		loadScript('/js/search/hexo.js',setSearchService);
+	
+})
+
+function listenSearch(){
+  
+    customSearch = new HexoSearch({
+      imagePath: SearchServiceimagePath
+    });
+  
+}
+function setSearchService() {
+	listenSearch();
+	
+		document.addEventListener("pjax:success", listenSearch);
+	
+}
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  <script defer>
+
+  const LCCounter = {
+    app_id: 'v6cb35sRa1lfGq6EOtTQHHyf-gzGzoHsz',
+    app_key: '2ulfq63r4brxg2l9QfXp0cTM',
+    custom_api_server: '',
+
+    // 查询存储的记录
+    getRecord(Counter, url, title) {
+      return new Promise(function (resolve, reject) {
+        Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({url})))
+          .then(resp => resp.json())
+          .then(({results, code, error}) => {
+            if (code === 401) {
+              throw error;
+            }
+            if (results && results.length > 0) {
+              var record = results[0];
+              resolve(record);
+            } else {
+              Counter('post', '/classes/Counter', {url, title: title, times: 0})
+                .then(resp => resp.json())
+                .then((record, error) => {
+                  if (error) {
+                    throw error;
+                  }
+                  resolve(record);
+                }).catch(error => {
+                console.error('Failed to create', error);
+                reject(error);
+              });
+            }
+          }).catch((error) => {
+          console.error('LeanCloud Counter Error:', error);
+          reject(error);
+        });
+      })
+    },
+
+    // 发起自增请求
+    increment(Counter, incrArr) {
+      return new Promise(function (resolve, reject) {
+        Counter('post', '/batch', {
+          "requests": incrArr
+        }).then((res) => {
+          res = res.json();
+          if (res.error) {
+            throw res.error;
+          }
+          resolve(res);
+        }).catch((error) => {
+          console.error('Failed to save visitor count', error);
+          reject(error);
+        });
+      });
+    },
+
+    // 构建自增请求体
+    buildIncrement(objectId) {
+      return {
+        "method": "PUT",
+        "path": `/1.1/classes/Counter/${ objectId }`,
+        "body": {
+          "times": {
+            '__op': 'Increment',
+            'amount': 1
+          }
+        }
+      }
+    },
+
+    // 校验是否为有效的 UV
+    validUV() {
+      var key = 'LeanCloudUVTimestamp';
+      var flag = localStorage.getItem(key);
+      if (flag) {
+        // 距离标记小于 24 小时则不计为 UV
+        if (new Date().getTime() - parseInt(flag) <= 86400000) {
+          return false;
+        }
+      }
+      localStorage.setItem(key, new Date().getTime().toString());
+      return true;
+    },
+
+    addCount(Counter) {
+      var enableIncr = '' === 'true' && window.location.hostname !== 'localhost';
+      enableIncr = true;
+      var getterArr = [];
+      var incrArr = [];
+      // 请求 PV 并自增
+      var pvCtn = document.querySelector('#lc-sv');
+      if (pvCtn || enableIncr) {
+        var pvGetter = this.getRecord(Counter, 'http://raymond-zhao.top' + '/#lc-sv', 'Visits').then((record) => {
+          incrArr.push(this.buildIncrement(record.objectId))
+          var eles = document.querySelectorAll('#lc-sv #number');
+          if (eles.length > 0) {
+            eles.forEach((el,index,array)=>{
+              el.innerText = record.times + 1;
+              if (pvCtn) {
+                pvCtn.style.display = 'inline';
+              }
+            })
+          }
+        });
+        getterArr.push(pvGetter);
+      }
+
+      // 请求 UV 并自增
+      var uvCtn = document.querySelector('#lc-uv');
+      if (uvCtn || enableIncr) {
+        var uvGetter = this.getRecord(Counter, 'http://raymond-zhao.top' + '/#lc-uv', 'Visitors').then((record) => {
+          var vuv = this.validUV();
+          vuv && incrArr.push(this.buildIncrement(record.objectId))
+          var eles = document.querySelectorAll('#lc-uv #number');
+          if (eles.length > 0) {
+            eles.forEach((el,index,array)=>{
+              el.innerText = record.times + (vuv ? 1 : 0);
+              if (uvCtn) {
+                uvCtn.style.display = 'inline';
+              }
+            })
+          }
+        });
+        getterArr.push(uvGetter);
+      }
+
+      // 请求文章的浏览数，如果是当前页面就自增
+      var allPV = document.querySelectorAll('#lc-pv');
+      if (allPV.length > 0 || enableIncr) {
+        for (i = 0; i < allPV.length; i++) {
+          let pv = allPV[i];
+          let title = pv.getAttribute('data-title');
+          var url = 'http://raymond-zhao.top' + pv.getAttribute('data-path');
+          if (url) {
+            var viewGetter = this.getRecord(Counter, url, title).then((record) => {
+              // 是当前页面就自增
+              let curPath = window.location.pathname;
+              if (curPath.includes('index.html')) {
+                curPath = curPath.substring(0, curPath.lastIndexOf('index.html'));
+              }
+              if (pv.getAttribute('data-path') == curPath) {
+                incrArr.push(this.buildIncrement(record.objectId));
+              }
+              if (pv) {
+                var ele = pv.querySelector('#lc-pv #number');
+                if (ele) {
+                  if (pv.getAttribute('data-path') == curPath) {
+                    ele.innerText = (record.times || 0) + 1;
+                  } else {
+                    ele.innerText = record.times || 0;
+                  }
+                  pv.style.display = 'inline';
+                }
+              }
+            });
+            getterArr.push(viewGetter);
+          }
+        }
+      }
+
+      // 如果启动计数自增，批量发起自增请求
+      if (enableIncr) {
+        Promise.all(getterArr).then(() => {
+          incrArr.length > 0 && this.increment(Counter, incrArr);
+        })
+      }
+
+    },
+
+
+    fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${ api_server }/1.1${ url }`, {
+          method,
+          headers: {
+            'X-LC-Id': this.app_id,
+            'X-LC-Key': this.app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      this.addCount(Counter);
+    },
+
+    refreshCounter() {
+      var api_server = this.app_id.slice(-9) !== '-MdYXbMMI' ? this.custom_api_server : `https://${ this.app_id.slice(0, 8).toLowerCase() }.api.lncldglobal.com`;
+      if (api_server) {
+        this.fetchData(api_server);
+      } else {
+        fetch('https://app-router.leancloud.cn/2/route?appId=' + this.app_id)
+          .then(resp => resp.json())
+          .then(({api_server}) => {
+            this.fetchData('https://' + api_server);
+          });
+      }
+    }
+
+  };
+
+  LCCounter.refreshCounter();
+
+  document.addEventListener('pjax:complete', function () {
+    LCCounter.refreshCounter();
+  });
+</script>
+
+
+
+
+
+
+
+
+<script>
+function listennSidebarTOC() {
+  const navItems = document.querySelectorAll(".toc li");
+  if (!navItems.length) return;
+  const sections = [...navItems].map((element) => {
+    const link = element.querySelector(".toc-link");
+    const target = document.getElementById(
+      decodeURI(link.getAttribute("href")).replace("#", "")
+    );
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      window.scrollTo({
+		top: target.offsetTop + 100,
+		
+	  });
+    });
+    return target;
+  });
+
+  function activateNavByIndex(target) {
+    if (target.classList.contains("active-current")) return;
+
+    document.querySelectorAll(".toc .active").forEach((element) => {
+      element.classList.remove("active", "active-current");
+    });
+    target.classList.add("active", "active-current");
+    let parent = target.parentNode;
+    while (!parent.matches(".toc")) {
+      if (parent.matches("li")) parent.classList.add("active");
+      parent = parent.parentNode;
+    }
+  }
+
+  function findIndex(entries) {
+    let index = 0;
+    let entry = entries[index];
+    if (entry.boundingClientRect.top > 0) {
+      index = sections.indexOf(entry.target);
+      return index === 0 ? 0 : index - 1;
+    }
+    for (; index < entries.length; index++) {
+      if (entries[index].boundingClientRect.top <= 0) {
+        entry = entries[index];
+      } else {
+        return sections.indexOf(entry.target);
+      }
+    }
+    return sections.indexOf(entry.target);
+  }
+
+  function createIntersectionObserver(marginTop) {
+    marginTop = Math.floor(marginTop + 10000);
+    let intersectionObserver = new IntersectionObserver(
+      (entries, observe) => {
+        let scrollHeight = document.documentElement.scrollHeight + 100;
+        if (scrollHeight > marginTop) {
+          observe.disconnect();
+          createIntersectionObserver(scrollHeight);
+          return;
+        }
+        let index = findIndex(entries);
+        activateNavByIndex(navItems[index]);
+      },
+      {
+        rootMargin: marginTop + "px 0px -100% 0px",
+        threshold: 0,
+      }
+    );
+    sections.forEach((element) => {
+      element && intersectionObserver.observe(element);
+    });
+  }
+  createIntersectionObserver(document.documentElement.scrollHeight);
+}
+
+document.addEventListener("DOMContentLoaded", listennSidebarTOC);
+document.addEventListener("pjax:success", listennSidebarTOC);
+</script>
+
+<!-- more -->
+
+
+
+
+    
+      
+
+
+<script src="https://cdn.jsdelivr.net/npm/pjax@0.2.8/pjax.min.js"></script>
+
+
+<!-- 样式位于：source/css/_third-party/pjaxanimate.styl -->
+
+<div class="pjax-animate">
+  
+    <script src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script>
+    <div id="loading-bar-wrapper"><script>NProgress.configure({parent:"#loading-bar-wrapper",trickleSpeed: 100})</script></div>
+    <script>
+      window.ShowLoading = function() {
+        NProgress.start();
+      };
+      window.HideLoading = function() {
+        NProgress.done();
+      }
+    </script>
+  
+</div>
+
+
+<script>
+    var pjax;
+    document.addEventListener('DOMContentLoaded', function () {
+      pjax = new Pjax({
+        elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([pjax-fancybox])',
+        selectors: [
+          "title",
+          "#l_cover",
+          "#pjax-container",
+          "#pjax-header-nav-list"
+        ],
+        cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+        timeout: 5000
+      });
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+      //window.stop(); // 相当于点击了浏览器的停止按钮
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      window.subData = null; // 移除标题（用于一二级导航栏切换处）
+      if (typeof $.fancybox != "undefined") {
+        $.fancybox.close();    // 关闭弹窗
+      }
+      volantis.$switcher.removeClass('active'); // 关闭移动端激活的搜索框
+      volantis.$header.removeClass('z_search-open'); // 关闭移动端激活的搜索框
+      volantis.$wrapper.removeClass('sub'); // 跳转页面时关闭二级导航
+
+      // 解绑事件 避免重复监听
+      volantis.$topBtn.unbind('click');
+      $('.menu a').unbind('click');
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+	  
+      window.ShowLoading();
+	  
+    });
+
+    document.addEventListener('pjax:complete', function () {
+      // 关于百度统计对 SPA 页面的处理：
+      // 方案一：百度统计>管理>单页应用设置中，打开开启按钮即可对SPA进行统计。 https://tongji.baidu.com/web/help/article?id=324
+      // 方案二：取消注释下列代码。 https://tongji.baidu.com/web/help/article?id=235
+       
+
+      // 关于谷歌统计对 SPA 页面的处理：
+      // 当应用以动态方式加载内容并更新地址栏中的网址时，也应该更新通过 gtag.js 存储的网页网址。
+      // https://developers.google.cn/analytics/devguides/collection/gtagjs/single-page-applications?hl=zh-cn
+      
+	 
+
+      $('.nav-main').find('.list-v').not('.menu-phone').removeAttr("style",""); // 移除小尾巴的移除
+      $('.menu-phone.list-v').removeAttr("style",""); // 移除小尾巴的移除
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+      try{
+          if (typeof $.fancybox == "undefined") {
+            SCload_fancybox();
+          } else {
+            pjax_fancybox();
+          }
+        
+        
+        
+        
+        
+          pjax_initCopyCode();
+        
+        
+          pjax_valine();
+        
+        
+        
+        
+      } catch (e) {
+        console.log(e);
+      }
+	  
+      window.HideLoading();
+	  
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+	  
+      window.HideLoading();
+	  
+      window.location.href = e.triggerElement.href;
+    });
+</script>
+
+    
+  </div>
+</body>
+</html>

@@ -1,0 +1,1780 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head hexo-theme='https://github.com/volantis-x/hexo-theme-volantis/tree/4.0.0'>
+  <meta charset="utf-8">
+  <!-- SEO相关 -->
+  
+    
+  
+  <!-- 渲染优化 -->
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  <link rel='dns-prefetch' href='https://cdn.jsdelivr.net'>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <!-- 页面元数据 -->
+  
+  <title>《Java8实战》基础知识 - 吹梦到西洲</title>
+  
+    <meta name="keywords" content="Java8">
+  
+
+  
+    <meta name="description" content="介绍 Java 8 的基础知识。学完第一部分，将会对 Lambda 表达式有充分的了解。">
+  
+
+  <!-- feed -->
+  
+
+  <!-- import meta -->
+  
+
+  <!-- link -->
+  
+    <link rel="shortcut icon" type='image/x-icon' href="/images/3d-architecture.svg">
+  
+
+  <!-- import link -->
+  
+
+  
+    
+<link rel="stylesheet" href="/css/first.css">
+
+  
+
+  
+  <link rel="stylesheet" href="/css/style.css" media="print" onload="this.media='all';this.onload=null">
+  <noscript><link rel="stylesheet" href="/css/style.css"></noscript>
+  
+
+  <script id="loadcss"></script>
+
+</head>
+
+<body>
+  
+
+<header id="l_header" class="l_header auto shadow blur show" style='opacity: 0' >
+  <div class='container'>
+  <div id='wrapper'>
+    <div class='nav-sub'>
+      <p class="title"></p>
+      <ul class='switcher nav-list-h m-phone' id="pjax-header-nav-list">
+        <li><a id="s-comment" class="fas fa-comments fa-fw" target="_self" href='javascript:void(0)'></a></li>
+        
+          <li><a id="s-toc" class="s-toc fas fa-list fa-fw" target="_self" href='javascript:void(0)'></a></li>
+        
+      </ul>
+    </div>
+		<div class="nav-main">
+      
+        
+        <a class="title flat-box" target="_self" href='/'>
+          
+            <img no-lazy class='logo' src='https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/blog/Logo-NavBar@3x.png'/>
+          
+          
+          
+        </a>
+      
+
+			<div class='menu navigation'>
+				<ul class='nav-list-h m-pc'>
+          
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/
+                  
+                  
+                  
+                    id="home"
+                  >
+                  <i class='fas fa-rss fa-fw'></i>博客
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/categories/
+                  
+                  
+                  
+                    id="categories"
+                  >
+                  <i class='fas fa-folder-open fa-fw'></i>分类
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/tags/
+                  
+                  
+                  
+                    id="tags"
+                  >
+                  <i class='fas fa-tags fa-fw'></i>标签
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/archives/
+                  
+                  
+                  
+                    id="archives"
+                  >
+                  <i class='fas fa-archive fa-fw'></i>归档
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/friends/
+                  
+                  
+                  
+                    id="friends"
+                  >
+                  <i class='fas fa-link fa-fw'></i>友链
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/about/
+                  
+                  
+                  
+                    id="about"
+                  >
+                  <i class='fas fa-info-circle fa-fw'></i>关于
+                </a>
+                
+              </li>
+            
+          
+          
+				</ul>
+			</div>
+
+      <div class="m_search">
+        <form name="searchform" class="form u-search-form">
+          <i class="icon fas fa-search fa-fw"></i>
+          <input type="text" class="input u-search-input" placeholder="Search..." />
+        </form>
+      </div>
+
+			<ul class='switcher nav-list-h m-phone'>
+				
+					<li><a class="s-search fas fa-search fa-fw" target="_self" href='javascript:void(0)'></a></li>
+				
+				<li>
+          <a class="s-menu fas fa-bars fa-fw" target="_self" href='javascript:void(0)'></a>
+          <ul class="menu-phone list-v navigation white-box">
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/
+                  
+                  
+                  
+                    id="home"
+                  >
+                  <i class='fas fa-rss fa-fw'></i>博客
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/categories/
+                  
+                  
+                  
+                    id="categories"
+                  >
+                  <i class='fas fa-folder-open fa-fw'></i>分类
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/tags/
+                  
+                  
+                  
+                    id="tags"
+                  >
+                  <i class='fas fa-tags fa-fw'></i>标签
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/archives/
+                  
+                  
+                  
+                    id="archives"
+                  >
+                  <i class='fas fa-archive fa-fw'></i>归档
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/friends/
+                  
+                  
+                  
+                    id="friends"
+                  >
+                  <i class='fas fa-link fa-fw'></i>友链
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/about/
+                  
+                  
+                  
+                    id="about"
+                  >
+                  <i class='fas fa-info-circle fa-fw'></i>关于
+                </a>
+                
+              </li>
+            
+          
+            
+          </ul>
+        </li>
+			</ul>
+		</div>
+	</div>
+  </div>
+</header>
+
+  <div id="l_body">
+    <div id="l_cover">
+  
+    
+        <div id="full" class='cover-wrapper post search' style="display: none;">
+          
+            <div class='cover-bg lazyload placeholder' data-bg="/images/cover-2.jpg"></div>
+          
+          <div class='cover-body'>
+  <div class='top'>
+    
+    
+      <p class="title">吹梦到西洲</p>
+    
+    
+  </div>
+  <div class='bottom'>
+    
+      <div class="m_search">
+        <form name="searchform" class="form u-search-form">
+          <input type="text" class="input u-search-input" placeholder="Looking for something?" />
+          <i class="icon fas fa-search fa-fw"></i>
+        </form>
+      </div>
+    
+    <div class='menu navigation'>
+      <div class='list-h'>
+        
+          
+            <a href="/"
+              
+              
+              id="home">
+              <i class='fas fa-rss fa-fw'></i><p>博客</p>
+            </a>
+          
+            <a href="/categories/"
+              
+              
+              id="categories">
+              <i class='fas fa-folder-open fa-fw'></i><p>分类</p>
+            </a>
+          
+            <a href="/tags/"
+              
+              
+              id="tags">
+              <i class='fas fa-tags fa-fw'></i><p>标签</p>
+            </a>
+          
+            <a href="/archives/"
+              
+              
+              id="archives">
+              <i class='fas fa-archive fa-fw'></i><p>归档</p>
+            </a>
+          
+            <a href="/friends/"
+              
+              
+              id="friends">
+              <i class='fas fa-link fa-fw'></i><p>友链</p>
+            </a>
+          
+            <a href="/about/"
+              
+              
+              id="about">
+              <i class='fas fa-info-circle fa-fw'></i><p>关于</p>
+            </a>
+          
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+          <div id="scroll-down" style="display: none;"><i class="fa fa-chevron-down scroll-down-effects"></i></div>
+        </div>
+    
+  
+  </div>
+
+    <div id='safearea'>
+      <div class='body-wrapper' id="pjax-container">
+        
+
+<div class='l_main'>
+  <article class="article post white-box reveal md shadow article-type-post" id="post" itemscope itemprop="blogPost">
+  
+
+
+  
+  <div class="article-meta" id="top">
+    
+    
+    
+      <h1 class="title">
+        《Java8实战》基础知识
+      </h1>
+      <div class='new-meta-box'>
+        
+          
+            
+<div class='new-meta-item author'>
+  <a class='author' href="/" rel="nofollow">
+    <img no-lazy src="">
+    <p>吹梦到西洲</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  <div class='new-meta-item category'>
+    <a class='notlink'>
+      <i class="fas fa-folder-open fa-fw" aria-hidden="true"></i>
+      <a class="category-link" href="/categories/Java/">Java</a>
+    </a>
+  </div>
+
+
+          
+        
+          
+            <div class="new-meta-item date">
+  <a class='notlink'>
+    <i class="fas fa-calendar-alt fa-fw" aria-hidden="true"></i>
+    <p>发布于：Jan 29, 2021</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  <div class="new-meta-item browse leancloud">
+    <a class='notlink'>
+      
+      <div id="lc-pv" data-title="《Java8实战》基础知识" data-path="/2021/01/29/2021-01-29-Java8InActionPart1/">
+        <i class="fas fa-eye fa-fw" aria-hidden="true"></i>
+        <span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span>
+        次浏览
+      </div>
+    </a>
+  </div>
+
+
+          
+        
+      </div>
+    
+  </div>
+
+
+  
+  <h1 id="1-为什么要关心-Java-8"><a href="#1-为什么要关心-Java-8" class="headerlink" title="1.为什么要关心 Java 8"></a>1.为什么要关心 Java 8</h1><p>Java 8 不但对软件有影响，对硬件也有影响：平常用的 CPU 都是多核的—笔记本电脑或台式机上的处理器可能有四个 CPU 甚至更多内核。但是，绝大多数现有的 Java 程序都只使用其中一个内核， 其他三个都闲着，或只是用一小部分的处理能力来运行操作系统或杀毒程序。</p>
+<p>在Java 8之前，专家们可能会说必须利用线程才能使用多个内核。但是线程用起来不容易。</p>
+<p>Java 8 特点：</p>
+<ul>
+<li>Stream API</li>
+<li>向方法传递代码的技巧</li>
+<li>接口中的默认方法</li>
+</ul>
+<p>Java 8 提供了一个新的 API(称为“流”，Stream)，它支持许多处理数据的并行操作，其思路和在数据库查询语言中的思路类似—用更高级的方式表达想要的东西，而由“实现”(在这里是Streams库)来选择最佳低级执行机制。可以避免用 synchronized 编写代码，且效率更高。</p>
+<p>Java 8 中的主要变化反映了它开始远离常侧重于改变现有值的经典面向对象思想，而向<strong>函数式编程</strong>领域转变，在大面上考虑做什么被认为是头等大事，并和如何实现区分开来。</p>
+<p>编程语言的整个目的就在于操作值，要是按照历史 上编程语言的传统，这些值因此被称为一等值。编程语言中的其他结构也许有助于我们表示值的结构，但在程序执行期间不能传递，因而是二等公民。人们发现，在运行时传递方法能将方法变成一等公民。</p>
+<p>谓词(predicate) 在数学上常常用来代表一个类似函数的东西，它接受一个参数值，并返回true或false。</p>
+<p>for-each 循环一个个去迭代元素，然后再处理元素。我们把这种 数据迭代的方法称为<strong>外部迭代</strong>。相反，有了Stream API，你根本用不着操心循环的事情。数据处理完全是在库内部进行的。我们把这种思想叫作<strong>内部迭代</strong>。</p>
+<h1 id="2-通过行为参数化传递代码"><a href="#2-通过行为参数化传递代码" class="headerlink" title="2.通过行为参数化传递代码"></a>2.通过行为参数化传递代码</h1><p>行为参数化就是可以帮助你处理频繁变更的需求的一种软件开发模式。一言以蔽之，它意味着拿出一个代码块，把它准备好却不去执行它。这个代码块以后可以被程序的其他部分调用，这意味可以推迟这块代码的执行。</p>
+<h2 id="2-1-方法参数化"><a href="#2-1-方法参数化" class="headerlink" title="2.1 方法参数化"></a>2.1 方法参数化</h2><blockquote>
+<p>功能需求：根据传入的 Apple 属性，对 List<Apple> inventory 进行筛选，完成收集后的 List。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Apple</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> weight = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">private</span> String color = <span class="string">""</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-2-阶段-1"><a href="#2-2-阶段-1" class="headerlink" title="2.2 阶段 1"></a>2.2 阶段 1</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> List&lt;Apple&gt; <span class="title">filterGreenApples</span><span class="params">(List&lt;Apple&gt; inventory)</span></span>&#123;</span><br><span class="line">    List&lt;Apple&gt; result = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span> (Apple apple: inventory)&#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="string">"green"</span>.equals(apple.getColor())) &#123;</span><br><span class="line">            result.add(apple);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> List&lt;Apple&gt; <span class="title">filterHeavyApples</span><span class="params">(List&lt;Apple&gt; inventory)</span></span>&#123;</span><br><span class="line">    List&lt;Apple&gt; result = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span> (Apple apple: inventory)&#123;</span><br><span class="line">        <span class="keyword">if</span> (apple.getWeight() &gt; <span class="number">150</span>) &#123;</span><br><span class="line">            result.add(apple);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> List&lt;Apple&gt; <span class="title">filterApplesByParams</span><span class="params">(List&lt;Apple&gt; inventory, String param)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="string">"color"</span>.equals(param)) &#123;</span><br><span class="line">        <span class="keyword">return</span> filterGreenApples(inventory);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">"weight"</span>.equals(param)) &#123;</span><br><span class="line">    	<span class="keyword">return</span> filterHeavyApples(inventory);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>如果想改变过滤条件，比如把过滤颜色从 “green” 变成 “red” 该怎么办？重新添加一个方法，但是改动的代码只有一两行吗？</p>
+</blockquote>
+<h2 id="2-3-阶段-2"><a href="#2-3-阶段-2" class="headerlink" title="2.3 阶段 2"></a>2.3 阶段 2</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">ApplePredicate</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">test</span><span class="params">(Apple a)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">AppleWeightPredicate</span> <span class="keyword">implements</span> <span class="title">ApplePredicate</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">test</span><span class="params">(Apple apple)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> apple.getWeight() &gt; <span class="number">150</span>; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">AppleColorPredicate</span> <span class="keyword">implements</span> <span class="title">ApplePredicate</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">test</span><span class="params">(Apple apple)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"green"</span>.equals(apple.getColor());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">AppleRedAndHeavyPredicate</span> <span class="keyword">implements</span> <span class="title">ApplePredicate</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">test</span><span class="params">(Apple apple)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"red"</span>.equals(apple.getColor()) </span><br><span class="line">            &amp;&amp; apple.getWeight() &gt; <span class="number">150</span>; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> List&lt;Apple&gt; <span class="title">filter</span><span class="params">(List&lt;Apple&gt; inventory, ApplePredicate p)</span></span>&#123;</span><br><span class="line">    List&lt;Apple&gt; result = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span>(Apple apple : inventory)&#123;</span><br><span class="line">        <span class="keyword">if</span>(p.test(apple))&#123;</span><br><span class="line">            result.add(apple);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> List&lt;Apple&gt; <span class="title">filterGreenApples</span><span class="params">(List&lt;Apple&gt; inventory)</span></span>&#123;</span><br><span class="line">    List&lt;Apple&gt; result = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span>(Apple apple: inventory)&#123;</span><br><span class="line">        <span class="keyword">if</span>(<span class="string">"green"</span>.equals(apple.getColor()))&#123;</span><br><span class="line">            result.add(apple);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> List&lt;Apple&gt; <span class="title">filterApplesByColor</span><span class="params">(List&lt;Apple&gt; inventory, String color)</span></span>&#123;</span><br><span class="line">    List&lt;Apple&gt; result = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span>(Apple apple: inventory)&#123;</span><br><span class="line">        <span class="keyword">if</span>(apple.getColor().equals(color))&#123;</span><br><span class="line">            result.add(apple);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> List&lt;Apple&gt; <span class="title">filterApplesByWeight</span><span class="params">(List&lt;Apple&gt; inventory, <span class="keyword">int</span> weight)</span></span>&#123;</span><br><span class="line">    List&lt;Apple&gt; result = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span>(Apple apple: inventory)&#123;</span><br><span class="line">        <span class="keyword">if</span>(apple.getWeight() &gt; weight)&#123;</span><br><span class="line">            result.add(apple);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String... args)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	List&lt;Apple&gt; inventory = Arrays.asList(<span class="keyword">new</span> Apple(<span class="number">80</span>,<span class="string">"green"</span>), <span class="keyword">new</span> Apple(<span class="number">155</span>, <span class="string">"green"</span>), <span class="keyword">new</span> Apple(<span class="number">120</span>, <span class="string">"red"</span>));	</span><br><span class="line"></span><br><span class="line">    <span class="comment">// [Apple&#123;color='green', weight=80&#125;, Apple&#123;color='green', weight=155&#125;]</span></span><br><span class="line">    List&lt;Apple&gt; greenApples = filterApplesByColor(inventory, <span class="string">"green"</span>);</span><br><span class="line">    System.out.println(greenApples);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// [Apple&#123;color='red', weight=120&#125;]</span></span><br><span class="line">    List&lt;Apple&gt; redApples = filterApplesByColor(inventory, <span class="string">"red"</span>);</span><br><span class="line">    System.out.println(redApples);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// [Apple&#123;color='green', weight=80&#125;, Apple&#123;color='green', weight=155&#125;]</span></span><br><span class="line">    List&lt;Apple&gt; greenApples2 = filter(inventory, <span class="keyword">new</span> AppleColorPredicate());</span><br><span class="line">    System.out.println(greenApples2);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// [Apple&#123;color='green', weight=155&#125;]</span></span><br><span class="line">    List&lt;Apple&gt; heavyApples = filter(inventory, <span class="keyword">new</span> AppleWeightPredicate());</span><br><span class="line">    System.out.println(heavyApples);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// []</span></span><br><span class="line">    List&lt;Apple&gt; redAndHeavyApples = filter(inventory, <span class="keyword">new</span> AppleRedAndHeavyPredicate());</span><br><span class="line">    System.out.println(redAndHeavyApples);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// [Apple&#123;color='red', weight=120&#125;]</span></span><br><span class="line">    List&lt;Apple&gt; redApples2 = filter(inventory, <span class="keyword">new</span> ApplePredicate() &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">test</span><span class="params">(Apple a)</span></span>&#123;</span><br><span class="line">            <span class="keyword">return</span> a.getColor().equals(<span class="string">"red"</span>); </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    System.out.println(redApples2);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-4-阶段-3"><a href="#2-4-阶段-3" class="headerlink" title="2.4 阶段 3"></a>2.4 阶段 3</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">isGreenApple</span><span class="params">(Apple apple)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"green"</span>.equals(apple.getColor()); </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">isHeavyApple</span><span class="params">(Apple apple)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> apple.getWeight() &gt; <span class="number">150</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> List&lt;Apple&gt; <span class="title">filterApples</span><span class="params">(List&lt;Apple&gt; inventory, Predicate&lt;Apple&gt; p)</span> </span>&#123;</span><br><span class="line">    List&lt;Apple&gt; result = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span>(Apple apple : inventory)&#123;</span><br><span class="line">        <span class="keyword">if</span>(p.test(apple))&#123;</span><br><span class="line">            result.add(apple);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String... args)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    List&lt;Apple&gt; inventory = Arrays.asList(<span class="keyword">new</span> Apple(<span class="number">80</span>,<span class="string">"green"</span>),</span><br><span class="line">                                          <span class="keyword">new</span> Apple(<span class="number">155</span>, <span class="string">"green"</span>),</span><br><span class="line">                                          <span class="keyword">new</span> Apple(<span class="number">120</span>, <span class="string">"red"</span>));	</span><br><span class="line"></span><br><span class="line">    <span class="comment">// [Apple&#123;color='green', weight=80&#125;, Apple&#123;color='green', weight=155&#125;]</span></span><br><span class="line">    List&lt;Apple&gt; greenApples = filterApples(inventory, FilteringApples::isGreenApple);</span><br><span class="line">    System.out.println(greenApples);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// [Apple&#123;color='green', weight=155&#125;]</span></span><br><span class="line">    List&lt;Apple&gt; heavyApples = filterApples(inventory, FilteringApples::isHeavyApple);</span><br><span class="line">    System.out.println(heavyApples);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// [Apple&#123;color='green', weight=80&#125;, Apple&#123;color='green', weight=155&#125;]</span></span><br><span class="line">    List&lt;Apple&gt; greenApples2 = filterApples(inventory, (Apple a) -&gt; <span class="string">"green"</span>.equals(a.getColor()));</span><br><span class="line">    System.out.println(greenApples2);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// [Apple&#123;color='green', weight=155&#125;]</span></span><br><span class="line">    List&lt;Apple&gt; heavyApples2 = filterApples(inventory, (Apple a) -&gt; a.getWeight() &gt; <span class="number">150</span>);</span><br><span class="line">    System.out.println(heavyApples2);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// []</span></span><br><span class="line">    List&lt;Apple&gt; weirdApples = filterApples(inventory, (Apple a) -&gt; a.getWeight() &lt; <span class="number">80</span> || </span><br><span class="line">                                           <span class="string">"brown"</span>.equals(a.getColor()));</span><br><span class="line">    System.out.println(weirdApples);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="3-Lambda-表达式"><a href="#3-Lambda-表达式" class="headerlink" title="3.Lambda 表达式"></a>3.Lambda 表达式</h1><h2 id="3-1-Lambda-管中窥豹"><a href="#3-1-Lambda-管中窥豹" class="headerlink" title="3.1 Lambda 管中窥豹"></a>3.1 Lambda 管中窥豹</h2><p>可以把 Lambda 表达式理解为<strong>简洁地表示可传递的匿名函数的一种方式</strong>：它没有名称，但有参数列表、函数主体、返回类型，可能还有一个可以抛出的异常列表。</p>
+<ul>
+<li>匿名：它不像普通方法那样有一个确切的名称。</li>
+<li>函数： Lambda  函数不像方法（Method）那样属于某个特定的类。但和方法一样， Lambda  有参数列表、函数主体、返回类型，还可能有可以抛出的异常列表。</li>
+<li>传递： Lambda  表达式可以作为参数传递给方法或存储在变量中。</li>
+<li>简洁：无需像匿名类那样写很多模板代码。</li>
+</ul>
+<p>普通方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 等号右边的就是 匿名函数类。</span></span><br><span class="line">Comparator&lt;Apple&gt; byWeight = <span class="keyword">new</span> Comparator&lt;Apple&gt;() &#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compareTo</span><span class="params">(Apple a1, Apple a2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> a1.getWeight().compareTo(a2.getWeight());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> Lambda  函数</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Comparator&lt;Apple&gt; byWeight = (Apple a1, Apple a2) -&gt; a.getWeight().compareTo(a2.getWeight());</span><br></pre></td></tr></table></figure>
+
+<p>需要注意的是 <code>Comparator&lt;T&gt;</code> 是一个接口。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Comparator</span>&lt;<span class="title">T</span>&gt; </span>&#123; ... &#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> Lambda  表达式有三个部分：参数列表（可以为空，即无参）、箭头、 Lambda  主体（可以无返回值，即 <code>void</code>）。</p>
+</blockquote>
+<p>一些 <code>Lambda</code> 示例</p>
+<table>
+<thead>
+<tr>
+<th align="center">使用案例</th>
+<th align="center">Lambda  示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">布尔表达式</td>
+<td align="center"><code>(List&lt;String&gt; list) -&gt; list.isEmpty();</code></td>
+</tr>
+<tr>
+<td align="center">创建对象</td>
+<td align="center"><code>() -&gt; new Apple(10);</code></td>
+</tr>
+<tr>
+<td align="center">消费一个对象</td>
+<td align="center"><code>(Apple a) -&gt; { System.out.println(a.getWeight()) };</code></td>
+</tr>
+<tr>
+<td align="center">从一个对象中选择/抽取</td>
+<td align="center"><code>(String s) -&gt; s.length();</code></td>
+</tr>
+<tr>
+<td align="center">组合两个值</td>
+<td align="center"><code>(int a, int b) -&gt; a * b;</code></td>
+</tr>
+<tr>
+<td align="center">比较两个对象</td>
+<td align="center"><code>(Apple a1, Apple a2) -&gt; a1.getWeight().compareTo(a2.getWeight())</code></td>
+</tr>
+</tbody></table>
+<h2 id="3-2-Lambda-使用场景"><a href="#3-2-Lambda-使用场景" class="headerlink" title="3.2 Lambda 使用场景"></a>3.2 Lambda 使用场景</h2><p>在<strong>函数式接口</strong>上使用 Lambda 表达式。</p>
+<h3 id="3-2-1-函数式接口"><a href="#3-2-1-函数式接口" class="headerlink" title="3.2.1 函数式接口"></a>3.2.1 函数式接口</h3><p>一言以蔽之，<strong>函数式接口</strong>就是只定义一个抽象方法的接口。比如常见的 <code>Comparator&lt;T&gt;、Runnable、Callable</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// java.util.Comparator</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Comparator</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">compare</span><span class="params">(T o1, T o2)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// java.lang.Runnable</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// java.util.concurrent.Callable</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Callable</span>&lt;<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function">V <span class="title">call</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>另外，在 Java 8 中已经允许接口中有方法的默认实现，也就是接口可以拥有<strong>默认方法（即在类没有对方法进行实现时， 其主体为方法提供默认实现的方法）</strong>。即使一个接口有很多默认方法，但是只要接口只定义了一个<strong>抽象方法</strong>，它就仍然是一个<strong>函数式接口</strong>。</p>
+<h3 id="3-2-2-函数描述符"><a href="#3-2-2-函数描述符" class="headerlink" title="3.2.2 函数描述符"></a>3.2.2 函数描述符</h3><p>函数式接口的抽象方法的签名基本上就是 Lambda 表达式的签名。这种抽象方法叫作<strong>函数描述符</strong>。例如，Runnable 接口可以看作一个什么也不接受什么也不返回(void)的函数的签名，因为它只有一个叫作 run 的抽象方法，这个方法什么也不接受，什么也不返回(void)。</p>
+<p> Lambda  表达式可以被赋给一个变量，或传递给一个接受函数式接口作为参数的方法，但是这个 Lambda 表达式的签名要和函数式接口的抽象方法一样。</p>
+<blockquote>
+<p>@<strong>FunctionalInterface</strong> 是怎么回事?</p>
+<p>如果查看新的 Java API，会发现函数式接口带有 @FunctionalInterface 的标注，这个标注用于表示该接口会设计成 一个函数式接口。不是必需的，但对于为此设计的接口而言，使用它是比较推荐的，就像是 @Override 标注表示方法被重写了。</p>
+</blockquote>
+<h2 id="3-3-环绕执行模式"><a href="#3-3-环绕执行模式" class="headerlink" title="3.3 环绕执行模式"></a>3.3 环绕执行模式</h2><p>资源处理（例如处理文件或数据库）时一个常见的模式就是打开一个资源，做一些处理， 然后关闭资源。这个设置和清理阶段总是很类似，并且会围绕着执行处理的那些重要代码。这就是所谓的环绕执行(execute around)模式。</p>
+<p>在以下代码中，是从一个文件中读取一行所需的模板代码。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">processFile</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> (BufferedReader br = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> FileReader(<span class="string">"data.json"</span>))) &#123;</span><br><span class="line">        <span class="keyword">return</span> br.readLine();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-3-1-行为参数化"><a href="#3-3-1-行为参数化" class="headerlink" title="3.3.1 行为参数化"></a>3.3.1 行为参数化</h3><p>上面那段代码是有局限的。只能读文件的第一行，如果想要返回头两行，甚至是返回使用最频繁的词，该怎么办？理想情况下，要重用执行设置和清理的代码，并告诉 <code>processFile</code>方法对文件执行不同的操作。也就是需要把 <code>processFile</code> 的行为参数化。需要一种方法把行为传递给 <code>processFile</code>，以便它可以利用 <code>BufferedReader</code> 执行不同的行为。</p>
+<p>需要一个接收 <code>BufferedReader</code> 并返回 <code>String</code> 的 <code>Lambda</code>，下面就是从 <code>BufferedReader</code> 中打印两行的写法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">String result = processFile((BufferedReader br) -&gt; br.readLine() + br.readLine());</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-3-2-使用函数式接口来传递行为"><a href="#3-3-2-使用函数式接口来传递行为" class="headerlink" title="3.3.2 使用函数式接口来传递行为"></a>3.3.2 使用函数式接口来传递行为</h3><p>前面提到过， Lambda  仅可用于上下文是函数式接口的情况。因此需要创建一个能匹配 <code>BufferedReader -&gt; String</code>，还可以抛出 <code>IOException</code> 异常的接口。暂且称此接口为 <code>BufferedReaderProcessor</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">BufferedReaderProcessor</span> </span>&#123;</span><br><span class="line">    <span class="function">String <span class="title">process</span><span class="params">(BufferedReader b)</span> <span class="keyword">throws</span> IOException</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接下来就可以把这个接口作为新的 <code>processFile</code> 方法的参数了：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">processFile</span><span class="params">(BufferedReaderProcessor p)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-3-3-执行一个行为"><a href="#3-3-3-执行一个行为" class="headerlink" title="3.3.3 执行一个行为"></a>3.3.3 执行一个行为</h3><p>任何 <code>BufferedReader -&gt; String</code> 形式的 <code>Lambda</code> 都可以作为参数来传递，因为它们符合 <code>BufferedReaderProcessor</code> 接口中定义的 <code>process</code> 方法的签名。</p>
+<p> Lambda  表达式允许直接内联，为函数式接口的抽象方法提供实现，并且将整个表达式作为函数式接口的一个实例。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">processFile</span><span class="params">(BufferedReaderProcessor p)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> (BufferedReader br = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> FileReader(<span class="string">"data.json"</span>))) &#123;</span><br><span class="line">        <span class="keyword">return</span> p.process(br);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-3-4-传递-Lambda"><a href="#3-3-4-传递-Lambda" class="headerlink" title="3.3.4 传递  Lambda"></a>3.3.4 传递  Lambda</h3><p>接下来就可以通过传递不同的 <code>Lambda</code> 重用 <code>processFile</code> 方法，并以不同的方式处理文件了。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 处理一行</span></span><br><span class="line">String oneLine = processFile((BufferedReader br) -&gt; br.readLine());</span><br><span class="line"><span class="comment">// 处理两行</span></span><br><span class="line">String twoLines = processFile((BufferedReader br) -&gt; br.readLine() + br.readLine());</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-4-使用函数式接口"><a href="#3-4-使用函数式接口" class="headerlink" title="3.4 使用函数式接口"></a>3.4 使用函数式接口</h2><p>函数式接口定义且只定义了一个抽象方法。函数式接口很有用，因为抽象方法的签名可以描述 Lambda 表达式的签名。函数式接口的抽象方法的签名称为<strong>函数描述符</strong>。</p>
+<h3 id="3-4-1-Predicate"><a href="#3-4-1-Predicate" class="headerlink" title="3.4.1 Predicate"></a>3.4.1 <strong>Predicate</strong></h3><p><code>java.util.function.Predicate&lt;T&gt;</code> 接口定义了一个名叫 test 的抽象方法，它接受泛型 T 对象，并返回一个 boolean。在需要表示一个涉及类型 T 的布尔表达式时，就可以使用这个接口。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Predicate</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">test</span><span class="params">(T t)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> &lt;T&gt; <span class="function">List&lt;T&gt; <span class="title">filter</span><span class="params">(List&lt;T&gt; list, Predicate&lt;T&gt; predicate)</span> </span>&#123;</span><br><span class="line">    List&lt;T&gt; res = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span> (T t : list) &#123;</span><br><span class="line">        <span class="keyword">if</span> (predicate.test(t))</span><br><span class="line">            res.add(t);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Predicate&lt;String&gt; nonEmptyStringPredicate = (String s) -&gt; !s.isEmpty();</span><br><span class="line">List&lt;String&gt; nonEmpty = filter(listOfStrings, nonEmptyStringPredicate);</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-4-2-Consumer"><a href="#3-4-2-Consumer" class="headerlink" title="3.4.2 Consumer"></a>3.4.2 <strong>Consumer</strong></h3><p><code>java.util.function.Consumer&lt;T&gt;</code> 定义了一个名叫 accept 的抽象方法，它接受泛型 T 的对象，没有返回(void)。如果需要访问类型 T 的对象，并对其执行某些操作，可以使用这个接口。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Consumer</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">accept</span><span class="params">(T t)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> &lt;T&gt; <span class="function"><span class="keyword">void</span> <span class="title">forEach</span><span class="params">(List&lt;T&gt; list, Consumer&lt;T&gt; consumer)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (T t : list) &#123;</span><br><span class="line">        c.accept(t);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">forEach(Arrays.asList(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>), (Integer i) -&gt; System.out.println(i));</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-4-3-Function"><a href="#3-4-3-Function" class="headerlink" title="3.4.3 Function"></a>3.4.3 <strong>Function</strong></h3><p><code>java.util.function.Function&lt;T, R&gt;</code> 接口定义了一个叫作 apply 的方法，它接受一个泛型 T 的对象，并返回一个泛型 R 的对象。如果需要定义一个 Lambda ，将输入对象的信息映射到输出，可以使用这个接口。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Function</span>&lt;<span class="title">T</span>, <span class="title">R</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function">R <span class="title">apply</span><span class="params">(T t)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> &lt;T, R&gt; <span class="function">List&lt;R&gt; <span class="title">map</span><span class="params">(List&lt;T&gt; list, Function&lt;T, R&gt; function)</span> </span>&#123;</span><br><span class="line">    List&lt;R&gt; res = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span> (T t : list) &#123;</span><br><span class="line">        res.add(function.apply(t));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">List&lt;Integer&gt; res = map(Arrays.asList(<span class="string">" Lambda s"</span>,<span class="string">"in"</span>,<span class="string">"action"</span>), (String s) -&gt; s.length());</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-4-4-原始类型特化"><a href="#3-4-4-原始类型特化" class="headerlink" title="3.4.4 原始类型特化"></a>3.4.4 原始类型特化</h3><p>Java 类型要么是引用类型(比如 Byte、Integer、Object、List)，要么是原始类型(比如 int、double、byte、char)。但是泛型(比如 <code>Consumer&lt;T&gt;</code> 中的 T)只能绑定到引用类型。这是由泛型内部的实现方式造成的。</p>
+<ul>
+<li>自动装箱：将原始类型转换为对应的引用类型。</li>
+<li>自动拆箱：将引用类型转换为对应的原始类型。</li>
+</ul>
+<p>但这在性能方面是要付出代价的。装箱后的值本质上就是把原始类型包裹起来，并保存在堆（Heap）里。因此，装箱后的值需要更多的内存，并需要额外的内存搜索来获取被包裹的原始值。</p>
+<p>Java 8 为前面所说的函数式接口带来了一个专门的版本，以便在输入和输出都是原始类型时避免自动装箱的操作。</p>
+<p>比如，在下面的代码中，使用 IntPredicate 就避免了对值 1000 进行装箱操作，但要是用 <code>Predicate&lt;Integer&gt;</code> 就会把参数 1000 装箱到一个 Integer 对象中：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IntPredicate</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">test</span><span class="params">(<span class="keyword">int</span> t)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">IntPredicate evenNumbers = (<span class="keyword">int</span> i) -&gt; i % <span class="number">2</span> == <span class="number">0</span>;</span><br><span class="line">evenNumbers.test(<span class="number">1000</span>); <span class="comment">// true，无装箱操作。</span></span><br><span class="line"></span><br><span class="line">Predicate&lt;Integer&gt; oddNumbers = (Integer i) -&gt; i % <span class="number">2</span> == <span class="number">1</span>;</span><br><span class="line">oddNumbers.test(<span class="number">1000</span>); <span class="comment">// false, 装箱。</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>一般来说，针对专门的输入参数类型的函数式接口的名称都要加上对应的原始类型前缀，比如 DoublePredicate、IntConsumer、LongBinaryOperator、IntFunction等。Function 接口还有针对输出参数类型的变种：ToIntFunction<T>、IntToDoubleFunction等。</p>
+</blockquote>
+<p>Java 8 中常用的函数式接口。</p>
+<table>
+<thead>
+<tr>
+<th align="center">函数式接口</th>
+<th align="center">函数描述符</th>
+<th align="center">原始类型特化</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">占位</td>
+<td align="center">占位</td>
+<td align="center">占位</td>
+</tr>
+</tbody></table>
+<p>任何函数式接口都不允许抛出受检异常(checked exception)。如果需要 Lambda 表达式来抛出异常，有两种办法：</p>
+<ul>
+<li>定义一个自己的函数式接口，并声明受检异常。</li>
+<li>或者把 Lambda 包在一个 <code>try/catch</code> 块中。</li>
+</ul>
+<h2 id="3-5-类型检查、类型推断以及限制"><a href="#3-5-类型检查、类型推断以及限制" class="headerlink" title="3.5 类型检查、类型推断以及限制"></a>3.5 类型检查、类型推断以及限制</h2><p> Lambda 表达式时，说它可以为函数式接口生成一个实例。然而， Lambda  表达式本身并不包含它在实现哪个函数式接口的信息。为了全面了解 Lambda 表达式，你应该知 道 Lambda 的实际类型是什么。</p>
+<h3 id="3-5-1-类型检查"><a href="#3-5-1-类型检查" class="headerlink" title="3.5.1 类型检查"></a>3.5.1 类型检查</h3><p> Lambda  的类型是从使用 Lambda 的上下文推断出来的。上下文中 Lambda 表达式需要的类型称为<strong>目标类型</strong>。下图概述了下列代码的类型检查过程。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Apple&gt; heavierThan150g = filter(inventory, (Apple a) -&gt; a.getWeight() &gt; <span class="number">150</span>);</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://tva1.sinaimg.cn/large/008eGmZEly1gn4op78nrdj314j0u0jx6.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/008eGmZEly1gn4op78nrdj314j0u0jx6.jpg" srcset="data:image/png;base64,666" alt="类型检查"></p>
+<h3 id="3-5-2-相同-Lambda-，不同函数式接口。"><a href="#3-5-2-相同-Lambda-，不同函数式接口。" class="headerlink" title="3.5.2 相同  Lambda ，不同函数式接口。"></a>3.5.2 相同  Lambda ，不同函数式接口。</h3><p>有了目标类型的概念，同一个 Lambda 表达式就可以与不同的函数式接口联系起来，只要它们的抽象方法签名能够兼容。比如，</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Callable&lt;Integer&gt; c = () -&gt; <span class="number">42</span>;</span><br><span class="line">PrivilegedAction&lt;Integer&gt; p = () -&gt; <span class="number">42</span>;</span><br></pre></td></tr></table></figure>
+
+<p>它们都代表着什么也不接受且返回一个泛型 T 的函数。</p>
+<blockquote>
+<p>特殊的 void 兼容规则</p>
+<p>如果一个 Lambda 的主体是一个语句表达式， 它就和一个返回 void 的函数描述符兼容(当然需要参数列表也兼容)。</p>
+</blockquote>
+<h3 id="3-5-3-类型推断"><a href="#3-5-3-类型推断" class="headerlink" title="3.5.3 类型推断"></a>3.5.3 类型推断</h3><p>Java 编译器会从上下文（目标类型）推断出用什么函数式接口来配合 Lambda 表达式，这意味着它也可以推断出适合 Lambda 的签名，因为<strong>函数描述符</strong>可以通过目标类型来得到。这样做的好处在于，编译器可以了解 Lambda 表达式的参数类型，这样就可以在 Lambda 语法中省去标注参数类型。比如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 显示参数类型</span></span><br><span class="line">Comparator&lt;Apple&gt; c = (Apple a1, Apple a2) -&gt; a1.getWeight().compareTo(a2.getWeight());</span><br><span class="line"><span class="comment">// 类型推断，从 Comparator 的泛型类型推断出 a1, a2 的类型。</span></span><br><span class="line">Comparator&lt;Apple&gt; c = (a1, a2) -&gt; a1.getWeight().compareTo(a2.getWeight());</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-5-4-使用局部变量"><a href="#3-5-4-使用局部变量" class="headerlink" title="3.5.4 使用局部变量"></a>3.5.4 使用局部变量</h3><p>迄今为止所介绍的所有 Lambda 表达式都只用到了其主体里面的参数。但 Lambda 表达式也允许使用自由变量(不是参数，而是在外层作用域中定义的变量)，就像匿名类一样。 它们被称作捕获 Lambda 。比如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> portNumber = <span class="number">1337</span>;</span><br><span class="line">Runnable r = () -&gt; System.out.println(portNumber);</span><br></pre></td></tr></table></figure>
+
+<p> Lambda 可以没有限制地捕获实例变量和静态变量。但局部变量必须显式声明为 final， 或事实上是 final。换句话说， Lambda 表达式只能捕获指派给它们的局部变量一次。(注:捕获实例变量可以被看作捕获最终局部变量 this。)</p>
+<p>实例变量都存储在堆中，而局部变量则保存在栈上。</p>
+<blockquote>
+<p>闭包</p>
+<p>闭包就是一个函数的实例，且它可以无限制地访问那个函数的非本地变量。闭包可以作为参数传递给另一个函数。它也可以访问和修改其作用域之外的变量。现在，Java 8 的 Lambda 和匿名类可以做类似于闭包的事情：它们可以作为参数传递给方法，并且可以访问其作用域之外的变量。但有一个限制：它们不能修改定义 Lambda 的方法的局部变量的内容。这些变量必须是隐式最终的。可以认为 Lambda 是对值封闭，而不是对变量封闭。</p>
+</blockquote>
+<h2 id="3-6-方法引用"><a href="#3-6-方法引用" class="headerlink" title="3.6 方法引用"></a>3.6 方法引用</h2><p>方法引用允许重复使用现有的方法定义，并像 Lambda 一样传递它们。在一些情况下， 比起使用 Lambda 表达式，它们更易读，也更自然。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//  Lambda </span></span><br><span class="line">inventory.sort((Apple a1, Apple a2) -&gt; a1.getWeight().compareTo(a2.getWeight()));</span><br><span class="line"><span class="comment">// Method Reference</span></span><br><span class="line">inventory.sort(comparing(Apple::getWeight));</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-6-1-管中窥豹"><a href="#3-6-1-管中窥豹" class="headerlink" title="3.6.1 管中窥豹"></a>3.6.1 管中窥豹</h3><p>方法引用可以被看作仅仅调用特定方法的 Lambda 的一种快捷写法。它的基本思想是，如果一个 Lambda 代表的只是“直接调用这个方法”，那最好还是用名称来调用它，而不是去描述如何调用它。事实上，方法引用就是根据已有的方法实现来创建  Lambda 表达式。但是，显式地指明方法的名称，代码的可读性会更好。</p>
+<p>当需要使用方法引用时，目标引用放在分隔符 <code>::</code> 前，方法名称放在后面（不需要括号，因为并没有实际调用这个方法）。可以把方法引用看作针对仅仅涉及单一方法的 Lambda 的语法糖。</p>
+<p> Lambda 及其等效方法引用的例子。</p>
+<table>
+<thead>
+<tr>
+<th align="center">Lambda</th>
+<th align="center">等效的方法引用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>(Apple a) -&gt; a.getWeight()</code></td>
+<td align="center"><code>Apple::getWeight</code></td>
+</tr>
+<tr>
+<td align="center"><code>() -&gt; Thread.currentThread().dumpStack()</code></td>
+<td align="center"><code>Thread.currentThread()::dumpStack</code></td>
+</tr>
+<tr>
+<td align="center"><code>(str, i) -&gt; str.substring(i)</code></td>
+<td align="center"><code>String::substring</code></td>
+</tr>
+<tr>
+<td align="center"><code>(String s) -&gt; System.out.println(s)</code></td>
+<td align="center"><code>System.out::println</code></td>
+</tr>
+</tbody></table>
+<p>方法引用主要有三类。</p>
+<ul>
+<li>指向静态方法的方法引用(例如 Integer 的 parseInt 方法，写作 <code>Integer::parseInt</code>)。</li>
+<li>指向任意类型实例方法的方法引用(例如 String 的 length 方法，写作 <code>String::length</code>)。</li>
+<li>指向现有对象的实例方法的方法引用(假设有一个局部变量 expensiveTransaction 用于存放 Transaction 类型的对象，它支持实例方法 getValue，那么可以写 <code>expensiveTransaction::getValue</code>)。</li>
+</ul>
+<p>依照一些简单的方法，可以将 Lambda 表达式重构为等价的方法引用。</p>
+<p><img src="https://tva1.sinaimg.cn/large/008eGmZEly1gn4q71ugmgj31320o841q.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/008eGmZEly1gn4q71ugmgj31320o841q.jpg" srcset="data:image/png;base64,666" alt="image-20210129180852801"></p>
+<h3 id="3-6-2-构造函数引用"><a href="#3-6-2-构造函数引用" class="headerlink" title="3.6.2 构造函数引用"></a>3.6.2 构造函数引用</h3><p>对于一个现有构造函数，可以利用它的名称和关键字 <code>new</code> 来创建它的一个引用：<code>ClassName::new</code>。它的功能与指向静态方法的引用类似。例如，假设有一个构造函数没有参数。 它适合 Supplier 的签名 <code>() -&gt; Apple</code>。可以这样做：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 构造函数引用指向默认的 Apple() 构造函数</span></span><br><span class="line">Supplier&lt;Apple&gt; c1 = Apple::<span class="keyword">new</span>; <span class="comment">// 等价于 Supplier&lt;Apple&gt; c1 = () -&gt; new Apple();</span></span><br><span class="line"><span class="comment">// 调用 Supplier 的 get 方法 将产生一个新的 Apple。</span></span><br><span class="line">Apple a1 = c1.get();</span><br></pre></td></tr></table></figure>
+
+<p>如果构造函数的签名是 <code>Apple(Integer weight)</code>，那么它就适合 Function 接口的签名，于是可以这样写：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 等价于 Function&lt;Integer, Apple&gt; c2 = (weight) -&gt; new Apple(weight);</span></span><br><span class="line">Function&lt;Integer, Apple&gt; c2 = Apple::<span class="keyword">new</span>;</span><br><span class="line">Apple a2 = c2.apply(<span class="number">110</span>);</span><br></pre></td></tr></table></figure>
+
+<p>如果构造函数具有两个参数，签名是 <code>Apple(String color, Integer weight)</code>，它适合 BiFunction 接口的签名，于是可以这样写：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 等价于 BiFunction&lt;String, Integer, Apple&gt; c3 = (color, weight) -&gt; new Apple(color, weight);</span></span><br><span class="line">BiFunction&lt;String, Integer, Apple&gt; c3 = Apple::<span class="keyword">new</span>;</span><br><span class="line">Apple c3 = c3.apply(<span class="string">"green"</span>, <span class="number">110</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-7-Lambda-和方法引用实战"><a href="#3-7-Lambda-和方法引用实战" class="headerlink" title="3.7 Lambda 和方法引用实战"></a>3.7 Lambda 和方法引用实战</h2><blockquote>
+<p>用不同的排序策略给一个 Apple 列表排序，并需要展示如何把一个原始粗暴的解决方案转变得更为简明。</p>
+</blockquote>
+<p>最后结果：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">inventory.sort(comparing(Apple::getWeight));</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-8-复合方法"><a href="#3-8-复合方法" class="headerlink" title="3.8 复合方法"></a>3.8 复合方法</h2><p>可以把多个简单的 Lambda 复合成复杂的表达式。可以让两个谓词之间做一个 or 操作，组合成一个更大的谓词，还可以让一个函数的结果成为另一个函数的输入。</p>
+<h3 id="3-8-1-比较器复合"><a href="#3-8-1-比较器复合" class="headerlink" title="3.8.1 比较器复合"></a>3.8.1 比较器复合</h3><p>可以使用静态方法 <code>Comparator.comparing</code>，根据提取用于比较的键值的 Function 来返回一个 Comparator，如下所示：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 原始</span></span><br><span class="line">Comparator&lt;Apple&gt; c = Comparator.comparing(Apple::getWeight);</span><br><span class="line"><span class="comment">// 逆序</span></span><br><span class="line">inventory.sort(comparing(Apple::getWeight).reversed());</span><br><span class="line"><span class="comment">// 比较器链。在按重量比较两个苹果之后，按原产国排序。</span></span><br><span class="line">inventory.sort(comparing(Apple::getWeight).reversed().thenComparing(Apple::getCountry));</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-8-2-谓词复合"><a href="#3-8-2-谓词复合" class="headerlink" title="3.8.2 谓词复合"></a>3.8.2 谓词复合</h3><p>谓词接口包括三个方法：negate、and 和 or，可以重用已有的 Predicate 来创建更杂的谓词。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Predicate&lt;Apple&gt; notRedApple = redApple.negate(); <span class="comment">// 苹果不是红的</span></span><br><span class="line"><span class="comment">// 链接两个谓词来生成另一个 Predicate 对象</span></span><br><span class="line">Predicate&lt;Apple&gt; redAndHeavyApple = redApple.and(a -&gt; a.getWeight() &gt; <span class="number">150</span>);</span><br><span class="line"><span class="comment">// </span></span><br><span class="line">Predicate&lt;Apple&gt; redAndHeavyAppleOrGreen = redApple.and(a -&gt; a.getWeight() &gt; <span class="number">150</span>).or(a -&gt; <span class="string">"green"</span>.equals(a.getColor()));</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-8-3-函数复合"><a href="#3-8-3-函数复合" class="headerlink" title="3.8.3 函数复合"></a>3.8.3 函数复合</h3><p>可以把 Function 接口所代表的 Lambda 表达式复合起来。Function 接口为此配了 andThen 和 compose 两个默认方法，它们都会返回 Function 的一个实例。</p>
+<ul>
+<li><code>andThen</code>：先对输入应用一个给定函数，再对输出应用另一个函数。意味着 <code>g(f(x))</code>。</li>
+<li><code>compose</code>：先把给定的函数用作 compose 的参数里面给的那个函数，然后再把函数本身用于结果。意味着 <code>f(g(x))</code>。</li>
+</ul>
+<h2 id="3-9-数学中的类似思想"><a href="#3-9-数学中的类似思想" class="headerlink" title="3.9 数学中的类似思想"></a>3.9 数学中的类似思想</h2><h2 id="3-10-小结"><a href="#3-10-小结" class="headerlink" title="3.10 小结"></a>3.10 小结</h2><ul>
+<li>Lambda 表达式可以理解为一种匿名函数:它没有名称，但有参数列表、函数主体、返回类型，可能还有一个可以抛出的异常的列表。</li>
+<li>Lambda 表达式可以简洁地传递代码。</li>
+<li>函数式接口就是仅仅声明了一个抽象方法的接口。</li>
+<li>只有在接受函数式接口的地方才可以使用 Lambda 表达式。</li>
+<li>Lambda 表达式允许直接内联，为函数式接口的抽象方法提供实现，并且将整个表达式作为函数式接口的一个实例。</li>
+<li>Java 8 自带一些常用的函数式接口，放在 <code>java.util.function</code> 包里。</li>
+<li>为了避免装箱操作，对 <code>Predicate&lt;T&gt;</code> 和 <code>Function&lt;T, R&gt;</code> 等通用函数式接口的原始类型特化。</li>
+<li>Lambda 表达式所需要代表的类型称为目标类型。</li>
+<li>方法引用可以重复使用现有的方法实现并直接传递它们。</li>
+<li>Comparator、Predicate 和 Function 等函数式接口都有几个可以用来结合 Lambda 表达式的默认方法。</li>
+</ul>
+
+  
+  
+    
+    <div class='footer'>
+      
+      
+      
+        <div class='copyright'>
+          <blockquote>
+            
+              
+                <p>博客内容遵循 署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0) 协议</p>
+
+              
+            
+              
+                <p>本文永久链接是：<a href=http://raymond-zhao.top/2021/01/29/2021-01-29-Java8InActionPart1/>http://raymond-zhao.top/2021/01/29/2021-01-29-Java8InActionPart1/</a></p>
+              
+            
+          </blockquote>
+        </div>
+      
+      
+    </div>
+  
+  
+    
+
+
+  <div class='article-meta' id="bottom">
+    <div class='new-meta-box'>
+      
+        
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-06-20T13:59:48+08:00">
+  <a class='notlink'>
+    <i class="fas fa-edit fa-fw" aria-hidden="true"></i>
+    <p>更新于：Jun 20, 2021</p>
+  </a>
+</div>
+
+        
+      
+        
+          
+  
+  <div class="new-meta-item meta-tags"><a class="tag" href="/tags/Java8/" rel="nofollow"><i class="fas fa-hashtag fa-fw" aria-hidden="true"></i><p>Java8</p></a></div>
+
+
+        
+      
+        
+          
+  <div class="new-meta-item share -mob-share-list">
+  <div class="-mob-share-list share-body">
+    
+      
+        <a class="-mob-share-qq" title="" rel="external nofollow noopener noreferrer"
+          
+          href="http://connect.qq.com/widget/shareqq/index.html?url=http://raymond-zhao.top/2021/01/29/2021-01-29-Java8InActionPart1/&title=《Java8实战》基础知识 - 吹梦到西洲&summary="
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qq.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qq.png" srcset="data:image/png;base64,666">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-qzone" title="" rel="external nofollow noopener noreferrer"
+          
+          href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=http://raymond-zhao.top/2021/01/29/2021-01-29-Java8InActionPart1/&title=《Java8实战》基础知识 - 吹梦到西洲&summary="
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qzone.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qzone.png" srcset="data:image/png;base64,666">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-weibo" title="" rel="external nofollow noopener noreferrer"
+          
+          href="http://service.weibo.com/share/share.php?url=http://raymond-zhao.top/2021/01/29/2021-01-29-Java8InActionPart1/&title=《Java8实战》基础知识 - 吹梦到西洲&summary="
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/weibo.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/weibo.png" srcset="data:image/png;base64,666">
+          
+        </a>
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+
+
+        
+      
+    </div>
+  </div>
+
+
+  
+  
+
+  
+    <div class="prev-next">
+      
+        <a class='prev' href='/2021/01/29/2021-01-29-Java8InActionPart2/'>
+          <p class='title'><i class="fas fa-chevron-left" aria-hidden="true"></i>《Java8实战》函数式数据处理</p>
+          <p class='content'>4 引入流集合是Java中使用最多的API。几乎每个Java应用程序都会制造和处理集合。集合对于很多编程任务来说都是非常基本的：它们可以把数据分组并加以处 理。尽管集合对于几乎任何一个Java应...</p>
+        </a>
+      
+      
+        <a class='next' href='/2020/08/26/2020-08-26-Network-TCPANDUDP/'>
+          <p class='title'>TCP的运输连接管理<i class="fas fa-chevron-right" aria-hidden="true"></i></p>
+          <p class='content'>TCP的运输连接管理TCP 是面向连接的协议，运输连接是用来传送 TCP 报文的。TCP 运输连接的建立和释放是每一次面向连接的通信中必不可少的过程。因此，运输连接就有三个阶段，即：连接建立、数...</p>
+        </a>
+      
+    </div>
+  
+</article>
+
+
+  
+
+  <article class="post white-box reveal shadow" id="comments">
+    <p ct><i class='fas fa-comments'></i> 评论</p>
+    
+    <div id="valine_container" class="valine_thread">
+  <i class="fas fa-cog fa-spin fa-fw fa-2x"></i>
+</div>
+
+  </article>
+
+
+
+
+
+
+</div>
+<aside class='l_side'>
+  
+  
+    
+    
+
+
+
+  <section class="widget toc-wrapper shadow desktop mobile" id="toc-div" >
+    
+  <header>
+    
+      <i class="fas fa-list fa-fw" aria-hidden="true"></i><span class='name'>本文目录</span>
+    
+  </header>
+
+
+    <div class='content'>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-方法参数化"><span class="toc-text">2.1 方法参数化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-阶段-1"><span class="toc-text">2.2 阶段 1</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-阶段-2"><span class="toc-text">2.3 阶段 2</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-4-阶段-3"><span class="toc-text">2.4 阶段 3</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-Lambda-管中窥豹"><span class="toc-text">3.1 Lambda 管中窥豹</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-Lambda-使用场景"><span class="toc-text">3.2 Lambda 使用场景</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-1-函数式接口"><span class="toc-text">3.2.1 函数式接口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-2-函数描述符"><span class="toc-text">3.2.2 函数描述符</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-3-环绕执行模式"><span class="toc-text">3.3 环绕执行模式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-1-行为参数化"><span class="toc-text">3.3.1 行为参数化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-2-使用函数式接口来传递行为"><span class="toc-text">3.3.2 使用函数式接口来传递行为</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-3-执行一个行为"><span class="toc-text">3.3.3 执行一个行为</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-4-传递-Lambda"><span class="toc-text">3.3.4 传递  Lambda</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-4-使用函数式接口"><span class="toc-text">3.4 使用函数式接口</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-1-Predicate"><span class="toc-text">3.4.1 Predicate</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-2-Consumer"><span class="toc-text">3.4.2 Consumer</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-3-Function"><span class="toc-text">3.4.3 Function</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-4-原始类型特化"><span class="toc-text">3.4.4 原始类型特化</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-5-类型检查、类型推断以及限制"><span class="toc-text">3.5 类型检查、类型推断以及限制</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-5-1-类型检查"><span class="toc-text">3.5.1 类型检查</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-5-2-相同-Lambda-，不同函数式接口。"><span class="toc-text">3.5.2 相同  Lambda ，不同函数式接口。</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-5-3-类型推断"><span class="toc-text">3.5.3 类型推断</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-5-4-使用局部变量"><span class="toc-text">3.5.4 使用局部变量</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-6-方法引用"><span class="toc-text">3.6 方法引用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-6-1-管中窥豹"><span class="toc-text">3.6.1 管中窥豹</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-6-2-构造函数引用"><span class="toc-text">3.6.2 构造函数引用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-7-Lambda-和方法引用实战"><span class="toc-text">3.7 Lambda 和方法引用实战</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-8-复合方法"><span class="toc-text">3.8 复合方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-8-1-比较器复合"><span class="toc-text">3.8.1 比较器复合</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-8-2-谓词复合"><span class="toc-text">3.8.2 谓词复合</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-8-3-函数复合"><span class="toc-text">3.8.3 函数复合</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-9-数学中的类似思想"><span class="toc-text">3.9 数学中的类似思想</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-10-小结"><span class="toc-text">3.10 小结</span></a></li></ol>
+    </div>
+  </section>
+
+
+  
+
+
+</aside>
+
+
+
+        
+        
+          <!--此文件用来存放一些不方便取值的变量-->
+<!--思路大概是将值藏到重加载的区域内-->
+
+<script>
+  window.pdata={}
+  pdata.ispage=true;
+  pdata.postTitle="《Java8实战》基础知识";
+  pdata.commentPath="";
+  pdata.commentPlaceholder="";
+
+  var l_header=document.getElementById("l_header");
+  
+  l_header.classList.add("show");
+  
+</script>
+
+        
+      </div>
+      
+  
+  <footer class="footer clearfix">
+    <br><br>
+    
+      
+        <div class="aplayer-container">
+          
+
+
+        </div>
+      
+    
+      
+        <br>
+        <div class="social-wrapper">
+          
+            
+          
+            
+          
+            
+          
+        </div>
+      
+    
+      
+        <div><p>博客內容遵循 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW" target="_blank" rel="noopener">姓名標示-非商業性-相同方式分享 4.0 國際 (CC BY-NC-SA 4.0) 協議</a></p>
+</div>
+      
+    
+      
+        
+          <div><p><span id="lc-sv">本站总访问量为 <span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span> 次</span> <span id="lc-uv">访客数为 <span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span> 人</span></p>
+</div>
+        
+      
+    
+      
+        本站使用
+        <a href="https://github.com/volantis-x/hexo-theme-volantis/tree/4.0.0" target="_blank" class="codename">Volantis</a>
+        作為主題
+      
+    
+      
+        <div class='copyright'>
+        <p><a href="/">Copyright © 2017-2020 XXX</a></p>
+
+        </div>
+      
+    
+  </footer>
+
+
+      <a id="s-top" class="fas fa-arrow-up fa-fw" href='javascript:void(0)'></a>
+    </div>
+  </div>
+  <div>
+    <script>
+window.volantis={};
+window.volantis.loadcss=document.getElementById("loadcss");
+/********************脚本懒加载函数********************************/
+function loadScript(src, cb) {
+var HEAD = document.getElementsByTagName('head')[0] || document.documentElement;
+var script = document.createElement('script');
+script.setAttribute('type','text/javascript');
+if (cb) script.onload = cb;
+script.setAttribute('src', src);
+HEAD.appendChild(script);
+}
+//https://github.com/filamentgroup/loadCSS
+var loadCSS = function( href, before, media, attributes ){
+	var doc = window.document;
+	var ss = doc.createElement( "link" );
+	var ref;
+	if( before ){
+		ref = before;
+	}
+	else {
+		var refs = ( doc.body || doc.getElementsByTagName( "head" )[ 0 ] ).childNodes;
+		ref = refs[ refs.length - 1];
+	}
+	var sheets = doc.styleSheets;
+	if( attributes ){
+		for( var attributeName in attributes ){
+			if( attributes.hasOwnProperty( attributeName ) ){
+				ss.setAttribute( attributeName, attributes[attributeName] );
+			}
+		}
+	}
+	ss.rel = "stylesheet";
+	ss.href = href;
+	ss.media = "only x";
+	function ready( cb ){
+		if( doc.body ){
+			return cb();
+		}
+		setTimeout(function(){
+			ready( cb );
+		});
+	}
+	ready( function(){
+		ref.parentNode.insertBefore( ss, ( before ? ref : ref.nextSibling ) );
+	});
+	var onloadcssdefined = function( cb ){
+		var resolvedHref = ss.href;
+		var i = sheets.length;
+		while( i-- ){
+			if( sheets[ i ].href === resolvedHref ){
+				return cb();
+			}
+		}
+		setTimeout(function() {
+			onloadcssdefined( cb );
+		});
+	};
+	function loadCB(){
+		if( ss.addEventListener ){
+			ss.removeEventListener( "load", loadCB );
+		}
+		ss.media = media || "all";
+	}
+	if( ss.addEventListener ){
+		ss.addEventListener( "load", loadCB);
+	}
+	ss.onloadcssdefined = onloadcssdefined;
+	onloadcssdefined( loadCB );
+	return ss;
+};
+</script>
+<script>
+  
+  loadCSS("https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14/css/all.min.css", window.volantis.loadcss);
+  
+  
+  
+  
+</script>
+<!-- required -->
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5/dist/jquery.min.js"></script>
+
+<script>
+  function pjax_fancybox() {
+    $(".md .gallery").find("img").each(function () { //渲染 fancybox
+      var element = document.createElement("a"); // a 标签
+      $(element).attr("class", "fancybox");
+      $(element).attr("pjax-fancybox", "");  // 过滤 pjax
+      $(element).attr("href", $(this).attr("src"));
+      if ($(this).attr("data-original")) {
+        $(element).attr("href", $(this).attr("data-original"));
+      }
+      $(element).attr("data-fancybox", "images");
+      var caption = "";   // 描述信息
+      if ($(this).attr('alt')) {  // 判断当前页面是否存在描述信息
+        $(element).attr('data-caption', $(this).attr('alt'));
+        caption = $(this).attr('alt');
+      }
+      var div = document.createElement("div");
+      $(div).addClass("fancybox");
+      $(this).wrap(div); // 最外层套 div ，其实主要作用还是 class 样式
+      var span = document.createElement("span");
+      $(span).addClass("image-caption");
+      $(span).text(caption); // 加描述
+      $(this).after(span);  // 再套一层描述
+      $(this).wrap(element);  // 最后套 a 标签
+    })
+    $(".md .gallery").find("img").fancybox({
+      selector: '[data-fancybox="images"]',
+      hash: false,
+      loop: false,
+      closeClick: true,
+      helpers: {
+        overlay: {closeClick: true}
+      },
+      buttons: [
+        "zoom",
+        "close"
+      ]
+    });
+  };
+  function SCload_fancybox() {
+    if ($(".md .gallery").find("img").length == 0) return;
+    loadCSS("https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css", document.getElementById("loadcss"));
+    setTimeout(function() {
+      loadScript('https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js', pjax_fancybox)
+    }, 1);
+  };
+  $(function () {
+    SCload_fancybox();
+  });
+</script>
+
+
+<!-- internal -->
+
+
+
+
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+
+
+  
+  
+    <script>
+      window.FPConfig = {
+        delay: 0,
+        ignoreKeywords: [],
+        maxRPS: 5,
+        hoverDelay: 25
+      };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/gh/gijo-varghese/flying-pages@2.1.2/flying-pages.min.js"></script>
+  
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+    var clipboard = new ClipboardJS('.btn-copy', {
+        target: function (trigger) {
+            return trigger.nextElementSibling
+        }
+    });
+    function wait(callback, seconds) {
+        var timelag = null;
+        timelag = window.setTimeout(callback, seconds)
+    }
+    function pjax_initCopyCode() {
+		if($(".highlight .code pre").length+$(".article pre code").length==0)return;
+        var copyHtml = '';
+        copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+        copyHtml += '<i class="fas fa-copy"></i><span>COPY</span>';
+        copyHtml += '</button>';
+        $(".highlight .code pre").before(copyHtml);
+        $(".article pre code").before(copyHtml);
+        clipboard.off('success').on('success', function (e) {
+            let $btn = $(e.trigger);
+            $btn.addClass('copied');
+            let $icon = $($btn.find('i'));
+            $icon.removeClass('fa-copy');
+            $icon.addClass('fa-check-circle');
+            let $span = $($btn.find('span'));
+            $span[0].innerText = 'COPIED';
+            wait(function () {
+                $icon.removeClass('fa-check-circle');
+                $icon.addClass('fa-copy');
+                $span[0].innerText = 'COPY'
+            }, 2000)
+        });
+        clipboard.off('error').on('error', function (e) {
+            e.clearSelection();
+            let $btn = $(e.trigger);
+            $btn.addClass('copy-failed');
+            let $icon = $($btn.find('i'));
+            $icon.removeClass('fa-copy');
+            $icon.addClass('fa-times-circle');
+            let $span = $($btn.find('span'));
+            $span[0].innerText = 'COPY FAILED';
+            wait(function () {
+                $icon.removeClass('fa-times-circle');
+                $icon.addClass('fa-copy');
+                $span[0].innerText = 'COPY'
+            }, 2000)
+        })
+    }
+    $(function () {
+        pjax_initCopyCode()
+    });
+</script>
+
+
+
+
+
+
+
+
+  
+  
+<script src="/js/valine.js"></script>
+
+
+<script>
+  var GUEST_INFO = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link'.split(',').filter(function (item) {
+    return GUEST_INFO.indexOf(item) > -1
+  });
+  var REQUIRED_FIELDS = ['nick', 'mail', 'link'];
+  var requiredFields = ''.split(',').filter(function (item) {
+    return REQUIRED_FIELDS.indexOf(item) > -1
+  });
+
+  function emoji(path, idx, ext) {
+    return path + "/" + path + "-" + idx + "." + ext;
+  }
+
+  var emojiMaps = {};
+  for (var i = 1; i <= 54; i++) {
+    emojiMaps['tieba-' + i] = emoji('tieba', i, 'png');
+  }
+  for (var i = 1; i <= 101; i++) {
+    emojiMaps['qq-' + i] = emoji('qq', i, 'gif');
+  }
+  for (var i = 1; i <= 116; i++) {
+    emojiMaps['aru-' + i] = emoji('aru', i, 'gif');
+  }
+  for (var i = 1; i <= 125; i++) {
+    emojiMaps['twemoji-' + i] = emoji('twemoji', i, 'png');
+  }
+  for (var i = 1; i <= 4; i++) {
+    emojiMaps['weibo-' + i] = emoji('weibo', i, 'png');
+  }
+
+  function pjax_valine() {
+    if(!document.querySelectorAll("#valine_container")[0])return;
+
+    let pagePlaceholder = pdata.commentPlaceholder || "快来评论吧~";
+
+    let path = pdata.commentPath;
+    if (path.length == 0) {
+      let defaultPath = '';
+      path = defaultPath || decodeURI(window.location.pathname);
+    }
+
+    var valine = new Valine();
+    valine.init({
+      el: '#valine_container',
+      meta: meta,
+      placeholder: pagePlaceholder,
+      path: path,
+      appId: "v6cb35sRa1lfGq6EOtTQHHyf-gzGzoHsz",
+      appKey: "2ulfq63r4brxg2l9QfXp0cTM",
+      pageSize: '10',
+      avatar: 'robohash',
+      lang: 'zh-cn',
+      visitor: 'true',
+      highlight: 'true',
+      mathJax: 'true',
+      enableQQ: 'true',
+      recordIP: 'true',
+      requiredFields: requiredFields,
+      emojiCDN: 'https://cdn.jsdelivr.net/gh/volantis-x/cdn-emoji/valine/',
+      emojiMaps: emojiMaps
+    })
+  }
+
+  $(function () {
+    pjax_valine();
+  });
+</script>
+
+
+
+
+
+  
+<script src="/js/app.js"></script>
+
+
+
+<!-- optional -->
+
+  <script>
+const SearchServiceimagePath="https://cdn.jsdelivr.net/gh/volantis-x/cdn-volantis@master/img/";
+const ROOT =  ("/" || "/").endsWith('/') ? ("/" || "/") : ("//" || "/" );
+
+$('.input.u-search-input').one('focus',function(){
+	
+		loadScript('/js/search/hexo.js',setSearchService);
+	
+})
+
+function listenSearch(){
+  
+    customSearch = new HexoSearch({
+      imagePath: SearchServiceimagePath
+    });
+  
+}
+function setSearchService() {
+	listenSearch();
+	
+		document.addEventListener("pjax:success", listenSearch);
+	
+}
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  <script defer>
+
+  const LCCounter = {
+    app_id: 'v6cb35sRa1lfGq6EOtTQHHyf-gzGzoHsz',
+    app_key: '2ulfq63r4brxg2l9QfXp0cTM',
+    custom_api_server: '',
+
+    // 查询存储的记录
+    getRecord(Counter, url, title) {
+      return new Promise(function (resolve, reject) {
+        Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({url})))
+          .then(resp => resp.json())
+          .then(({results, code, error}) => {
+            if (code === 401) {
+              throw error;
+            }
+            if (results && results.length > 0) {
+              var record = results[0];
+              resolve(record);
+            } else {
+              Counter('post', '/classes/Counter', {url, title: title, times: 0})
+                .then(resp => resp.json())
+                .then((record, error) => {
+                  if (error) {
+                    throw error;
+                  }
+                  resolve(record);
+                }).catch(error => {
+                console.error('Failed to create', error);
+                reject(error);
+              });
+            }
+          }).catch((error) => {
+          console.error('LeanCloud Counter Error:', error);
+          reject(error);
+        });
+      })
+    },
+
+    // 发起自增请求
+    increment(Counter, incrArr) {
+      return new Promise(function (resolve, reject) {
+        Counter('post', '/batch', {
+          "requests": incrArr
+        }).then((res) => {
+          res = res.json();
+          if (res.error) {
+            throw res.error;
+          }
+          resolve(res);
+        }).catch((error) => {
+          console.error('Failed to save visitor count', error);
+          reject(error);
+        });
+      });
+    },
+
+    // 构建自增请求体
+    buildIncrement(objectId) {
+      return {
+        "method": "PUT",
+        "path": `/1.1/classes/Counter/${ objectId }`,
+        "body": {
+          "times": {
+            '__op': 'Increment',
+            'amount': 1
+          }
+        }
+      }
+    },
+
+    // 校验是否为有效的 UV
+    validUV() {
+      var key = 'LeanCloudUVTimestamp';
+      var flag = localStorage.getItem(key);
+      if (flag) {
+        // 距离标记小于 24 小时则不计为 UV
+        if (new Date().getTime() - parseInt(flag) <= 86400000) {
+          return false;
+        }
+      }
+      localStorage.setItem(key, new Date().getTime().toString());
+      return true;
+    },
+
+    addCount(Counter) {
+      var enableIncr = '' === 'true' && window.location.hostname !== 'localhost';
+      enableIncr = true;
+      var getterArr = [];
+      var incrArr = [];
+      // 请求 PV 并自增
+      var pvCtn = document.querySelector('#lc-sv');
+      if (pvCtn || enableIncr) {
+        var pvGetter = this.getRecord(Counter, 'http://raymond-zhao.top' + '/#lc-sv', 'Visits').then((record) => {
+          incrArr.push(this.buildIncrement(record.objectId))
+          var eles = document.querySelectorAll('#lc-sv #number');
+          if (eles.length > 0) {
+            eles.forEach((el,index,array)=>{
+              el.innerText = record.times + 1;
+              if (pvCtn) {
+                pvCtn.style.display = 'inline';
+              }
+            })
+          }
+        });
+        getterArr.push(pvGetter);
+      }
+
+      // 请求 UV 并自增
+      var uvCtn = document.querySelector('#lc-uv');
+      if (uvCtn || enableIncr) {
+        var uvGetter = this.getRecord(Counter, 'http://raymond-zhao.top' + '/#lc-uv', 'Visitors').then((record) => {
+          var vuv = this.validUV();
+          vuv && incrArr.push(this.buildIncrement(record.objectId))
+          var eles = document.querySelectorAll('#lc-uv #number');
+          if (eles.length > 0) {
+            eles.forEach((el,index,array)=>{
+              el.innerText = record.times + (vuv ? 1 : 0);
+              if (uvCtn) {
+                uvCtn.style.display = 'inline';
+              }
+            })
+          }
+        });
+        getterArr.push(uvGetter);
+      }
+
+      // 请求文章的浏览数，如果是当前页面就自增
+      var allPV = document.querySelectorAll('#lc-pv');
+      if (allPV.length > 0 || enableIncr) {
+        for (i = 0; i < allPV.length; i++) {
+          let pv = allPV[i];
+          let title = pv.getAttribute('data-title');
+          var url = 'http://raymond-zhao.top' + pv.getAttribute('data-path');
+          if (url) {
+            var viewGetter = this.getRecord(Counter, url, title).then((record) => {
+              // 是当前页面就自增
+              let curPath = window.location.pathname;
+              if (curPath.includes('index.html')) {
+                curPath = curPath.substring(0, curPath.lastIndexOf('index.html'));
+              }
+              if (pv.getAttribute('data-path') == curPath) {
+                incrArr.push(this.buildIncrement(record.objectId));
+              }
+              if (pv) {
+                var ele = pv.querySelector('#lc-pv #number');
+                if (ele) {
+                  if (pv.getAttribute('data-path') == curPath) {
+                    ele.innerText = (record.times || 0) + 1;
+                  } else {
+                    ele.innerText = record.times || 0;
+                  }
+                  pv.style.display = 'inline';
+                }
+              }
+            });
+            getterArr.push(viewGetter);
+          }
+        }
+      }
+
+      // 如果启动计数自增，批量发起自增请求
+      if (enableIncr) {
+        Promise.all(getterArr).then(() => {
+          incrArr.length > 0 && this.increment(Counter, incrArr);
+        })
+      }
+
+    },
+
+
+    fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${ api_server }/1.1${ url }`, {
+          method,
+          headers: {
+            'X-LC-Id': this.app_id,
+            'X-LC-Key': this.app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      this.addCount(Counter);
+    },
+
+    refreshCounter() {
+      var api_server = this.app_id.slice(-9) !== '-MdYXbMMI' ? this.custom_api_server : `https://${ this.app_id.slice(0, 8).toLowerCase() }.api.lncldglobal.com`;
+      if (api_server) {
+        this.fetchData(api_server);
+      } else {
+        fetch('https://app-router.leancloud.cn/2/route?appId=' + this.app_id)
+          .then(resp => resp.json())
+          .then(({api_server}) => {
+            this.fetchData('https://' + api_server);
+          });
+      }
+    }
+
+  };
+
+  LCCounter.refreshCounter();
+
+  document.addEventListener('pjax:complete', function () {
+    LCCounter.refreshCounter();
+  });
+</script>
+
+
+
+
+
+
+
+
+<script>
+function listennSidebarTOC() {
+  const navItems = document.querySelectorAll(".toc li");
+  if (!navItems.length) return;
+  const sections = [...navItems].map((element) => {
+    const link = element.querySelector(".toc-link");
+    const target = document.getElementById(
+      decodeURI(link.getAttribute("href")).replace("#", "")
+    );
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      window.scrollTo({
+		top: target.offsetTop + 100,
+		
+	  });
+    });
+    return target;
+  });
+
+  function activateNavByIndex(target) {
+    if (target.classList.contains("active-current")) return;
+
+    document.querySelectorAll(".toc .active").forEach((element) => {
+      element.classList.remove("active", "active-current");
+    });
+    target.classList.add("active", "active-current");
+    let parent = target.parentNode;
+    while (!parent.matches(".toc")) {
+      if (parent.matches("li")) parent.classList.add("active");
+      parent = parent.parentNode;
+    }
+  }
+
+  function findIndex(entries) {
+    let index = 0;
+    let entry = entries[index];
+    if (entry.boundingClientRect.top > 0) {
+      index = sections.indexOf(entry.target);
+      return index === 0 ? 0 : index - 1;
+    }
+    for (; index < entries.length; index++) {
+      if (entries[index].boundingClientRect.top <= 0) {
+        entry = entries[index];
+      } else {
+        return sections.indexOf(entry.target);
+      }
+    }
+    return sections.indexOf(entry.target);
+  }
+
+  function createIntersectionObserver(marginTop) {
+    marginTop = Math.floor(marginTop + 10000);
+    let intersectionObserver = new IntersectionObserver(
+      (entries, observe) => {
+        let scrollHeight = document.documentElement.scrollHeight + 100;
+        if (scrollHeight > marginTop) {
+          observe.disconnect();
+          createIntersectionObserver(scrollHeight);
+          return;
+        }
+        let index = findIndex(entries);
+        activateNavByIndex(navItems[index]);
+      },
+      {
+        rootMargin: marginTop + "px 0px -100% 0px",
+        threshold: 0,
+      }
+    );
+    sections.forEach((element) => {
+      element && intersectionObserver.observe(element);
+    });
+  }
+  createIntersectionObserver(document.documentElement.scrollHeight);
+}
+
+document.addEventListener("DOMContentLoaded", listennSidebarTOC);
+document.addEventListener("pjax:success", listennSidebarTOC);
+</script>
+
+<!-- more -->
+
+
+
+
+    
+      
+
+
+<script src="https://cdn.jsdelivr.net/npm/pjax@0.2.8/pjax.min.js"></script>
+
+
+<!-- 样式位于：source/css/_third-party/pjaxanimate.styl -->
+
+<div class="pjax-animate">
+  
+    <script src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script>
+    <div id="loading-bar-wrapper"><script>NProgress.configure({parent:"#loading-bar-wrapper",trickleSpeed: 100})</script></div>
+    <script>
+      window.ShowLoading = function() {
+        NProgress.start();
+      };
+      window.HideLoading = function() {
+        NProgress.done();
+      }
+    </script>
+  
+</div>
+
+
+<script>
+    var pjax;
+    document.addEventListener('DOMContentLoaded', function () {
+      pjax = new Pjax({
+        elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([pjax-fancybox])',
+        selectors: [
+          "title",
+          "#l_cover",
+          "#pjax-container",
+          "#pjax-header-nav-list"
+        ],
+        cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+        timeout: 5000
+      });
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+      //window.stop(); // 相当于点击了浏览器的停止按钮
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      window.subData = null; // 移除标题（用于一二级导航栏切换处）
+      if (typeof $.fancybox != "undefined") {
+        $.fancybox.close();    // 关闭弹窗
+      }
+      volantis.$switcher.removeClass('active'); // 关闭移动端激活的搜索框
+      volantis.$header.removeClass('z_search-open'); // 关闭移动端激活的搜索框
+      volantis.$wrapper.removeClass('sub'); // 跳转页面时关闭二级导航
+
+      // 解绑事件 避免重复监听
+      volantis.$topBtn.unbind('click');
+      $('.menu a').unbind('click');
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+	  
+      window.ShowLoading();
+	  
+    });
+
+    document.addEventListener('pjax:complete', function () {
+      // 关于百度统计对 SPA 页面的处理：
+      // 方案一：百度统计>管理>单页应用设置中，打开开启按钮即可对SPA进行统计。 https://tongji.baidu.com/web/help/article?id=324
+      // 方案二：取消注释下列代码。 https://tongji.baidu.com/web/help/article?id=235
+       
+
+      // 关于谷歌统计对 SPA 页面的处理：
+      // 当应用以动态方式加载内容并更新地址栏中的网址时，也应该更新通过 gtag.js 存储的网页网址。
+      // https://developers.google.cn/analytics/devguides/collection/gtagjs/single-page-applications?hl=zh-cn
+      
+	 
+
+      $('.nav-main').find('.list-v').not('.menu-phone').removeAttr("style",""); // 移除小尾巴的移除
+      $('.menu-phone.list-v').removeAttr("style",""); // 移除小尾巴的移除
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+      try{
+          if (typeof $.fancybox == "undefined") {
+            SCload_fancybox();
+          } else {
+            pjax_fancybox();
+          }
+        
+        
+        
+        
+        
+          pjax_initCopyCode();
+        
+        
+          pjax_valine();
+        
+        
+        
+        
+      } catch (e) {
+        console.log(e);
+      }
+	  
+      window.HideLoading();
+	  
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+	  
+      window.HideLoading();
+	  
+      window.location.href = e.triggerElement.href;
+    });
+</script>
+
+    
+  </div>
+</body>
+</html>

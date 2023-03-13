@@ -1,0 +1,2075 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head hexo-theme='https://github.com/volantis-x/hexo-theme-volantis/tree/4.0.0'>
+  <meta charset="utf-8">
+  <!-- SEO相关 -->
+  
+    
+  
+  <!-- 渲染优化 -->
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  <link rel='dns-prefetch' href='https://cdn.jsdelivr.net'>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <!-- 页面元数据 -->
+  
+  <title>Redis基础 - 吹梦到西洲</title>
+  
+    <meta name="keywords" content="Redis">
+  
+
+  
+    <meta name="description" content="学习《Redis实战》一书的笔记">
+  
+
+  <!-- feed -->
+  
+
+  <!-- import meta -->
+  
+
+  <!-- link -->
+  
+    <link rel="shortcut icon" type='image/x-icon' href="/images/3d-architecture.svg">
+  
+
+  <!-- import link -->
+  
+
+  
+    
+<link rel="stylesheet" href="/css/first.css">
+
+  
+
+  
+  <link rel="stylesheet" href="/css/style.css" media="print" onload="this.media='all';this.onload=null">
+  <noscript><link rel="stylesheet" href="/css/style.css"></noscript>
+  
+
+  <script id="loadcss"></script>
+
+</head>
+
+<body>
+  
+
+<header id="l_header" class="l_header auto shadow blur show" style='opacity: 0' >
+  <div class='container'>
+  <div id='wrapper'>
+    <div class='nav-sub'>
+      <p class="title"></p>
+      <ul class='switcher nav-list-h m-phone' id="pjax-header-nav-list">
+        <li><a id="s-comment" class="fas fa-comments fa-fw" target="_self" href='javascript:void(0)'></a></li>
+        
+          <li><a id="s-toc" class="s-toc fas fa-list fa-fw" target="_self" href='javascript:void(0)'></a></li>
+        
+      </ul>
+    </div>
+		<div class="nav-main">
+      
+        
+        <a class="title flat-box" target="_self" href='/'>
+          
+            <img no-lazy class='logo' src='https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/blog/Logo-NavBar@3x.png'/>
+          
+          
+          
+        </a>
+      
+
+			<div class='menu navigation'>
+				<ul class='nav-list-h m-pc'>
+          
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/
+                  
+                  
+                  
+                    id="home"
+                  >
+                  <i class='fas fa-rss fa-fw'></i>博客
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/categories/
+                  
+                  
+                  
+                    id="categories"
+                  >
+                  <i class='fas fa-folder-open fa-fw'></i>分类
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/tags/
+                  
+                  
+                  
+                    id="tags"
+                  >
+                  <i class='fas fa-tags fa-fw'></i>标签
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/archives/
+                  
+                  
+                  
+                    id="archives"
+                  >
+                  <i class='fas fa-archive fa-fw'></i>归档
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/friends/
+                  
+                  
+                  
+                    id="friends"
+                  >
+                  <i class='fas fa-link fa-fw'></i>友链
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/about/
+                  
+                  
+                  
+                    id="about"
+                  >
+                  <i class='fas fa-info-circle fa-fw'></i>关于
+                </a>
+                
+              </li>
+            
+          
+          
+				</ul>
+			</div>
+
+      <div class="m_search">
+        <form name="searchform" class="form u-search-form">
+          <i class="icon fas fa-search fa-fw"></i>
+          <input type="text" class="input u-search-input" placeholder="Search..." />
+        </form>
+      </div>
+
+			<ul class='switcher nav-list-h m-phone'>
+				
+					<li><a class="s-search fas fa-search fa-fw" target="_self" href='javascript:void(0)'></a></li>
+				
+				<li>
+          <a class="s-menu fas fa-bars fa-fw" target="_self" href='javascript:void(0)'></a>
+          <ul class="menu-phone list-v navigation white-box">
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/
+                  
+                  
+                  
+                    id="home"
+                  >
+                  <i class='fas fa-rss fa-fw'></i>博客
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/categories/
+                  
+                  
+                  
+                    id="categories"
+                  >
+                  <i class='fas fa-folder-open fa-fw'></i>分类
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/tags/
+                  
+                  
+                  
+                    id="tags"
+                  >
+                  <i class='fas fa-tags fa-fw'></i>标签
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/archives/
+                  
+                  
+                  
+                    id="archives"
+                  >
+                  <i class='fas fa-archive fa-fw'></i>归档
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/friends/
+                  
+                  
+                  
+                    id="friends"
+                  >
+                  <i class='fas fa-link fa-fw'></i>友链
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/about/
+                  
+                  
+                  
+                    id="about"
+                  >
+                  <i class='fas fa-info-circle fa-fw'></i>关于
+                </a>
+                
+              </li>
+            
+          
+            
+          </ul>
+        </li>
+			</ul>
+		</div>
+	</div>
+  </div>
+</header>
+
+  <div id="l_body">
+    <div id="l_cover">
+  
+    
+        <div id="full" class='cover-wrapper post search' style="display: none;">
+          
+            <div class='cover-bg lazyload placeholder' data-bg="/images/cover-2.jpg"></div>
+          
+          <div class='cover-body'>
+  <div class='top'>
+    
+    
+      <p class="title">吹梦到西洲</p>
+    
+    
+  </div>
+  <div class='bottom'>
+    
+      <div class="m_search">
+        <form name="searchform" class="form u-search-form">
+          <input type="text" class="input u-search-input" placeholder="Looking for something?" />
+          <i class="icon fas fa-search fa-fw"></i>
+        </form>
+      </div>
+    
+    <div class='menu navigation'>
+      <div class='list-h'>
+        
+          
+            <a href="/"
+              
+              
+              id="home">
+              <i class='fas fa-rss fa-fw'></i><p>博客</p>
+            </a>
+          
+            <a href="/categories/"
+              
+              
+              id="categories">
+              <i class='fas fa-folder-open fa-fw'></i><p>分类</p>
+            </a>
+          
+            <a href="/tags/"
+              
+              
+              id="tags">
+              <i class='fas fa-tags fa-fw'></i><p>标签</p>
+            </a>
+          
+            <a href="/archives/"
+              
+              
+              id="archives">
+              <i class='fas fa-archive fa-fw'></i><p>归档</p>
+            </a>
+          
+            <a href="/friends/"
+              
+              
+              id="friends">
+              <i class='fas fa-link fa-fw'></i><p>友链</p>
+            </a>
+          
+            <a href="/about/"
+              
+              
+              id="about">
+              <i class='fas fa-info-circle fa-fw'></i><p>关于</p>
+            </a>
+          
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+          <div id="scroll-down" style="display: none;"><i class="fa fa-chevron-down scroll-down-effects"></i></div>
+        </div>
+    
+  
+  </div>
+
+    <div id='safearea'>
+      <div class='body-wrapper' id="pjax-container">
+        
+
+<div class='l_main'>
+  <article class="article post white-box reveal md shadow article-type-post" id="post" itemscope itemprop="blogPost">
+  
+
+
+  
+  <div class="article-meta" id="top">
+    
+    
+    
+      <h1 class="title">
+        Redis基础
+      </h1>
+      <div class='new-meta-box'>
+        
+          
+            
+<div class='new-meta-item author'>
+  <a class='author' href="/" rel="nofollow">
+    <img no-lazy src="">
+    <p>吹梦到西洲</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  <div class='new-meta-item category'>
+    <a class='notlink'>
+      <i class="fas fa-folder-open fa-fw" aria-hidden="true"></i>
+      <a class="category-link" href="/categories/Redis/">Redis</a>
+    </a>
+  </div>
+
+
+          
+        
+          
+            <div class="new-meta-item date">
+  <a class='notlink'>
+    <i class="fas fa-calendar-alt fa-fw" aria-hidden="true"></i>
+    <p>发布于：Mar 24, 2020</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  <div class="new-meta-item browse leancloud">
+    <a class='notlink'>
+      
+      <div id="lc-pv" data-title="Redis基础" data-path="/2020/03/24/2020-03-24-Redis-RedisInAction/">
+        <i class="fas fa-eye fa-fw" aria-hidden="true"></i>
+        <span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span>
+        次浏览
+      </div>
+    </a>
+  </div>
+
+
+          
+        
+      </div>
+    
+  </div>
+
+
+  
+  <h1 id="第一章-初始Redis"><a href="#第一章-初始Redis" class="headerlink" title="第一章 初始Redis"></a>第一章 初始Redis</h1><h2 id="1-1-Redis简介"><a href="#1-1-Redis简介" class="headerlink" title="1.1 Redis简介"></a>1.1 Redis简介</h2><p>Redis 是一个远程内存数据库，它不仅性能强劲，而且还具有复制特性以及为解决问题而生 的独一无二的数据模型。Redis 提供了 5 种不同类型的数据结构，各式各样的问题都可以很自然 地映射到这些数据结构上:Redis 的数据结构致力于帮助用户解决问题，而不会像其他数据库那 样，要求用户扭曲问题来适应数据库。除此之外，通过复制、持久化(persistence)和客户端分 片(client-side sharding)等特性，用户可以很方便地将 Redis 扩展成一个能够包含数百 GB 数据、 每秒处理上百万次请求的系统。</p>
+<p>Redis是一个速度非常快的非关系数 据库(non-relational database)，它可以存储键(key)与 5 种不同类型的值(value)之间的 映射(mapping)，可以将存储在内存的键值对数据持久化到硬盘，可以使用复制特性来扩 展读性能，还可以使用客户端分片来扩展写性能。</p>
+<h3 id="1-1-1-Redis与其他数据库的对比"><a href="#1-1-1-Redis与其他数据库的对比" class="headerlink" title="1.1.1 Redis与其他数据库的对比"></a>1.1.1 Redis与其他数据库的对比</h3><p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gd5ficc7hrj31da0tq7ew.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/00831rSTly1gd5ficc7hrj31da0tq7ew.jpg" srcset="data:image/png;base64,666" alt="Redis与其他数据库的对比"></p>
+<h3 id="1-1-2-附加特性"><a href="#1-1-2-附加特性" class="headerlink" title="1.1.2 附加特性"></a>1.1.2 附加特性</h3><p>在使用类似 Redis 这样的内存数据库时，一个首先要考虑的问题就是“当服务器被关闭时， 服务器存储的数据将何去何从呢?”Redis 拥有两种不同形式的持久化方法，它们都可以用小而 紧凑的格式将存储在内存中的数据写入硬盘：</p>
+<ul>
+<li>时间点转储(point-in-time dump)：转储操作既可以在“指定时间段内有指定数量的写操作执行”这一条件被满足时执行， 又可以通过调用两条转储到硬盘(dump-to-disk)命令中的任何一条来执行。</li>
+<li>将所有修改了数据库的命令都写入一个只追加(append-only)文件里面，用户可以根据数据的重 要程度，将只追加写入设置为从不同步(sync)、每秒同步一次或者每写入一个命令就同步一次。</li>
+</ul>
+<p>为了扩展 Redis 的读性能，并为 Redis 提供故障转移（failover)支持，Redis 实现了 <strong><em>主从复制</em></strong> 特性:执行复制的从服务器会连接上主服务器，接收主服务器发送的整个数据库的初始副本(copy); 之后主服务器执行的写命令，都会被发送给所有连 接着的从服务器去执行，从而实时地更新从服务器的数据集。因为从服务器包含的数据会不断地 进行更新，所以客户端可以向任意一个从服务器发送读请求，以此来避免对主服务器进行集中式 的访问。</p>
+<h2 id="1-2-Redis数据结构简介"><a href="#1-2-Redis数据结构简介" class="headerlink" title="1.2 Redis数据结构简介"></a>1.2 Redis数据结构简介</h2><p><img src="https://tva1.sinaimg.cn/large/00831rSTly1gd5g2myptpj31bm0kogsh.jpg" class="lazyload" data-srcset="https://tva1.sinaimg.cn/large/00831rSTly1gd5g2myptpj31bm0kogsh.jpg" srcset="data:image/png;base64,666" alt="Redis数据结构"></p>
+<h1 id="第二章-Redis命令"><a href="#第二章-Redis命令" class="headerlink" title="第二章 Redis命令"></a>第二章 Redis命令</h1><p>本章主要内容：</p>
+<ul>
+<li>字符串命令、列表命令和集合命令</li>
+<li>散列命令和有序集合命令</li>
+<li>发布命令与订阅命令</li>
+<li>其他命令</li>
+</ul>
+<h2 id="2-1-字符串"><a href="#2-1-字符串" class="headerlink" title="2.1 字符串"></a>2.1 字符串</h2><p>在Redis里面，字符串可以存储以下三种类型的数据</p>
+<ul>
+<li><strong>字符串(byte string)</strong></li>
+<li><strong>整数</strong>：整数的取 值范围和系统的长整数(long integer)的取值范围相同</li>
+<li><strong>浮点数</strong>：浮点数的取值范围和精度与 IEEE 754 标准的双精度浮点数(double)相同</li>
+</ul>
+<p>下表为Redis中字符串的自增与自减命令</p>
+<table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">用例和描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>INCR</code></td>
+<td align="center">INCR key-name—将键存储的值加上1</td>
+</tr>
+<tr>
+<td align="center"><code>DECR</code></td>
+<td align="center">DECR key-name—将键存储的值减去1</td>
+</tr>
+<tr>
+<td align="center"><code>INCRBY</code></td>
+<td align="center">INCRBY key-name amount—将键存储的值加上整数amount</td>
+</tr>
+<tr>
+<td align="center"><code>DECRBY</code></td>
+<td align="center">DECRBY key-name amount—将键存储的值减去整数amount</td>
+</tr>
+<tr>
+<td align="center"><code>INCRBYFLOAT</code></td>
+<td align="center">INCRBYFLOAT key-name amount—将键存储的值加上浮点数amount</td>
+</tr>
+</tbody></table>
+<p>除了自增操作和自减操作之外，Redis 还拥有对字节串的其中一部分内容进行读取或者写入 的操作(这些操作也可以用于整数或者浮点数，但这种用法并不常见)</p>
+<table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">用例和描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>APPEND</code></td>
+<td align="center">APPEND key-name value—将值value追加到给定键key-name当前存储的值的末尾</td>
+</tr>
+<tr>
+<td align="center"><code>GETRANGE</code></td>
+<td align="center">GETRANGE key-name start end— 获取一个由偏移量 start 至偏移量 end 范围内所有字符组成 的子串，包括 start 和 end 在内</td>
+</tr>
+<tr>
+<td align="center"><code>SETRANGE</code></td>
+<td align="center">SETRANGE key-name offset value—将从start偏移量开始的子串设置为给定值</td>
+</tr>
+<tr>
+<td align="center"><code>GETBIT</code></td>
+<td align="center">GETBIT key-name offset— 将字节串看作是二进制位串(bit string)，并返回位串中偏移量为 offset 的二进制位的值</td>
+</tr>
+<tr>
+<td align="center"><code>SETBIT</code></td>
+<td align="center">SETBIT key-name offset value— 将字节串看作是二进制位串，并将位串中偏移量为 offset 的二进制位的值设置为 value</td>
+</tr>
+<tr>
+<td align="center"><code>BITCOUNT</code></td>
+<td align="center">BITCOUNT key-name [start end]— 统计二进制位串里面值为 1 的二进制位的数量，如果给定 了可选的 start 偏移量和 end 偏移量，那么只对偏移量指定范围内的二进制位进行统计</td>
+</tr>
+<tr>
+<td align="center"><code>BITOP</code></td>
+<td align="center">BITOP operation dest-key key-name [key-name …]— 对一个或多个二进制位串执行包 括并(AND)、或 (OR)、异或(XOR)、非 (NOT)在内的任意一种按位运算操作(bitwise operation)， 并将计算得出的结果保存在 dest-key 键里面</td>
+</tr>
+</tbody></table>
+<h2 id="2-2-列表"><a href="#2-2-列表" class="headerlink" title="2.2 列表"></a>2.2 列表</h2><p>Redis 的列表允许用户从序列的两端推入或者弹出元素，获取列表元 素，以及执行各种常见的列表操作。除此之外，列表还可以用来存储任务信息、最近浏览过的文章或者常用联系人信息。</p>
+<table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">用例和描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>RPUSH</code></td>
+<td align="center">RPUSH key-name value [value …]—将一个或多个值推入列表的右端</td>
+</tr>
+<tr>
+<td align="center"><code>LPUSH</code></td>
+<td align="center">LPUSH key-name value [value …]—将一个或多个值推入列表的左端</td>
+</tr>
+<tr>
+<td align="center"><code>RPOP</code></td>
+<td align="center">RPOP key-name—移除并返回列表最右端的元素</td>
+</tr>
+<tr>
+<td align="center"><code>LPOP</code></td>
+<td align="center">LPOP key-name—移除并返回列表最左端的元素</td>
+</tr>
+<tr>
+<td align="center"><code>LINDEX</code></td>
+<td align="center">LINDEX key-name offset—返回列表中偏移量为offset的元素</td>
+</tr>
+<tr>
+<td align="center"><code>LRANGE</code></td>
+<td align="center">返回列表从 start 偏移量到 end 偏移量范围内的所有元素</td>
+</tr>
+<tr>
+<td align="center"><code>LTRIM</code></td>
+<td align="center">对列表进行修剪，只保留从start偏移量到end偏移量范围，包括两端</td>
+</tr>
+</tbody></table>
+<p>有几个列表命令可以将元素从一个列表移动到另一个列表，或者阻塞(block)执行命令的 客户端直到有其他客户端给列表添加元素为止。</p>
+<table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">用例和描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>BLPOP</code></td>
+<td align="center">BLPOP key-name [key-name …] timeout— 从第一个非空列表中弹出位于最左端的元素， 或者在 timeout 秒之内阻塞并等待可弹出的元素出现</td>
+</tr>
+<tr>
+<td align="center"><code>BRPOP</code></td>
+<td align="center">BRPOP key-name [key-name …] timeout— 从第一个非空列表中弹出位于最右端的元素， 或者在 timeout 秒之内阻塞并等待可弹出的元素出现</td>
+</tr>
+<tr>
+<td align="center"><code>RPOPLPUSH</code></td>
+<td align="center">RPOPLPUSH source-key dest-key— 从 source-key 列表中弹出位于最右端的元素，然后 将这个元素推入 dest-key 列表的最左端，并向用户返回这个元素</td>
+</tr>
+<tr>
+<td align="center"><code>BRPOPLPUSH</code></td>
+<td align="center">BRPOPLPUSH source-key dest-key timeout—从source-key列表中弹出位于最右端的 元素，然后将这个元素推入 dest-key 列表的最左端，并向用户返回这个元素;如果 source-key 为空，那么在 timeout 秒之内阻塞并等待可弹出的元素出现</td>
+</tr>
+</tbody></table>
+<h2 id="2-3-集合"><a href="#2-3-集合" class="headerlink" title="2.3 集合"></a>2.3 集合</h2><p>Redis 的集合以无序的方式来存储多个各不相同的元素，用户可以快速地对集合执行添加 元素操作、移除元素操作以及检查一个元素是否存在于集合里。</p>
+<table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">用例和描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>SADD</code></td>
+<td align="center">SADD key-name item [item …]— 将一个或多个元素添加到集合里面，并返回被添 加元素当中原本并不存在于集合里面的元素数量</td>
+</tr>
+<tr>
+<td align="center"><code>SREM</code></td>
+<td align="center">SREM key-name item [item …]— 从集合里面移除一个或多个元素，并返回被移除 元素的数量</td>
+</tr>
+<tr>
+<td align="center"><code>SISMEMBER</code></td>
+<td align="center">SISMEMBER key-name item—检查元素item是否存在于集合key-name里</td>
+</tr>
+<tr>
+<td align="center"><code>SCARD</code></td>
+<td align="center">SCARD key-name—返回集合包含的元素的数量</td>
+</tr>
+<tr>
+<td align="center"><code>SMEMBERS</code></td>
+<td align="center">SMEMBERS key-name—返回集合包含的所有元素</td>
+</tr>
+<tr>
+<td align="center"><code>SRANDMEMBER</code></td>
+<td align="center">SRANDMEMBER key-name [count]— 从集合里面随机地返回一个或多个元素。当 count 为正数时，命令返回的随机元素不会重复;当 count 为负数时，命令返回的随机元素可能会 出现重复</td>
+</tr>
+<tr>
+<td align="center"><code>SPOP</code></td>
+<td align="center">SPOP key-name—随机地移除集合中的一个元素，并返回被移除的元素</td>
+</tr>
+<tr>
+<td align="center"><code>SMOVE</code></td>
+<td align="center">SMOVE source-key dest-key item— 如果集合 source-key 包含元素 item，那么从 集合 source-key 里面移除元素 item，并将元素 item 添加到集合 dest-key 中;如果 item 被成功移除，那么命令返回 1，否则返回 0</td>
+</tr>
+</tbody></table>
+<p>通过使用上面展示的命令，我们可以将各不相同的多个元素添加到集合里面，集合真正厉害的地方在于组合 和关联多个集合。</p>
+<table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">用例和描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>SDIFF</code></td>
+<td align="center">SDIFF key-name [key-name …]—返回那些存在于第一个集合、但不存在于其他集合中的元素(数学上的差集运算)</td>
+</tr>
+<tr>
+<td align="center"><code>SDIFFSTORE</code></td>
+<td align="center">SDIFFSTORE dest-key key-name [key-name …]— 将那些存在于第一个集合但并不存在于其他集合中的元素(数学上的差集运算)存储到 dest-key 键里面</td>
+</tr>
+<tr>
+<td align="center"><code>SINTER</code></td>
+<td align="center">SINTER key-name [key-name …]— 返回那些同时存在于所有集合中的元素(数学上的交集运算)</td>
+</tr>
+<tr>
+<td align="center"><code>SINTERSTORE</code></td>
+<td align="center">SINTERSTORE dest-key key-name [key-name …]— 将那些同时存在于所有集合的元素(数学上的交集运算)存储到 dest-key 键里面</td>
+</tr>
+<tr>
+<td align="center"><code>SUNION</code></td>
+<td align="center">SUNION key-name [key-name …]— 返回那些至少存在于一个集合中的元素(数学上的并集计算)</td>
+</tr>
+<tr>
+<td align="center"><code>SUNIONSTORE</code></td>
+<td align="center">SUNIONSTORE dest-key key-name [key-name …]— 将那些至少存在于一个集合中的元素(数学上的并集计算)存储到 dest-key 键里面</td>
+</tr>
+</tbody></table>
+<h2 id="2-4-散列"><a href="#2-4-散列" class="headerlink" title="2.4 散列"></a>2.4 散列</h2><p>Redis 的散列可以让用户将多个键值对存储到一个 Redis 键里面。从功能上 来说，Redis 为散列值提供了一些与字符串值相同的特性，使得散列非常适用于将一些相关的数 据存储在一起。我们可以把这种数据聚集看作是关系数据库中的行，或者文档数据库中的文档。</p>
+<table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">用例和描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>HMGET</code></td>
+<td align="center">HMGET key-name key [key …]— 从散列里面获取一个或多个键的值</td>
+</tr>
+<tr>
+<td align="center"><code>HMSET</code></td>
+<td align="center">HMSET key-name key value [key value …]—为散列里面的一个或多个键设置值</td>
+</tr>
+<tr>
+<td align="center"><code>HDEL</code></td>
+<td align="center">HDEL key-name key [key …]— 删除散列里面的一个或多个键值对，返回成功找到并删除的 键值对数量</td>
+</tr>
+<tr>
+<td align="center"><code>HLEN</code></td>
+<td align="center">HLEN key-name— 返回散列包含的键值对数量</td>
+</tr>
+</tbody></table>
+<p>下面列出了散列的其他几个批量操作命令，以及一些和字符串操作类似的散列命令。</p>
+<table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">用例和描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>HEXISTS</code></td>
+<td align="center">HEXISTS key-name key—检查给定键是否存在于散列中</td>
+</tr>
+<tr>
+<td align="center"><code>HKEYS</code></td>
+<td align="center">HKEYS key-name—获取散列包含的所有键</td>
+</tr>
+<tr>
+<td align="center"><code>HVALS</code></td>
+<td align="center">HVALS key-name—获取散列包含的所有值</td>
+</tr>
+<tr>
+<td align="center"><code>HGETALL</code></td>
+<td align="center">HGETALL key-name—获取散列包含的所有键值对</td>
+</tr>
+<tr>
+<td align="center"><code>HINCRBY</code></td>
+<td align="center">HINCRBY key-name key increment—将键key存储的值加上整数increment</td>
+</tr>
+<tr>
+<td align="center"><code>HINCRBYFLOAT</code></td>
+<td align="center">HINCRBYFLOAT key-name key increment—将键key存储的值加上浮点数increment</td>
+</tr>
+</tbody></table>
+<h2 id="2-5-有序集合"><a href="#2-5-有序集合" class="headerlink" title="2.5 有序集合"></a>2.5 有序集合</h2><p>和散列存储着键与值之间的映射类似，有序集合也存储着成员与分值之间的映射，并且提供 了分值处理命令，以及根据分值大小有序地获取(fetch)或扫描(scan)成员和分值的命令。</p>
+<table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">用例和描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>ZADD</code></td>
+<td align="center">ZADD key-name score member [score member …]—将带有给定分值的成员添加到有序集合里面</td>
+</tr>
+<tr>
+<td align="center"><code>ZREM</code></td>
+<td align="center">ZREM key-name member [member …]—从有序集合里面移除给定的成员，并返回被移除成员的数量</td>
+</tr>
+<tr>
+<td align="center"><code>ZCARD</code></td>
+<td align="center">ZCARD key-name—返回有序集合包含的成员数量</td>
+</tr>
+<tr>
+<td align="center"><code>ZINCRBY</code></td>
+<td align="center">ZINCRBY key-name increment member—将member成员的分值加上increment</td>
+</tr>
+<tr>
+<td align="center"><code>ZCOUNT</code></td>
+<td align="center">ZCOUNT key-name min max—返回分值介于min和max之间的成员数量</td>
+</tr>
+<tr>
+<td align="center"><code>ZRANK</code></td>
+<td align="center">ZRANK key-name member—返回成员member在有序集合中的排名</td>
+</tr>
+<tr>
+<td align="center"><code>ZSCORE</code></td>
+<td align="center">ZSCORE key-name member—返回成员member的分值</td>
+</tr>
+<tr>
+<td align="center"><code>ZRANGE</code></td>
+<td align="center">ZRANGE key-name start stop [WITHSCORES]—返回有序集合中排名介于start和stop 之间的成员，如果给定了可选的 WITHSCORES 选项，那么命令会将成员的分值也一并返回</td>
+</tr>
+</tbody></table>
+<p>有序集合的范围型数据获取命令和范围型数据删除命令，以及并集命令和交集命令。</p>
+<table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">用例和描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>ZREVRANK</code></td>
+<td align="center">ZREVRANK key-name member— 返回有序集合里成员 member 的排名，成员按照分值 从大到小排列</td>
+</tr>
+<tr>
+<td align="center"><code>ZREVRANGE</code></td>
+<td align="center">ZREVRANGE key-name start stop [WITHSCORES]— 返回有序集合给定排名范围内 的成员，成员按照分值从大到小排列</td>
+</tr>
+<tr>
+<td align="center"><code>ZRANGEBYSCORE</code></td>
+<td align="center">ZRANGEBYSCORE key min max [WITHSCORES] [LIMIT offset count]—返回 有序集合中，分值介于 min 和 max 之间的所有成员</td>
+</tr>
+<tr>
+<td align="center"><code>ZREVRANGEBYSCORE</code></td>
+<td align="center">ZREVRANGEBYSCORE key max min [WITHSCORES] [LIMIT offset count]— 获取有序集合中分值介于 min 和 max 之间的所有成员，并按照分值从大到小的顺序来返 回它们</td>
+</tr>
+<tr>
+<td align="center"><code>ZREMRANGEBYRANK</code></td>
+<td align="center">ZREMRANGEBYRANK key-name start stop— 移除有序集合中排名介于 start 和 stop 之间的所有成员</td>
+</tr>
+<tr>
+<td align="center">ZREMRANGEBYSCORE``</td>
+<td align="center">ZREMRANGEBYSCORE key-name min max— 移除有序集合中分值介于 min 和 max 之 间的所有成员</td>
+</tr>
+<tr>
+<td align="center"><code>ZINTERSTORE</code></td>
+<td align="center">ZINTERSTORE dest-key key-count key [key …] [WEIGHTS weight [weight …]] [AGGREGATE SUM</td>
+</tr>
+<tr>
+<td align="center"><code>ZUNIONSTORE</code></td>
+<td align="center">ZUNIONSTORE dest-key key-count key [key …] [WEIGHTS weight [weight …]] [AGGREGATE SUM</td>
+</tr>
+</tbody></table>
+<h2 id="2-6-发布订阅"><a href="#2-6-发布订阅" class="headerlink" title="2.6 发布订阅"></a>2.6 发布订阅</h2><p>发布与订阅(又称 pub/sub)的特 点是订阅者(listener)负责订阅频道(channel)，发送者(publisher)负责向频道发送二进制字 符串消息(binary string message)。每当有消息被发送至给定频道时，频道的所有订阅者都会收 到消息。</p>
+<table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">用例和描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>SUBSCRIBE</code></td>
+<td align="center">SUBSCRIBE channel [channel …]—订阅给定的一个或多个频道</td>
+</tr>
+<tr>
+<td align="center"><code>UNSUBSCRIBE</code></td>
+<td align="center">UNSUBSCRIBE [channel [channel …]]—退订给定的一个或多个频道，如果执行时没有给定任何频道，那么退订所有频道</td>
+</tr>
+<tr>
+<td align="center"><code>PUBLISH</code></td>
+<td align="center">PUBLISH channel message—向给定频道发送消息</td>
+</tr>
+<tr>
+<td align="center"><code>PSUBSCRIBE</code></td>
+<td align="center">PSUBSCRIBE pattern [pattern …]—订阅与给定模式相匹配的所有频道</td>
+</tr>
+<tr>
+<td align="center"><code>PUNSUBSCRIBE</code></td>
+<td align="center">PUNSUBSCRIBE [pattern [pattern …]]— 退订给定的模式，如果执行时没有给定任何 模式，那么退订所有模式</td>
+</tr>
+</tbody></table>
+<p>对于旧版 Redis 来说，如果一个客户端订阅了某个 或某些频道，但它读取消息的速度却不够快的话，那么不断积压的消息就会使得 Redis 输出缓冲 区的体积变得越来越大，这可能会导致 Redis 的速度变慢，甚至直接崩溃。也可能会导致 Redis 被操作系统强制杀死，甚至导致操作系统本身不可用。新版的 Redis 不会出现这种问题，因为它 会自动断开不符合 client-output-buffer-limit pubsub 配置选项要求的订阅客户端。</p>
+<p>任何网络系统在执行操作时都可能会遇上断线情况， 而断线产生的连接错误通常会使得网络连接两端中的其中一端进行重新连接。</p>
+<h2 id="2-7-其他命令"><a href="#2-7-其他命令" class="headerlink" title="2.7 其他命令"></a>2.7 其他命令</h2><h3 id="2-7-1-排序"><a href="#2-7-1-排序" class="headerlink" title="2.7.1 排序"></a>2.7.1 排序</h3><p>负责执行排序操作的 SORT 命令可以根据字符串、列表、集合、有序集合、散 列这 5 种键里面存储着的数据，对列表、集合以及有序集合进行排序。</p>
+<p>使用 SORT 命令提供的选项可以实现以下功能:根据降序而不是默认的升序来排序元素; 将元素看作是数字来进行排序，或者将元素看作是二进制字符串来进行排序(比如排序字符 串’110’和’12’的结果就跟排序数字 110 和 12 的结果不一样);使用被排序元素之外的其 他值作为权重来进行排序，甚至还可以从输入的列表、集合、有序集合以外的其他地方进行 取值。</p>
+<table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">用例和描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>SORT</code></td>
+<td align="center">SORT source-key [BY pattern] [LIMIT offset count] [GET pattern [GETpattern …]] [ASC|DESC] [ALPHA] [STORE dest-key] 根据给定的选项，对输入 列表、集合或者有序集合进行排序，然后返回或者存储排序的结果</td>
+</tr>
+</tbody></table>
+<h3 id="2-7-2-基本的Redis事务"><a href="#2-7-2-基本的Redis事务" class="headerlink" title="2.7.2 基本的Redis事务"></a>2.7.2 基本的Redis事务</h3><p>尽管 Redis 有几个可以在 两个键之间复制或者移动元素的命令，但却没有那种可以在两个不同类型之间移动元素的命令 (虽然可以使用 ZUNIONSTORE 命令将元素从一个集合复制到一个有序集合)。为了对相同或者不 同类型的多个键执行操作，Redis 有 5 个命令可以让用户在不被打断(interruption)的情况下对多个键执行操作，它们分别是 WATCH、MULTI、EXEC、UNWATCH 和 DISCARD。</p>
+<p>Redis 的基本事务(basic transaction)需要用到 MULTI 命令和 EXEC 命令，这种事务可以让 一个客户端在不被其他客户端打断的情况下执行多个命令。和关系数据库那种可以在执行的过程 中进行回滚(rollback)的事务不同，在 Redis 里面，被 MULTI 命令和 EXEC 命令包围的所有命 令会一个接一个地执行，直到所有命令都执行完毕为止。当一个事务执行完毕之后，Redis 才会 处理其他客户端的命令。</p>
+<h3 id="2-7-3-键的过期时间"><a href="#2-7-3-键的过期时间" class="headerlink" title="2.7.3 键的过期时间"></a>2.7.3 键的过期时间</h3><p>在使用 Redis 存储数据的时候，有些数据可能在某个时间点之后就不再有用了，用户可以使 用 DEL 命令显式地删除这些无用数据，也可以通过 Redis 的过期时间(expiration)特性来让一个 键在给定的时限(timeout)之后自动被删除。</p>
+<p>对于列表、集合、散列和有序集合这样的容器(container)来说，键过期命令只能为整个键设 置过期时间，而没办法为键里面的单个元素设置过期时间。</p>
+<table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">用例和描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>PERSIST</code></td>
+<td align="center">PERSIST key-name—移除键的过期时间</td>
+</tr>
+<tr>
+<td align="center"><code>TTL</code></td>
+<td align="center">TTL key-name—查看给定键距离过期还有多少秒</td>
+</tr>
+<tr>
+<td align="center"><code>EXPIRE</code></td>
+<td align="center">EXPIRE key-name seconds—让给定键在指定的秒数之后过期</td>
+</tr>
+<tr>
+<td align="center"><code>EXPIREAT</code></td>
+<td align="center">EXPIREAT key-name timestamp—将给定键的过期时间设置为给定的UNIX时间戳</td>
+</tr>
+<tr>
+<td align="center"><code>PTTL</code></td>
+<td align="center">PTTL key-name—查看给定键距离过期时间还有多少毫秒</td>
+</tr>
+<tr>
+<td align="center"><code>PEXPIRE</code></td>
+<td align="center">PEXPIRE key-name milliseconds— 让给定键在指定的毫秒数之后过期</td>
+</tr>
+<tr>
+<td align="center"><code>PEXPIREAT</code></td>
+<td align="center">PEXPIREAT key-name timestamp-milliseconds—将一个毫秒级精度的UNIX时间戳设置 为给定键的过期时间，</td>
+</tr>
+</tbody></table>
+<h1 id="第三章-数据安全性与性能保障"><a href="#第三章-数据安全性与性能保障" class="headerlink" title="第三章 数据安全性与性能保障"></a>第三章 数据安全性与性能保障</h1><p>本章主要内容</p>
+<ul>
+<li>将数据持久化到硬盘</li>
+<li>将数据复制至其他机器</li>
+<li>处理系统故障</li>
+<li>Redis 事务</li>
+<li>非事务型流水线(non-transactional pipeline)</li>
+<li>诊断性能问题</li>
+</ul>
+<h2 id="3-1-持久化选项"><a href="#3-1-持久化选项" class="headerlink" title="3.1 持久化选项"></a>3.1 持久化选项</h2><p>Redis 提供了两种不同的持久化方法来将数据存储到硬盘里面。一种方法叫快照(snapshotting)，它可以将存在于某一时刻的所有数据都写入硬盘里面。另一种方法叫只追加文件(append-only file， AOF)，它会在执行写命令时，将被执行的写命令复制到硬盘里面。这两种持久化方法既可以同 时使用，又可以单独使用，在某些情况下甚至可以两种方法都不使用，具体选择哪种持久化方法 需要根据用户的数据以及应用来决定。</p>
+<p>将内存中的数据存储到硬盘的一个主要原因是为了在之后重用数据，或者是为了防止系统 故障而将数据备份到一个远程位置。另外，存储在 Redis 里面的数据有可能是经过长时间计算 得出的，或者有程序正在使用 Redis 存储的数据进行计算，所以用户会希望自己可以将这些数 据存储起来以便之后使用，这样就不必再重新计算了。</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">通过 Homebrew 配置文件地址</span><br><span class="line"><span class="regexp">/usr/</span>local<span class="regexp">/etc/</span>redis.conf</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-1-1-快照持久化"><a href="#3-1-1-快照持久化" class="headerlink" title="3.1.1 快照持久化"></a>3.1.1 快照持久化</h3><p>Redis 可以通过创建快照来获得存储在内存里面的数据在某个时间点上的副本。在创建快照 之后，用户可以对快照进行备份，可以将快照复制到其他服务器从而创建具有相同数据的服务器副本，还可以将快照留在原地以便重启服务器时使用。</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">save</span> 60 1000</span><br><span class="line">stop-writes-<span class="keyword">on</span>-bgsave-<span class="keyword">error</span> yes</span><br><span class="line">rdbcompression yes</span><br><span class="line">dbfilename dump.rdb</span><br><span class="line"><span class="keyword">dir</span> /usr/<span class="keyword">local</span>/<span class="keyword">var</span>/<span class="keyword">db</span>/redis/</span><br></pre></td></tr></table></figure>
+
+<p>根据配置，快照将被写入 dbfilename 选项指定的文件里面，并储存在 dir 选项指定的路径上面。如果在新的快照文件创建完毕之前，Redis、系统或者硬件这三者之中的任意一个崩溃 了，那么 Redis 将丢失最近一次创建快照之后写入的所有数据。</p>
+<p>创建快照的方法</p>
+<ul>
+<li>客户端可以通过向Redis发送BGSAVE命令来创建一个快照。对于支持BGSAVE命令的平台来说(基本上所有平台都支持，除了Windows平台)，Redis会调用fork1来创建一个子进程，然后子进程负责将快照写入硬盘，而父进程则继续处理命令请求。</li>
+<li>客户端还可以通过向 Redis 发送 SAVE 命令来创建一个快照，接到 SAVE 命令的 Redis 服 务器在快照创建完毕之前将不再响应任何其他命令。SAVE 命令并不常用，通常只会在没有足够内存去执行 BGSAVE 命令的情况下，又或者即使等待持久化操作执行完毕也无所谓的情况下，才会使用这个命令。</li>
+<li>如果用户设置了 save 配置选项，比如 save 60 10000，那么从 Redis 最近一次创建快照之后开始算起，当“60 秒之内有 10 000 次写入”这个条件被满足时，Redis 就会自动 触发 BGSAVE 命令。如果用户设置了多个 save 配置选项，那么当任意一个 save 配置 选项所设置的条件被满足时，Redis 就会触发一次 BGSAVE 命令。</li>
+<li>当 Redis 通过 SHUTDOWN 命令接收到关闭服务器的请求时，或者接收到标准 TERM 信号 时，会执行一个 SAVE 命令，阻塞所有客户端，不再执行客户端发送的任何命令，并在 SAVE 命令执行完毕之后关闭服务器。</li>
+<li>当一个 Redis 服务器连接另一个 Redis 服务器，并向对方发送 SYNC 命令来开始一次复 制操作的时候，如果主服务器目前没有在执行 BGSAVE 操作，或者主服务器并非刚刚执 行完 BGSAVE 操作，那么主服务器就会执行 BGSAVE 命令。</li>
+</ul>
+<p>在只使用快照持久化来保存数据时，一定要记住:如果系统真的发生崩溃，用户将丢失最近一次生成快照之后更改的所有数据。因此，快照持久化只适用于那些即使丢失一部分数据也 不会造成问题的应用程序，不能接受这种数据损失的应用程序则可以考虑使用 AOF 持久化。</p>
+<p>几个使用快照持久化的场景</p>
+<ul>
+<li>个人开发</li>
+<li>对日志进行聚合计算</li>
+<li>大数据</li>
+</ul>
+<h3 id="3-1-2-AOF持久化"><a href="#3-1-2-AOF持久化" class="headerlink" title="3.1.2 AOF持久化"></a>3.1.2 AOF持久化</h3><p>AOF 持久化会将被执行的写命令写到 AOF 文件的末尾，以此来记录数据发生的变化。因此，Redis 只要从头到尾重新执行一次 AOF 文件包含的所有写命令，就可以恢复 AOF 文件所记录的数据集。 </p>
+<p><strong>文件同步</strong> 在向硬盘写入文件时，至少会发生3件事。当调用 <code>file.write()</code>方法 ( 或者其他编程语言里面的类似操作)对文件进行写入时，写入的内容首先会被存储到缓冲区，然后操作系统会在将来的某个时候将缓冲区存储的内容写入硬盘，而数据只有在被写入硬盘之后，才算是真正地保存到了硬盘里面。用户可以通过调用 <code>file.flush()</code>方法来请求操作系统尽快地将缓冲区存储的数据写入硬盘里，但具体何时执行写入操作仍然由操作系统决定。除此之外，用户还可以命令操作系统将文件同步(sync)到硬盘，同步操作会一直阻塞直到指定的文件被写入硬盘为止。当同步操作执行完毕之后，即使系统出现故障也不会对被同步的文件造成任何影响。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">appendonly</span> <span class="literal">no</span></span><br><span class="line"><span class="string">appendfsync</span> <span class="string">everysec</span> <span class="string">每秒执行一次同步，显式地将多个写命令同步到硬盘</span></span><br><span class="line"><span class="comment"># appendfsync always 每个 Redis 写命令都要同步写入硬盘。这样做会严重降低 Redis 的速度</span></span><br><span class="line"><span class="comment"># 使用固态硬盘的用户请谨慎使用 appendfsync always 选项，因为这个选项让 Redis 每次只写入一个命令</span></span><br><span class="line"><span class="comment"># appendfsync no 让操作系统来决定应该何时进行同步</span></span><br><span class="line"><span class="literal">no</span><span class="string">-appendfsync-on-rewrite</span> <span class="literal">no</span></span><br><span class="line"><span class="string">auto-aof-rewrite-percentage</span> <span class="number">100</span></span><br><span class="line"><span class="string">auto-aof-rewrite-min-size</span> <span class="string">64mb</span></span><br><span class="line"><span class="string">dir</span> <span class="string">/usr/local/var/db/redis/</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="3-1-3-重写-压缩-AOF-文件"><a href="#3-1-3-重写-压缩-AOF-文件" class="headerlink" title="3.1.3 重写/压缩 AOF 文件"></a>3.1.3 重写/压缩 AOF 文件</h3><p>AOF 持久化既可以将丢失数据的时间窗口降低至 1 秒(甚至不丢失任何数据)，又可以在极短的时间内完成定期的持久化操作，那么我们有什么理由不使用 AOF 持久化呢? 因为 AOF 文件体积会不断增大。</p>
+<p>为了解决 AOF 文件体积不断增大的问题，用户可以向 Redis 发送 BGREWRITEAOF 命令，这个命令会通过移除 AOF 文件中的冗余命令来重写(rewrite)AOF 文件，使 AOF 文件的体积变得尽可能地小。</p>
+<h2 id="3-2-复制"><a href="#3-2-复制" class="headerlink" title="3.2 复制"></a>3.2 复制</h2><p>复制可以让其他服务器拥有一个不断地更新的数据副本，从而使得拥有数据副本的服务器可以用于处理客户端发送的读请求。关系数据库通常会使用一个主服务器(master)向多个从服务器(slave)发送更新，并使用从服务器来处理所有读请求。Redis 也采用了同样的方法来实现 自己的复制特性，并将其用作扩展性能的一种手段。</p>
+<h3 id="3-2-1-对-Redis-的复制相关选项进行配置"><a href="#3-2-1-对-Redis-的复制相关选项进行配置" class="headerlink" title="3.2.1 对 Redis 的复制相关选项进行配置"></a>3.2.1 对 Redis 的复制相关选项进行配置</h3><p>当从服务器连接主服务器的时候，主服务器会执行 BGSAVE 操作。 因此为了正确地使用复制特性，用户需要保证主服务器已经正确地设置了dir 选项和 dbfilename 选项，并且这两个选项所指示的路径和文件对于 Redis 进程来说都是可写的(writable)。</p>
+<p>尽管有多个不同的选项可以控制从服务器自身的行为，但开启从服务器所必须的选项只有 slaveof一个。如果用户在启动Redis服务器的时候，指定了一个包含slaveof host port 选项的配置文件，那么 Redis 服务器将根据该选项给定的 IP 地址和端口号来连接主服务器。对于一个正在运行的Redis服务器，用户可以通过发送SLAVEOF no one命令来让服务器终止复制操作，不再接受主服务器的数据更新;也可以通过发送SLAVEOF host port命令来让服务器 开始复制一个新的主服务器。</p>
+<h3 id="3-2-2-Redis-复制的启动过程"><a href="#3-2-2-Redis-复制的启动过程" class="headerlink" title="3.2.2 Redis 复制的启动过程"></a>3.2.2 Redis 复制的启动过程</h3><p>从服务器在连接一个主服务器的时候，主服务器会创建一个快照文件并 将其发送至从服务器，但这只是主从复制执行过程的其中一步。</p>
+<table>
+<thead>
+<tr>
+<th align="center">步骤</th>
+<th align="center">主服务器操作</th>
+<th align="center">从服务器操作</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">1</td>
+<td align="center">(等待命令进入)</td>
+<td align="center">连接(或者重连接)主服务器，发送 SYNC 命令</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td align="center">开始执行 BGSAVE，并使用缓冲区记录 BGSAVE之后执行的所有写命令</td>
+<td align="center">根据配置选项来决定是继续使用现有的数据(如果有的话)来处理客户端的命令请求，还是向发送请求的客户端返回错误</td>
+</tr>
+<tr>
+<td align="center">3</td>
+<td align="center">BGSAVE 执行完毕，向从服务器发送快照文件， 并在发送期间继续使用缓冲区记录被执行的写命令</td>
+<td align="center">丢弃所有旧数据(如果有的话)，开始载入主服务器发来的快照文件</td>
+</tr>
+<tr>
+<td align="center">4</td>
+<td align="center">快照文件发送完毕，开始向从服务器发送存储在缓冲区里面的写命令</td>
+<td align="center">完成对快照文件的解释操作，像往常一样开始接受命令请求</td>
+</tr>
+<tr>
+<td align="center">5</td>
+<td align="center">缓冲区存储的写命令发送完毕;从现在开始， 每执行一个写命令，就向从服务器发送相同的 写命令</td>
+<td align="center">执行主服务器发来的所有存储在缓冲区里面的写命 令;并从现在开始，接收并执行主服务器传来的每个写命令</td>
+</tr>
+</tbody></table>
+
+  
+  
+    
+    <div class='footer'>
+      
+      
+      
+        <div class='copyright'>
+          <blockquote>
+            
+              
+                <p>博客内容遵循 署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0) 协议</p>
+
+              
+            
+              
+                <p>本文永久链接是：<a href=http://raymond-zhao.top/2020/03/24/2020-03-24-Redis-RedisInAction/>http://raymond-zhao.top/2020/03/24/2020-03-24-Redis-RedisInAction/</a></p>
+              
+            
+          </blockquote>
+        </div>
+      
+      
+    </div>
+  
+  
+    
+
+
+  <div class='article-meta' id="bottom">
+    <div class='new-meta-box'>
+      
+        
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-06-20T13:59:48+08:00">
+  <a class='notlink'>
+    <i class="fas fa-edit fa-fw" aria-hidden="true"></i>
+    <p>更新于：Jun 20, 2021</p>
+  </a>
+</div>
+
+        
+      
+        
+          
+  
+  <div class="new-meta-item meta-tags"><a class="tag" href="/tags/Redis/" rel="nofollow"><i class="fas fa-hashtag fa-fw" aria-hidden="true"></i><p>Redis</p></a></div>
+
+
+        
+      
+        
+          
+  <div class="new-meta-item share -mob-share-list">
+  <div class="-mob-share-list share-body">
+    
+      
+        <a class="-mob-share-qq" title="" rel="external nofollow noopener noreferrer"
+          
+          href="http://connect.qq.com/widget/shareqq/index.html?url=http://raymond-zhao.top/2020/03/24/2020-03-24-Redis-RedisInAction/&title=Redis基础 - 吹梦到西洲&summary="
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qq.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qq.png" srcset="data:image/png;base64,666">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-qzone" title="" rel="external nofollow noopener noreferrer"
+          
+          href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=http://raymond-zhao.top/2020/03/24/2020-03-24-Redis-RedisInAction/&title=Redis基础 - 吹梦到西洲&summary="
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qzone.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qzone.png" srcset="data:image/png;base64,666">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-weibo" title="" rel="external nofollow noopener noreferrer"
+          
+          href="http://service.weibo.com/share/share.php?url=http://raymond-zhao.top/2020/03/24/2020-03-24-Redis-RedisInAction/&title=Redis基础 - 吹梦到西洲&summary="
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/weibo.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/weibo.png" srcset="data:image/png;base64,666">
+          
+        </a>
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+
+
+        
+      
+    </div>
+  </div>
+
+
+  
+  
+
+  
+    <div class="prev-next">
+      
+        <a class='prev' href='/2020/03/30/2020-03-30-Redis-Basic/'>
+          <p class='title'><i class="fas fa-chevron-left" aria-hidden="true"></i>好好学 Redis</p>
+          <p class='content'>1. 缓存技术1.1 主流应用架构
+
+缓存穿透
+熔断
+
+1.2 缓存中间件1.2.1 Memcache
+支持简单数据类型
+不支持持久化存储
+不支持主从
+不支持分片
+
+1.2.2 Redis
+数据...</p>
+        </a>
+      
+      
+        <a class='next' href='/2020/03/21/2020-03-21-SE-SoftwareEngineering/'>
+          <p class='title'>《软件工程》思维导图<i class="fas fa-chevron-right" aria-hidden="true"></i></p>
+          <p class='content'>取用时若能注明出处，我将不胜感激。
+
+
+
+
+
+
+
+
+
+
+
+
+
+</p>
+        </a>
+      
+    </div>
+  
+</article>
+
+
+  
+
+  <article class="post white-box reveal shadow" id="comments">
+    <p ct><i class='fas fa-comments'></i> 评论</p>
+    
+    <div id="valine_container" class="valine_thread">
+  <i class="fas fa-cog fa-spin fa-fw fa-2x"></i>
+</div>
+
+  </article>
+
+
+
+
+
+
+</div>
+<aside class='l_side'>
+  
+  
+    
+    
+
+
+
+  <section class="widget toc-wrapper shadow desktop mobile" id="toc-div" >
+    
+  <header>
+    
+      <i class="fas fa-list fa-fw" aria-hidden="true"></i><span class='name'>本文目录</span>
+    
+  </header>
+
+
+    <div class='content'>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-Redis简介"><span class="toc-text">1.1 Redis简介</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-1-Redis与其他数据库的对比"><span class="toc-text">1.1.1 Redis与其他数据库的对比</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-2-附加特性"><span class="toc-text">1.1.2 附加特性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-Redis数据结构简介"><span class="toc-text">1.2 Redis数据结构简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-字符串"><span class="toc-text">2.1 字符串</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-列表"><span class="toc-text">2.2 列表</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-集合"><span class="toc-text">2.3 集合</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-4-散列"><span class="toc-text">2.4 散列</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-5-有序集合"><span class="toc-text">2.5 有序集合</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-6-发布订阅"><span class="toc-text">2.6 发布订阅</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-7-其他命令"><span class="toc-text">2.7 其他命令</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-7-1-排序"><span class="toc-text">2.7.1 排序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-7-2-基本的Redis事务"><span class="toc-text">2.7.2 基本的Redis事务</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-7-3-键的过期时间"><span class="toc-text">2.7.3 键的过期时间</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-持久化选项"><span class="toc-text">3.1 持久化选项</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-1-快照持久化"><span class="toc-text">3.1.1 快照持久化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-2-AOF持久化"><span class="toc-text">3.1.2 AOF持久化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-3-重写-压缩-AOF-文件"><span class="toc-text">3.1.3 重写&#x2F;压缩 AOF 文件</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-复制"><span class="toc-text">3.2 复制</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-1-对-Redis-的复制相关选项进行配置"><span class="toc-text">3.2.1 对 Redis 的复制相关选项进行配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-2-Redis-复制的启动过程"><span class="toc-text">3.2.2 Redis 复制的启动过程</span></a></li></ol></li></ol>
+    </div>
+  </section>
+
+
+  
+
+
+</aside>
+
+
+
+        
+        
+          <!--此文件用来存放一些不方便取值的变量-->
+<!--思路大概是将值藏到重加载的区域内-->
+
+<script>
+  window.pdata={}
+  pdata.ispage=true;
+  pdata.postTitle="Redis基础";
+  pdata.commentPath="";
+  pdata.commentPlaceholder="";
+
+  var l_header=document.getElementById("l_header");
+  
+  l_header.classList.add("show");
+  
+</script>
+
+        
+      </div>
+      
+  
+  <footer class="footer clearfix">
+    <br><br>
+    
+      
+        <div class="aplayer-container">
+          
+
+
+        </div>
+      
+    
+      
+        <br>
+        <div class="social-wrapper">
+          
+            
+          
+            
+          
+            
+          
+        </div>
+      
+    
+      
+        <div><p>博客內容遵循 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW" target="_blank" rel="noopener">姓名標示-非商業性-相同方式分享 4.0 國際 (CC BY-NC-SA 4.0) 協議</a></p>
+</div>
+      
+    
+      
+        
+          <div><p><span id="lc-sv">本站总访问量为 <span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span> 次</span> <span id="lc-uv">访客数为 <span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span> 人</span></p>
+</div>
+        
+      
+    
+      
+        本站使用
+        <a href="https://github.com/volantis-x/hexo-theme-volantis/tree/4.0.0" target="_blank" class="codename">Volantis</a>
+        作為主題
+      
+    
+      
+        <div class='copyright'>
+        <p><a href="/">Copyright © 2017-2020 XXX</a></p>
+
+        </div>
+      
+    
+  </footer>
+
+
+      <a id="s-top" class="fas fa-arrow-up fa-fw" href='javascript:void(0)'></a>
+    </div>
+  </div>
+  <div>
+    <script>
+window.volantis={};
+window.volantis.loadcss=document.getElementById("loadcss");
+/********************脚本懒加载函数********************************/
+function loadScript(src, cb) {
+var HEAD = document.getElementsByTagName('head')[0] || document.documentElement;
+var script = document.createElement('script');
+script.setAttribute('type','text/javascript');
+if (cb) script.onload = cb;
+script.setAttribute('src', src);
+HEAD.appendChild(script);
+}
+//https://github.com/filamentgroup/loadCSS
+var loadCSS = function( href, before, media, attributes ){
+	var doc = window.document;
+	var ss = doc.createElement( "link" );
+	var ref;
+	if( before ){
+		ref = before;
+	}
+	else {
+		var refs = ( doc.body || doc.getElementsByTagName( "head" )[ 0 ] ).childNodes;
+		ref = refs[ refs.length - 1];
+	}
+	var sheets = doc.styleSheets;
+	if( attributes ){
+		for( var attributeName in attributes ){
+			if( attributes.hasOwnProperty( attributeName ) ){
+				ss.setAttribute( attributeName, attributes[attributeName] );
+			}
+		}
+	}
+	ss.rel = "stylesheet";
+	ss.href = href;
+	ss.media = "only x";
+	function ready( cb ){
+		if( doc.body ){
+			return cb();
+		}
+		setTimeout(function(){
+			ready( cb );
+		});
+	}
+	ready( function(){
+		ref.parentNode.insertBefore( ss, ( before ? ref : ref.nextSibling ) );
+	});
+	var onloadcssdefined = function( cb ){
+		var resolvedHref = ss.href;
+		var i = sheets.length;
+		while( i-- ){
+			if( sheets[ i ].href === resolvedHref ){
+				return cb();
+			}
+		}
+		setTimeout(function() {
+			onloadcssdefined( cb );
+		});
+	};
+	function loadCB(){
+		if( ss.addEventListener ){
+			ss.removeEventListener( "load", loadCB );
+		}
+		ss.media = media || "all";
+	}
+	if( ss.addEventListener ){
+		ss.addEventListener( "load", loadCB);
+	}
+	ss.onloadcssdefined = onloadcssdefined;
+	onloadcssdefined( loadCB );
+	return ss;
+};
+</script>
+<script>
+  
+  loadCSS("https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14/css/all.min.css", window.volantis.loadcss);
+  
+  
+  
+  
+</script>
+<!-- required -->
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5/dist/jquery.min.js"></script>
+
+<script>
+  function pjax_fancybox() {
+    $(".md .gallery").find("img").each(function () { //渲染 fancybox
+      var element = document.createElement("a"); // a 标签
+      $(element).attr("class", "fancybox");
+      $(element).attr("pjax-fancybox", "");  // 过滤 pjax
+      $(element).attr("href", $(this).attr("src"));
+      if ($(this).attr("data-original")) {
+        $(element).attr("href", $(this).attr("data-original"));
+      }
+      $(element).attr("data-fancybox", "images");
+      var caption = "";   // 描述信息
+      if ($(this).attr('alt')) {  // 判断当前页面是否存在描述信息
+        $(element).attr('data-caption', $(this).attr('alt'));
+        caption = $(this).attr('alt');
+      }
+      var div = document.createElement("div");
+      $(div).addClass("fancybox");
+      $(this).wrap(div); // 最外层套 div ，其实主要作用还是 class 样式
+      var span = document.createElement("span");
+      $(span).addClass("image-caption");
+      $(span).text(caption); // 加描述
+      $(this).after(span);  // 再套一层描述
+      $(this).wrap(element);  // 最后套 a 标签
+    })
+    $(".md .gallery").find("img").fancybox({
+      selector: '[data-fancybox="images"]',
+      hash: false,
+      loop: false,
+      closeClick: true,
+      helpers: {
+        overlay: {closeClick: true}
+      },
+      buttons: [
+        "zoom",
+        "close"
+      ]
+    });
+  };
+  function SCload_fancybox() {
+    if ($(".md .gallery").find("img").length == 0) return;
+    loadCSS("https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css", document.getElementById("loadcss"));
+    setTimeout(function() {
+      loadScript('https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js', pjax_fancybox)
+    }, 1);
+  };
+  $(function () {
+    SCload_fancybox();
+  });
+</script>
+
+
+<!-- internal -->
+
+
+
+
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+
+
+  
+  
+    <script>
+      window.FPConfig = {
+        delay: 0,
+        ignoreKeywords: [],
+        maxRPS: 5,
+        hoverDelay: 25
+      };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/gh/gijo-varghese/flying-pages@2.1.2/flying-pages.min.js"></script>
+  
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+    var clipboard = new ClipboardJS('.btn-copy', {
+        target: function (trigger) {
+            return trigger.nextElementSibling
+        }
+    });
+    function wait(callback, seconds) {
+        var timelag = null;
+        timelag = window.setTimeout(callback, seconds)
+    }
+    function pjax_initCopyCode() {
+		if($(".highlight .code pre").length+$(".article pre code").length==0)return;
+        var copyHtml = '';
+        copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+        copyHtml += '<i class="fas fa-copy"></i><span>COPY</span>';
+        copyHtml += '</button>';
+        $(".highlight .code pre").before(copyHtml);
+        $(".article pre code").before(copyHtml);
+        clipboard.off('success').on('success', function (e) {
+            let $btn = $(e.trigger);
+            $btn.addClass('copied');
+            let $icon = $($btn.find('i'));
+            $icon.removeClass('fa-copy');
+            $icon.addClass('fa-check-circle');
+            let $span = $($btn.find('span'));
+            $span[0].innerText = 'COPIED';
+            wait(function () {
+                $icon.removeClass('fa-check-circle');
+                $icon.addClass('fa-copy');
+                $span[0].innerText = 'COPY'
+            }, 2000)
+        });
+        clipboard.off('error').on('error', function (e) {
+            e.clearSelection();
+            let $btn = $(e.trigger);
+            $btn.addClass('copy-failed');
+            let $icon = $($btn.find('i'));
+            $icon.removeClass('fa-copy');
+            $icon.addClass('fa-times-circle');
+            let $span = $($btn.find('span'));
+            $span[0].innerText = 'COPY FAILED';
+            wait(function () {
+                $icon.removeClass('fa-times-circle');
+                $icon.addClass('fa-copy');
+                $span[0].innerText = 'COPY'
+            }, 2000)
+        })
+    }
+    $(function () {
+        pjax_initCopyCode()
+    });
+</script>
+
+
+
+
+
+
+
+
+  
+  
+<script src="/js/valine.js"></script>
+
+
+<script>
+  var GUEST_INFO = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link'.split(',').filter(function (item) {
+    return GUEST_INFO.indexOf(item) > -1
+  });
+  var REQUIRED_FIELDS = ['nick', 'mail', 'link'];
+  var requiredFields = ''.split(',').filter(function (item) {
+    return REQUIRED_FIELDS.indexOf(item) > -1
+  });
+
+  function emoji(path, idx, ext) {
+    return path + "/" + path + "-" + idx + "." + ext;
+  }
+
+  var emojiMaps = {};
+  for (var i = 1; i <= 54; i++) {
+    emojiMaps['tieba-' + i] = emoji('tieba', i, 'png');
+  }
+  for (var i = 1; i <= 101; i++) {
+    emojiMaps['qq-' + i] = emoji('qq', i, 'gif');
+  }
+  for (var i = 1; i <= 116; i++) {
+    emojiMaps['aru-' + i] = emoji('aru', i, 'gif');
+  }
+  for (var i = 1; i <= 125; i++) {
+    emojiMaps['twemoji-' + i] = emoji('twemoji', i, 'png');
+  }
+  for (var i = 1; i <= 4; i++) {
+    emojiMaps['weibo-' + i] = emoji('weibo', i, 'png');
+  }
+
+  function pjax_valine() {
+    if(!document.querySelectorAll("#valine_container")[0])return;
+
+    let pagePlaceholder = pdata.commentPlaceholder || "快来评论吧~";
+
+    let path = pdata.commentPath;
+    if (path.length == 0) {
+      let defaultPath = '';
+      path = defaultPath || decodeURI(window.location.pathname);
+    }
+
+    var valine = new Valine();
+    valine.init({
+      el: '#valine_container',
+      meta: meta,
+      placeholder: pagePlaceholder,
+      path: path,
+      appId: "v6cb35sRa1lfGq6EOtTQHHyf-gzGzoHsz",
+      appKey: "2ulfq63r4brxg2l9QfXp0cTM",
+      pageSize: '10',
+      avatar: 'robohash',
+      lang: 'zh-cn',
+      visitor: 'true',
+      highlight: 'true',
+      mathJax: 'true',
+      enableQQ: 'true',
+      recordIP: 'true',
+      requiredFields: requiredFields,
+      emojiCDN: 'https://cdn.jsdelivr.net/gh/volantis-x/cdn-emoji/valine/',
+      emojiMaps: emojiMaps
+    })
+  }
+
+  $(function () {
+    pjax_valine();
+  });
+</script>
+
+
+
+
+
+  
+<script src="/js/app.js"></script>
+
+
+
+<!-- optional -->
+
+  <script>
+const SearchServiceimagePath="https://cdn.jsdelivr.net/gh/volantis-x/cdn-volantis@master/img/";
+const ROOT =  ("/" || "/").endsWith('/') ? ("/" || "/") : ("//" || "/" );
+
+$('.input.u-search-input').one('focus',function(){
+	
+		loadScript('/js/search/hexo.js',setSearchService);
+	
+})
+
+function listenSearch(){
+  
+    customSearch = new HexoSearch({
+      imagePath: SearchServiceimagePath
+    });
+  
+}
+function setSearchService() {
+	listenSearch();
+	
+		document.addEventListener("pjax:success", listenSearch);
+	
+}
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  <script defer>
+
+  const LCCounter = {
+    app_id: 'v6cb35sRa1lfGq6EOtTQHHyf-gzGzoHsz',
+    app_key: '2ulfq63r4brxg2l9QfXp0cTM',
+    custom_api_server: '',
+
+    // 查询存储的记录
+    getRecord(Counter, url, title) {
+      return new Promise(function (resolve, reject) {
+        Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({url})))
+          .then(resp => resp.json())
+          .then(({results, code, error}) => {
+            if (code === 401) {
+              throw error;
+            }
+            if (results && results.length > 0) {
+              var record = results[0];
+              resolve(record);
+            } else {
+              Counter('post', '/classes/Counter', {url, title: title, times: 0})
+                .then(resp => resp.json())
+                .then((record, error) => {
+                  if (error) {
+                    throw error;
+                  }
+                  resolve(record);
+                }).catch(error => {
+                console.error('Failed to create', error);
+                reject(error);
+              });
+            }
+          }).catch((error) => {
+          console.error('LeanCloud Counter Error:', error);
+          reject(error);
+        });
+      })
+    },
+
+    // 发起自增请求
+    increment(Counter, incrArr) {
+      return new Promise(function (resolve, reject) {
+        Counter('post', '/batch', {
+          "requests": incrArr
+        }).then((res) => {
+          res = res.json();
+          if (res.error) {
+            throw res.error;
+          }
+          resolve(res);
+        }).catch((error) => {
+          console.error('Failed to save visitor count', error);
+          reject(error);
+        });
+      });
+    },
+
+    // 构建自增请求体
+    buildIncrement(objectId) {
+      return {
+        "method": "PUT",
+        "path": `/1.1/classes/Counter/${ objectId }`,
+        "body": {
+          "times": {
+            '__op': 'Increment',
+            'amount': 1
+          }
+        }
+      }
+    },
+
+    // 校验是否为有效的 UV
+    validUV() {
+      var key = 'LeanCloudUVTimestamp';
+      var flag = localStorage.getItem(key);
+      if (flag) {
+        // 距离标记小于 24 小时则不计为 UV
+        if (new Date().getTime() - parseInt(flag) <= 86400000) {
+          return false;
+        }
+      }
+      localStorage.setItem(key, new Date().getTime().toString());
+      return true;
+    },
+
+    addCount(Counter) {
+      var enableIncr = '' === 'true' && window.location.hostname !== 'localhost';
+      enableIncr = true;
+      var getterArr = [];
+      var incrArr = [];
+      // 请求 PV 并自增
+      var pvCtn = document.querySelector('#lc-sv');
+      if (pvCtn || enableIncr) {
+        var pvGetter = this.getRecord(Counter, 'http://raymond-zhao.top' + '/#lc-sv', 'Visits').then((record) => {
+          incrArr.push(this.buildIncrement(record.objectId))
+          var eles = document.querySelectorAll('#lc-sv #number');
+          if (eles.length > 0) {
+            eles.forEach((el,index,array)=>{
+              el.innerText = record.times + 1;
+              if (pvCtn) {
+                pvCtn.style.display = 'inline';
+              }
+            })
+          }
+        });
+        getterArr.push(pvGetter);
+      }
+
+      // 请求 UV 并自增
+      var uvCtn = document.querySelector('#lc-uv');
+      if (uvCtn || enableIncr) {
+        var uvGetter = this.getRecord(Counter, 'http://raymond-zhao.top' + '/#lc-uv', 'Visitors').then((record) => {
+          var vuv = this.validUV();
+          vuv && incrArr.push(this.buildIncrement(record.objectId))
+          var eles = document.querySelectorAll('#lc-uv #number');
+          if (eles.length > 0) {
+            eles.forEach((el,index,array)=>{
+              el.innerText = record.times + (vuv ? 1 : 0);
+              if (uvCtn) {
+                uvCtn.style.display = 'inline';
+              }
+            })
+          }
+        });
+        getterArr.push(uvGetter);
+      }
+
+      // 请求文章的浏览数，如果是当前页面就自增
+      var allPV = document.querySelectorAll('#lc-pv');
+      if (allPV.length > 0 || enableIncr) {
+        for (i = 0; i < allPV.length; i++) {
+          let pv = allPV[i];
+          let title = pv.getAttribute('data-title');
+          var url = 'http://raymond-zhao.top' + pv.getAttribute('data-path');
+          if (url) {
+            var viewGetter = this.getRecord(Counter, url, title).then((record) => {
+              // 是当前页面就自增
+              let curPath = window.location.pathname;
+              if (curPath.includes('index.html')) {
+                curPath = curPath.substring(0, curPath.lastIndexOf('index.html'));
+              }
+              if (pv.getAttribute('data-path') == curPath) {
+                incrArr.push(this.buildIncrement(record.objectId));
+              }
+              if (pv) {
+                var ele = pv.querySelector('#lc-pv #number');
+                if (ele) {
+                  if (pv.getAttribute('data-path') == curPath) {
+                    ele.innerText = (record.times || 0) + 1;
+                  } else {
+                    ele.innerText = record.times || 0;
+                  }
+                  pv.style.display = 'inline';
+                }
+              }
+            });
+            getterArr.push(viewGetter);
+          }
+        }
+      }
+
+      // 如果启动计数自增，批量发起自增请求
+      if (enableIncr) {
+        Promise.all(getterArr).then(() => {
+          incrArr.length > 0 && this.increment(Counter, incrArr);
+        })
+      }
+
+    },
+
+
+    fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${ api_server }/1.1${ url }`, {
+          method,
+          headers: {
+            'X-LC-Id': this.app_id,
+            'X-LC-Key': this.app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      this.addCount(Counter);
+    },
+
+    refreshCounter() {
+      var api_server = this.app_id.slice(-9) !== '-MdYXbMMI' ? this.custom_api_server : `https://${ this.app_id.slice(0, 8).toLowerCase() }.api.lncldglobal.com`;
+      if (api_server) {
+        this.fetchData(api_server);
+      } else {
+        fetch('https://app-router.leancloud.cn/2/route?appId=' + this.app_id)
+          .then(resp => resp.json())
+          .then(({api_server}) => {
+            this.fetchData('https://' + api_server);
+          });
+      }
+    }
+
+  };
+
+  LCCounter.refreshCounter();
+
+  document.addEventListener('pjax:complete', function () {
+    LCCounter.refreshCounter();
+  });
+</script>
+
+
+
+
+
+
+
+
+<script>
+function listennSidebarTOC() {
+  const navItems = document.querySelectorAll(".toc li");
+  if (!navItems.length) return;
+  const sections = [...navItems].map((element) => {
+    const link = element.querySelector(".toc-link");
+    const target = document.getElementById(
+      decodeURI(link.getAttribute("href")).replace("#", "")
+    );
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      window.scrollTo({
+		top: target.offsetTop + 100,
+		
+	  });
+    });
+    return target;
+  });
+
+  function activateNavByIndex(target) {
+    if (target.classList.contains("active-current")) return;
+
+    document.querySelectorAll(".toc .active").forEach((element) => {
+      element.classList.remove("active", "active-current");
+    });
+    target.classList.add("active", "active-current");
+    let parent = target.parentNode;
+    while (!parent.matches(".toc")) {
+      if (parent.matches("li")) parent.classList.add("active");
+      parent = parent.parentNode;
+    }
+  }
+
+  function findIndex(entries) {
+    let index = 0;
+    let entry = entries[index];
+    if (entry.boundingClientRect.top > 0) {
+      index = sections.indexOf(entry.target);
+      return index === 0 ? 0 : index - 1;
+    }
+    for (; index < entries.length; index++) {
+      if (entries[index].boundingClientRect.top <= 0) {
+        entry = entries[index];
+      } else {
+        return sections.indexOf(entry.target);
+      }
+    }
+    return sections.indexOf(entry.target);
+  }
+
+  function createIntersectionObserver(marginTop) {
+    marginTop = Math.floor(marginTop + 10000);
+    let intersectionObserver = new IntersectionObserver(
+      (entries, observe) => {
+        let scrollHeight = document.documentElement.scrollHeight + 100;
+        if (scrollHeight > marginTop) {
+          observe.disconnect();
+          createIntersectionObserver(scrollHeight);
+          return;
+        }
+        let index = findIndex(entries);
+        activateNavByIndex(navItems[index]);
+      },
+      {
+        rootMargin: marginTop + "px 0px -100% 0px",
+        threshold: 0,
+      }
+    );
+    sections.forEach((element) => {
+      element && intersectionObserver.observe(element);
+    });
+  }
+  createIntersectionObserver(document.documentElement.scrollHeight);
+}
+
+document.addEventListener("DOMContentLoaded", listennSidebarTOC);
+document.addEventListener("pjax:success", listennSidebarTOC);
+</script>
+
+<!-- more -->
+
+
+
+
+    
+      
+
+
+<script src="https://cdn.jsdelivr.net/npm/pjax@0.2.8/pjax.min.js"></script>
+
+
+<!-- 样式位于：source/css/_third-party/pjaxanimate.styl -->
+
+<div class="pjax-animate">
+  
+    <script src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script>
+    <div id="loading-bar-wrapper"><script>NProgress.configure({parent:"#loading-bar-wrapper",trickleSpeed: 100})</script></div>
+    <script>
+      window.ShowLoading = function() {
+        NProgress.start();
+      };
+      window.HideLoading = function() {
+        NProgress.done();
+      }
+    </script>
+  
+</div>
+
+
+<script>
+    var pjax;
+    document.addEventListener('DOMContentLoaded', function () {
+      pjax = new Pjax({
+        elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([pjax-fancybox])',
+        selectors: [
+          "title",
+          "#l_cover",
+          "#pjax-container",
+          "#pjax-header-nav-list"
+        ],
+        cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+        timeout: 5000
+      });
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+      //window.stop(); // 相当于点击了浏览器的停止按钮
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      window.subData = null; // 移除标题（用于一二级导航栏切换处）
+      if (typeof $.fancybox != "undefined") {
+        $.fancybox.close();    // 关闭弹窗
+      }
+      volantis.$switcher.removeClass('active'); // 关闭移动端激活的搜索框
+      volantis.$header.removeClass('z_search-open'); // 关闭移动端激活的搜索框
+      volantis.$wrapper.removeClass('sub'); // 跳转页面时关闭二级导航
+
+      // 解绑事件 避免重复监听
+      volantis.$topBtn.unbind('click');
+      $('.menu a').unbind('click');
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+	  
+      window.ShowLoading();
+	  
+    });
+
+    document.addEventListener('pjax:complete', function () {
+      // 关于百度统计对 SPA 页面的处理：
+      // 方案一：百度统计>管理>单页应用设置中，打开开启按钮即可对SPA进行统计。 https://tongji.baidu.com/web/help/article?id=324
+      // 方案二：取消注释下列代码。 https://tongji.baidu.com/web/help/article?id=235
+       
+
+      // 关于谷歌统计对 SPA 页面的处理：
+      // 当应用以动态方式加载内容并更新地址栏中的网址时，也应该更新通过 gtag.js 存储的网页网址。
+      // https://developers.google.cn/analytics/devguides/collection/gtagjs/single-page-applications?hl=zh-cn
+      
+	 
+
+      $('.nav-main').find('.list-v').not('.menu-phone').removeAttr("style",""); // 移除小尾巴的移除
+      $('.menu-phone.list-v').removeAttr("style",""); // 移除小尾巴的移除
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+      try{
+          if (typeof $.fancybox == "undefined") {
+            SCload_fancybox();
+          } else {
+            pjax_fancybox();
+          }
+        
+        
+        
+        
+        
+          pjax_initCopyCode();
+        
+        
+          pjax_valine();
+        
+        
+        
+        
+      } catch (e) {
+        console.log(e);
+      }
+	  
+      window.HideLoading();
+	  
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+	  
+      window.HideLoading();
+	  
+      window.location.href = e.triggerElement.href;
+    });
+</script>
+
+    
+  </div>
+</body>
+</html>
