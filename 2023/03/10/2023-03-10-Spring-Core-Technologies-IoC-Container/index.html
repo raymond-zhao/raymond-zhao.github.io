@@ -501,14 +501,107 @@
 <p>Bean 的定义与组成应用的真是对象是互相对应的，通常，开发者定义服务层对象，持久层对象 repositories 或 DAOs，展示层对象 Web Controller，底层对象如 JPA EntityManageFactory，JMS 队列等。通常来说，并不需要在容器中定义精心雕琢过的领域对象，因为创建和加载领域对象是 repositories 和业务逻辑的责任。</p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://www.springframework.org/schema/beans</span></span></span><br><span class="line"><span class="tag"><span class="string">        https://www.springframework.org/schema/beans/spring-beans.xsd"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"..."</span> <span class="attr">class</span>=<span class="string">"..."</span>&gt;</span>  </span><br><span class="line">        <span class="comment">&lt;!-- collaborators and configuration for this bean go here --&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- id 可被合作对象引用 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"..."</span> <span class="attr">ref</span>=<span class="string">"..."</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"..."</span> <span class="attr">ref</span>=<span class="string">"..."</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"..."</span> <span class="attr">class</span>=<span class="string">"..."</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- collaborators and configuration for this bean go here --&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- more bean definitions go here --&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
-<p>在这面这个例子中，</p>
-<h2 id="容器初始化"><a href="#容器初始化" class="headerlink" title="容器初始化"></a>容器初始化</h2><p>传递给 <code>ApplicationContext</code> 构造器的路径会引导容器从外部资源加载配置元数据，如本地文件系统、Java 类路径等。</p>
+<p>在这面这个例子中，<code>property name</code> 指向 JavaBean 属性，<code>ref</code> 指向另一个 Bean 的定义，<code>id</code> 与 <code>ref</code> 之间的联系表现了协作对象之间的联系。</p>
+<h2 id="初始化容器"><a href="#初始化容器" class="headerlink" title="初始化容器"></a>初始化容器</h2><p>传递给 <code>ApplicationContext</code> 构造器的路径会引导容器从外部资源加载配置元数据，如本地文件系统、Java 类路径等。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ApplicationContext context = <span class="keyword">new</span> ClassPathXmlApplication(<span class="string">"service.xml"</span>, <span class="string">"daos.xml);</span></span><br></pre></td></tr></table></figure>
 
 <blockquote>
-<p>Note: 在了解 Spring IoC 容器之后，也许还需要了解 Spring 的资源 <code>Resource</code> 的设计，<a href="https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#resources" target="_blank" rel="noopener">Resource</a> 提供了便捷的从路径中读取以 URI 语法定义的输入流机制。特别的，<code>Resource</code> 路径被用于构造容器的上下文，详情可参考 <a href="https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#resources-app-ctx" target="_blank" rel="noopener">Application Contexts and Resource Paths</a>。</p>
+<p>Note: 在了解了 Spring IoC 容器之后，也许还需要了解 Spring 的抽象资源 <code>Resource</code>，<a href="https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#resources" target="_blank" rel="noopener">Resource</a> 提供了便捷的从路径中读取以 URI 语法定义的输入流机制。特别的，<code>Resource</code> 路径被用于构造容器的上下文，详情可参考 <a href="https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#resources-app-ctx" target="_blank" rel="noopener">Application Contexts and Resource Paths</a>。</p>
 </blockquote>
+<h3 id="编写基于-XML-配置元数据"><a href="#编写基于-XML-配置元数据" class="headerlink" title="编写基于 XML 配置元数据"></a>编写基于 XML 配置元数据</h3><p>将 Bean 的定义分散在多个不同的 XML 在某些场景下是非常有用的，每一个独立的 XML 配置文件代表了应用架构中的某一个逻辑层。</p>
+<p>可以使用应用上下文构造器加载多个不同 XML 片段中的 Bean 定义，这个构造器接受一个或多个 <code>Resource</code> 路径，也可以在 XML 文件中使用 <code>&lt;import/&gt;</code> 标签加载其他文件中的 Bean 定义，以下是一个例子。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">beans</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">import</span> <span class="attr">resource</span>=<span class="string">"services.xml"</span>/&gt;</span></span><br><span class="line">  	<span class="comment">&lt;!-- 虽然也支持 classpath 与绝对路径，但尽量不要这么做。--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">import</span> <span class="attr">resource</span>=<span class="string">"resources/messageSource.xml"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">import</span> <span class="attr">resource</span>=<span class="string">"/resources/themeSource.xml"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"bean1"</span> <span class="attr">class</span>=<span class="string">"..."</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"bean2"</span> <span class="attr">class</span>=<span class="string">"..."</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
+<h2 id="使用-IoC-容器"><a href="#使用-IoC-容器" class="headerlink" title="使用 IoC 容器"></a>使用 IoC 容器</h2><p><code>ApplicationContext</code> 是管理不同 Bean 注册及其依赖的高级接口，通过 <code>T getBean(String name, Class&lt;T&gt; requiredType)</code> 方法可以获取 Bean 的实例。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建并配置 Bean</span></span><br><span class="line">ApplicationContext context = <span class="keyword">new</span> ClassPathXmlApplication(<span class="string">"services.xml"</span>, <span class="string">"daos.xml"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取配置好的实例</span></span><br><span class="line">PetStoreService service = context.getBean(<span class="string">"petStore"</span>, PetStoreService<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用配置好的实例</span></span><br><span class="line">List&lt;String&gt; userList = service.getUsernameList();</span><br></pre></td></tr></table></figure>
+
+<p><code>ApplicationContext</code> 接口也有一些除 <code>getBean(...)</code> 之外的获取 Bean 实例的方法，但是在应用程序中，一般来说，除非有对 Spring API 的直接调用，否则不应该出现对 <code>getBean</code> 的显式使用。</p>
+<h1 id="Bean-简介"><a href="#Bean-简介" class="headerlink" title="Bean 简介"></a>Bean 简介</h1><p>Spring IoC 容器管理一个或多个 Bean，这些 Bean 通过通过配置元数据被加载到容器之中。在容器内部，这些 Bean 的定义由 <code>BeanDefinition</code> 对象表示，包含以下一些属性：</p>
+<ul>
+<li>包限定类名：通常是某个 Bean 的具体实现类</li>
+<li>Bean 的行为配置元素，表明了 Bean 应该在 Container 的状态与行为，如作用域、生命周期回调等。</li>
+<li>完成当前 Bean 所需功能而对其他 Bean 的引用，这些引用也被称为依赖/合作对象。</li>
+<li>其他需要为新建对象设置的属性，如一个管理连接池的 Bean 所支持的连接数量以及连接池的大小。</li>
+</ul>
+<p>上面这些元数据表明了组成每个 Bean 定义的基本属性，下表则描述了这些属性：</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>链接</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Class</td>
+<td><a href="https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-class" target="_blank" rel="noopener">Bean 的初始化</a></td>
+</tr>
+<tr>
+<td>Name</td>
+<td><a href="https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-beanname" target="_blank" rel="noopener">Bean 的命名</a></td>
+</tr>
+<tr>
+<td>Scope</td>
+<td><a href="https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-scopes" target="_blank" rel="noopener">Bean 的作用域</a></td>
+</tr>
+<tr>
+<td>Constructor arguments</td>
+<td><a href="https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-collaborators" target="_blank" rel="noopener">依赖注入</a></td>
+</tr>
+<tr>
+<td>Properties</td>
+<td><a href="https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-collaborators" target="_blank" rel="noopener">依赖注入</a></td>
+</tr>
+<tr>
+<td>Autowiring mode</td>
+<td><a href="https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-autowire" target="_blank" rel="noopener">自动装配协作器</a></td>
+</tr>
+<tr>
+<td>Lazy initialization mode</td>
+<td><a href="https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-lazy-init" target="_blank" rel="noopener">Bean 的懒初始化</a></td>
+</tr>
+<tr>
+<td>Initialization method</td>
+<td><a href="https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-lifecycle-initializingbean" target="_blank" rel="noopener">初始化回调</a></td>
+</tr>
+<tr>
+<td>Destruction method</td>
+<td><a href="https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-lifecycle-disposablebean" target="_blank" rel="noopener">销毁回调</a></td>
+</tr>
+</tbody></table>
+<p>除去创建某个包含特定 Bean 定义的 Bean 之外，<code>ApplicationContext</code> 的实现也允许某些用户自建对象注册到容器之中，可以通过<code>BeanFactory</code> 的 <code>getBeanFactory()</code> 方法实现，这个方法返回了 <code>DefaultListableBeanFactory</code>。<code>DefaultListableBeanFactory</code> 支持通过 <code>registerSingleton(..)</code> 与 <code>registerBeanDefinition(..)</code> 方法注册 Bean。</p>
+<blockquote>
+<p>Bean 的元数据与手动注册的 Bean 实例需要尽早注册，以便于容器在自动装配及解析时可以正确使用。尽管容器在某种情况下支持重写已存在的元数据和单例实例，但这并不包括在运行时注册 Bean，这可能会导致并发访问，Bean 数据不一致性等问题。</p>
+</blockquote>
+<h2 id="Bean-的命名"><a href="#Bean-的命名" class="headerlink" title="Bean 的命名"></a>Bean 的命名</h2><p>每个 Bean 在容器内可以拥有一个或多个具备唯一性的标识符，但通常来说每个 Bean 只有一个标识符。然而，如果需要有超过一个的标识符，这些标识符可以以“别名（alias）”的形式存在。</p>
+<p>在基于 XML 的配置元数据中，使用 <code>id</code> 和 <code>name</code> 属性作为 Bean 标识符，如果 <code>name</code> 属性有多个值存在时，可以使用逗号 <code>,</code>，分号 <code>;</code> 或空格分隔。</p>
+<p><code>Bean</code> 的 <code>id</code> 和 <code>name</code> 属性并不是必须提供的，如果缺省，容器会为 Bean 创建一个唯一的名字，然而，如果需要使用 <code>ref</code> 属性应用一个 Bean，那就必须提供 <code>name</code>。</p>
+<p>关于为什么可以不提供 <code>name</code>，可以参考 <a href="https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-inner-beans" target="_blank" rel="noopener">inner beans</a> 和 <code>autowiring collaborators</code>。</p>
+<blockquote>
+<p>Bean 一般使用驼峰命名法，并有利于 Spring AOP 应用 <code>Advice</code>。</p>
+</blockquote>
+<blockquote>
+<p>Note</p>
+<p>在扫描类路径中的组件时，Spring 会为未未名的组件生成 Bean 名，规则<strong>是：将类的 simpleName 的首字母转为小写。</strong></p>
+<p>然而，在一些特殊的场景中，如包含不止一个字符的命名中，首字母和第二个字符均为大写时，则会保留原始的命名，此规则定义在 <code>java.beans.Introspector.decapitalize</code>。</p>
+</blockquote>
+<p>为 Bean 起别名的例子：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- fromName 与 toName 均指向同一个 Bean --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">alias</span> <span class="attr">name</span>=<span class="string">"fromName"</span> <span class="attr">alias</span>=<span class="string">"toName"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- 以下两个语句中的三个不同的名字，都指向同一个 Bean --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">alias</span> <span class="attr">name</span>=<span class="string">"myApp-dataSource"</span> <span class="attr">alias</span>=<span class="string">"subsystemA-dataSource"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">alias</span> <span class="attr">name</span>=<span class="string">"myApp-dataSource"</span> <span class="attr">alias</span>=<span class="string">"subsystemB-dataSource"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>另外，也可以使用 Java 代码在 <code>@Bean</code> 注解中添加 <code>alias</code> 属性，可参考 <a href="https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-java-bean-annotation" target="_blank" rel="noopener">Using the @Bean Annotation</a>。</p>
+<h2 id="初始化-Bean"><a href="#初始化-Bean" class="headerlink" title="初始化 Bean"></a>初始化 Bean</h2><p>Bean 的定义本质上是用来创建一个或多个对象的清单/目录/指示，当容器被要求使用某个配置元数据时，容器就在这个清单中查找某个名字的 Bean 定义，并创建出实际的对象。</p>
+<p>在基于 XML 的配置元数据中，通过 <code>&lt;bean/&gt;</code> 元素的 <code>class</code> 属性指定要初始化的对象类型通常是必须的（实际上是 <code>BeanDefinition</code> 实例的 <code>Class</code> 属性），但也有例外，可参考 <a href="https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-class-instance-factory-method" target="_blank" rel="noopener">使用实例工厂方法进行实例化</a> 与 <a href="https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-child-bean-definitions" target="_blank" rel="noopener">Bean 定义与继承</a>，<code>Class</code> 属性有以下两种使用方式：</p>
+<ul>
+<li>通常，容器指定要构建的 Bean 的类型，直接通过反射调用 Bean 的构造器直接创建 Bean，等价于 Java 代码的 <code>new</code> 操作符。</li>
+<li>在包含用于创建对象的静态工厂方法的实际类中，容器直接调用类中的静态工厂方法创建 Bean 这种操作并不常见，通过静态工厂方法返回的对象的类型可能属于同一类型，但也可能完全不同。</li>
+</ul>
+<blockquote>
+<h3 id="内部类名称"><a href="#内部类名称" class="headerlink" title="内部类名称"></a>内部类名称</h3><p>如果需要为内部类配置 Bean 定义，要么使用二进制名，要么使用嵌套类的实际名。</p>
+<p>例如，假设在 <code>com.example</code> 包下存在一个名为 <code>SomeThing</code> 的类，而且 <code>SomeThing</code> 类有一个静态内部类 <code>OtherThing</code>，可以使用 <code>$</code> 或 <code>.</code> 来分割外部类与内部类。所以 Bean 定义中的 <code>class</code> 属性为 <code>com.example.SomeThing$OtherThing</code> 或 <code>com.example.SomeThing.OtherThing</code>。</p>
+</blockquote>
+<h3 id="使用构造器实例化"><a href="#使用构造器实例化" class="headerlink" title="使用构造器实例化"></a>使用构造器实例化</h3><p>当使用构造器创建 Bean 时，所有的普通类对 Spring 来说都是可用的并且可兼容的，简单来说就是开发出的类并不需要实现任何接口或者按照特定的风格编码，只需要指定 Bean 的类即可，然而对于某个 Bean 而言，可能需要根据 IoC 的类型指定一个无参构造器。</p>
+<p>Spring IoC 容器可以虚拟地管理你想要管理的任何类，并不仅限于 JavaBean，但是大多数的 Spring 用户偏向于只拥有一个无参构造器以及若干 <code>getters/setters</code> 的 JavaBean。</p>
+<p>更多关于构造器初始化的内容，可参考 <a href="https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-factory-collaborators" target="_blank" rel="noopener">Injecting Dependenies</a></p>
+<h3 id="使用静态工厂方法实例化"><a href="#使用静态工厂方法实例化" class="headerlink" title="使用静态工厂方法实例化"></a>使用静态工厂方法实例化</h3><h3 id="使用实例工厂方法实例化"><a href="#使用实例工厂方法实例化" class="headerlink" title="使用实例工厂方法实例化"></a>使用实例工厂方法实例化</h3><h3 id="确定-Bean-的运行时类型"><a href="#确定-Bean-的运行时类型" class="headerlink" title="确定 Bean 的运行时类型"></a>确定 Bean 的运行时类型</h3>
   
   
     
@@ -542,10 +635,10 @@
     <div class='new-meta-box'>
       
         
-          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2023-03-12T08:48:21+08:00">
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2023-03-13T10:06:42+08:00">
   <a class='notlink'>
     <i class="fas fa-edit fa-fw" aria-hidden="true"></i>
-    <p>更新于：Mar 12, 2023</p>
+    <p>更新于：Mar 13, 2023</p>
   </a>
 </div>
 
@@ -720,7 +813,7 @@
 
 
     <div class='content'>
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#配置元数据"><span class="toc-text">配置元数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#容器初始化"><span class="toc-text">容器初始化</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#配置元数据"><span class="toc-text">配置元数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#初始化容器"><span class="toc-text">初始化容器</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#编写基于-XML-配置元数据"><span class="toc-text">编写基于 XML 配置元数据</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用-IoC-容器"><span class="toc-text">使用 IoC 容器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Bean-的命名"><span class="toc-text">Bean 的命名</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#初始化-Bean"><span class="toc-text">初始化 Bean</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#内部类名称"><span class="toc-text">内部类名称</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用构造器实例化"><span class="toc-text">使用构造器实例化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用静态工厂方法实例化"><span class="toc-text">使用静态工厂方法实例化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用实例工厂方法实例化"><span class="toc-text">使用实例工厂方法实例化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#确定-Bean-的运行时类型"><span class="toc-text">确定 Bean 的运行时类型</span></a></li></ol></li></ol>
     </div>
   </section>
 
@@ -779,7 +872,7 @@
       
     
       
-        <div><p>博客內容遵循 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh_TW" target="_blank" rel="noopener">姓名標示-非商業性-相同方式分享 4.0 國際 (CC BY-NC-SA 4.0) 協議</a></p>
+        <div><p>博客内容遵循 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener">署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0) 协议</a></p>
 </div>
       
     
@@ -793,7 +886,7 @@
       
         本站使用
         <a href="https://github.com/volantis-x/hexo-theme-volantis/tree/4.0.0" target="_blank" class="codename">Volantis</a>
-        作為主題
+        作为主题
       
     
       
